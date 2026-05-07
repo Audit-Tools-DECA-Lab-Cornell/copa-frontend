@@ -332,13 +332,102 @@ function MetadataRow({
 
 // ── Stat card ────────────────────────────────────────────────────────────────
 
+function useCountUpForCard(target: number | null, duration: number, enabled: boolean): number | null {
+	const [value, setValue] = React.useState(0);
+
+	React.useEffect(() => {
+		if (!enabled || target === null) return;
+
+		let rafId = 0;
+		const start = Date.now();
+
+		const tick = () => {
+			const elapsed = Date.now() - start;
+			const progress = Math.min(elapsed / duration, 1);
+			const ease = 1 - Math.pow(1 - progress, 3);
+			const currentValue = parseFloat((target * ease).toFixed(1));
+			setValue(currentValue);
+
+			if (progress < 1) {
+				rafId = requestAnimationFrame(tick);
+			}
+		};
+
+		rafId = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(rafId);
+	}, [target, duration, enabled]);
+
+	if (target === null) return null;
+	if (!enabled) return target;
+	return value;
+}
+
+interface ReportStatCardProps {
+	label: string;
+	pvValue?: number | null;
+	uValue?: number | null;
+	sValue?: number | null;
+	pvMax?: number;
+	uMax?: number;
+	sMax?: number;
+	displayFormat?: "combined" | "individual" | "sociability";
+	valueColor?: string;
+	stagger?: number;
+}
+
 function ReportStatCard({
 	label,
-	value,
-	helper,
+	pvValue,
+	uValue,
+	sValue,
+	pvMax,
+	uMax,
+	sMax,
+	displayFormat = "individual",
 	valueColor,
 	stagger = 0
-}: Readonly<{ label: string; value: string; helper?: string; valueColor?: string; stagger?: number }>) {
+}: Readonly<ReportStatCardProps>) {
+	const pvAnimated = useCountUpForCard(pvValue ?? null, 900, true);
+	const uAnimated = useCountUpForCard(uValue ?? null, 900, true);
+	const sAnimated = useCountUpForCard(sValue ?? null, 900, true);
+
+	const formatDisplayValue = (): string => {
+		if (displayFormat === "combined") {
+			const pvPct = pvValue != null && pvMax ? Math.round((pvValue / pvMax) * 100) : null;
+			const uPct = uValue != null && uMax ? Math.round((uValue / uMax) * 100) : null;
+			if (pvPct === null || uPct === null) return "Pending";
+			return `PV ${pvPct}% · U ${uPct}%`;
+		}
+
+		if (displayFormat === "sociability") {
+			if (sAnimated === null) return "—";
+			return sAnimated.toFixed(0);
+		}
+
+		// individual format
+		if (label.includes("Play")) {
+			if (pvAnimated === null) return "—";
+			const pct = pvMax && pvValue != null ? Math.round((pvValue / pvMax) * 100) : 0;
+			return `${pvAnimated.toFixed(0)} (${pct}%)`;
+		}
+		if (label.includes("Usability")) {
+			if (uAnimated === null) return "—";
+			const pct = uMax && uValue != null ? Math.round((uValue / uMax) * 100) : 0;
+			return `${uAnimated.toFixed(0)} (${pct}%)`;
+		}
+		if (label.includes("Sociability")) {
+			if (sAnimated === null) return "—";
+			const pct = sMax && sValue != null ? Math.round((sValue / sMax) * 100) : 0;
+			return `${sAnimated.toFixed(0)} (${pct}%)`;
+		}
+
+		// overall format
+		const pvPct = pvValue != null && pvMax ? Math.round((pvValue / pvMax) * 100) : null;
+		const uPct = uValue != null && uMax ? Math.round((uValue / uMax) * 100) : null;
+		if (pvPct === null || uPct === null) return "—";
+		return `PV ${pvPct}% · U ${uPct}%`;
+	};
+
 	return (
 		<Card
 			className="animate-score-reveal relative flex flex-col justify-between gap-3 overflow-hidden border-border bg-card/95"
@@ -354,9 +443,17 @@ function ReportStatCard({
 						"font-heading text-2xl font-bold leading-none tracking-tight tabular-nums sm:text-3xl",
 						valueColor ?? "text-foreground"
 					)}>
-					{value}
+					{formatDisplayValue()}
 				</div>
-				{helper !== undefined ? <p className="text-[11px] leading-4 text-muted-foreground">{helper}</p> : null}
+				{pvMax !== undefined && uMax !== undefined ? (
+					<p className="text-[11px] leading-4 text-muted-foreground">
+						Max PV = {pvMax}, Max U = {uMax}
+					</p>
+				) : sMax !== undefined ? (
+					<p className="text-[11px] leading-4 text-muted-foreground">
+						Max score = {sMax}
+					</p>
+				) : null}
 			</CardContent>
 		</Card>
 	);
@@ -664,10 +761,6 @@ export interface AuditReportViewProps {
  */
 export function AuditReportView({ audit, instrument = null, basePath }: Readonly<AuditReportViewProps>) {
 	const overall = getEffectiveScoreTotals(audit.scores);
-	const overallPvPct = overall !== null ? pct(overall.play_value_total, overall.play_value_total_max) : "—";
-	const overallUPct = overall !== null ? pct(overall.usability_total, overall.usability_total_max) : "—";
-	const overallSocPct = overall !== null ? pct(overall.sociability_total, overall.sociability_total_max) : "—";
-	const overallCombined = overall !== null ? `PV ${overallPvPct} · U ${overallUPct}` : "Pending";
 
 	const domainRows = React.useMemo(() => {
 		if (instrument === null) return [];
@@ -776,33 +869,35 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 				<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
 					<ReportStatCard
 						label="Overall Score"
-						value={overallCombined}
-						helper={
-							overall !== null
-								? `Max PV = ${overall.play_value_total_max}, Max U = ${overall.usability_total_max}`
-								: undefined
-						}
+						pvValue={overall?.play_value_total ?? null}
+						uValue={overall?.usability_total ?? null}
+						pvMax={overall?.play_value_total_max}
+						uMax={overall?.usability_total_max}
+						displayFormat="combined"
 						valueColor="text-accent-terracotta"
 						stagger={0}
 					/>
 					<ReportStatCard
 						label="Play Value"
-						value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "—"}
-						helper={overall !== null ? `Max score = ${overall.play_value_total_max}` : undefined}
+						pvValue={overall?.play_value_total ?? null}
+						pvMax={overall?.play_value_total_max}
+						displayFormat="individual"
 						valueColor="text-accent-terracotta"
 						stagger={60}
 					/>
 					<ReportStatCard
 						label="Usability"
-						value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "—"}
-						helper={overall !== null ? `Max score = ${overall.usability_total_max}` : undefined}
+						uValue={overall?.usability_total ?? null}
+						uMax={overall?.usability_total_max}
+						displayFormat="individual"
 						valueColor="text-accent-slate"
 						stagger={120}
 					/>
 					<ReportStatCard
 						label="Sociability"
-						value={overall !== null ? `${overall.sociability_total} (${overallSocPct})` : "—"}
-						helper={overall !== null ? `Max score = ${overall.sociability_total_max}` : undefined}
+						sValue={overall?.sociability_total ?? null}
+						sMax={overall?.sociability_total_max}
+						displayFormat="sociability"
 						valueColor="text-accent-violet"
 						stagger={180}
 					/>
