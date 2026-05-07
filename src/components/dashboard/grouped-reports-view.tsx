@@ -507,6 +507,7 @@ export function GroupedReportsView({
 	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
 	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
 	const skipNextSearchChangeRef = React.useRef(false);
+	const previousSearchValueRef = React.useRef(searchValue);
 	const tableRows = React.useMemo(() => toReportTableRows(rows), [rows]);
 	const placeGroupsByKey = React.useMemo(() => {
 		const groupedRows = new Map<string, AuditActivityRow[]>();
@@ -518,14 +519,17 @@ export function GroupedReportsView({
 	}, [rows]);
 
 	React.useEffect(() => {
-		if (searchValue !== undefined) {
-			setGlobalFilter(current => {
-				if (current === searchValue) return current;
-				skipNextSearchChangeRef.current = true;
-				return searchValue;
-			});
+		const previousSearchValue = previousSearchValueRef.current;
+		previousSearchValueRef.current = searchValue;
+		if (
+			searchValue !== undefined &&
+			searchValue !== previousSearchValue &&
+			searchValue !== globalFilter
+		) {
+			skipNextSearchChangeRef.current = true;
+			setGlobalFilter(searchValue);
 		}
-	}, [searchValue]);
+	}, [globalFilter, searchValue]);
 
 	React.useEffect(() => {
 		setRowSelection({});
@@ -549,25 +553,25 @@ export function GroupedReportsView({
 		() => [
 			...(onExportSelected
 				? [
-						{
-							id: "select",
-							header: "",
-							enableGrouping: false,
-							cell: ({ row, table }) => {
-								if (row.getIsGrouped()) {
-									return null;
-								}
-								const selection = table.getState().rowSelection;
-								return (
-									<Checkbox
-										checked={Boolean(selection[row.id])}
-										onCheckedChange={checked => row.toggleSelected(checked === true)}
-										aria-label={`Select ${row.original.auditCode}`}
-									/>
-								);
+					{
+						id: "select",
+						header: "",
+						enableGrouping: false,
+						cell: ({ row, table }) => {
+							if (row.getIsGrouped()) {
+								return null;
 							}
-						} satisfies ColumnDef<ReportTableRow>
-					]
+							const selection = table.getState().rowSelection;
+							return (
+								<Checkbox
+									checked={Boolean(selection[row.id])}
+									onCheckedChange={checked => row.toggleSelected(checked === true)}
+									aria-label={`Select ${row.original.auditCode}`}
+								/>
+							);
+						}
+					} satisfies ColumnDef<ReportTableRow>
+				]
 				: []),
 			{
 				accessorKey: "projectGroupKey",
