@@ -370,31 +370,26 @@ export function AuditorDashboardClient() {
 						title={t("stats.assignedPlaces.title")}
 						value={String(summary.total_assigned_places)}
 						helper={t("stats.assignedPlaces.helper")}
-
 					/>
 					<StatCard
 						title={t("stats.inProgress.title")}
 						value={String(summary.in_progress_audits)}
 						helper={t("stats.inProgress.helper")}
-
 					/>
 					<StatCard
 						title={t("stats.submitted.title")}
 						value={String(summary.submitted_audits)}
 						helper={t("stats.submitted.helper")}
-
 					/>
 					<StatCard
 						title={t("stats.pendingPlaces.title")}
 						value={String(summary.pending_places)}
 						helper={t("stats.pendingPlaces.helper")}
-
 					/>
 					<StatCard
 						title={t("stats.meanSubmittedScore.title")}
 						value={formatScoreLabel(summary.average_submitted_score, formatT)}
 						helper={t("stats.meanSubmittedScore.helper")}
-
 					/>
 				</div>
 			) : null}

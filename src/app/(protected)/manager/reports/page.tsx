@@ -263,25 +263,21 @@ export default function ManagerReportsPage() {
 					title="Total Reports"
 					value={String(totalSubmitted)}
 					helper="Submitted audits ready for review."
- 
 				/>
 				<StatCard
 					title="Average Score"
 					value={averageScore ? `PV ${averageScore.pv} | U ${averageScore.u}` : "Pending"}
 					helper="Mean score across all submitted audits."
- 
 				/>
 				<StatCard
 					title="Auditors"
 					value={String(new Set(data?.items.map(a => a.auditor_code)).size)}
 					helper="Unique auditors with submitted reports."
- 
 				/>
 				<StatCard
 					title="Places"
 					value={String(new Set(data?.items.map(a => a.place_id)).size)}
 					helper="Unique places with submitted audits."
- 
 				/>
 			</div>
 			<AuditsTable

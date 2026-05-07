@@ -84,13 +84,11 @@ export default function AdminSystemPage() {
 					title={t("stats.instrumentVersion.title")}
 					value={system.instrument_version}
 					helper={t("stats.instrumentVersion.helper")}
-
 				/>
 				<StatCard
 					title={t("stats.auditSections.title")}
 					value={String(totalSectionCount)}
 					helper={t("stats.auditSections.helper")}
-
 				/>
 				<StatCard
 					title={t("stats.questionCount.title")}
@@ -99,13 +97,11 @@ export default function AdminSystemPage() {
 						preAuditCount: totalPreAuditQuestionCount,
 						sectionCount: totalSectionQuestionCount
 					})}
-
 				/>
 				<StatCard
 					title={t("stats.executionModes.title")}
 					value={String(instrument.execution_modes.length)}
 					helper={t("stats.executionModes.helper")}
-
 				/>
 			</div>
 			<div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">

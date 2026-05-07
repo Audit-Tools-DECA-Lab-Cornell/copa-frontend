@@ -174,7 +174,10 @@ function AlignedBarCell({
 				aria-label={`${metric.label}: ${isNa ? "not assessed" : `${percentage}%`}`}>
 				{!isNa && fillHeight > 0 ? (
 					<div
-						className={cn("w-full rounded-b-sm opacity-90 transition-[height] duration-500 ease-spring", color)}
+						className={cn(
+							"w-full rounded-b-sm opacity-90 transition-[height] duration-500 ease-spring",
+							color
+						)}
 						style={{ height: fillHeight }}
 					/>
 				) : isNa ? (
@@ -450,9 +453,7 @@ function ReportStatCard({
 						Max PV = {pvMax}, Max U = {uMax}
 					</p>
 				) : sMax !== undefined ? (
-					<p className="text-[11px] leading-4 text-muted-foreground">
-						Max score = {sMax}
-					</p>
+					<p className="text-[11px] leading-4 text-muted-foreground">Max score = {sMax}</p>
 				) : null}
 			</CardContent>
 		</Card>
@@ -1013,7 +1014,10 @@ function DomainAccordionItem({
 	const borderColor = getDomainBorderColor(domainKey);
 
 	return (
-		<AccordionItem value={domainKey} className="overflow-hidden rounded-r-md border-y-0 border-r-0 border-l-[3px] bg-surface" style={{ borderLeftColor: borderColor }}>
+		<AccordionItem
+			value={domainKey}
+			className="overflow-hidden rounded-r-md border-y-0 border-r-0 border-l-[3px] bg-surface"
+			style={{ borderLeftColor: borderColor }}>
 			<AccordionTrigger className="px-4 hover:no-underline">
 				<div className="flex flex-1 items-center justify-between gap-3 pr-2">
 					<span className="text-left font-heading text-[13px] font-semibold text-text-primary">{title}</span>

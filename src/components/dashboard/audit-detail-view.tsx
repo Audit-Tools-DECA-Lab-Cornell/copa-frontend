@@ -162,7 +162,6 @@ function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
 				title="Summary Score"
 				value={formatScoreLabel(summaryScore, formatT)}
 				helper="Combined Play Value and Usability total."
- 
 			/>
 			<StatCard
 				title="Play Value"
@@ -172,7 +171,6 @@ function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
 						? `${Math.round(overall.play_value_total * 10) / 10} / ${Math.round(overall.play_value_total_max * 10) / 10}`
 						: "Pending"
 				}
- 
 			/>
 			<StatCard
 				title="Usability"
@@ -182,13 +180,11 @@ function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
 						? `${Math.round(overall.usability_total * 10) / 10} / ${Math.round(overall.usability_total_max * 10) / 10}`
 						: "Pending"
 				}
- 
 			/>
 			<StatCard
 				title="Duration"
 				value={audit.total_minutes !== null ? `${audit.total_minutes} min` : "—"}
 				helper="Total audit session duration."
- 
 			/>
 		</div>
 	);

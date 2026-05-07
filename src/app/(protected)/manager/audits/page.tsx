@@ -292,25 +292,21 @@ export default function ManagerAuditsPage() {
 					title={t("stats.totalAudits.title")}
 					value={String(auditsQuery.data.summary.total_audits)}
 					helper={t("stats.totalAudits.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}
 					value={String(auditsQuery.data.summary.submitted_audits)}
 					helper={t("stats.submitted.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
 					value={String(auditsQuery.data.summary.in_progress_audits)}
 					helper={t("stats.inProgress.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.meanScore.title")}
 					value={formatScoreLabel(auditsQuery.data.summary.average_score, formatT)}
 					helper={t("stats.meanScore.helper")}
- 
 				/>
 			</div>
 			<AuditsTable

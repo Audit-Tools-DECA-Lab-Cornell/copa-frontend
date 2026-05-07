@@ -17,5 +17,5 @@ export const CHART_COLORS = {
 	grid: "var(--edge)",
 	axis: "var(--text-muted)",
 	tooltipBg: "var(--surface-raised)",
-	tooltipBorder: "var(--edge)",
+	tooltipBorder: "var(--edge)"
 } as const;

@@ -229,20 +229,17 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 					title={t("stats.assignments.title")}
 					value={String(auditor.assignments_count)}
 					helper={t("stats.assignments.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.completedAudits.title")}
 					value={String(auditor.completed_audits)}
 					helper={t("stats.completedAudits.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.lastActive.title")}
 					value={formatDateTimeLabel(auditor.last_active_at, formatT)}
 					valueClassName="font-sans text-lg leading-snug md:text-xl"
 					helper={t("stats.lastActive.helper")}
- 
 				/>
 			</div>
 

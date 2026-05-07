@@ -329,11 +329,11 @@ export function ManagerDashboardClient({
 				</Card>
 
 				<ProjectStatusPanel
-					projects={projects.map((p) => ({
+					projects={projects.map(p => ({
 						name: p.name,
 						completedPlaces: p.audits_completed ?? 0,
 						inProgressPlaces: 0,
-						totalPlaces: p.places_count ?? 0,
+						totalPlaces: p.places_count ?? 0
 					}))}
 				/>
 			</div>

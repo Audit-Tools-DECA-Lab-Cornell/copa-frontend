@@ -193,19 +193,16 @@ export default function ManagerPlaceDetailPage() {
 					title={t("stats.submitted.title")}
 					value={String(history.submitted_audits)}
 					helper={t("stats.submitted.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
 					value={String(history.in_progress_audits)}
 					helper={t("stats.inProgress.helper")}
- 
 				/>
 				<StatCard
 					title="Overall PV/U"
 					value={formatScorePairLabel(history.overall_scores, formatT)}
 					helper={t("stats.meanScore.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.latestSubmitted.title")}
@@ -216,7 +213,6 @@ export default function ManagerPlaceDetailPage() {
 					}
 					valueClassName="font-sans text-lg leading-snug md:text-xl"
 					helper={t("stats.latestSubmitted.helper")}
- 
 				/>
 			</div>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

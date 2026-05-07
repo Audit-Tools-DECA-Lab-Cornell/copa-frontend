@@ -462,19 +462,16 @@ export default function ManagerPlacesPage() {
 					title={t("stats.totalPlaces.title")}
 					value={String(placesQuery.data.summary.total_places)}
 					helper={t("stats.totalPlaces.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}
 					value={String(placesQuery.data.summary.completed_place_audits)}
 					helper={t("stats.submitted.helper")}
- 
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
 					value={String(placesQuery.data.summary.completed_place_surveys)}
 					helper={t("stats.inProgress.helper")}
- 
 				/>
 				<StatCard title="Overall PV/U" value={meanScore} helper={t("stats.meanScore.helper")} />
 			</div>
