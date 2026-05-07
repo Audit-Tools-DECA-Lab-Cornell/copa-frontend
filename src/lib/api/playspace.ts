@@ -579,7 +579,30 @@ export const playspaceApi = {
 			delete: async (placeId: string): Promise<void> =>
 				fetchNoContent(`/playspace/places/${encodeURIComponent(placeId)}`, {
 					method: "DELETE"
-				})
+				}),
+			savePlaceReport: async (
+				placeId: string,
+				payload: {
+					report_type: "combined" | "full_assessment";
+					audit_id?: string | null;
+					survey_id?: string | null;
+					submission_id?: string | null;
+				}
+			): Promise<PlaceDetail> =>
+				fetchValidatedJson(
+					`/playspace/places/${encodeURIComponent(placeId)}/place-reports`,
+					placeDetailSchema,
+					{
+						method: "POST",
+						body: JSON.stringify(payload)
+					}
+				),
+			deletePlaceReport: async (placeId: string, reportIndex: number): Promise<PlaceDetail> =>
+				fetchValidatedJson(
+					`/playspace/places/${encodeURIComponent(placeId)}/place-reports/${reportIndex}`,
+					placeDetailSchema,
+					{ method: "DELETE" }
+				)
 		},
 		auditors: {
 			create: async (payload: z.infer<typeof auditorCreateRequestSchema>): Promise<AuditorProfileDetail> => {

@@ -194,6 +194,14 @@ export const placeAuditHistoryItemSchema = z.object({
 	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
+export const savedPlaceReportEntrySchema = z.object({
+	report_type: z.enum(["combined", "full_assessment"]),
+	audit_id: z.string().uuid().nullable().optional().default(null),
+	survey_id: z.string().uuid().nullable().optional().default(null),
+	submission_id: z.string().uuid().nullable().optional().default(null),
+	created_at: z.string().datetime()
+});
+
 export const placeHistorySchema = z.object({
 	place_id: z.string().uuid(),
 	place_name: z.string(),
@@ -212,6 +220,7 @@ export const placeHistorySchema = z.object({
 	average_submitted_score: z.number().nullable(),
 	latest_submitted_at: z.string().datetime().nullable(),
 	audits: z.array(placeAuditHistoryItemSchema),
+	saved_place_reports: z.array(savedPlaceReportEntrySchema).optional().default([]),
 	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
 	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
 	place_audit_count: z.number().int().nonnegative().optional().default(0),
@@ -339,6 +348,7 @@ export const placeDetailSchema = z.object({
 	end_date: z.string().date().nullable(),
 	est_auditors: z.number().int().nullable(),
 	auditor_description: z.string().nullable(),
+	saved_place_reports: z.array(savedPlaceReportEntrySchema).optional().default([]),
 	created_at: z.string().datetime()
 });
 
@@ -961,6 +971,7 @@ export type AuditorSummary = z.infer<typeof auditorSummarySchema>;
 export type PlaceSummary = z.infer<typeof placeSummarySchema>;
 export type PlayspaceType = z.infer<typeof playspaceTypeSchema>;
 export type PlaceAuditHistoryItem = z.infer<typeof placeAuditHistoryItemSchema>;
+export type SavedPlaceReportEntry = z.infer<typeof savedPlaceReportEntrySchema>;
 export type PlaceHistory = z.infer<typeof placeHistorySchema>;
 export type ManagerPlacesSummary = z.infer<typeof managerPlacesSummarySchema>;
 export type ManagerPlaceRow = z.infer<typeof managerPlaceRowSchema>;

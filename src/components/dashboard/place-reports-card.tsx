@@ -1,0 +1,151 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FileTextIcon, PlusCircleIcon, Trash2Icon, ExternalLinkIcon } from "lucide-react";
+
+import type { SavedPlaceReportEntry } from "@/lib/api/playspace";
+import { playspaceApi } from "@/lib/api/playspace";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+interface PlaceReportsCardProps {
+	placeId: string;
+	projectId: string;
+	savedReports: SavedPlaceReportEntry[];
+	rolePrefix: "admin" | "manager";
+}
+
+function formatDate(iso: string): string {
+	const d = new Date(iso);
+	return Number.isNaN(d.getTime())
+		? iso
+		: d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix }: PlaceReportsCardProps) {
+	const queryClient = useQueryClient();
+
+	const deleteMutation = useMutation({
+		mutationFn: (index: number) => playspaceApi.management.places.deletePlaceReport(placeId, index),
+		onSuccess: () => {
+			void queryClient.invalidateQueries({ queryKey: ["playspace", rolePrefix, "placeHistory"] });
+			void queryClient.invalidateQueries({
+				queryKey: ["playspace", "manager", "placeHistory", projectId, placeId]
+			});
+		}
+	});
+
+	function buildReportHref(report: SavedPlaceReportEntry): string {
+		const base = `/${rolePrefix}/reports/place-report`;
+		if (report.report_type === "combined" && report.audit_id && report.survey_id) {
+			return `${base}?audit=${report.audit_id}&survey=${report.survey_id}&placeId=${placeId}`;
+		}
+		if (report.submission_id) {
+			return `${base}?submission=${report.submission_id}&placeId=${placeId}`;
+		}
+		return base;
+	}
+
+	function buildNewReportHref(): string {
+		return `/${rolePrefix}/reports?placeId=${placeId}`;
+	}
+
+	return (
+		<Card>
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<div>
+						<CardTitle className="flex items-center gap-2 text-base">
+							<FileTextIcon className="size-4" />
+							Place Reports
+						</CardTitle>
+						<CardDescription>
+							Saved report combinations for this place. Go to{" "}
+							<Link
+								href={buildNewReportHref()}
+								className="underline underline-offset-2 hover:text-foreground">
+								Reports
+							</Link>{" "}
+							to build a new one.
+						</CardDescription>
+					</div>
+					<Button asChild variant="outline" size="sm">
+						<Link href={buildNewReportHref()}>
+							<PlusCircleIcon data-icon="inline-start" />
+							Build Report
+						</Link>
+					</Button>
+				</div>
+			</CardHeader>
+
+			{savedReports.length > 0 && (
+				<>
+					<Separator />
+					<CardContent className="pt-4">
+						<div className="flex flex-col gap-2">
+							{savedReports.map((report, index) => (
+								<div
+									key={`${report.report_type}-${report.created_at}-${index}`}
+									className="flex items-center gap-3 rounded-md border px-4 py-3">
+									<div className="flex-1">
+										<div className="flex items-center gap-2">
+											<Badge
+												variant={report.report_type === "combined" ? "default" : "secondary"}>
+												{report.report_type === "combined"
+													? "Full Assessment (combined)"
+													: "Full Assessment"}
+											</Badge>
+											<span className="text-xs text-muted-foreground">
+												Saved {formatDate(report.created_at)}
+											</span>
+										</div>
+										{report.report_type === "combined" && report.audit_id && report.survey_id && (
+											<p className="mt-1 font-mono text-xs text-muted-foreground">
+												A: {report.audit_id.slice(0, 8)}… · S: {report.survey_id.slice(0, 8)}…
+											</p>
+										)}
+										{report.report_type === "full_assessment" && report.submission_id && (
+											<p className="mt-1 font-mono text-xs text-muted-foreground">
+												{report.submission_id.slice(0, 8)}…
+											</p>
+										)}
+									</div>
+									<div className="flex items-center gap-1">
+										<Button asChild variant="ghost" size="sm">
+											<Link href={buildReportHref(report)}>
+												<ExternalLinkIcon data-icon="inline-start" />
+												View
+											</Link>
+										</Button>
+										<Button
+											type="button"
+											variant="ghost"
+											size="sm"
+											disabled={deleteMutation.isPending}
+											onClick={() => deleteMutation.mutate(index)}
+											className="text-destructive hover:text-destructive">
+											<Trash2Icon data-icon="inline-start" />
+											Remove
+										</Button>
+									</div>
+								</div>
+							))}
+						</div>
+					</CardContent>
+				</>
+			)}
+
+			{savedReports.length === 0 && (
+				<CardContent className="py-6 text-center">
+					<p className="text-sm text-muted-foreground">
+						No place reports saved yet. Build one from the Reports page.
+					</p>
+				</CardContent>
+			)}
+		</Card>
+	);
+}

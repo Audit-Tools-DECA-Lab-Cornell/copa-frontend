@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { FilterIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import {
@@ -115,6 +116,7 @@ function FilterPopover({ title, options, selectedValues, onChange }: FilterPopov
 export default function AdminPlacesPage() {
 	const t = useTranslations("admin.places");
 	const formatT = useTranslations("common.format");
+	const router = useRouter();
 	const [sorting, setSorting] = React.useState<SortingState>([{ id: "last_audited_at", desc: true }]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [pagination, setPagination] = React.useState<PaginationState>({
@@ -415,6 +417,11 @@ export default function AdminPlacesPage() {
 				rowCount={placesQuery.data.total_count}
 				pageCount={placesQuery.data.total_pages}
 				isFetching={placesQuery.isFetching}
+				onRowClick={(row: AdminPlaceRow) => {
+					router.push(
+						`/admin/places/${encodeURIComponent(row.place_id)}?projectId=${encodeURIComponent(row.project_id)}`
+					);
+				}}
 			/>
 		</div>
 	);

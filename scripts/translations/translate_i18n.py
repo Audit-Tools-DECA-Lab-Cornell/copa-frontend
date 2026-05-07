@@ -20,7 +20,6 @@ from __future__ import annotations
 import argparse
 import copy
 import json
-import os
 import re
 import subprocess
 import sys
@@ -31,6 +30,7 @@ from typing import Final, Literal, TypeAlias, cast
 import litellm
 
 from dotenv import find_dotenv, load_dotenv
+
 load_dotenv(find_dotenv(), override=True)
 
 FileKind: TypeAlias = Literal["json", "instrument", "instrument-json"]
@@ -39,8 +39,10 @@ TranslationPath: TypeAlias = tuple[PathToken, ...]
 JsonScalar: TypeAlias = str | int | float | bool | None
 JsonValue: TypeAlias = JsonScalar | list["JsonValue"] | dict[str, "JsonValue"]
 
+
 class MissingValue:
     """Sentinel used to differentiate absent values from explicit null values."""
+
 
 MaybeJsonValue: TypeAlias = JsonValue | MissingValue
 
@@ -86,12 +88,15 @@ NON_TRANSLATABLE_KEYS: Final[set[str]] = {
 
 MISSING: Final[MissingValue] = MissingValue()
 
+
 class TranslationScriptError(Exception):
     """Base error type for translation-script failures."""
+
 
 @dataclass(frozen=True)
 class ScriptConfig:
     """Runtime configuration for the translation script."""
+
     repo_root: Path
     locales_dir: Path
     source_locale: str
@@ -108,32 +113,41 @@ class ScriptConfig:
     batch_character_limit: int
     verbose: bool
 
+
 @dataclass(frozen=True)
 class TranslatableFile:
     """Description of one locale file that may need translations."""
+
     kind: FileKind
     locale: str
     source_path: Path
     target_path: Path
 
+
 @dataclass(frozen=True)
 class TranslationEntry:
     """One source string that should be translated into the target locale."""
+
     identifier: str
     path: TranslationPath
     source_text: str
 
+
 @dataclass(frozen=True)
 class TranslationBatch:
     """A bounded set of translation entries for one API request."""
+
     entries: tuple[TranslationEntry, ...]
+
 
 @dataclass(frozen=True)
 class FileTranslationResult:
     """Summary for one translated file."""
+
     file: TranslatableFile
     translated_count: int
     updated: bool
+
 
 def main() -> int:
     """Parse CLI arguments, translate requested files, and return an exit code."""
@@ -153,6 +167,7 @@ def main() -> int:
         print(f"Unexpected error: {error}", file=sys.stderr)
         return 1
 
+
 def build_config() -> ScriptConfig:
     """Build a validated runtime config from CLI arguments and repo defaults."""
     repo_root = Path(__file__).resolve().parents[2]
@@ -169,7 +184,9 @@ def build_config() -> ScriptConfig:
 
     source_locale_path = locales_dir / f"{source_locale}.json"
     if not source_locale_path.is_file():
-        raise TranslationScriptError(f"Source locale file was not found: {source_locale_path}")
+        raise TranslationScriptError(
+            f"Source locale file was not found: {source_locale_path}"
+        )
 
     target_locales = resolve_target_locales(
         locales_dir=locales_dir,
@@ -194,6 +211,7 @@ def build_config() -> ScriptConfig:
         batch_character_limit=args.batch_character_limit,
         verbose=args.verbose,
     )
+
 
 def build_argument_parser(locales_dir: Path) -> argparse.ArgumentParser:
     """Create the CLI argument parser."""
@@ -272,12 +290,19 @@ def build_argument_parser(locales_dir: Path) -> argparse.ArgumentParser:
     )
     return parser
 
-def resolve_target_locales(locales_dir: Path, source_locale: str, requested_locales: tuple[str, ...]) -> tuple[str, ...]:
+
+def resolve_target_locales(
+    locales_dir: Path, source_locale: str, requested_locales: tuple[str, ...]
+) -> tuple[str, ...]:
     """Resolve which target locale folders should be processed."""
     if len(requested_locales) > 0:
-        cleaned_locales = tuple(locale.strip() for locale in requested_locales if locale.strip() != "")
+        cleaned_locales = tuple(
+            locale.strip() for locale in requested_locales if locale.strip() != ""
+        )
         if len(cleaned_locales) == 0:
-            raise TranslationScriptError("At least one non-empty --target-locale value is required.")
+            raise TranslationScriptError(
+                "At least one non-empty --target-locale value is required."
+            )
         return cleaned_locales
 
     discovered_locales = tuple(
@@ -291,7 +316,10 @@ def resolve_target_locales(locales_dir: Path, source_locale: str, requested_loca
         raise TranslationScriptError("No target locale files were found.")
     return discovered_locales
 
-def translate_requested_files(config: ScriptConfig, translator: LiteLLMTranslator) -> list[FileTranslationResult]:
+
+def translate_requested_files(
+    config: ScriptConfig, translator: LiteLLMTranslator
+) -> list[FileTranslationResult]:
     """Translate all files selected by the current CLI configuration."""
     source_instrument_bundle: JsonValue | None = None
     results: list[FileTranslationResult] = []
@@ -304,9 +332,13 @@ def translate_requested_files(config: ScriptConfig, translator: LiteLLMTranslato
 
         for file in locale_files:
             if file.kind == "json":
-                result = translate_json_file(config=config, translator=translator, file=file)
+                result = translate_json_file(
+                    config=config, translator=translator, file=file
+                )
             elif file.kind == "instrument-json":
-                result = translate_instrument_json_file(config=config, translator=translator, file=file)
+                result = translate_instrument_json_file(
+                    config=config, translator=translator, file=file
+                )
             else:
                 if source_instrument_bundle is None:
                     source_instrument_bundle = load_instrument_bundle(
@@ -323,31 +355,72 @@ def translate_requested_files(config: ScriptConfig, translator: LiteLLMTranslato
             results.append(result)
     return results
 
-def discover_translatable_files(config: ScriptConfig, locale: str) -> list[TranslatableFile]:
+
+def discover_translatable_files(
+    config: ScriptConfig, locale: str
+) -> list[TranslatableFile]:
     """List locale files that match the requested format and optional file filters."""
     source_locale_path = config.locales_dir / f"{config.source_locale}.json"
     target_locale_path = config.locales_dir / f"{locale}.json"
     files: list[TranslatableFile] = []
 
     if config.format_filter in ("all", "json"):
-        files.append(TranslatableFile(kind="json", locale=locale, source_path=source_locale_path, target_path=target_locale_path))
+        files.append(
+            TranslatableFile(
+                kind="json",
+                locale=locale,
+                source_path=source_locale_path,
+                target_path=target_locale_path,
+            )
+        )
 
     if config.format_filter in ("all", "instrument"):
         instrument_export_prefix = locale_to_export_prefix(locale)
-        files.append(TranslatableFile(kind="instrument", locale=locale, source_path=config.repo_root / "src" / "lib" / "enInstrument.ts", target_path=config.repo_root / "src" / "lib" / f"{instrument_export_prefix}Instrument.ts"))
+        files.append(
+            TranslatableFile(
+                kind="instrument",
+                locale=locale,
+                source_path=config.repo_root / "src" / "lib" / "enInstrument.ts",
+                target_path=config.repo_root
+                / "src"
+                / "lib"
+                / f"{instrument_export_prefix}Instrument.ts",
+            )
+        )
 
     if config.format_filter in ("all", "instrument-json"):
         possible_roots = [config.repo_root, config.repo_root.parent]
         for root in possible_roots:
             root_json = root / f"{locale}.json"
             if root_json.is_file():
-                files.append(TranslatableFile(kind="instrument-json", locale=locale, source_path=root_json, target_path=root_json))
+                files.append(
+                    TranslatableFile(
+                        kind="instrument-json",
+                        locale=locale,
+                        source_path=root_json,
+                        target_path=root_json,
+                    )
+                )
             for path in root.rglob("*.instrument.json"):
-                if "node_modules" in path.parts: continue
-                files.append(TranslatableFile(kind="instrument-json", locale=locale, source_path=path, target_path=path))
+                if "node_modules" in path.parts:
+                    continue
+                files.append(
+                    TranslatableFile(
+                        kind="instrument-json",
+                        locale=locale,
+                        source_path=path,
+                        target_path=path,
+                    )
+                )
 
-    if len(config.file_filters) == 0: return files
-    return [file for file in files if file_matches_filters(file=file, filters=config.file_filters)]
+    if len(config.file_filters) == 0:
+        return files
+    return [
+        file
+        for file in files
+        if file_matches_filters(file=file, filters=config.file_filters)
+    ]
+
 
 def file_matches_filters(file: TranslatableFile, filters: tuple[str, ...]) -> bool:
     """Return True when a file path matches any of the user-provided suffix filters."""
@@ -355,51 +428,117 @@ def file_matches_filters(file: TranslatableFile, filters: tuple[str, ...]) -> bo
     target_suffix = file.target_path.as_posix()
     for value in filters:
         normalized_filter = value.strip().replace("\\", "/")
-        if normalized_filter == "": continue
-        if source_suffix.endswith(normalized_filter) or target_suffix.endswith(normalized_filter): return True
+        if normalized_filter == "":
+            continue
+        if source_suffix.endswith(normalized_filter) or target_suffix.endswith(
+            normalized_filter
+        ):
+            return True
     return False
 
-def translate_json_file(config: ScriptConfig, translator: LiteLLMTranslator, file: TranslatableFile) -> FileTranslationResult:
+
+def translate_json_file(
+    config: ScriptConfig, translator: LiteLLMTranslator, file: TranslatableFile
+) -> FileTranslationResult:
     """Translate one JSON namespace file."""
     source_data = cast(JsonValue, read_json_file(file.source_path))
-    current_target_data: JsonValue = cast(JsonValue, read_json_file(file.target_path)) if file.target_path.is_file() else cast(JsonValue, {})
-    translation_entries = collect_translation_entries(source_value=source_data, current_value=current_target_data, overwrite=config.overwrite)
+    current_target_data: JsonValue = (
+        cast(JsonValue, read_json_file(file.target_path))
+        if file.target_path.is_file()
+        else cast(JsonValue, {})
+    )
+    translation_entries = collect_translation_entries(
+        source_value=source_data,
+        current_value=current_target_data,
+        overwrite=config.overwrite,
+    )
 
     if len(translation_entries) == 0:
-        print(f"Skipping {file.target_path.relative_to(config.repo_root)} (no missing strings).")
+        print(
+            f"Skipping {file.target_path.relative_to(config.repo_root)} (no missing strings)."
+        )
         return FileTranslationResult(file=file, translated_count=0, updated=False)
 
-    print(f"Translating {len(translation_entries)} strings in {file.target_path.relative_to(config.repo_root)} ...")
-    translated_mapping = translator.translate_entries(target_locale=file.locale, entries=translation_entries)
-    next_target_data = merge_translations_into_value(source_value=source_data, current_value=current_target_data, translated_mapping=translated_mapping)
-    ordered_output = reorder_like_source(source_value=source_data, target_value=next_target_data)
+    print(
+        f"Translating {len(translation_entries)} strings in {file.target_path.relative_to(config.repo_root)} ..."
+    )
+    translated_mapping = translator.translate_entries(
+        target_locale=file.locale, entries=translation_entries
+    )
+    next_target_data = merge_translations_into_value(
+        source_value=source_data,
+        current_value=current_target_data,
+        translated_mapping=translated_mapping,
+    )
+    ordered_output = reorder_like_source(
+        source_value=source_data, target_value=next_target_data
+    )
 
-    if not config.dry_run: write_json_file(path=file.target_path, value=ordered_output)
-    return FileTranslationResult(file=file, translated_count=len(translation_entries), updated=not config.dry_run)
+    if not config.dry_run:
+        write_json_file(path=file.target_path, value=ordered_output)
+    return FileTranslationResult(
+        file=file, translated_count=len(translation_entries), updated=not config.dry_run
+    )
 
-def translate_instrument_file(config: ScriptConfig, translator: LiteLLMTranslator, file: TranslatableFile, source_bundle: JsonValue) -> FileTranslationResult:
+
+def translate_instrument_file(
+    config: ScriptConfig,
+    translator: LiteLLMTranslator,
+    file: TranslatableFile,
+    source_bundle: JsonValue,
+) -> FileTranslationResult:
     """Translate one compact instrument bundle."""
-    current_target_bundle = load_instrument_bundle(repo_root=config.repo_root, mode="current", locale=file.locale)
-    translation_entries = collect_translation_entries(source_value=source_bundle, current_value=current_target_bundle, overwrite=config.overwrite, skip_keys=NON_TRANSLATABLE_KEYS)
+    current_target_bundle = load_instrument_bundle(
+        repo_root=config.repo_root, mode="current", locale=file.locale
+    )
+    translation_entries = collect_translation_entries(
+        source_value=source_bundle,
+        current_value=current_target_bundle,
+        overwrite=config.overwrite,
+        skip_keys=NON_TRANSLATABLE_KEYS,
+    )
 
     if len(translation_entries) == 0:
-        print(f"Skipping {file.target_path.relative_to(config.repo_root)} (no missing strings).")
+        print(
+            f"Skipping {file.target_path.relative_to(config.repo_root)} (no missing strings)."
+        )
         return FileTranslationResult(file=file, translated_count=0, updated=False)
 
-    print(f"Translating {len(translation_entries)} strings in {file.target_path.relative_to(config.repo_root)} ...")
-    translated_mapping = translator.translate_entries(target_locale=file.locale, entries=translation_entries)
-    next_target_bundle = merge_translations_into_value(source_value=source_bundle, current_value=current_target_bundle, translated_mapping=translated_mapping)
-    ordered_output = reorder_like_source(source_value=source_bundle, target_value=next_target_bundle)
+    print(
+        f"Translating {len(translation_entries)} strings in {file.target_path.relative_to(config.repo_root)} ..."
+    )
+    translated_mapping = translator.translate_entries(
+        target_locale=file.locale, entries=translation_entries
+    )
+    next_target_bundle = merge_translations_into_value(
+        source_value=source_bundle,
+        current_value=current_target_bundle,
+        translated_mapping=translated_mapping,
+    )
+    ordered_output = reorder_like_source(
+        source_value=source_bundle, target_value=next_target_bundle
+    )
 
-    if not config.dry_run: write_instrument_typescript(path=file.target_path, locale=file.locale, value=ordered_output)
-    return FileTranslationResult(file=file, translated_count=len(translation_entries), updated=not config.dry_run)
+    if not config.dry_run:
+        write_instrument_typescript(
+            path=file.target_path, locale=file.locale, value=ordered_output
+        )
+    return FileTranslationResult(
+        file=file, translated_count=len(translation_entries), updated=not config.dry_run
+    )
 
-def translate_instrument_json_file(config: ScriptConfig, translator: LiteLLMTranslator, file: TranslatableFile) -> FileTranslationResult:
+
+def translate_instrument_json_file(
+    config: ScriptConfig, translator: LiteLLMTranslator, file: TranslatableFile
+) -> FileTranslationResult:
     """Translate one instrument JSON file."""
     all_data = read_json_file(file.target_path)
-    if not isinstance(all_data, dict): raise TranslationScriptError(f"Expected a dict in {file.target_path}")
+    if not isinstance(all_data, dict):
+        raise TranslationScriptError(f"Expected a dict in {file.target_path}")
 
-    is_multi_locale = config.source_locale in all_data and isinstance(all_data[config.source_locale], dict)
+    is_multi_locale = config.source_locale in all_data and isinstance(
+        all_data[config.source_locale], dict
+    )
     if is_multi_locale:
         source_data = all_data[config.source_locale]
         current_target_data = all_data.get(file.locale, {})
@@ -411,16 +550,33 @@ def translate_instrument_json_file(config: ScriptConfig, translator: LiteLLMTran
             source_data = all_data
             current_target_data = {}
 
-    translation_entries = collect_translation_entries(source_value=source_data, current_value=current_target_data, overwrite=config.overwrite, skip_keys=NON_TRANSLATABLE_KEYS)
+    translation_entries = collect_translation_entries(
+        source_value=source_data,
+        current_value=current_target_data,
+        overwrite=config.overwrite,
+        skip_keys=NON_TRANSLATABLE_KEYS,
+    )
 
     if len(translation_entries) == 0:
-        print(f"Skipping {file.target_path.name} locale {file.locale} (no missing strings).")
+        print(
+            f"Skipping {file.target_path.name} locale {file.locale} (no missing strings)."
+        )
         return FileTranslationResult(file=file, translated_count=0, updated=False)
 
-    print(f"Translating {len(translation_entries)} strings in {file.target_path.name} locale {file.locale} ...")
-    translated_mapping = translator.translate_entries(target_locale=file.locale, entries=translation_entries)
-    next_target_data = merge_translations_into_value(source_value=source_data, current_value=current_target_data, translated_mapping=translated_mapping)
-    ordered_output = reorder_like_source(source_value=source_data, target_value=next_target_data)
+    print(
+        f"Translating {len(translation_entries)} strings in {file.target_path.name} locale {file.locale} ..."
+    )
+    translated_mapping = translator.translate_entries(
+        target_locale=file.locale, entries=translation_entries
+    )
+    next_target_data = merge_translations_into_value(
+        source_value=source_data,
+        current_value=current_target_data,
+        translated_mapping=translated_mapping,
+    )
+    ordered_output = reorder_like_source(
+        source_value=source_data, target_value=next_target_data
+    )
 
     if not config.dry_run:
         if is_multi_locale:
@@ -429,10 +585,15 @@ def translate_instrument_json_file(config: ScriptConfig, translator: LiteLLMTran
         else:
             write_json_file(path=file.target_path, value=ordered_output)
 
-    return FileTranslationResult(file=file, translated_count=len(translation_entries), updated=not config.dry_run)
+    return FileTranslationResult(
+        file=file, translated_count=len(translation_entries), updated=not config.dry_run
+    )
+
 
 def read_json_file(path: Path) -> JsonValue:
-    with path.open("r", encoding="utf-8") as f: return cast(JsonValue, json.load(f))
+    with path.open("r", encoding="utf-8") as f:
+        return cast(JsonValue, json.load(f))
+
 
 def write_json_file(path: Path, value: JsonValue) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -440,141 +601,240 @@ def write_json_file(path: Path, value: JsonValue) -> None:
         json.dump(value, f, ensure_ascii=False, indent=4)
         f.write("\n")
 
+
 def write_instrument_typescript(path: Path, locale: str, value: JsonValue) -> None:
     export_name = f"{locale_to_export_prefix(locale)}InstrumentTranslations"
     path.parent.mkdir(parents=True, exist_ok=True)
     serialized = json.dumps(value, ensure_ascii=False, indent=4)
     content = f'import type {{ InstrumentTranslations }} from "@/lib/instrument-translations";\n\nexport const {export_name} = {serialized} satisfies InstrumentTranslations;\n'
-    with path.open("w", encoding="utf-8", newline="\n") as f: f.write(content)
+    with path.open("w", encoding="utf-8", newline="\n") as f:
+        f.write(content)
 
-def load_instrument_bundle(repo_root: Path, mode: Literal["source", "current"], locale: str) -> JsonValue:
+
+def load_instrument_bundle(
+    repo_root: Path, mode: Literal["source", "current"], locale: str
+) -> JsonValue:
     helper = repo_root / "scripts" / "translations" / "export_instrument_bundle.mjs"
-    proc = subprocess.run(["node", str(helper), mode, locale], cwd=repo_root, capture_output=True, text=True)
-    if proc.returncode != 0: raise TranslationScriptError(f"Failed to export bundle: {proc.stderr}")
+    proc = subprocess.run(
+        ["node", str(helper), mode, locale],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        raise TranslationScriptError(f"Failed to export bundle: {proc.stderr}")
     return cast(JsonValue, json.loads(proc.stdout))
 
-def collect_translation_entries(source_value: JsonValue, current_value: MaybeJsonValue, overwrite: bool, path: TranslationPath = (), skip_keys: set[str] | None = None) -> list[TranslationEntry]:
+
+def collect_translation_entries(
+    source_value: JsonValue,
+    current_value: MaybeJsonValue,
+    overwrite: bool,
+    path: TranslationPath = (),
+    skip_keys: set[str] | None = None,
+) -> list[TranslationEntry]:
     entries: list[TranslationEntry] = []
     if isinstance(source_value, str):
         if should_translate_string(source_value, current_value, overwrite):
-            entries.append(TranslationEntry(identifier=translation_path_to_identifier(path), path=path, source_text=source_value))
+            entries.append(
+                TranslationEntry(
+                    identifier=translation_path_to_identifier(path),
+                    path=path,
+                    source_text=source_value,
+                )
+            )
         return entries
     if isinstance(source_value, list):
         curr_list = current_value if isinstance(current_value, list) else None
         for i, item in enumerate(source_value):
             next_curr = curr_list[i] if curr_list and i < len(curr_list) else MISSING
-            entries.extend(collect_translation_entries(item, next_curr, overwrite, (*path, i), skip_keys))
+            entries.extend(
+                collect_translation_entries(
+                    item, next_curr, overwrite, (*path, i), skip_keys
+                )
+            )
         return entries
     if isinstance(source_value, dict):
         curr_dict = current_value if isinstance(current_value, dict) else None
         for k, v in source_value.items():
-            if skip_keys and k in skip_keys: continue
+            if skip_keys and k in skip_keys:
+                continue
             next_curr = curr_dict[k] if curr_dict and k in curr_dict else MISSING
-            entries.extend(collect_translation_entries(v, next_curr, overwrite, (*path, k), skip_keys))
+            entries.extend(
+                collect_translation_entries(
+                    v, next_curr, overwrite, (*path, k), skip_keys
+                )
+            )
         return entries
     return entries
 
-def should_translate_string(source_text: str, current_value: MaybeJsonValue, overwrite: bool) -> bool:
-    if not source_text.strip(): return False
-    if overwrite or isinstance(current_value, MissingValue): return True
+
+def should_translate_string(
+    source_text: str, current_value: MaybeJsonValue, overwrite: bool
+) -> bool:
+    if not source_text.strip():
+        return False
+    if overwrite or isinstance(current_value, MissingValue):
+        return True
     if isinstance(current_value, str):
         stripped = current_value.strip()
         return not stripped or stripped.startswith("TODO:")
     return False
 
-def merge_translations_into_value(source_value: JsonValue, current_value: JsonValue, translated_mapping: dict[str, str]) -> JsonValue:
+
+def merge_translations_into_value(
+    source_value: JsonValue,
+    current_value: JsonValue,
+    translated_mapping: dict[str, str],
+) -> JsonValue:
     next_val = copy.deepcopy(current_value)
-    if not isinstance(next_val, (dict, list)): next_val = {} if isinstance(source_value, dict) else []
+    if not isinstance(next_val, (dict, list)):
+        next_val = {} if isinstance(source_value, dict) else []
     for ident, text in translated_mapping.items():
-        set_nested_value(cast(JsonValue, next_val), identifier_to_translation_path(ident), text)
+        set_nested_value(
+            cast(JsonValue, next_val), identifier_to_translation_path(ident), text
+        )
     return cast(JsonValue, next_val)
 
+
 def set_nested_value(root: JsonValue, path: TranslationPath, value: str) -> None:
-    if not path: raise TranslationScriptError("Empty path.")
+    if not path:
+        raise TranslationScriptError("Empty path.")
     curr = root
     for i, token in enumerate(path):
         last = i == len(path) - 1
         if isinstance(token, str):
-            if not isinstance(curr, dict): raise TranslationScriptError("Expected dict.")
-            if last: curr[token] = value
+            if not isinstance(curr, dict):
+                raise TranslationScriptError("Expected dict.")
+            if last:
+                curr[token] = value
             else:
-                if token not in curr or not isinstance(curr[token], (dict, list)): curr[token] = [] if isinstance(path[i+1], int) else {}
+                if token not in curr or not isinstance(curr[token], (dict, list)):
+                    curr[token] = [] if isinstance(path[i + 1], int) else {}
                 curr = curr[token]
         else:
-            if not isinstance(curr, list): raise TranslationScriptError("Expected list.")
-            while len(curr) <= token: curr.append(None)
-            if last: curr[token] = value
+            if not isinstance(curr, list):
+                raise TranslationScriptError("Expected list.")
+            while len(curr) <= token:
+                curr.append(None)
+            if last:
+                curr[token] = value
             else:
-                if curr[token] is None or not isinstance(curr[token], (dict, list)): curr[token] = [] if isinstance(path[i+1], int) else {}
+                if curr[token] is None or not isinstance(curr[token], (dict, list)):
+                    curr[token] = [] if isinstance(path[i + 1], int) else {}
                 curr = curr[token]
+
 
 def reorder_like_source(source_value: JsonValue, target_value: JsonValue) -> JsonValue:
     if isinstance(source_value, dict) and isinstance(target_value, dict):
-        ordered = {k: reorder_like_source(source_value[k], target_value[k]) for k in source_value if k in target_value}
+        ordered = {
+            k: reorder_like_source(source_value[k], target_value[k])
+            for k in source_value
+            if k in target_value
+        }
         ordered.update({k: v for k, v in target_value.items() if k not in ordered})
         return ordered
     if isinstance(source_value, list) and isinstance(target_value, list):
-        return [reorder_like_source(source_value[i] if i < len(source_value) else v, v) for i, v in enumerate(target_value)]
+        return [
+            reorder_like_source(source_value[i] if i < len(source_value) else v, v)
+            for i, v in enumerate(target_value)
+        ]
     return target_value
 
+
 def translation_path_to_identifier(path: TranslationPath) -> str:
-    if not path: return "$"
+    if not path:
+        return "$"
     parts = []
     for t in path:
-        if isinstance(t, int): parts.append(f"[{t}]")
-        elif not parts: parts.append(t)
-        else: parts.append(f".{t}")
+        if isinstance(t, int):
+            parts.append(f"[{t}]")
+        elif not parts:
+            parts.append(t)
+        else:
+            parts.append(f".{t}")
     return "".join(parts)
 
+
 def identifier_to_translation_path(identifier: str) -> TranslationPath:
-    if identifier == "$": return ()
+    if identifier == "$":
+        return ()
     path = []
     buffer = ""
     i = 0
     while i < len(identifier):
         c = identifier[i]
         if c == ".":
-            if buffer: path.append(buffer); buffer = ""
-            i += 1; continue
+            if buffer:
+                path.append(buffer)
+                buffer = ""
+            i += 1
+            continue
         if c == "[":
-            if buffer: path.append(buffer); buffer = ""
+            if buffer:
+                path.append(buffer)
+                buffer = ""
             end = identifier.find("]", i)
-            path.append(int(identifier[i+1:end]))
-            i = end + 1; continue
-        buffer += c; i += 1
-    if buffer: path.append(buffer)
+            path.append(int(identifier[i + 1 : end]))
+            i = end + 1
+            continue
+        buffer += c
+        i += 1
+    if buffer:
+        path.append(buffer)
     return tuple(path)
+
 
 def locale_to_export_prefix(locale: str) -> str:
     segs = [s.lower() for s in re.split(r"[^A-Za-z0-9]+", locale) if s]
     return segs[0] + "".join(s.capitalize() for s in segs[1:])
 
+
 def print_summary(results: list[FileTranslationResult], dry_run: bool) -> None:
     translated = [r for r in results if r.translated_count > 0]
     total = sum(r.translated_count for r in translated)
-    if not results: print("No files processed.")
-    elif not total: print("All up to date.")
-    else: print(f"{'Planned' if dry_run else 'Translated'} {total} strings across {len(translated)} file(s).")
+    if not results:
+        print("No files processed.")
+    elif not total:
+        print("All up to date.")
+    else:
+        print(
+            f"{'Planned' if dry_run else 'Translated'} {total} strings across {len(translated)} file(s)."
+        )
+
 
 class LiteLLMTranslator:
     """Translator using LiteLLM with Claude as primary and Gemini as fallback."""
+
     def __init__(self, config: ScriptConfig) -> None:
         self._config = config
 
-    def translate_entries(self, target_locale: str, entries: list[TranslationEntry]) -> dict[str, str]:
-        batches = build_translation_batches(entries, self._config.batch_item_limit, self._config.batch_character_limit)
+    def translate_entries(
+        self, target_locale: str, entries: list[TranslationEntry]
+    ) -> dict[str, str]:
+        batches = build_translation_batches(
+            entries, self._config.batch_item_limit, self._config.batch_character_limit
+        )
         mapping = {}
         for i, batch in enumerate(batches, 1):
-            if self._config.verbose: print(f"  Batch {i}/{len(batches)} ({len(batch.entries)} strings)")
+            if self._config.verbose:
+                print(f"  Batch {i}/{len(batches)} ({len(batch.entries)} strings)")
             mapping.update(self._translate_one_batch(target_locale, batch))
         return mapping
 
-    def _translate_one_batch(self, target_locale: str, batch: TranslationBatch) -> dict[str, str]:
+    def _translate_one_batch(
+        self, target_locale: str, batch: TranslationBatch
+    ) -> dict[str, str]:
         instructions = build_translation_instructions(target_locale)
-        input_data = {"entries": [{"id": e.identifier, "source_text": e.source_text} for e in batch.entries]}
-        
+        input_data = {
+            "entries": [
+                {"id": e.identifier, "source_text": e.source_text}
+                for e in batch.entries
+            ]
+        }
+
         prompt = f"{instructions}\n\nInput JSON:\n{json.dumps(input_data, indent=2)}"
-        
+
         for attempt in range(self._config.retries):
             model = self._config.model if attempt == 0 else self._config.fallback_model
             try:
@@ -588,20 +848,33 @@ class LiteLLMTranslator:
                 parsed = json.loads(content)
                 return validate_translation_payload(parsed, batch.entries)
             except Exception as e:
-                if attempt == self._config.retries - 1: raise TranslationScriptError(f"Batch failed after {self._config.retries} attempts: {e}")
-                print(f"    Attempt {attempt+1} failed with {model}, retrying with {self._config.fallback_model if attempt == 0 else model}...")
-                time.sleep(2 ** attempt)
+                if attempt == self._config.retries - 1:
+                    raise TranslationScriptError(
+                        f"Batch failed after {self._config.retries} attempts: {e}"
+                    )
+                print(
+                    f"    Attempt {attempt + 1} failed with {model}, retrying with {self._config.fallback_model if attempt == 0 else model}..."
+                )
+                time.sleep(2**attempt)
         return {}
 
-def build_translation_batches(entries: list[TranslationEntry], item_limit: int, char_limit: int) -> list[TranslationBatch]:
+
+def build_translation_batches(
+    entries: list[TranslationEntry], item_limit: int, char_limit: int
+) -> list[TranslationBatch]:
     batches, curr_entries, curr_chars = [], [], 0
     for e in entries:
-        if len(curr_entries) >= item_limit or (curr_entries and curr_chars + len(e.source_text) > char_limit):
+        if len(curr_entries) >= item_limit or (
+            curr_entries and curr_chars + len(e.source_text) > char_limit
+        ):
             batches.append(TranslationBatch(tuple(curr_entries)))
             curr_entries, curr_chars = [], 0
-        curr_entries.append(e); curr_chars += len(e.source_text)
-    if curr_entries: batches.append(TranslationBatch(tuple(curr_entries)))
+        curr_entries.append(e)
+        curr_chars += len(e.source_text)
+    if curr_entries:
+        batches.append(TranslationBatch(tuple(curr_entries)))
     return batches
+
 
 def build_translation_instructions(target_locale: str) -> str:
     hint = LOCALE_STYLE_HINTS.get(target_locale, "Use natural, professional language.")
@@ -609,17 +882,25 @@ def build_translation_instructions(target_locale: str) -> str:
         "You are a professional software localization translator.\n"
         f"{hint}\n"
         "Translate each `source_text` into the target locale.\n"
-        "Return JSON only: { \"translations\": [{ \"id\": \"...\", \"text\": \"...\" }] }\n"
+        'Return JSON only: { "translations": [{ "id": "...", "text": "..." }] }\n'
         "Preserve placeholders ({{value}}, <strong>, **bold**, `code`) exactly.\n"
         "Do not translate IDs or technical names."
     )
 
-def validate_translation_payload(payload: dict, entries: tuple[TranslationEntry, ...]) -> dict[str, str]:
+
+def validate_translation_payload(
+    payload: dict, entries: tuple[TranslationEntry, ...]
+) -> dict[str, str]:
     translations = payload.get("translations", [])
-    if len(translations) != len(entries): raise TranslationScriptError(f"Expected {len(entries)} translations, got {len(translations)}")
+    if len(translations) != len(entries):
+        raise TranslationScriptError(
+            f"Expected {len(entries)} translations, got {len(translations)}"
+        )
     mapping = {t["id"]: t["text"] for t in translations if "id" in t and "text" in t}
-    if len(mapping) != len(entries): raise TranslationScriptError("Missing IDs in response.")
+    if len(mapping) != len(entries):
+        raise TranslationScriptError("Missing IDs in response.")
     return mapping
+
 
 if __name__ == "__main__":
     sys.exit(main())

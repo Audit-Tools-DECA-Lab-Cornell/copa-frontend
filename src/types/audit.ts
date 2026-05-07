@@ -71,7 +71,8 @@ export const instrumentQuestionSchema = z.object({
 	scales: z.array(questionScaleSchema).default([]),
 	options: z.array(choiceOptionSchema).default([]),
 	required: z.boolean().default(true),
-	display_if: questionDisplayConditionSchema.nullable().optional()
+	display_if: questionDisplayConditionSchema.nullable().optional(),
+	notes_prompt: z.string().nullable().optional()
 });
 
 export const instrumentSectionSchema = z.object({

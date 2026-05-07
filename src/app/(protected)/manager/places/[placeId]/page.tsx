@@ -12,6 +12,7 @@ import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialo
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { PlaceReportsCard } from "@/components/dashboard/place-reports-card";
 import { formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
@@ -259,6 +260,14 @@ export default function ManagerPlaceDetailPage() {
 				description={t("table.description")}
 				pageSize={8}
 				emptyMessage={t("table.emptyMessage")}
+			/>
+
+			{/* Place Reports */}
+			<PlaceReportsCard
+				placeId={placeId}
+				projectId={projectId ?? ""}
+				savedReports={history.saved_place_reports ?? []}
+				rolePrefix="manager"
 			/>
 
 			<AssignAuditorDialog

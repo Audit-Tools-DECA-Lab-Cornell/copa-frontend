@@ -2,59 +2,35 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
-import { FileTextIcon, XIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import type { ColumnFiltersState } from "@tanstack/react-table";
+import { XIcon } from "lucide-react";
 
 import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
-import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
+import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
-import {
-	getTextColumnFilterValue,
-	preservePreviousData,
-	toBackendSortParam
-} from "@/components/dashboard/server-table-utils";
+import { getTextColumnFilterValue, preservePreviousData } from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function ManagerReportsPage() {
 	const session = useAuthSession();
-	const router = useRouter();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
-	const [sorting, setSorting] = React.useState<SortingState>([{ id: "submitted_at", desc: true }]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-	const [pagination, setPagination] = React.useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 10
-	});
-
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
 	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
 	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
 
 	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
-	const selectedProjectIdsKey = selectedProjectIds.join("|");
-	const selectedAuditorIdsKey = selectedAuditorIds.join("|");
-	const selectedPlaceIdsKey = selectedPlaceIds.join("|");
-	const sortParam = toBackendSortParam(sorting);
-
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 };
-		});
-	}, [searchValue, selectedProjectIdsKey, selectedAuditorIdsKey, selectedPlaceIdsKey, sortParam]);
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "manager", "reports", "projects", accountId],
 		queryFn: async () => {
-			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
-			}
+			if (!accountId) throw new Error("Manager account context is unavailable.");
 			return playspaceApi.accounts.projects(accountId);
 		},
 		enabled: accountId !== null
@@ -63,10 +39,8 @@ export default function ManagerReportsPage() {
 	const placesQuery = useQuery({
 		queryKey: ["playspace", "manager", "reports", "places", accountId],
 		queryFn: async () => {
-			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
-			}
-			return playspaceApi.accounts.places(accountId, { page: 1, pageSize: 200 });
+			if (!accountId) throw new Error("Manager account context is unavailable.");
+			return playspaceApi.accounts.places(accountId, { page: 1, pageSize: 100 });
 		},
 		enabled: accountId !== null
 	});
@@ -74,9 +48,7 @@ export default function ManagerReportsPage() {
 	const auditorsQuery = useQuery({
 		queryKey: ["playspace", "manager", "reports", "auditors", accountId],
 		queryFn: async () => {
-			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
-			}
+			if (!accountId) throw new Error("Manager account context is unavailable.");
 			return playspaceApi.accounts.auditors(accountId);
 		},
 		enabled: accountId !== null
@@ -87,25 +59,20 @@ export default function ManagerReportsPage() {
 			"playspace",
 			"manager",
 			"reports",
+			"all",
 			accountId,
-			pagination.pageIndex,
-			pagination.pageSize,
 			searchValue,
-			sortParam,
 			selectedProjectIds,
 			selectedAuditorIds,
 			selectedPlaceIds
 		],
 		queryFn: async () => {
-			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
-			}
+			if (!accountId) throw new Error("Manager account context is unavailable.");
 			return playspaceApi.accounts.audits(accountId, {
 				statuses: ["SUBMITTED"],
-				page: pagination.pageIndex + 1,
-				pageSize: pagination.pageSize,
+				page: 1,
+				pageSize: 100,
 				search: searchValue,
-				sort: sortParam,
 				projectIds: selectedProjectIds,
 				auditorIds: selectedAuditorIds,
 				placeIds: selectedPlaceIds
@@ -115,48 +82,47 @@ export default function ManagerReportsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!reportsQuery.data) {
-			return;
-		}
+	const projectOptions = React.useMemo(
+		() => (projectsQuery.data ?? []).map(p => ({ label: p.name, value: p.id })),
+		[projectsQuery.data]
+	);
+	const placeOptions = React.useMemo(
+		() => (placesQuery.data?.items ?? []).map((p: ManagerPlaceRow) => ({ label: p.name, value: p.id })),
+		[placesQuery.data]
+	);
+	const auditorOptions = React.useMemo(
+		() =>
+			(auditorsQuery.data ?? []).map((a: AuditorSummary) => ({
+				label: `${a.auditor_code} · ${a.full_name}`,
+				value: a.id
+			})),
+		[auditorsQuery.data]
+	);
 
-		const maxPageIndex = Math.max(reportsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
-		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [reportsQuery.data, pagination.pageIndex]);
-
-	const projectOptions = React.useMemo(() => {
-		return (projectsQuery.data ?? []).map(p => ({ label: p.name, value: p.id }));
-	}, [projectsQuery.data]);
-
-	const placeOptions = React.useMemo(() => {
-		return (placesQuery.data?.items ?? []).map((p: ManagerPlaceRow) => ({
-			label: p.name,
-			value: p.id
-		}));
-	}, [placesQuery.data]);
-
-	const auditorOptions = React.useMemo(() => {
-		return (auditorsQuery.data ?? []).map((a: AuditorSummary) => ({
-			label: `${a.auditor_code} · ${a.full_name}`,
-			value: a.id
-		}));
-	}, [auditorsQuery.data]);
+	const rows = React.useMemo(
+		() =>
+			(reportsQuery.data?.items ?? []).map(audit => ({
+				id: audit.audit_id,
+				auditCode: audit.audit_code,
+				status: audit.status,
+				auditorCode: audit.auditor_code,
+				placeName: audit.place_name,
+				placeId: audit.place_id,
+				projectName: audit.project_name,
+				projectId: audit.project_id,
+				accountName: null as string | null,
+				executionMode: audit.execution_mode,
+				startedAt: audit.started_at,
+				submittedAt: audit.submitted_at,
+				score: audit.summary_score,
+				scorePair: audit.score_pair
+			})),
+		[reportsQuery.data]
+	);
 
 	const hasActiveFilters =
 		selectedProjectIds.length > 0 || selectedAuditorIds.length > 0 || selectedPlaceIds.length > 0;
-
-	function clearAllFilters(): void {
-		setSelectedProjectIds([]);
-		setSelectedAuditorIds([]);
-		setSelectedPlaceIds([]);
-	}
+	const data = reportsQuery.data;
 
 	if (!accountId) {
 		return (
@@ -165,11 +131,7 @@ export default function ManagerReportsPage() {
 					eyebrow="Manager Workspace"
 					title="Audit Reports"
 					description="View submitted audit reports from your auditors."
-					breadcrumbs={[
-						{ label: "Dashboard", href: "/manager/dashboard" },
-						{ label: "Auditors", href: "/manager/auditors" },
-						{ label: "Reports" }
-					]}
+					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 				/>
 				<Card>
 					<CardContent className="py-8">
@@ -182,20 +144,14 @@ export default function ManagerReportsPage() {
 		);
 	}
 
-	const isInitialLoading = reportsQuery.isLoading && !reportsQuery.data;
-
-	if (isInitialLoading) {
+	if (reportsQuery.isLoading && !reportsQuery.data) {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
 					eyebrow="Manager Workspace"
 					title="Audit Reports"
-					description="View submitted audit reports from your auditors."
-					breadcrumbs={[
-						{ label: "Dashboard", href: "/manager/dashboard" },
-						{ label: "Auditors", href: "/manager/auditors" },
-						{ label: "Reports" }
-					]}
+					description="View submitted audit reports grouped by place."
+					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, idx) => (
@@ -205,7 +161,7 @@ export default function ManagerReportsPage() {
 						/>
 					))}
 				</div>
-				<div className="h-[420px] animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
 			</div>
 		);
 	}
@@ -224,50 +180,30 @@ export default function ManagerReportsPage() {
 		);
 	}
 
-	const data = reportsQuery.data;
-	const rows: AuditActivityRow[] =
-		data?.items.map(audit => ({
-			id: audit.audit_id,
-			auditCode: audit.audit_code,
-			status: audit.status,
-			auditorCode: audit.auditor_code,
-			placeName: audit.place_name,
-			placeId: audit.place_id,
-			projectName: audit.project_name,
-			projectId: audit.project_id,
-			accountName: null,
-			executionMode: audit.execution_mode,
-			startedAt: audit.started_at,
-			submittedAt: audit.submitted_at,
-			score: audit.summary_score,
-			scorePair: audit.score_pair
-		})) ?? [];
-
-	const totalSubmitted = data?.summary.submitted_audits;
-	const averageScore = data?.summary.average_scores;
-
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
 				eyebrow="Manager Workspace"
 				title="Audit Reports"
-				description="View submitted audit reports from your auditors."
-				breadcrumbs={[
-					{ label: "Dashboard", href: "/manager/dashboard" },
-					{ label: "Auditors", href: "/manager/auditors" },
-					{ label: "Reports" }
-				]}
+				description="View submitted audit reports grouped by place. Select a place to build a combined report."
+				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 			/>
+
+			{/* Summary stats */}
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
 					title="Total Reports"
-					value={String(totalSubmitted)}
+					value={String(data?.summary.submitted_audits ?? 0)}
 					helper="Submitted audits ready for review."
 					tone="info"
 				/>
 				<StatCard
 					title="Average Score"
-					value={averageScore ? `PV ${averageScore.pv} | U ${averageScore.u}` : "Pending"}
+					value={
+						data?.summary.average_scores
+							? `PV ${data.summary.average_scores.pv} | U ${data.summary.average_scores.u}`
+							: "Pending"
+					}
 					helper="Mean score across all submitted audits."
 					tone="success"
 				/>
@@ -284,68 +220,45 @@ export default function ManagerReportsPage() {
 					tone="violet"
 				/>
 			</div>
-			<AuditsTable
-				rows={rows}
-				basePath="/manager/reports"
-				title="Submitted Audit Reports"
-				description="Browse completed audit reports. Click on a row to view details."
-				emptyMessage="No submitted audit reports yet."
-				sortingState={sorting}
-				onSortingStateChange={setSorting}
-				columnFiltersState={columnFilters}
-				onColumnFiltersStateChange={setColumnFilters}
-				paginationState={pagination}
-				onPaginationStateChange={setPagination}
-				manualFiltering
-				manualSorting
-				manualPagination
-				rowCount={reportsQuery.data?.total_count}
-				pageCount={reportsQuery.data?.total_pages}
-				isFetching={reportsQuery.isFetching}
-				onRowClick={row => {
-					router.push(`/manager/reports/${row.id}`);
-				}}
-				getRowActions={row => [
-					{
-						label: "View Report",
-						onSelect: () => router.push(`/manager/reports/${row.id}`),
-						icon: FileTextIcon
-					}
-				]}
-				toolbarExtra={
-					<>
-						<FilterPopover
-							title="Projects"
-							options={projectOptions}
-							selectedValues={selectedProjectIds}
-							onChange={setSelectedProjectIds}
-						/>
-						<FilterPopover
-							title="Places"
-							options={placeOptions}
-							selectedValues={selectedPlaceIds}
-							onChange={setSelectedPlaceIds}
-						/>
-						<FilterPopover
-							title="Auditors"
-							options={auditorOptions}
-							selectedValues={selectedAuditorIds}
-							onChange={setSelectedAuditorIds}
-						/>
-						{hasActiveFilters && (
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								className="gap-1.5"
-								onClick={clearAllFilters}>
-								<XIcon className="size-3.5" />
-								Clear filters
-							</Button>
-						)}
-					</>
-				}
-			/>
+
+			{/* Filters */}
+			<div className="flex flex-wrap items-center gap-2">
+				<FilterPopover
+					title="Projects"
+					options={projectOptions}
+					selectedValues={selectedProjectIds}
+					onChange={setSelectedProjectIds}
+				/>
+				<FilterPopover
+					title="Places"
+					options={placeOptions}
+					selectedValues={selectedPlaceIds}
+					onChange={setSelectedPlaceIds}
+				/>
+				<FilterPopover
+					title="Auditors"
+					options={auditorOptions}
+					selectedValues={selectedAuditorIds}
+					onChange={setSelectedAuditorIds}
+				/>
+				{hasActiveFilters && (
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						className="gap-1.5"
+						onClick={() => {
+							setSelectedProjectIds([]);
+							setSelectedAuditorIds([]);
+							setSelectedPlaceIds([]);
+						}}>
+						<XIcon className="size-3.5" />
+						Clear filters
+					</Button>
+				)}
+			</div>
+
+			<GroupedReportsView rows={rows} basePath="/manager/reports" rolePrefix="manager" />
 		</div>
 	);
 }
