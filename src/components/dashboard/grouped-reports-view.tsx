@@ -429,15 +429,15 @@ function CopyCodeButton({ value }: CopyCodeButtonProps) {
 
 interface GroupRowActionProps {
 	row: Row<ReportTableRow>;
+	placeGroup?: PlaceGroup;
 	onBuildReport: (placeGroup: PlaceGroup) => void;
 }
 
-function GroupRowAction({ row, onBuildReport }: GroupRowActionProps) {
-	if (!row.getIsGrouped() || row.depth !== 1) {
+function GroupRowAction({ row, placeGroup, onBuildReport }: GroupRowActionProps) {
+	if (!row.getIsGrouped() || row.depth !== 1 || !placeGroup) {
 		return null;
 	}
 
-	const placeGroup = makePlaceGroup(row.getLeafRows().map(leafRow => leafRow.original));
 	const submittedCount = getSubmittedRows(placeGroup.rows).length;
 	const canBuild =
 		getModeRows(placeGroup.rows, "both").length > 0 ||
@@ -476,6 +476,14 @@ export function GroupedReportsView({
 	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
 	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
 	const tableRows = React.useMemo(() => toReportTableRows(rows), [rows]);
+	const placeGroupsByKey = React.useMemo(() => {
+		const groupedRows = new Map<string, AuditActivityRow[]>();
+		for (const row of rows) {
+			const key = `${getPlaceName(row)}:::${getPlaceId(row)}`;
+			groupedRows.set(key, [...(groupedRows.get(key) ?? []), row]);
+		}
+		return new Map(Array.from(groupedRows, ([key, groupRows]) => [key, makePlaceGroup(groupRows)]));
+	}, [rows]);
 
 	React.useEffect(() => {
 		if (searchValue !== undefined) {
@@ -624,17 +632,21 @@ export function GroupedReportsView({
 				id: "actions",
 				header: "Actions",
 				enableGrouping: false,
-				cell: ({ row }) =>
-					row.getIsGrouped() ? (
-						<GroupRowAction row={row} onBuildReport={setBuildPlaceGroup} />
-					) : (
+				cell: ({ row }) => {
+					if (row.getIsGrouped()) {
+						const placeGroup = placeGroupsByKey.get(String(row.getValue("placeGroupKey")));
+						return <GroupRowAction row={row} placeGroup={placeGroup} onBuildReport={setBuildPlaceGroup} />;
+					}
+
+					return (
 						<Button asChild variant="ghost" size="sm">
 							<Link href={`${basePath}/${encodeURIComponent(row.original.id)}`}>View</Link>
 						</Button>
-					)
+					);
+				}
 			}
 		],
-		[basePath, selectedIds]
+		[basePath, placeGroupsByKey, selectedIds]
 	);
 
 	// TanStack Table exposes stable instance methods; the React compiler lint can over-report this integration.
@@ -809,14 +821,14 @@ export function GroupedReportsView({
 
 			<div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
 				<span>
-					Showing {filteredLeafCount} of {rows.length} submitted reports with TanStack project/place grouping.
+					Showing {filteredLeafCount} of {rows.length} reports with TanStack project/place grouping.
 				</span>
 				<span>Select individual rows for exports; use place group actions to build combined reports.</span>
 			</div>
 
 			{buildPlaceGroup ? (
 				<BuildPlaceReportDialog
-					open={buildPlaceGroup !== null}
+					open
 					onOpenChange={open => {
 						if (!open) setBuildPlaceGroup(null);
 					}}
