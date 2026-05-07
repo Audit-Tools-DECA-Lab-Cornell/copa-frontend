@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnFiltersState } from "@tanstack/react-table";
 import { XIcon } from "lucide-react";
 
 import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
@@ -11,7 +10,7 @@ import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
-import { getTextColumnFilterValue, preservePreviousData } from "@/components/dashboard/server-table-utils";
+import { preservePreviousData } from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,12 +19,10 @@ export default function ManagerReportsPage() {
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
-	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [reportSearch, setReportSearch] = React.useState("");
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
 	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
 	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
-
-	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "manager", "reports", "projects", accountId],
@@ -61,7 +58,7 @@ export default function ManagerReportsPage() {
 			"reports",
 			"all",
 			accountId,
-			searchValue,
+			reportSearch,
 			selectedProjectIds,
 			selectedAuditorIds,
 			selectedPlaceIds
@@ -72,7 +69,7 @@ export default function ManagerReportsPage() {
 				statuses: ["SUBMITTED"],
 				page: 1,
 				pageSize: 100,
-				search: searchValue,
+				search: reportSearch,
 				projectIds: selectedProjectIds,
 				auditorIds: selectedAuditorIds,
 				placeIds: selectedPlaceIds
@@ -258,7 +255,14 @@ export default function ManagerReportsPage() {
 				)}
 			</div>
 
-			<GroupedReportsView rows={rows} basePath="/manager/reports" rolePrefix="manager" />
+			<GroupedReportsView
+				rows={rows}
+				basePath="/manager/reports"
+				rolePrefix="manager"
+				searchValue={reportSearch}
+				onSearchValueChange={setReportSearch}
+				isSearching={reportsQuery.isFetching}
+			/>
 		</div>
 	);
 }

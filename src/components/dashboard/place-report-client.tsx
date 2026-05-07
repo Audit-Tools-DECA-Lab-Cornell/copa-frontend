@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SaveIcon, CheckCircleIcon } from "lucide-react";
+import { SaveIcon, CheckCircleIcon, FileTextIcon, LayersIcon, LinkIcon, AlertCircleIcon } from "lucide-react";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import type { AuditSession, ScoreTotals } from "@/lib/api/playspace";
@@ -225,6 +225,10 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 	}
 
 	const reportTypeLabel = isCombined ? "Full Assessment (combined)" : "Full Assessment";
+	const reportSourceLabel = isCombined ? "Audit + survey pair" : "Single full-assessment submission";
+	const reportSourceDescription = isCombined
+		? "This report merges the audit-side and survey-side submissions into one place-level assessment."
+		: "This report uses one submission that already includes the full assessment.";
 
 	return (
 		<div className="space-y-6">
@@ -240,34 +244,21 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 				actions={<BackButton href={reportsBasePath} label="Back to Reports" />}
 			/>
 
-			{/* Combined report indicator */}
-			<Card>
-				<CardHeader>
-					<div className="flex items-center justify-between">
-						<div className="flex flex-col gap-1">
-							<CardTitle className="flex items-center gap-2 text-base">
+			<Card className="overflow-hidden">
+				<CardHeader className="border-b border-border/70 bg-muted/25">
+					<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+						<div className="space-y-2">
+							<CardTitle className="flex flex-wrap items-center gap-2 text-lg">
+								<FileTextIcon className="size-5 text-primary" />
 								Place Report
 								<Badge variant={isCombined ? "default" : "secondary"}>{reportTypeLabel}</Badge>
 							</CardTitle>
-							<CardDescription>
-								{isCombined ? (
-									<>
-										Built from: <span className="font-mono text-xs">{auditId?.slice(0, 8)}…</span>{" "}
-										(audit) + <span className="font-mono text-xs">{surveyId?.slice(0, 8)}…</span>{" "}
-										(survey)
-									</>
-								) : (
-									<>
-										Built from submission:{" "}
-										<span className="font-mono text-xs">{submissionId?.slice(0, 8)}…</span>
-									</>
-								)}
-							</CardDescription>
+							<CardDescription>{reportSourceDescription}</CardDescription>
 						</div>
-						{placeId && (
-							<div className="flex items-center gap-2">
+						{placeId ? (
+							<div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
 								{savedSuccess ? (
-									<div className="flex items-center gap-1.5 text-sm text-emerald-600">
+									<div className="inline-flex items-center justify-center gap-1.5 rounded-md border border-status-success-border bg-status-success-surface px-3 py-2 text-sm font-medium text-status-success">
 										<CheckCircleIcon className="size-4" />
 										Saved to place
 									</div>
@@ -275,7 +266,6 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 									<Button
 										type="button"
 										variant="outline"
-										size="sm"
 										disabled={saveMutation.isPending}
 										onClick={() => saveMutation.mutate()}>
 										<SaveIcon data-icon="inline-start" />
@@ -283,9 +273,52 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 									</Button>
 								)}
 							</div>
-						)}
+						) : null}
 					</div>
 				</CardHeader>
+				<CardContent className="grid gap-4 p-4 md:grid-cols-3">
+					<div className="rounded-lg border bg-card p-4">
+						<div className="flex items-center gap-2 text-sm font-semibold">
+							<LayersIcon className="size-4 text-primary" />
+							Report type
+						</div>
+						<p className="mt-2 text-sm text-muted-foreground">{reportSourceLabel}</p>
+					</div>
+					<div className="rounded-lg border bg-card p-4">
+						<div className="flex items-center gap-2 text-sm font-semibold">
+							<LinkIcon className="size-4 text-primary" />
+							Source IDs
+						</div>
+						<p className="mt-2 font-mono text-xs text-muted-foreground">
+							{isCombined ? (
+								<>
+									A: {auditId?.slice(0, 8)}… · S: {surveyId?.slice(0, 8)}…
+								</>
+							) : (
+								<>Submission: {submissionId?.slice(0, 8)}…</>
+							)}
+						</p>
+					</div>
+					<div className="rounded-lg border bg-card p-4">
+						<div className="flex items-center gap-2 text-sm font-semibold">
+							<CheckCircleIcon className="size-4 text-primary" />
+							{savedSuccess ? "Saved report" : "Next step"}
+						</div>
+						<p className="mt-2 text-sm text-muted-foreground">
+							{savedSuccess
+								? "This report is saved to the place record and can be reopened from the place details page."
+								: "Save this combination to the place record so it is easy to reopen later."}
+						</p>
+					</div>
+					{saveMutation.isError ? (
+						<div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive md:col-span-3">
+							<div className="flex gap-2">
+								<AlertCircleIcon className="mt-0.5 size-4 shrink-0" />
+								<p>Unable to save this place report. Please try again.</p>
+							</div>
+						</div>
+					) : null}
+				</CardContent>
 			</Card>
 
 			<Separator />

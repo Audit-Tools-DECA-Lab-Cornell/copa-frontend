@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FileTextIcon, PlusCircleIcon, Trash2Icon, ExternalLinkIcon } from "lucide-react";
+import { FileTextIcon, PlusCircleIcon, Trash2Icon, ExternalLinkIcon, LayersIcon } from "lucide-react";
 
 import type { SavedPlaceReportEntry } from "@/lib/api/playspace";
 import { playspaceApi } from "@/lib/api/playspace";
@@ -55,9 +55,9 @@ export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix 
 	}
 
 	return (
-		<Card>
-			<CardHeader>
-				<div className="flex items-center justify-between">
+		<Card className="overflow-hidden">
+			<CardHeader className="border-b border-border/70 bg-muted/25">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div>
 						<CardTitle className="flex items-center gap-2 text-base">
 							<FileTextIcon className="size-4" />
@@ -86,39 +86,54 @@ export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix 
 				<>
 					<Separator />
 					<CardContent className="pt-4">
-						<div className="flex flex-col gap-2">
+						<div className="grid gap-3 lg:grid-cols-2">
 							{savedReports.map((report, index) => (
 								<div
 									key={`${report.report_type}-${report.created_at}-${index}`}
-									className="flex items-center gap-3 rounded-md border px-4 py-3">
-									<div className="flex-1">
-										<div className="flex items-center gap-2">
-											<Badge
-												variant={report.report_type === "combined" ? "default" : "secondary"}>
-												{report.report_type === "combined"
-													? "Full Assessment (combined)"
-													: "Full Assessment"}
-											</Badge>
-											<span className="text-xs text-muted-foreground">
-												Saved {formatDate(report.created_at)}
-											</span>
+									className="flex flex-col gap-4 rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-accent/20">
+									<div className="flex items-start gap-3">
+										<div className="rounded-lg bg-primary/10 p-2 text-primary">
+											<LayersIcon className="size-4" />
 										</div>
-										{report.report_type === "combined" && report.audit_id && report.survey_id && (
-											<p className="mt-1 font-mono text-xs text-muted-foreground">
-												A: {report.audit_id.slice(0, 8)}… · S: {report.survey_id.slice(0, 8)}…
+										<div className="min-w-0 flex-1 space-y-2">
+											<div className="flex flex-wrap items-center gap-2">
+												<Badge
+													variant={
+														report.report_type === "combined" ? "default" : "secondary"
+													}>
+													{report.report_type === "combined"
+														? "Audit + survey"
+														: "Full assessment"}
+												</Badge>
+												<span className="text-xs text-muted-foreground">
+													Saved {formatDate(report.created_at)}
+												</span>
+											</div>
+											<p className="text-sm text-muted-foreground">
+												{report.report_type === "combined"
+													? "Saved combination of one place audit and one place survey."
+													: "Saved single submission with the full assessment."}
 											</p>
-										)}
-										{report.report_type === "full_assessment" && report.submission_id && (
-											<p className="mt-1 font-mono text-xs text-muted-foreground">
-												{report.submission_id.slice(0, 8)}…
-											</p>
-										)}
+											{report.report_type === "combined" &&
+												report.audit_id &&
+												report.survey_id && (
+													<p className="font-mono text-xs text-muted-foreground">
+														A: {report.audit_id.slice(0, 8)}… · S:{" "}
+														{report.survey_id.slice(0, 8)}…
+													</p>
+												)}
+											{report.report_type === "full_assessment" && report.submission_id && (
+												<p className="font-mono text-xs text-muted-foreground">
+													Submission: {report.submission_id.slice(0, 8)}…
+												</p>
+											)}
+										</div>
 									</div>
-									<div className="flex items-center gap-1">
-										<Button asChild variant="ghost" size="sm">
+									<div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+										<Button asChild variant="outline" size="sm">
 											<Link href={buildReportHref(report)}>
 												<ExternalLinkIcon data-icon="inline-start" />
-												View
+												Open report
 											</Link>
 										</Button>
 										<Button
@@ -140,9 +155,13 @@ export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix 
 			)}
 
 			{savedReports.length === 0 && (
-				<CardContent className="py-6 text-center">
-					<p className="text-sm text-muted-foreground">
-						No place reports saved yet. Build one from the Reports page.
+				<CardContent className="py-10 text-center">
+					<div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+						<FileTextIcon className="size-5" />
+					</div>
+					<p className="mt-3 text-sm font-medium">No place reports saved yet</p>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Build one from the Reports page and save the selected combination here.
 					</p>
 				</CardContent>
 			)}
