@@ -58,6 +58,9 @@ export interface GroupedReportsViewProps {
 	basePath: string;
 	onExportSelected?: (selectedIds: string[]) => void;
 	rolePrefix: "admin" | "manager";
+	searchValue?: string;
+	onSearchValueChange?: (value: string) => void;
+	isSearching?: boolean;
 }
 
 const fallbackText = (key: string) => {
@@ -458,13 +461,37 @@ function GroupRowAction({ row, onBuildReport }: GroupRowActionProps) {
 	);
 }
 
-export function GroupedReportsView({ rows, basePath, onExportSelected, rolePrefix }: GroupedReportsViewProps) {
+export function GroupedReportsView({
+	rows,
+	basePath,
+	onExportSelected,
+	rolePrefix,
+	searchValue,
+	onSearchValueChange,
+	isSearching = false
+}: GroupedReportsViewProps) {
 	const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
-	const [globalFilter, setGlobalFilter] = React.useState("");
+	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
 	const [grouping, setGrouping] = React.useState<GroupingState>(["projectGroupKey", "placeGroupKey"]);
 	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
 	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
 	const tableRows = React.useMemo(() => toReportTableRows(rows), [rows]);
+
+	React.useEffect(() => {
+		if (searchValue !== undefined) {
+			setGlobalFilter(searchValue);
+		}
+	}, [searchValue]);
+
+	React.useEffect(() => {
+		if (!onSearchValueChange) return;
+
+		const timeout = globalThis.setTimeout(() => {
+			onSearchValueChange(globalFilter.trim());
+		}, 300);
+
+		return () => globalThis.clearTimeout(timeout);
+	}, [globalFilter, onSearchValueChange]);
 
 	const columns = React.useMemo<ColumnDef<ReportTableRow>[]>(
 		() => [
@@ -622,7 +649,9 @@ export function GroupedReportsView({ rows, basePath, onExportSelected, rolePrefi
 		},
 		onGroupingChange: setGrouping,
 		onExpandedChange: setExpanded,
-		onGlobalFilterChange: setGlobalFilter,
+		onGlobalFilterChange: updater => {
+			setGlobalFilter(previous => String(typeof updater === "function" ? updater(previous) : (updater ?? "")));
+		},
 		globalFilterFn: (row, _columnId, filterValue) => {
 			const query = String(filterValue).trim().toLowerCase();
 			return query.length === 0 || row.original.searchText.includes(query);
@@ -669,6 +698,7 @@ export function GroupedReportsView({ rows, basePath, onExportSelected, rolePrefi
 							<Badge variant="secondary">{projectCount} projects</Badge>
 							<Badge variant="secondary">{placeCount} places</Badge>
 							<Badge variant="secondary">{rows.length} reports</Badge>
+							{isSearching ? <Badge variant="outline">Searching…</Badge> : null}
 						</div>
 					</div>
 					<div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -680,6 +710,11 @@ export function GroupedReportsView({ rows, basePath, onExportSelected, rolePrefi
 								placeholder="Search report code, auditor, project, or place…"
 								className="pl-9"
 							/>
+							{onSearchValueChange ? (
+								<p className="mt-2 text-xs text-muted-foreground">
+									Searches submitted reports on the server, then refines the grouped table locally.
+								</p>
+							) : null}
 						</div>
 						<div className="flex flex-wrap gap-2">
 							<Button

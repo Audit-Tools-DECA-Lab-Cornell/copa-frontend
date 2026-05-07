@@ -19,6 +19,7 @@ export default function ManagerReportsPage() {
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
+	const [reportSearch, setReportSearch] = React.useState("");
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
 	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
 	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
@@ -57,6 +58,7 @@ export default function ManagerReportsPage() {
 			"reports",
 			"all",
 			accountId,
+			reportSearch,
 			selectedProjectIds,
 			selectedAuditorIds,
 			selectedPlaceIds
@@ -67,6 +69,7 @@ export default function ManagerReportsPage() {
 				statuses: ["SUBMITTED"],
 				page: 1,
 				pageSize: 100,
+				search: reportSearch,
 				projectIds: selectedProjectIds,
 				auditorIds: selectedAuditorIds,
 				placeIds: selectedPlaceIds
@@ -252,7 +255,14 @@ export default function ManagerReportsPage() {
 				)}
 			</div>
 
-			<GroupedReportsView rows={rows} basePath="/manager/reports" rolePrefix="manager" />
+			<GroupedReportsView
+				rows={rows}
+				basePath="/manager/reports"
+				rolePrefix="manager"
+				searchValue={reportSearch}
+				onSearchValueChange={setReportSearch}
+				isSearching={reportsQuery.isFetching}
+			/>
 		</div>
 	);
 }
