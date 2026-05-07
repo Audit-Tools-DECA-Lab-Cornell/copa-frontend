@@ -33,6 +33,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import { cn } from "@/lib/utils";
@@ -431,9 +432,28 @@ function CopyCodeButton({ value }: CopyCodeButtonProps) {
 			title={isCopied ? "Copied!" : "Copy code"}>
 			{isCopied ? <CheckIcon className="size-3.5 text-status-success" /> : <CopyIcon className="size-3.5" />}
 			<span className="sr-only" aria-live="polite">
-				{isCopied ? "Copied!" : "Copy code"}
+				{isCopied ? "Copied!" : null}
 			</span>
 		</Button>
+	);
+}
+
+function ScoreLegend() {
+	return (
+		<span className="inline-flex items-center gap-1">
+			Score
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button type="button" variant="ghost" size="icon-xs" aria-label="Score abbreviation legend">
+						<InfoIcon className="size-3.5 text-muted-foreground" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent className="w-56 text-sm" align="start">
+					<p className="font-medium">Score legend</p>
+					<p className="mt-1 text-muted-foreground">PV = Play Value. U = Usability.</p>
+				</PopoverContent>
+			</Popover>
+		</span>
 	);
 }
 
@@ -486,6 +506,7 @@ export function GroupedReportsView({
 	const [grouping, setGrouping] = React.useState<GroupingState>(["projectGroupKey", "placeGroupKey"]);
 	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
 	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
+	const skipNextSearchChangeRef = React.useRef(false);
 	const tableRows = React.useMemo(() => toReportTableRows(rows), [rows]);
 	const placeGroupsByKey = React.useMemo(() => {
 		const groupedRows = new Map<string, AuditActivityRow[]>();
@@ -498,7 +519,11 @@ export function GroupedReportsView({
 
 	React.useEffect(() => {
 		if (searchValue !== undefined) {
-			setGlobalFilter(searchValue);
+			setGlobalFilter(current => {
+				if (current === searchValue) return current;
+				skipNextSearchChangeRef.current = true;
+				return searchValue;
+			});
 		}
 	}, [searchValue]);
 
@@ -508,6 +533,10 @@ export function GroupedReportsView({
 
 	React.useEffect(() => {
 		if (!onSearchValueChange) return;
+		if (skipNextSearchChangeRef.current) {
+			skipNextSearchChangeRef.current = false;
+			return;
+		}
 
 		const timeout = globalThis.setTimeout(() => {
 			onSearchValueChange(globalFilter.trim());
@@ -630,12 +659,7 @@ export function GroupedReportsView({
 			},
 			{
 				id: "score",
-				header: () => (
-					<span className="inline-flex items-center gap-1" title="PV = Play Value. U = Usability.">
-						Score
-						<InfoIcon className="size-3.5 text-muted-foreground" aria-hidden="true" />
-					</span>
-				),
+				header: () => <ScoreLegend />,
 				enableGrouping: false,
 				cell: ({ row }) =>
 					row.getIsGrouped() ? null : (

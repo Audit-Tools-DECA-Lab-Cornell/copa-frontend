@@ -152,8 +152,8 @@ export default function ManagerReportsPage() {
 					description="View submitted audit reports grouped by place."
 					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 				/>
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, idx) => (
+				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+					{Array.from({ length: 5 }).map((_, idx) => (
 						<div
 							key={`stat-skeleton-${idx}`}
 							className="h-32 animate-pulse rounded-card border border-border bg-card"
