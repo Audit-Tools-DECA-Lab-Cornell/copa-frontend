@@ -15,6 +15,8 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+const REPORTS_PAGE_SIZE = 200;
+
 export default function ManagerReportsPage() {
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
@@ -68,7 +70,7 @@ export default function ManagerReportsPage() {
 			return playspaceApi.accounts.audits(accountId, {
 				statuses: ["SUBMITTED"],
 				page: 1,
-				pageSize: 100,
+				pageSize: REPORTS_PAGE_SIZE,
 				search: reportSearch,
 				projectIds: selectedProjectIds,
 				auditorIds: selectedAuditorIds,
@@ -187,7 +189,7 @@ export default function ManagerReportsPage() {
 			/>
 
 			{/* Summary stats */}
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard
 					title="Total Reports"
 					value={String(data?.summary.submitted_audits ?? 0)}
@@ -195,13 +197,15 @@ export default function ManagerReportsPage() {
 					tone="info"
 				/>
 				<StatCard
-					title="Average Score"
-					value={
-						data?.summary.average_scores
-							? `PV ${data.summary.average_scores.pv} | U ${data.summary.average_scores.u}`
-							: "Pending"
-					}
-					helper="Mean score across all submitted audits."
+					title="Average PV"
+					value={data?.summary.average_scores ? String(data.summary.average_scores.pv) : "Pending"}
+					helper="Mean Play Value score."
+					tone="success"
+				/>
+				<StatCard
+					title="Average U"
+					value={data?.summary.average_scores ? String(data.summary.average_scores.u) : "Pending"}
+					helper="Mean Usability score."
 					tone="success"
 				/>
 				<StatCard
@@ -262,6 +266,7 @@ export default function ManagerReportsPage() {
 				searchValue={reportSearch}
 				onSearchValueChange={setReportSearch}
 				isSearching={reportsQuery.isFetching}
+				totalCount={reportsQuery.data?.total_count}
 			/>
 		</div>
 	);

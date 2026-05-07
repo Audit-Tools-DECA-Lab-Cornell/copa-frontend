@@ -61,6 +61,7 @@ export interface GroupedReportsViewProps {
 	searchValue?: string;
 	onSearchValueChange?: (value: string) => void;
 	isSearching?: boolean;
+	totalCount?: number;
 }
 
 const fallbackText = (key: string) => {
@@ -421,8 +422,17 @@ function CopyCodeButton({ value }: CopyCodeButtonProps) {
 	}
 
 	return (
-		<Button type="button" variant="ghost" size="icon-xs" onClick={handleCopy} aria-label={`Copy ${value}`}>
+		<Button
+			type="button"
+			variant="ghost"
+			size="icon-xs"
+			onClick={handleCopy}
+			aria-label={isCopied ? `Copied ${value}` : `Copy ${value}`}
+			title={isCopied ? "Copied!" : "Copy code"}>
 			{isCopied ? <CheckIcon className="size-3.5 text-status-success" /> : <CopyIcon className="size-3.5" />}
+			<span className="sr-only" aria-live="polite">
+				{isCopied ? "Copied!" : "Copy code"}
+			</span>
 		</Button>
 	);
 }
@@ -468,7 +478,8 @@ export function GroupedReportsView({
 	rolePrefix,
 	searchValue,
 	onSearchValueChange,
-	isSearching = false
+	isSearching = false,
+	totalCount
 }: GroupedReportsViewProps) {
 	const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
@@ -492,6 +503,10 @@ export function GroupedReportsView({
 	}, [searchValue]);
 
 	React.useEffect(() => {
+		setRowSelection({});
+	}, [rows]);
+
+	React.useEffect(() => {
 		if (!onSearchValueChange) return;
 
 		const timeout = globalThis.setTimeout(() => {
@@ -503,24 +518,28 @@ export function GroupedReportsView({
 
 	const columns = React.useMemo<ColumnDef<ReportTableRow>[]>(
 		() => [
-			{
-				id: "select",
-				header: "",
-				enableGrouping: false,
-				cell: ({ row, table }) => {
-					if (row.getIsGrouped()) {
-						return null;
-					}
-					const selection = table.getState().rowSelection;
-					return (
-						<Checkbox
-							checked={Boolean(selection[row.id])}
-							onCheckedChange={checked => row.toggleSelected(checked === true)}
-							aria-label={`Select ${row.original.auditCode}`}
-						/>
-					);
-				}
-			},
+			...(onExportSelected
+				? [
+						{
+							id: "select",
+							header: "",
+							enableGrouping: false,
+							cell: ({ row, table }) => {
+								if (row.getIsGrouped()) {
+									return null;
+								}
+								const selection = table.getState().rowSelection;
+								return (
+									<Checkbox
+										checked={Boolean(selection[row.id])}
+										onCheckedChange={checked => row.toggleSelected(checked === true)}
+										aria-label={`Select ${row.original.auditCode}`}
+									/>
+								);
+							}
+						} satisfies ColumnDef<ReportTableRow>
+					]
+				: []),
 			{
 				accessorKey: "projectGroupKey",
 				header: "Project",
@@ -611,7 +630,12 @@ export function GroupedReportsView({
 			},
 			{
 				id: "score",
-				header: "Score",
+				header: () => (
+					<span className="inline-flex items-center gap-1" title="PV = Play Value. U = Usability.">
+						Score
+						<InfoIcon className="size-3.5 text-muted-foreground" aria-hidden="true" />
+					</span>
+				),
 				enableGrouping: false,
 				cell: ({ row }) =>
 					row.getIsGrouped() ? null : (
@@ -636,7 +660,7 @@ export function GroupedReportsView({
 				}
 			}
 		],
-		[basePath, placeGroupsByKey]
+		[basePath, onExportSelected, placeGroupsByKey]
 	);
 
 	// TanStack Table exposes stable instance methods; the React compiler lint can over-report this integration.
@@ -647,7 +671,7 @@ export function GroupedReportsView({
 		state: {
 			grouping,
 			expanded,
-			globalFilter,
+			globalFilter: onSearchValueChange ? "" : globalFilter,
 			rowSelection
 		},
 		getRowId: row => row.id,
@@ -676,8 +700,12 @@ export function GroupedReportsView({
 	}
 
 	const filteredLeafCount = table.getFilteredRowModel().rows.length;
+	const loadedCount = rows.length;
+	const reportedTotalCount = totalCount ?? loadedCount;
+	const isPartialResultSet = reportedTotalCount > loadedCount;
 	const placeCount = new Set(tableRows.map(row => row.placeGroupKey)).size;
 	const projectCount = new Set(tableRows.map(row => row.projectGroupKey)).size;
+	const allRowsExpanded = table.getIsAllRowsExpanded();
 
 	if (rows.length === 0) {
 		return (
@@ -705,7 +733,8 @@ export function GroupedReportsView({
 						<div className="flex flex-wrap gap-2">
 							<Badge variant="secondary">{projectCount} projects</Badge>
 							<Badge variant="secondary">{placeCount} places</Badge>
-							<Badge variant="secondary">{rows.length} reports</Badge>
+							<Badge variant="secondary">{loadedCount} reports loaded</Badge>
+							{isPartialResultSet ? <Badge variant="outline">{reportedTotalCount} total</Badge> : null}
 							{isSearching ? <Badge variant="outline">Searching…</Badge> : null}
 						</div>
 					</div>
@@ -720,7 +749,7 @@ export function GroupedReportsView({
 							/>
 							{onSearchValueChange ? (
 								<p className="mt-2 text-xs text-muted-foreground">
-									Searches submitted reports on the server, then refines the grouped table locally.
+									Searches submitted reports on the server after you stop typing.
 								</p>
 							) : null}
 						</div>
@@ -729,15 +758,9 @@ export function GroupedReportsView({
 								type="button"
 								variant="outline"
 								size="sm"
-								onClick={() => table.toggleAllRowsExpanded(true)}>
-								Expand all
-							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => table.toggleAllRowsExpanded(false)}>
-								Collapse all
+								onClick={() => table.toggleAllRowsExpanded(!allRowsExpanded)}
+								aria-pressed={allRowsExpanded}>
+								{allRowsExpanded ? "Collapse all" : "Expand all"}
 							</Button>
 							{selectedCount > 0 ? (
 								<Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
@@ -810,9 +833,17 @@ export function GroupedReportsView({
 
 			<div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
 				<span>
-					Showing {filteredLeafCount} of {rows.length} reports with TanStack project/place grouping.
+					Showing {filteredLeafCount} of {loadedCount}
+					{isPartialResultSet ? ` loaded (${reportedTotalCount} total matching reports)` : " reports"} grouped
+					by project and place.
 				</span>
-				<span>Select individual rows for exports; use place group actions to build combined reports.</span>
+				<span>
+					{isPartialResultSet
+						? "Narrow the search or filters to review reports that are not loaded yet."
+						: onExportSelected
+							? "Select individual rows for exports; use place group actions to build combined reports."
+							: "Use place group actions to build combined reports."}
+				</span>
 			</div>
 
 			{buildPlaceGroup ? (

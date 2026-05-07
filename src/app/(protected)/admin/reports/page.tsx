@@ -19,6 +19,8 @@ import { FilterPopover } from "@/components/dashboard/filter-popover";
 import { preservePreviousData } from "@/components/dashboard/server-table-utils";
 import { Button } from "@/components/ui/button";
 
+const REPORTS_PAGE_SIZE = 200;
+
 export default function AdminReportsPage() {
 	const [reportSearch, setReportSearch] = React.useState("");
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
@@ -50,7 +52,7 @@ export default function AdminReportsPage() {
 			playspaceApi.admin.accounts({ page: 1, pageSize: 100, accountTypes: ["MANAGER"] })
 	});
 
-	// Fetch all submitted reports (no pagination — grouped view handles display)
+	// Fetch the first reporting slice; the grouped view shows the total count so overflow is visible.
 	const reportsQuery = useQuery({
 		queryKey: [
 			"playspace",
@@ -66,7 +68,7 @@ export default function AdminReportsPage() {
 		queryFn: () =>
 			playspaceApi.admin.audits({
 				page: 1,
-				pageSize: 200,
+				pageSize: REPORTS_PAGE_SIZE,
 				search: reportSearch,
 				projectIds: selectedProjectIds,
 				placeIds: selectedPlaceIds,
@@ -207,6 +209,7 @@ export default function AdminReportsPage() {
 				searchValue={reportSearch}
 				onSearchValueChange={setReportSearch}
 				isSearching={reportsQuery.isFetching}
+				totalCount={reportsQuery.data?.total_count}
 			/>
 		</div>
 	);
