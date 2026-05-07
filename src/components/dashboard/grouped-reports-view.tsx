@@ -3,28 +3,41 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ColumnDef, ExpandedState, GroupingState, Row } from "@tanstack/react-table";
 import {
+	flexRender,
+	getCoreRowModel,
+	getExpandedRowModel,
+	getFilteredRowModel,
+	getGroupedRowModel,
+	getSortedRowModel,
+	useReactTable
+} from "@tanstack/react-table";
+import {
+	CheckIcon,
 	ChevronDownIcon,
 	ChevronRightIcon,
-	FileTextIcon,
+	CopyIcon,
 	DownloadIcon,
+	FileTextIcon,
+	InfoIcon,
 	PlusCircleIcon,
-	CheckIcon,
-	CopyIcon
+	SearchIcon,
+	SparklesIcon
 } from "lucide-react";
 
 import type { AuditActivityRow } from "./audits-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
-import { formatDateTimeLabel, formatScorePairLabel, formatScoreLabel, formatAuditCodeReference } from "./utils";
+import { cn } from "@/lib/utils";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 
 interface PlaceGroup {
 	placeId: string;
@@ -34,10 +47,10 @@ interface PlaceGroup {
 	rows: AuditActivityRow[];
 }
 
-interface ProjectGroup {
-	projectId: string;
-	projectName: string;
-	placeGroups: PlaceGroup[];
+interface ReportTableRow extends AuditActivityRow {
+	projectGroupKey: string;
+	placeGroupKey: string;
+	searchText: string;
 }
 
 export interface GroupedReportsViewProps {
@@ -47,47 +60,116 @@ export interface GroupedReportsViewProps {
 	rolePrefix: "admin" | "manager";
 }
 
-// ── Grouping Logic ───────────────────────────────────────────────────────────
+const fallbackText = (key: string) => {
+	const values: Record<string, string> = {
+		noRecentActivity: "—",
+		pending: "Pending"
+	};
+	return values[key] ?? key;
+};
 
-function groupByProjectAndPlace(rows: AuditActivityRow[]): ProjectGroup[] {
-	const projectMap = new Map<string, { name: string; placeMap: Map<string, PlaceGroup> }>();
-
-	for (const row of rows) {
-		const projectId = row.projectId ?? "unknown";
-		const projectName = row.projectName ?? "Unknown Project";
-		const placeId = row.placeId ?? "unknown";
-		const placeName = row.placeName ?? "Unknown Place";
-
-		if (!projectMap.has(projectId)) {
-			projectMap.set(projectId, { name: projectName, placeMap: new Map() });
-		}
-		const project = projectMap.get(projectId)!;
-
-		if (!project.placeMap.has(placeId)) {
-			project.placeMap.set(placeId, {
-				placeId,
-				placeName,
-				projectId,
-				projectName,
-				rows: []
-			});
-		}
-		project.placeMap.get(placeId)!.rows.push(row);
-	}
-
-	const projectGroups: ProjectGroup[] = [];
-	for (const [projectId, { name, placeMap }] of projectMap) {
-		projectGroups.push({
-			projectId,
-			projectName: name,
-			placeGroups: Array.from(placeMap.values())
-		});
-	}
-
-	return projectGroups;
+function getProjectName(row: AuditActivityRow): string {
+	return row.projectName ?? "Unknown project";
 }
 
-// ── Build Place Report Dialog ────────────────────────────────────────────────
+function getPlaceName(row: AuditActivityRow): string {
+	return row.placeName ?? "Unknown place";
+}
+
+function getProjectId(row: AuditActivityRow): string {
+	return row.projectId ?? "unknown-project";
+}
+
+function getPlaceId(row: AuditActivityRow): string {
+	return row.placeId ?? "unknown-place";
+}
+
+function toReportTableRows(rows: AuditActivityRow[]): ReportTableRow[] {
+	return rows.map(row => {
+		const projectName = getProjectName(row);
+		const placeName = getPlaceName(row);
+		return {
+			...row,
+			projectGroupKey: `${projectName}:::${getProjectId(row)}`,
+			placeGroupKey: `${placeName}:::${getPlaceId(row)}`,
+			searchText: [row.auditCode, row.auditorCode, projectName, placeName, row.accountName]
+				.filter((value): value is string => Boolean(value))
+				.join(" ")
+				.toLowerCase()
+		};
+	});
+}
+
+function makePlaceGroup(rows: AuditActivityRow[]): PlaceGroup {
+	const firstRow = rows[0];
+	return {
+		placeId: firstRow ? getPlaceId(firstRow) : "unknown-place",
+		placeName: firstRow ? getPlaceName(firstRow) : "Unknown place",
+		projectId: firstRow ? getProjectId(firstRow) : "unknown-project",
+		projectName: firstRow ? getProjectName(firstRow) : "Unknown project",
+		rows
+	};
+}
+
+function getSubmittedRows(rows: AuditActivityRow[]): AuditActivityRow[] {
+	return rows
+		.filter(row => row.status === "SUBMITTED")
+		.sort((a, b) => new Date(b.submittedAt ?? 0).getTime() - new Date(a.submittedAt ?? 0).getTime());
+}
+
+function getModeRows(rows: AuditActivityRow[], mode: "audit" | "survey" | "both"): AuditActivityRow[] {
+	return getSubmittedRows(rows).filter(row => row.executionMode === mode);
+}
+
+function scoreLabel(row: AuditActivityRow): string {
+	return row.scorePair
+		? formatScorePairLabel(row.scorePair, fallbackText)
+		: formatScoreLabel(row.score, fallbackText);
+}
+
+function submissionMeta(row: AuditActivityRow): string {
+	return [row.auditorCode, formatDateTimeLabel(row.submittedAt, fallbackText)].filter(Boolean).join(" · ");
+}
+
+interface SelectableSubmissionCardProps {
+	row: AuditActivityRow;
+	selected: boolean;
+	name: string;
+	onSelect: () => void;
+}
+
+function SelectableSubmissionCard({ row, selected, name, onSelect }: SelectableSubmissionCardProps) {
+	return (
+		<label
+			className={cn(
+				"group flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-3 transition-all hover:border-primary/40 hover:bg-accent/40",
+				selected && "border-primary bg-primary/5 shadow-sm"
+			)}>
+			<input type="radio" name={name} className="sr-only" checked={selected} onChange={onSelect} />
+			<div
+				className={cn(
+					"mt-0.5 flex size-5 items-center justify-center rounded-full border text-primary transition-colors",
+					selected ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/35"
+				)}>
+				{selected ? <CheckIcon className="size-3.5" /> : null}
+			</div>
+			<div className="min-w-0 flex-1 space-y-2">
+				<div className="flex flex-wrap items-center gap-2">
+					<code className="rounded-sm bg-secondary px-2 py-1 font-mono text-xs text-foreground">
+						{formatAuditCodeReference(row.auditCode)}
+					</code>
+					{row.executionMode ? (
+						<Badge variant="outline" className="text-[11px]">
+							{getExecutionModeLabel(row.executionMode as "audit" | "survey" | "both")}
+						</Badge>
+					) : null}
+				</div>
+				<p className="text-xs text-muted-foreground">{submissionMeta(row)}</p>
+				<p className="text-xs font-medium text-foreground">Score: {scoreLabel(row)}</p>
+			</div>
+		</label>
+	);
+}
 
 interface BuildPlaceReportDialogProps {
 	open: boolean;
@@ -98,19 +180,24 @@ interface BuildPlaceReportDialogProps {
 
 function BuildPlaceReportDialog({ open, onOpenChange, placeGroup, rolePrefix }: BuildPlaceReportDialogProps) {
 	const router = useRouter();
-	const [selectedAuditId, setSelectedAuditId] = React.useState<string | null>(null);
-	const [selectedSurveyId, setSelectedSurveyId] = React.useState<string | null>(null);
-	const [selectedFullAssessmentId, setSelectedFullAssessmentId] = React.useState<string | null>(null);
-	const [mode, setMode] = React.useState<"pair" | "full">("pair");
-
-	const submittedRows = placeGroup.rows.filter(r => r.status === "SUBMITTED");
-	const auditRows = submittedRows.filter(r => r.executionMode === "audit");
-	const surveyRows = submittedRows.filter(r => r.executionMode === "survey");
-	const fullRows = submittedRows.filter(r => r.executionMode === "both");
+	const auditRows = React.useMemo(() => getModeRows(placeGroup.rows, "audit"), [placeGroup.rows]);
+	const surveyRows = React.useMemo(() => getModeRows(placeGroup.rows, "survey"), [placeGroup.rows]);
+	const fullRows = React.useMemo(() => getModeRows(placeGroup.rows, "both"), [placeGroup.rows]);
+	const [selectedAuditId, setSelectedAuditId] = React.useState<string | null>(auditRows[0]?.id ?? null);
+	const [selectedSurveyId, setSelectedSurveyId] = React.useState<string | null>(surveyRows[0]?.id ?? null);
+	const [selectedFullAssessmentId, setSelectedFullAssessmentId] = React.useState<string | null>(
+		fullRows[0]?.id ?? null
+	);
+	const [mode, setMode] = React.useState<"pair" | "full">(
+		auditRows.length > 0 && surveyRows.length > 0 ? "pair" : "full"
+	);
 
 	const canBuildPair = selectedAuditId !== null && selectedSurveyId !== null;
 	const canBuildFull = selectedFullAssessmentId !== null;
 	const canBuild = mode === "pair" ? canBuildPair : canBuildFull;
+	const selectedAudit = auditRows.find(row => row.id === selectedAuditId);
+	const selectedSurvey = surveyRows.find(row => row.id === selectedSurveyId);
+	const selectedFull = fullRows.find(row => row.id === selectedFullAssessmentId);
 
 	function handleBuild() {
 		if (mode === "pair" && canBuildPair) {
@@ -127,319 +214,433 @@ function BuildPlaceReportDialog({ open, onOpenChange, placeGroup, rolePrefix }: 
 	}
 
 	React.useEffect(() => {
-		if (!open) {
-			setSelectedAuditId(null);
-			setSelectedSurveyId(null);
-			setSelectedFullAssessmentId(null);
-			setMode("pair");
+		if (open) {
+			setSelectedAuditId(auditRows[0]?.id ?? null);
+			setSelectedSurveyId(surveyRows[0]?.id ?? null);
+			setSelectedFullAssessmentId(fullRows[0]?.id ?? null);
+			setMode(auditRows.length > 0 && surveyRows.length > 0 ? "pair" : "full");
 		}
-	}, [open]);
+	}, [auditRows, fullRows, open, surveyRows]);
+
+	const buildHint =
+		mode === "pair"
+			? "Choose one submitted place audit and one submitted place survey. The builder combines both into a single full-assessment report."
+			: "Choose one submission that was already completed as a full assessment.";
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-lg">
-				<DialogHeader>
-					<DialogTitle>Build Place Report</DialogTitle>
-					<DialogDescription>
-						Select submissions to build a report for {placeGroup.placeName}.
-					</DialogDescription>
-				</DialogHeader>
-
-				<div className="flex gap-2">
-					<Button
-						type="button"
-						variant={mode === "pair" ? "default" : "outline"}
-						size="sm"
-						onClick={() => setMode("pair")}>
-						Audit + Survey Pair
-					</Button>
-					<Button
-						type="button"
-						variant={mode === "full" ? "default" : "outline"}
-						size="sm"
-						onClick={() => setMode("full")}>
-						Full Assessment
-					</Button>
+			<DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto p-0">
+				<div className="border-b bg-muted/30 px-6 py-5">
+					<DialogHeader>
+						<DialogTitle className="flex items-center gap-2 text-xl">
+							<SparklesIcon className="size-5 text-primary" />
+							Build a place report
+						</DialogTitle>
+						<DialogDescription>
+							Create a clear, shareable report for {placeGroup.placeName} in {placeGroup.projectName}.
+						</DialogDescription>
+					</DialogHeader>
 				</div>
 
-				<Separator />
-
-				{mode === "pair" ? (
-					<div className="flex flex-col gap-4">
-						<div>
-							<h4 className="mb-2 text-sm font-medium">Select Place Audit (1 required)</h4>
-							{auditRows.length === 0 ? (
-								<p className="text-sm text-muted-foreground">No submitted place audits available.</p>
-							) : (
-								<div className="flex flex-col gap-1.5">
-									{auditRows.map(row => (
-										<label
-											key={row.id}
-											className="flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/50 has-[:checked]:border-primary has-[:checked]:bg-accent">
-											<input
-												type="radio"
-												name="audit-selection"
-												className="sr-only"
-												checked={selectedAuditId === row.id}
-												onChange={() => setSelectedAuditId(row.id)}
-											/>
-											<div className="flex-1">
-												<p className="text-sm font-medium">
-													{formatAuditCodeReference(row.auditCode)}
-												</p>
-												<p className="text-xs text-muted-foreground">
-													{row.auditorCode} &middot;{" "}
-													{row.submittedAt
-														? new Date(row.submittedAt).toLocaleDateString()
-														: "—"}
-												</p>
-											</div>
-											{selectedAuditId === row.id && (
-												<CheckIcon className="size-4 text-primary" />
-											)}
-										</label>
-									))}
-								</div>
+				<div className="space-y-5 p-6">
+					<div className="grid gap-3 md:grid-cols-2">
+						<button
+							type="button"
+							className={cn(
+								"rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:bg-accent/35",
+								mode === "pair" && "border-primary bg-primary/5 shadow-sm"
 							)}
-						</div>
-						<div>
-							<h4 className="mb-2 text-sm font-medium">Select Place Survey (1 required)</h4>
-							{surveyRows.length === 0 ? (
-								<p className="text-sm text-muted-foreground">No submitted place surveys available.</p>
-							) : (
-								<div className="flex flex-col gap-1.5">
-									{surveyRows.map(row => (
-										<label
-											key={row.id}
-											className="flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/50 has-[:checked]:border-primary has-[:checked]:bg-accent">
-											<input
-												type="radio"
-												name="survey-selection"
-												className="sr-only"
-												checked={selectedSurveyId === row.id}
-												onChange={() => setSelectedSurveyId(row.id)}
-											/>
-											<div className="flex-1">
-												<p className="text-sm font-medium">
-													{formatAuditCodeReference(row.auditCode)}
-												</p>
-												<p className="text-xs text-muted-foreground">
-													{row.auditorCode} &middot;{" "}
-													{row.submittedAt
-														? new Date(row.submittedAt).toLocaleDateString()
-														: "—"}
-												</p>
-											</div>
-											{selectedSurveyId === row.id && (
-												<CheckIcon className="size-4 text-primary" />
-											)}
-										</label>
-									))}
-								</div>
-							)}
-						</div>
-					</div>
-				) : (
-					<div>
-						<h4 className="mb-2 text-sm font-medium">Select Full Assessment (1 required)</h4>
-						{fullRows.length === 0 ? (
-							<p className="text-sm text-muted-foreground">No submitted full assessments available.</p>
-						) : (
-							<div className="flex flex-col gap-1.5">
-								{fullRows.map(row => (
-									<label
-										key={row.id}
-										className="flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors hover:bg-accent/50 has-[:checked]:border-primary has-[:checked]:bg-accent">
-										<input
-											type="radio"
-											name="full-selection"
-											className="sr-only"
-											checked={selectedFullAssessmentId === row.id}
-											onChange={() => setSelectedFullAssessmentId(row.id)}
-										/>
-										<div className="flex-1">
-											<p className="text-sm font-medium">
-												{formatAuditCodeReference(row.auditCode)}
-											</p>
-											<p className="text-xs text-muted-foreground">
-												{row.auditorCode} &middot;{" "}
-												{row.submittedAt ? new Date(row.submittedAt).toLocaleDateString() : "—"}
-											</p>
-										</div>
-										{selectedFullAssessmentId === row.id && (
-											<CheckIcon className="size-4 text-primary" />
-										)}
-									</label>
-								))}
+							onClick={() => setMode("pair")}>
+							<div className="flex items-center justify-between gap-3">
+								<p className="font-semibold">Audit + survey pair</p>
+								<Badge variant={canBuildPair ? "default" : "secondary"}>
+									{auditRows.length} audit · {surveyRows.length} survey
+								</Badge>
 							</div>
-						)}
+							<p className="mt-2 text-sm text-muted-foreground">
+								Best when the place was evaluated with separate audit and survey submissions.
+							</p>
+						</button>
+						<button
+							type="button"
+							className={cn(
+								"rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:bg-accent/35",
+								mode === "full" && "border-primary bg-primary/5 shadow-sm"
+							)}
+							onClick={() => setMode("full")}>
+							<div className="flex items-center justify-between gap-3">
+								<p className="font-semibold">Existing full assessment</p>
+								<Badge variant={canBuildFull ? "default" : "secondary"}>
+									{fullRows.length} available
+								</Badge>
+							</div>
+							<p className="mt-2 text-sm text-muted-foreground">
+								Use a submission that already contains audit and survey answers together.
+							</p>
+						</button>
 					</div>
-				)}
 
-				<div className="flex justify-end gap-2 pt-2">
-					<Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-						Cancel
-					</Button>
-					<Button type="button" disabled={!canBuild} onClick={handleBuild}>
-						<FileTextIcon data-icon="inline-start" />
-						Build Report
-					</Button>
+					<div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
+						<div className="flex gap-2">
+							<InfoIcon className="mt-0.5 size-4 shrink-0 text-primary" />
+							<p>{buildHint}</p>
+						</div>
+					</div>
+
+					{mode === "pair" ? (
+						<div className="grid gap-4 lg:grid-cols-2">
+							<div className="space-y-2">
+								<div className="flex items-center justify-between">
+									<h4 className="text-sm font-semibold">1. Select place audit</h4>
+									<Badge variant="outline">{auditRows.length}</Badge>
+								</div>
+								{auditRows.length === 0 ? (
+									<p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+										No submitted place audits are available for this place.
+									</p>
+								) : (
+									<div className="max-h-80 space-y-2 overflow-y-auto pr-1">
+										{auditRows.map(row => (
+											<SelectableSubmissionCard
+												key={row.id}
+												row={row}
+												name="audit-selection"
+												selected={selectedAuditId === row.id}
+												onSelect={() => setSelectedAuditId(row.id)}
+											/>
+										))}
+									</div>
+								)}
+							</div>
+							<div className="space-y-2">
+								<div className="flex items-center justify-between">
+									<h4 className="text-sm font-semibold">2. Select place survey</h4>
+									<Badge variant="outline">{surveyRows.length}</Badge>
+								</div>
+								{surveyRows.length === 0 ? (
+									<p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+										No submitted place surveys are available for this place.
+									</p>
+								) : (
+									<div className="max-h-80 space-y-2 overflow-y-auto pr-1">
+										{surveyRows.map(row => (
+											<SelectableSubmissionCard
+												key={row.id}
+												row={row}
+												name="survey-selection"
+												selected={selectedSurveyId === row.id}
+												onSelect={() => setSelectedSurveyId(row.id)}
+											/>
+										))}
+									</div>
+								)}
+							</div>
+						</div>
+					) : (
+						<div className="space-y-2">
+							<div className="flex items-center justify-between">
+								<h4 className="text-sm font-semibold">Select one full assessment</h4>
+								<Badge variant="outline">{fullRows.length}</Badge>
+							</div>
+							{fullRows.length === 0 ? (
+								<p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+									No submitted full assessments are available for this place.
+								</p>
+							) : (
+								<div className="grid max-h-96 gap-2 overflow-y-auto pr-1 md:grid-cols-2">
+									{fullRows.map(row => (
+										<SelectableSubmissionCard
+											key={row.id}
+											row={row}
+											name="full-selection"
+											selected={selectedFullAssessmentId === row.id}
+											onSelect={() => setSelectedFullAssessmentId(row.id)}
+										/>
+									))}
+								</div>
+							)}
+						</div>
+					)}
+
+					<div className="rounded-xl border bg-muted/25 p-4">
+						<p className="text-sm font-semibold">Report preview</p>
+						<p className="mt-1 text-sm text-muted-foreground">
+							{mode === "pair" && selectedAudit && selectedSurvey
+								? `Combines ${formatAuditCodeReference(selectedAudit.auditCode)} with ${formatAuditCodeReference(selectedSurvey.auditCode)}.`
+								: mode === "full" && selectedFull
+									? `Builds from ${formatAuditCodeReference(selectedFull.auditCode)}.`
+									: "Select the required submissions to continue."}
+						</p>
+					</div>
+
+					<div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
+						<Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+							Cancel
+						</Button>
+						<Button type="button" disabled={!canBuild} onClick={handleBuild}>
+							<FileTextIcon data-icon="inline-start" />
+							Build Report
+						</Button>
+					</div>
 				</div>
 			</DialogContent>
 		</Dialog>
 	);
 }
 
-// ── Submission Row ───────────────────────────────────────────────────────────
-
-interface SubmissionRowProps {
-	row: AuditActivityRow;
-	basePath: string;
-	isSelected: boolean;
-	onSelectionChange: (id: string, selected: boolean) => void;
+interface CopyCodeButtonProps {
+	value: string;
 }
 
-function SubmissionRow({ row, basePath, isSelected, onSelectionChange }: SubmissionRowProps) {
-	const mode = row.executionMode as "audit" | "survey" | "both" | null;
+function CopyCodeButton({ value }: CopyCodeButtonProps) {
+	const [isCopied, setIsCopied] = React.useState(false);
+	const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	React.useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				globalThis.clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
+	async function handleCopy() {
+		try {
+			await navigator.clipboard.writeText(value);
+			setIsCopied(true);
+			if (timeoutRef.current) {
+				globalThis.clearTimeout(timeoutRef.current);
+			}
+			timeoutRef.current = globalThis.setTimeout(() => setIsCopied(false), 1500);
+		} catch {
+			setIsCopied(false);
+		}
+	}
 
 	return (
-		<div className="flex items-center gap-3 rounded-md border px-4 py-3 transition-colors hover:bg-accent/30">
-			<Checkbox
-				checked={isSelected}
-				onCheckedChange={checked => onSelectionChange(row.id, checked === true)}
-				aria-label={`Select ${row.auditCode}`}
-			/>
-			<Link href={`${basePath}/${encodeURIComponent(row.id)}`} className="flex flex-1 items-center gap-4">
-				<div className="flex-1">
-					<div className="flex items-center gap-2">
-						<code className="rounded-sm bg-secondary px-1.5 py-0.5 font-mono text-xs">
-							{formatAuditCodeReference(row.auditCode)}
-						</code>
-						{mode && (
-							<Badge variant="outline" className="text-xs">
-								{getExecutionModeLabel(mode)}
-							</Badge>
-						)}
-					</div>
-					<p className="mt-1 text-xs text-muted-foreground">
-						Auditor: {row.auditorCode}
-						{row.submittedAt && <> &middot; Submitted {new Date(row.submittedAt).toLocaleDateString()}</>}
-					</p>
-				</div>
-				<div className="text-right">
-					{row.scorePair ? (
-						<span className="font-mono text-sm tabular-nums">
-							PV {row.scorePair.pv} | U {row.scorePair.u}
-						</span>
-					) : row.score !== null ? (
-						<span className="font-mono text-sm tabular-nums">{row.score}</span>
-					) : (
-						<span className="text-sm text-muted-foreground">—</span>
-					)}
-				</div>
-			</Link>
+		<Button type="button" variant="ghost" size="icon-xs" onClick={handleCopy} aria-label={`Copy ${value}`}>
+			{isCopied ? <CheckIcon className="size-3.5 text-status-success" /> : <CopyIcon className="size-3.5" />}
+		</Button>
+	);
+}
+
+interface GroupRowActionProps {
+	row: Row<ReportTableRow>;
+	onBuildReport: (placeGroup: PlaceGroup) => void;
+}
+
+function GroupRowAction({ row, onBuildReport }: GroupRowActionProps) {
+	if (!row.getIsGrouped() || row.depth !== 1) {
+		return null;
+	}
+
+	const placeGroup = makePlaceGroup(row.getLeafRows().map(leafRow => leafRow.original));
+	const submittedCount = getSubmittedRows(placeGroup.rows).length;
+	const canBuild =
+		getModeRows(placeGroup.rows, "both").length > 0 ||
+		(getModeRows(placeGroup.rows, "audit").length > 0 && getModeRows(placeGroup.rows, "survey").length > 0);
+
+	return (
+		<div className="flex items-center justify-end gap-2">
+			<Badge variant="outline" className="hidden sm:inline-flex">
+				{submittedCount} submitted
+			</Badge>
+			<Button
+				type="button"
+				size="sm"
+				variant="outline"
+				disabled={!canBuild}
+				onClick={() => onBuildReport(placeGroup)}>
+				<PlusCircleIcon data-icon="inline-start" />
+				Build place report
+			</Button>
 		</div>
 	);
 }
 
-// ── Place Group Card ─────────────────────────────────────────────────────────
-
-interface PlaceGroupCardProps {
-	placeGroup: PlaceGroup;
-	basePath: string;
-	selectedIds: Set<string>;
-	onSelectionChange: (id: string, selected: boolean) => void;
-	rolePrefix: "admin" | "manager";
-}
-
-function PlaceGroupCard({ placeGroup, basePath, selectedIds, onSelectionChange, rolePrefix }: PlaceGroupCardProps) {
-	const [isOpen, setIsOpen] = React.useState(true);
-	const [buildDialogOpen, setBuildDialogOpen] = React.useState(false);
-	const submittedCount = placeGroup.rows.filter(r => r.status === "SUBMITTED").length;
-
-	return (
-		<>
-			<Collapsible open={isOpen} onOpenChange={setIsOpen}>
-				<div className="rounded-lg border bg-card">
-					<CollapsibleTrigger asChild>
-						<button
-							type="button"
-							className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-accent/30">
-							<div className="flex items-center gap-3">
-								{isOpen ? (
-									<ChevronDownIcon className="size-4 text-muted-foreground" />
-								) : (
-									<ChevronRightIcon className="size-4 text-muted-foreground" />
-								)}
-								<div>
-									<p className="font-medium">{placeGroup.placeName}</p>
-									<p className="text-xs text-muted-foreground">
-										{submittedCount} submitted {submittedCount === 1 ? "report" : "reports"}
-									</p>
-								</div>
-							</div>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={e => {
-									e.stopPropagation();
-									setBuildDialogOpen(true);
-								}}>
-								<PlusCircleIcon data-icon="inline-start" />
-								Build Place Report
-							</Button>
-						</button>
-					</CollapsibleTrigger>
-					<CollapsibleContent>
-						<Separator />
-						<div className="flex flex-col gap-2 p-3">
-							{placeGroup.rows.map(row => (
-								<SubmissionRow
-									key={row.id}
-									row={row}
-									basePath={basePath}
-									isSelected={selectedIds.has(row.id)}
-									onSelectionChange={onSelectionChange}
-								/>
-							))}
-						</div>
-					</CollapsibleContent>
-				</div>
-			</Collapsible>
-			<BuildPlaceReportDialog
-				open={buildDialogOpen}
-				onOpenChange={setBuildDialogOpen}
-				placeGroup={placeGroup}
-				rolePrefix={rolePrefix}
-			/>
-		</>
-	);
-}
-
-// ── Main Grouped View ────────────────────────────────────────────────────────
-
 export function GroupedReportsView({ rows, basePath, onExportSelected, rolePrefix }: GroupedReportsViewProps) {
 	const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+	const [globalFilter, setGlobalFilter] = React.useState("");
+	const [grouping, setGrouping] = React.useState<GroupingState>(["projectGroupKey", "placeGroupKey"]);
+	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
+	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
+	const tableRows = React.useMemo(() => toReportTableRows(rows), [rows]);
 
-	const projectGroups = React.useMemo(() => groupByProjectAndPlace(rows), [rows]);
-	const hasMultipleProjects = projectGroups.length > 1;
-
-	function handleSelectionChange(id: string, selected: boolean) {
-		setSelectedIds(prev => {
-			const next = new Set(prev);
-			if (selected) {
-				next.add(id);
-			} else {
-				next.delete(id);
+	const columns = React.useMemo<ColumnDef<ReportTableRow>[]>(
+		() => [
+			{
+				id: "select",
+				header: "",
+				enableGrouping: false,
+				cell: ({ row }) => {
+					if (row.getIsGrouped()) {
+						return null;
+					}
+					return (
+						<Checkbox
+							checked={selectedIds.has(row.original.id)}
+							onCheckedChange={checked => {
+								const selected = checked === true;
+								setSelectedIds(prev => {
+									const next = new Set(prev);
+									if (selected) {
+										next.add(row.original.id);
+									} else {
+										next.delete(row.original.id);
+									}
+									return next;
+								});
+							}}
+							aria-label={`Select ${row.original.auditCode}`}
+						/>
+					);
+				}
+			},
+			{
+				accessorKey: "projectGroupKey",
+				header: "Project",
+				cell: ({ row, getValue }) => {
+					if (row.getIsGrouped()) {
+						const label = String(getValue()).split(":::")[0];
+						return (
+							<button
+								type="button"
+								className="flex min-w-[240px] items-center gap-2 text-left font-semibold text-foreground"
+								onClick={row.getToggleExpandedHandler()}>
+								{row.getIsExpanded() ? (
+									<ChevronDownIcon className="size-4" />
+								) : (
+									<ChevronRightIcon className="size-4" />
+								)}
+								<span>{label}</span>
+								<Badge variant="secondary">{row.getLeafRows().length}</Badge>
+							</button>
+						);
+					}
+					return <span className="text-muted-foreground">{row.original.projectName ?? "—"}</span>;
+				}
+			},
+			{
+				accessorKey: "placeGroupKey",
+				header: "Place",
+				cell: ({ row, getValue }) => {
+					if (row.getIsGrouped()) {
+						const label = String(getValue()).split(":::")[0];
+						return (
+							<button
+								type="button"
+								className="flex min-w-[220px] items-center gap-2 text-left font-semibold text-foreground"
+								onClick={row.getToggleExpandedHandler()}>
+								{row.getIsExpanded() ? (
+									<ChevronDownIcon className="size-4" />
+								) : (
+									<ChevronRightIcon className="size-4" />
+								)}
+								<span>{label}</span>
+								<Badge variant="secondary">{row.getLeafRows().length}</Badge>
+							</button>
+						);
+					}
+					return <span>{row.original.placeName ?? "—"}</span>;
+				}
+			},
+			{
+				accessorKey: "auditCode",
+				header: "Report",
+				enableGrouping: false,
+				cell: ({ row }) => {
+					if (row.getIsGrouped()) return null;
+					const mode = row.original.executionMode as "audit" | "survey" | "both" | null;
+					return (
+						<div className="min-w-[260px] space-y-2">
+							<div className="flex items-center gap-2">
+								<Link
+									href={`${basePath}/${encodeURIComponent(row.original.id)}`}
+									className="font-medium text-foreground hover:text-primary">
+									{formatAuditCodeReference(row.original.auditCode)}
+								</Link>
+								<CopyCodeButton value={row.original.auditCode} />
+							</div>
+							<div className="flex flex-wrap items-center gap-2">
+								{mode ? (
+									<Badge variant="outline" className="text-xs">
+										{getExecutionModeLabel(mode)}
+									</Badge>
+								) : null}
+								<span className="text-xs text-muted-foreground">
+									Auditor {row.original.auditorCode}
+								</span>
+							</div>
+						</div>
+					);
+				}
+			},
+			{
+				accessorKey: "submittedAt",
+				header: "Submitted",
+				enableGrouping: false,
+				cell: ({ row }) =>
+					row.getIsGrouped() ? null : (
+						<span>{formatDateTimeLabel(row.original.submittedAt, fallbackText)}</span>
+					)
+			},
+			{
+				id: "score",
+				header: "Score",
+				enableGrouping: false,
+				cell: ({ row }) =>
+					row.getIsGrouped() ? null : (
+						<span className="font-mono text-sm tabular-nums">{scoreLabel(row.original)}</span>
+					)
+			},
+			{
+				id: "actions",
+				header: "Actions",
+				enableGrouping: false,
+				cell: ({ row }) =>
+					row.getIsGrouped() ? (
+						<GroupRowAction row={row} onBuildReport={setBuildPlaceGroup} />
+					) : (
+						<Button asChild variant="ghost" size="sm">
+							<Link href={`${basePath}/${encodeURIComponent(row.original.id)}`}>View</Link>
+						</Button>
+					)
 			}
-			return next;
-		});
-	}
+		],
+		[basePath, selectedIds]
+	);
 
-	function handleClearSelection() {
+	// TanStack Table exposes stable instance methods; the React compiler lint can over-report this integration.
+	// eslint-disable-next-line react-hooks/incompatible-library
+	const table = useReactTable({
+		data: tableRows,
+		columns,
+		state: {
+			grouping,
+			expanded,
+			globalFilter
+		},
+		onGroupingChange: setGrouping,
+		onExpandedChange: setExpanded,
+		onGlobalFilterChange: setGlobalFilter,
+		globalFilterFn: (row, _columnId, filterValue) => {
+			const query = String(filterValue).trim().toLowerCase();
+			return query.length === 0 || row.original.searchText.includes(query);
+		},
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getGroupedRowModel: getGroupedRowModel(),
+		getExpandedRowModel: getExpandedRowModel(),
+		getSortedRowModel: getSortedRowModel()
+	});
+
+	function clearSelection() {
 		setSelectedIds(new Set());
 	}
+
+	const filteredLeafCount = table.getFilteredRowModel().rows.length;
+	const placeCount = new Set(tableRows.map(row => row.placeGroupKey)).size;
+	const projectCount = new Set(tableRows.map(row => row.projectGroupKey)).size;
 
 	if (rows.length === 0) {
 		return (
@@ -453,68 +654,141 @@ export function GroupedReportsView({ rows, basePath, onExportSelected, rolePrefi
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
-			{selectedIds.size > 0 && (
-				<div className="sticky top-0 z-10 flex items-center justify-between rounded-lg border bg-card px-4 py-3 shadow-sm">
-					<p className="text-sm font-medium">
-						{selectedIds.size} {selectedIds.size === 1 ? "report" : "reports"} selected
-					</p>
-					<div className="flex items-center gap-2">
-						<Button type="button" variant="ghost" size="sm" onClick={handleClearSelection}>
-							Clear
-						</Button>
-						{onExportSelected && (
-							<Button type="button" size="sm" onClick={() => onExportSelected(Array.from(selectedIds))}>
-								<DownloadIcon data-icon="inline-start" />
-								Export Selected
-							</Button>
-						)}
-					</div>
-				</div>
-			)}
-
-			{hasMultipleProjects ? (
-				projectGroups.map(projectGroup => (
-					<Card key={projectGroup.projectId}>
-						<CardHeader>
-							<CardTitle className="text-lg">{projectGroup.projectName}</CardTitle>
+		<div className="space-y-4">
+			<Card className="overflow-hidden">
+				<CardHeader className="gap-4 border-b border-border/70">
+					<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+						<div>
+							<CardTitle>Grouped reports table</CardTitle>
 							<CardDescription>
-								{projectGroup.placeGroups.length}{" "}
-								{projectGroup.placeGroups.length === 1 ? "place" : "places"}
+								Review submissions by project and place, then build a place report from the relevant
+								group.
 							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<div className="flex flex-col gap-3">
-								{projectGroup.placeGroups.map(placeGroup => (
-									<PlaceGroupCard
-										key={placeGroup.placeId}
-										placeGroup={placeGroup}
-										basePath={basePath}
-										selectedIds={selectedIds}
-										onSelectionChange={handleSelectionChange}
-										rolePrefix={rolePrefix}
-									/>
-								))}
-							</div>
-						</CardContent>
-					</Card>
-				))
-			) : (
-				<div className="flex flex-col gap-3">
-					{projectGroups.flatMap(pg =>
-						pg.placeGroups.map(placeGroup => (
-							<PlaceGroupCard
-								key={placeGroup.placeId}
-								placeGroup={placeGroup}
-								basePath={basePath}
-								selectedIds={selectedIds}
-								onSelectionChange={handleSelectionChange}
-								rolePrefix={rolePrefix}
+						</div>
+						<div className="flex flex-wrap gap-2">
+							<Badge variant="secondary">{projectCount} projects</Badge>
+							<Badge variant="secondary">{placeCount} places</Badge>
+							<Badge variant="secondary">{rows.length} reports</Badge>
+						</div>
+					</div>
+					<div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+						<div className="relative max-w-xl flex-1">
+							<SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+							<Input
+								value={globalFilter}
+								onChange={event => setGlobalFilter(event.target.value)}
+								placeholder="Search report code, auditor, project, or place…"
+								className="pl-9"
 							/>
-						))
-					)}
-				</div>
-			)}
+						</div>
+						<div className="flex flex-wrap gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => table.toggleAllRowsExpanded(true)}>
+								Expand all
+							</Button>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => table.toggleAllRowsExpanded(false)}>
+								Collapse all
+							</Button>
+							{selectedIds.size > 0 ? (
+								<Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
+									Clear selection
+								</Button>
+							) : null}
+							{onExportSelected && selectedIds.size > 0 ? (
+								<Button
+									type="button"
+									size="sm"
+									onClick={() => onExportSelected(Array.from(selectedIds))}>
+									<DownloadIcon data-icon="inline-start" />
+									Export {selectedIds.size}
+								</Button>
+							) : null}
+						</div>
+					</div>
+				</CardHeader>
+				<CardContent className="p-0">
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map(headerGroup => (
+								<TableRow key={headerGroup.id} className="hover:bg-transparent">
+									{headerGroup.headers.map(header => (
+										<TableHead
+											key={header.id}
+											className={cn(header.id === "actions" && "text-right")}>
+											{header.isPlaceholder
+												? null
+												: flexRender(header.column.columnDef.header, header.getContext())}
+										</TableHead>
+									))}
+								</TableRow>
+							))}
+						</TableHeader>
+						<TableBody>
+							{table.getRowModel().rows.length > 0 ? (
+								table.getRowModel().rows.map(row => (
+									<TableRow
+										key={row.id}
+										data-state={
+											!row.getIsGrouped() && selectedIds.has(row.original.id)
+												? "selected"
+												: undefined
+										}
+										className={cn(
+											row.getIsGrouped() && row.depth === 0 && "bg-muted/45 hover:bg-muted/55",
+											row.getIsGrouped() && row.depth === 1 && "bg-primary/5 hover:bg-primary/10"
+										)}>
+										{row.getVisibleCells().map(cell => (
+											<TableCell
+												key={cell.id}
+												className={cn(
+													row.getIsGrouped() && "py-3",
+													cell.column.id === "actions" && "text-right"
+												)}>
+												{cell.getIsPlaceholder()
+													? null
+													: flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow className="hover:bg-transparent">
+									<TableCell
+										colSpan={table.getVisibleLeafColumns().length}
+										className="h-28 text-center text-sm text-muted-foreground">
+										No reports match the current search.
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
+
+			<div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
+				<span>
+					Showing {filteredLeafCount} of {rows.length} submitted reports with TanStack project/place grouping.
+				</span>
+				<span>Select individual rows for exports; use place group actions to build combined reports.</span>
+			</div>
+
+			{buildPlaceGroup ? (
+				<BuildPlaceReportDialog
+					open={buildPlaceGroup !== null}
+					onOpenChange={open => {
+						if (!open) setBuildPlaceGroup(null);
+					}}
+					placeGroup={buildPlaceGroup}
+					rolePrefix={rolePrefix}
+				/>
+			) : null}
 		</div>
 	);
 }

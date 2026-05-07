@@ -1,8 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { XIcon } from "lucide-react";
 import * as React from "react";
 
@@ -18,19 +16,10 @@ import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
-import {
-	getTextColumnFilterValue,
-	preservePreviousData,
-	toBackendSortParam
-} from "@/components/dashboard/server-table-utils";
+import { preservePreviousData } from "@/components/dashboard/server-table-utils";
 import { Button } from "@/components/ui/button";
 
 export default function AdminReportsPage() {
-	const router = useRouter();
-	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-
-	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
-
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
 	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
 	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
@@ -67,7 +56,6 @@ export default function AdminReportsPage() {
 			"admin",
 			"reports",
 			"all",
-			searchValue,
 			selectedProjectIds,
 			selectedPlaceIds,
 			selectedAuditorIds,
@@ -77,7 +65,6 @@ export default function AdminReportsPage() {
 			playspaceApi.admin.audits({
 				page: 1,
 				pageSize: 200,
-				search: searchValue,
 				projectIds: selectedProjectIds,
 				placeIds: selectedPlaceIds,
 				auditorIds: selectedAuditorIds,
