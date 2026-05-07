@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ColumnDef, ExpandedState, GroupingState, Row } from "@tanstack/react-table";
+import type { ColumnDef, ExpandedState, GroupingState, Row, RowSelectionState } from "@tanstack/react-table";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -470,7 +470,7 @@ export function GroupedReportsView({
 	onSearchValueChange,
 	isSearching = false
 }: GroupedReportsViewProps) {
-	const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+	const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
 	const [grouping, setGrouping] = React.useState<GroupingState>(["projectGroupKey", "placeGroupKey"]);
 	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
@@ -507,25 +507,15 @@ export function GroupedReportsView({
 				id: "select",
 				header: "",
 				enableGrouping: false,
-				cell: ({ row }) => {
+				cell: ({ row, table }) => {
 					if (row.getIsGrouped()) {
 						return null;
 					}
+					const selection = table.getState().rowSelection;
 					return (
 						<Checkbox
-							checked={selectedIds.has(row.original.id)}
-							onCheckedChange={checked => {
-								const selected = checked === true;
-								setSelectedIds(prev => {
-									const next = new Set(prev);
-									if (selected) {
-										next.add(row.original.id);
-									} else {
-										next.delete(row.original.id);
-									}
-									return next;
-								});
-							}}
+							checked={Boolean(selection[row.id])}
+							onCheckedChange={checked => row.toggleSelected(checked === true)}
 							aria-label={`Select ${row.original.auditCode}`}
 						/>
 					);
@@ -646,7 +636,7 @@ export function GroupedReportsView({
 				}
 			}
 		],
-		[basePath, placeGroupsByKey, selectedIds]
+		[basePath, placeGroupsByKey]
 	);
 
 	// TanStack Table exposes stable instance methods; the React compiler lint can over-report this integration.
@@ -657,10 +647,13 @@ export function GroupedReportsView({
 		state: {
 			grouping,
 			expanded,
-			globalFilter
+			globalFilter,
+			rowSelection
 		},
+		getRowId: row => row.id,
 		onGroupingChange: setGrouping,
 		onExpandedChange: setExpanded,
+		onRowSelectionChange: setRowSelection,
 		onGlobalFilterChange: updater => {
 			setGlobalFilter(previous => String(typeof updater === "function" ? updater(previous) : (updater ?? "")));
 		},
@@ -675,8 +668,11 @@ export function GroupedReportsView({
 		getSortedRowModel: getSortedRowModel()
 	});
 
+	const selectedReportIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
+	const selectedCount = selectedReportIds.length;
+
 	function clearSelection() {
-		setSelectedIds(new Set());
+		setRowSelection({});
 	}
 
 	const filteredLeafCount = table.getFilteredRowModel().rows.length;
@@ -743,18 +739,15 @@ export function GroupedReportsView({
 								onClick={() => table.toggleAllRowsExpanded(false)}>
 								Collapse all
 							</Button>
-							{selectedIds.size > 0 ? (
+							{selectedCount > 0 ? (
 								<Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
 									Clear selection
 								</Button>
 							) : null}
-							{onExportSelected && selectedIds.size > 0 ? (
-								<Button
-									type="button"
-									size="sm"
-									onClick={() => onExportSelected(Array.from(selectedIds))}>
+							{onExportSelected && selectedCount > 0 ? (
+								<Button type="button" size="sm" onClick={() => onExportSelected(selectedReportIds)}>
 									<DownloadIcon data-icon="inline-start" />
-									Export {selectedIds.size}
+									Export {selectedCount}
 								</Button>
 							) : null}
 						</div>
@@ -782,11 +775,7 @@ export function GroupedReportsView({
 								table.getRowModel().rows.map(row => (
 									<TableRow
 										key={row.id}
-										data-state={
-											!row.getIsGrouped() && selectedIds.has(row.original.id)
-												? "selected"
-												: undefined
-										}
+										data-state={!row.getIsGrouped() && row.getIsSelected() ? "selected" : undefined}
 										className={cn(
 											row.getIsGrouped() && row.depth === 0 && "bg-muted/45 hover:bg-muted/55",
 											row.getIsGrouped() && row.depth === 1 && "bg-primary/5 hover:bg-primary/10"

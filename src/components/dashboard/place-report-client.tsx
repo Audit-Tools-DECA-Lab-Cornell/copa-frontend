@@ -302,10 +302,12 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 					<div className="rounded-lg border bg-card p-4">
 						<div className="flex items-center gap-2 text-sm font-semibold">
 							<CheckCircleIcon className="size-4 text-primary" />
-							Next step
+							{savedSuccess ? "Saved report" : "Next step"}
 						</div>
 						<p className="mt-2 text-sm text-muted-foreground">
-							Save this combination to the place record so it is easy to reopen later.
+							{savedSuccess
+								? "This report is saved to the place record and can be reopened from the place details page."
+								: "Save this combination to the place record so it is easy to reopen later."}
 						</p>
 					</div>
 					{saveMutation.isError ? (
