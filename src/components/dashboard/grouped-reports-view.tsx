@@ -456,7 +456,6 @@ export function GroupedReportsView({
 	const [sorting, setSorting] = React.useState<SortingState>([{ id: "latestSubmittedAt", desc: true }]);
 	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
 	const [selectedReportIds, setSelectedReportIds] = React.useState<Record<string, boolean>>({});
-	const previousSearchValueRef = React.useRef(searchValue);
 	const skipNextSearchChangeRef = React.useRef(false);
 
 	const placeGroups = React.useMemo(() => buildPlaceGroups(rows), [rows]);
@@ -647,6 +646,7 @@ export function GroupedReportsView({
 		[]
 	);
 
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable({
 		data: placeGroups,
 		columns,

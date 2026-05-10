@@ -445,54 +445,46 @@
 			}
 		},
 		"instruments": {
+			"title": "Instrumentenverwaltung",
+			"description": "Verwalten Sie Audit-Instrumentversionen, Übersetzungen und veröffentlichen Sie neue Definitionen.",
+			"uploadAction": "JSON hochladen",
+			"createDraft": "Neuen Entwurf erstellen",
+			"activeVersion": "Aktive Version",
+			"viewingVersion": "Version anzeigen",
+			"backToActive": "Zurück zur aktiven Version",
+			"createDraftFromHere": "Entwurf von hier erstellen",
 			"error": {
 				"title": "Instrumente konnten nicht geladen werden",
 				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen.",
 				"retry": "Erneut versuchen"
 			},
-			"header": {
-				"eyebrow": "Administratorbereich",
-				"title": "Instrumentenverwaltung",
-				"description": "Verwalten Sie Audit-Instrumentversionen, Übersetzungen und veröffentlichen Sie neue Definitionen.",
-				"back": "Zurück zum Dashboard"
+			"toast": {
+				"saveSuccess": "Instrument gespeichert",
+				"saveActiveDesc": "Version {version} wurde gespeichert und aktiviert.",
+				"saveDraftDesc": "Version {version} wurde als Entwurf gespeichert.",
+				"saveError": "Fehler beim Speichern des Instruments",
+				"activateSuccess": "Instrument aktiviert",
+				"activateDesc": "Version {version} ist jetzt die aktive Version.",
+				"activateError": "Fehler beim Aktivieren des Instruments"
 			},
-			"breadcrumbs": {
-				"dashboard": "Dashboard",
-				"instruments": "Instrumente"
+			"empty": {
+				"title": "Keine Instrumente gefunden",
+				"description": "Laden Sie Ihre erste Instrumentendefinition hoch, um zu beginnen.",
+				"action": "Instrument hochladen"
 			},
 			"versionHistory": {
 				"title": "Versionshistorie",
-				"description": "Alle Instrumentversionen. Nur eine kann gleichzeitig aktiv sein.",
-				"version": "Version",
-				"status": "Status",
-				"created": "Erstellt",
-				"actions": "Aktionen",
-				"active": "Aktiv",
-				"inactive": "Inaktiv",
-				"activate": "Aktivieren",
-				"deactivate": "Deaktivieren",
+				"versions": "{count} {count, plural, one {Version} other {Versionen}}",
+				"viewDetails": "Details anzeigen",
+				"activated": "Aktiviert am {date}",
+				"created": "Erstellt am {date}",
+				"makeActive": "Aktivieren",
+				"showMore": "Weitere Historie anzeigen",
 				"noVersions": "Keine Instrumentversionen gefunden.",
-				"confirmActivate": "Dadurch werden alle anderen Versionen deaktiviert und diese wird zur aktiven Quelle der Wahrheit. Fortfahren?",
-				"confirmActivateTitle": "Instrumentversion aktivieren"
-			},
-			"actions": {
-				"publishNew": "Neue Version veröffentlichen",
-				"uploadJson": "JSON hochladen",
-				"viewContent": "Inhalt anzeigen",
-				"editDuplicate": "Bearbeiten & Duplizieren"
-			},
-			"editor": {
-				"title": "Instrumenten-Editor",
-				"breadcrumb": "Editor",
-				"description": "Bearbeitung einer Kopie von Version {version}. Änderungen werden als neue Version gespeichert.",
-				"cancel": "Abbrechen",
-				"saveDraft": "Als Entwurf speichern",
-				"publish": "Veröffentlichen & Aktivieren",
-				"publishTitle": "Neue Instrumentversion veröffentlichen",
-				"publishConfirm": "Dadurch werden alle anderen Versionen deaktiviert und die neue Version wird zur aktiven Quelle der Wahrheit für alle Clients.",
-				"draftTitle": "Als Entwurf speichern",
-				"draftConfirm": "Die neue Version wird gespeichert, aber nicht aktiviert. Sie können sie später über die Versionshistorie aktivieren.",
-				"newVersionLabel": "Neue Versionsnummer"
+				"confirmActivateTitle": "Diese Version aktivieren?",
+				"confirmActivate": "Dies ersetzt sofort das aktuelle aktive Instrument für alle Prüfer. Laufende Audits werden mit ihrer gestarteten Version fortgesetzt.",
+				"activate": "Version aktivieren",
+				"cancel": "Abbrechen"
 			},
 			"upload": {
 				"title": "Instrument-JSON hochladen",
@@ -503,9 +495,24 @@
 				"filePlaceholder": "Klicken oder ziehen Sie eine .json-Datei hierher",
 				"fileLoaded": "Geladen ({keys} Schlüssel auf oberster Ebene)",
 				"saveDraft": "Als Entwurf speichern",
-				"publishActive": "Veröffentlichen & Aktivieren"
+				"publishActive": "Veröffentlichen & Aktivieren",
+				"cancel": "Abbrechen",
+				"errorJsonObj": "Die Datei muss ein JSON-Objekt enthalten.",
+				"errorInvalidJson": "Ungültige JSON-Datei."
+			},
+			"activate": {
+				"title": "Instrumentversion aktivieren",
+				"description": "Dadurch werden alle anderen Versionen deaktiviert und diese wird zur aktiven Quelle der Wahrheit. Fortfahren?",
+				"cancel": "Abbrechen",
+				"confirm": "Version aktivieren"
 			},
 			"content": {
+				"editDraft": "Instrumenten-Editor",
+				"editDraftDesc": "Bearbeitung einer Kopie von Version {version}. Änderungen werden als neue Version gespeichert.",
+				"cancel": "Abbrechen",
+				"saveDraft": "Als Entwurf speichern",
+				"publish": "Veröffentlichen & Aktivieren",
+				"overview": "Übersicht",
 				"title": "Instrumentinhalt",
 				"sections": "Abschnitte",
 				"questions": "Fragen",
@@ -576,6 +583,10 @@
 				"customOptionsSummary": "{count} Optionen (Standard: {defaultCount})",
 				"addParagraph": "Absatz hinzufügen",
 				"removeParagraph": "Entfernen",
+				"addSection": "Abschnitt hinzufügen",
+				"removeSection": "Abschnitt entfernen",
+				"moveUp": "Nach oben",
+				"moveDown": "Nach unten",
 				"addQuestion": "Frage hinzufügen",
 				"removeQuestion": "Frage entfernen",
 				"addOption": "Option hinzufügen",
@@ -590,6 +601,12 @@
 				"removeScaleDefinition": "Entfernen",
 				"addPreAuditQuestion": "Frage hinzufügen",
 				"removePreAuditQuestion": "Entfernen",
+				"noQuestions": "Keine Fragen in diesem Abschnitt.",
+				"questionCount": "{count, plural, one {# Frage} other {# Fragen}}",
+				"sectionDetails": "Abschnittsdetails",
+				"noDescription": "Keine Beschreibung",
+				"noInstruction": "Keine Anweisung",
+				"noNotesPrompt": "Keine Notizhinweis",
 				"questionKey": "Frageschlüssel",
 				"sectionKey": "Abschnittsschlüssel",
 				"scaleKey": "Skalenschlüssel",
@@ -637,6 +654,10 @@
 				"legalDocuments": "Rechtliche Dokumente",
 				"legalDocumentsDescription": "Nutzungsbedingungen und Datenschutzhinweis für Prüfer beim Onboarding.",
 				"addLegalDocument": "Dokument hinzufügen",
+				"addLegalDoc": "Dokument hinzufügen",
+				"removeLegalDoc": "Dokument entfernen",
+				"documentDetails": "Dokumentendetails",
+				"untitledDocument": "Unbenanntes Dokument",
 				"noLegalDocuments": "Keine rechtlichen Dokumente. Fügen Sie ein Dokument hinzu.",
 				"legalDocKey": "Dokumentschlüssel",
 				"legalDocShortTitle": "Kurztitel",
@@ -652,7 +673,13 @@
 				"legalSectionBody": "Textabsätze",
 				"legalSectionBullets": "Aufzählungspunkte",
 				"addBullet": "Punkt hinzufügen",
-				"noBullets": "Keine Aufzählungspunkte in diesem Abschnitt."
+				"noBullets": "Keine Aufzählungspunkte in diesem Abschnitt.",
+				"reviewTitle": "Neue Instrumentversion veröffentlichen",
+				"reviewDescription": "Überprüfen Sie die erkannten Änderungen vor der Veröffentlichung. Dies wird alle anderen Versionen deaktivieren.",
+				"detectedChanges": "Erkannte Änderungen ({count})",
+				"noChanges": "Keine Änderungen zwischen diesen Versionen erkannt.",
+				"publishing": "Veröffentliche...",
+				"publishAndActivate": "Veröffentlichen & Aktivieren"
 			}
 		},
 		"system": {

@@ -9,13 +9,10 @@ import {
 	HashIcon,
 	ActivityIcon,
 	LayersIcon,
-	DownloadIcon,
 	ChevronsUpDownIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
 	ListIcon,
-	FileSpreadsheetIcon,
-	FileTextIcon,
 	ChevronsDownUpIcon
 } from "lucide-react";
 
@@ -33,7 +30,6 @@ import {
 	reportBarScoreTier,
 	roundedPercentOfMax
 } from "@/lib/audit/report-helpers";
-import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/export/audit";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";

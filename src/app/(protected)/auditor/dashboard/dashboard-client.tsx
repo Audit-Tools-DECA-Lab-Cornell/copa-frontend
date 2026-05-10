@@ -170,18 +170,21 @@ export function AuditorDashboardClient() {
 	}
 
 	/** Build the href for the execute/resume page. */
-	function getExecuteHref(place: AuditorPlace): string {
+	const getExecuteHref = React.useCallback((place: AuditorPlace): string => {
 		return `/auditor/execute/${encodeURIComponent(place.place_id)}?projectId=${encodeURIComponent(place.project_id)}`;
-	}
+	}, []);
 
 	/** Build the primary link href for a place row — report if submitted, execute otherwise. */
-	function getPrimaryHref(place: AuditorPlace): string {
-		const status = deriveSessionStatus(place);
-		if (status === "submitted" && place.audit_id) {
-			return `/auditor/reports/${encodeURIComponent(place.audit_id)}`;
-		}
-		return getExecuteHref(place);
-	}
+	const getPrimaryHref = React.useCallback(
+		(place: AuditorPlace): string => {
+			const status = deriveSessionStatus(place);
+			if (status === "submitted" && place.audit_id) {
+				return `/auditor/reports/${encodeURIComponent(place.audit_id)}`;
+			}
+			return getExecuteHref(place);
+		},
+		[getExecuteHref]
+	);
 
 	const columns = React.useMemo<ColumnDef<AuditorPlace>[]>(
 		() => [
@@ -320,7 +323,7 @@ export function AuditorDashboardClient() {
 				}
 			}
 		],
-		[formatT, t]
+		[formatT, getExecuteHref, getPrimaryHref, t]
 	);
 
 	const isInitialLoading =

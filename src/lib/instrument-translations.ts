@@ -302,7 +302,7 @@ function localizeInstrumentSection(
  * @param _languageTag Current i18n language tag (unused -- kept for API compat).
  * @returns An empty translation bundle.
  */
-export function getInstrumentTranslations(_languageTag: string | undefined): InstrumentTranslations {
+export function getInstrumentTranslations(): InstrumentTranslations {
 	return {};
 }
 
@@ -357,7 +357,7 @@ export function useLocalizedInstrument(
 		if (!baseInstrumentOverride) {
 			return null;
 		}
-		const translations = getInstrumentTranslations(activeLanguage);
+		const translations = getInstrumentTranslations();
 		return localizeInstrument(baseInstrumentOverride, translations);
 	}, [activeLanguage, baseInstrumentOverride]);
 }
