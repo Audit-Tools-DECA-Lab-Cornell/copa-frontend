@@ -10,7 +10,6 @@ import {
 	Minus,
 	Plus,
 	Ruler,
-	Sparkles,
 	Trash2
 } from "lucide-react";
 import type {
@@ -36,66 +35,85 @@ import { CONSTRUCT_OPTIONS, MODE_OPTIONS, QUESTION_TYPE_OPTIONS, SCALE_KEY_OPTIO
 export function ChoiceOptionsEditor({
 	options,
 	onChange
-}: Readonly<{
+}: {
 	options: ChoiceOption[];
-	onChange: (options: ChoiceOption[]) => void;
-}>) {
-	const t = useTranslations("admin.instruments.content");
-
-	function updateOption(index: number, field: keyof ChoiceOption, value: string | null) {
+	onChange: (opts: ChoiceOption[]) => void;
+}) {
+	function updateOption(i: number, field: keyof ChoiceOption, val: string) {
 		const next = structuredClone(options);
-		(next[index] as Record<string, string | null | undefined>)[field] = value;
+		next[i] = { ...next[i], [field]: val };
 		onChange(next);
 	}
 
 	function addOption() {
-		onChange([...options, makeDefaultChoiceOption()]);
+		onChange([...options, { key: "", label: "", description: "" }]);
 	}
 
-	function removeOption(index: number) {
-		onChange(options.filter((_, i) => i !== index));
+	function removeOption(i: number) {
+		onChange(options.filter((_, idx) => idx !== i));
+	}
+
+	if (options.length === 0) {
+		return (
+			<div className="flex items-center justify-between">
+				<span className="text-xs text-muted-foreground">No options</span>
+				<Button variant="ghost" size="sm" onClick={addOption} className="h-7 gap-1 text-xs">
+					<Plus className="h-3 w-3" />
+					Add option
+				</Button>
+			</div>
+		);
 	}
 
 	return (
 		<div className="space-y-2">
+			{/* Section header */}
 			<div className="flex items-center justify-between">
-				<Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-					{t("options")} ({options.length})
-				</Label>
-				<Button variant="ghost" size="sm" onClick={addOption}>
-					<Plus className="mr-1 h-3 w-3" />
-					{t("addOption")}
+				<span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+					Options ({options.length})
+				</span>
+				<Button variant="ghost" size="sm" onClick={addOption} className="h-7 gap-1 text-xs">
+					<Plus className="h-3 w-3" />
+					Add
 				</Button>
 			</div>
-			{options.map((opt, oIdx) => (
-				<div key={oIdx} className="flex items-start gap-2 rounded border border-border/40 bg-muted/20 p-2">
-					<div className="min-w-0 flex-1 grid gap-2 sm:grid-cols-3">
-						<EditableField
-							label={t("optionKey")}
+
+			{/* Column headers — shown ONCE, not per row */}
+			<div className="grid grid-cols-[1fr_1fr_auto] gap-2 px-1">
+				<span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide">Key</span>
+				<span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide">Label</span>
+				<span className="w-7" />
+			</div>
+
+			{/* Option rows */}
+			<div className="space-y-1.5">
+				{options.map((opt, i) => (
+					<div
+						key={i}
+						className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center rounded-lg bg-muted/30 border border-border/40 px-2 py-1.5">
+						<Input
 							value={opt.key}
-							mono
-							onChange={v => updateOption(oIdx, "key", v)}
+							onChange={e => updateOption(i, "key", e.target.value)}
+							placeholder="option_key"
+							className="h-7 text-xs font-mono bg-background border-border/60"
 						/>
-						<EditableField
-							label={t("optionLabel")}
+						<Input
 							value={opt.label}
-							onChange={v => updateOption(oIdx, "label", v)}
+							onChange={e => updateOption(i, "label", e.target.value)}
+							placeholder="Display label"
+							className="h-7 text-xs bg-background border-border/60"
 						/>
-						<EditableField
-							label={t("optionDescription")}
-							value={opt.description ?? ""}
-							onChange={v => updateOption(oIdx, "description", v || null)}
-						/>
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={() => removeOption(i)}
+							className="h-7 w-7 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
+							aria-label="Remove option">
+							<Trash2 className="h-3 w-3" />
+						</Button>
 					</div>
-					<Button
-						variant="ghost"
-						size="icon"
-						className="mt-5 shrink-0 text-muted-foreground hover:text-destructive"
-						onClick={() => removeOption(oIdx)}>
-						<Minus className="h-4 w-4" />
-					</Button>
-				</div>
-			))}
+				))}
+			</div>
 		</div>
 	);
 }
@@ -157,7 +175,7 @@ export function ScaleOptionsEditor({
 						{t("boostValue")}
 					</span>
 					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-						Flags
+						{t("flags")}
 					</span>
 					<span /> {/* delete column */}
 				</div>
@@ -262,7 +280,7 @@ export function ScaleOptionsEditor({
 									: "border-border bg-transparent text-muted-foreground hover:border-border/80"
 							}`}
 							title={t("isNotApplicable")}>
-							N/A
+							{t("notApplicable")}
 						</button>
 						<button
 							type="button"
@@ -277,7 +295,7 @@ export function ScaleOptionsEditor({
 									: "border-border bg-transparent text-muted-foreground hover:border-border/80"
 							}`}
 							title={t("allowsFollowUp")}>
-							Follow-up
+							{t("followUpBadge")}
 						</button>
 					</div>
 
@@ -295,18 +313,18 @@ export function ScaleOptionsEditor({
 			{/* Legend for flag pills */}
 			{options.some(o => o.is_not_applicable || o.allows_follow_up_scales) && (
 				<div className="flex items-center gap-3 pt-1 pl-1">
-					<span className="text-[10px] text-muted-foreground/60">Flags:</span>
+					<span className="text-[10px] text-muted-foreground/60">{t("flags")}:</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
 						<span className="rounded-full border border-amber-400/60 bg-amber-100 dark:bg-amber-900/30 px-1.5 text-amber-800 dark:text-amber-300">
-							N/A
+							{t("notApplicable")}
 						</span>
-						= not applicable option
+						= {t("notApplicableDesc")}
 					</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
 						<span className="rounded-full border border-violet-400/60 bg-violet-100 dark:bg-violet-900/30 px-1.5 text-violet-800 dark:text-violet-300">
-							Follow-up
+							{t("followUpBadge")}
 						</span>
-						= unlocks follow-up scales
+						= {t("allowsFollowUpDesc")}
 					</span>
 				</div>
 			)}
@@ -478,7 +496,6 @@ export function QuestionScalesEditor({
 									<Badge
 										variant="outline"
 										className="gap-1 border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta text-[10px] px-1.5 py-0">
-										<Sparkles className="h-3 w-3" />
 										{t("customOptions")}
 									</Badge>
 								)}
@@ -570,10 +587,8 @@ export function QuestionEditor({
 									key={`custom-${scale.key}`}
 									variant="outline"
 									className="gap-1 border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta text-[10px] px-1.5 py-0">
-									<Sparkles className="h-3 w-3" />
-									{t.has(`scaleLabels.${scale.key}`)
-										? t(`scaleLabels.${scale.key}`)
-										: scale.key}: {t("customOptions")}
+									{t.has(`scaleLabels.${scale.key}`) ? t(`scaleLabels.${scale.key}`) : scale.key}:{" "}
+									{t("customOptions")}
 								</Badge>
 							);
 						})}

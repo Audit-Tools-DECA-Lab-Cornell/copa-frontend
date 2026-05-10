@@ -360,8 +360,11 @@ export function SpreadsheetView({
 																)
 															) : (
 																<span className="text-xs text-muted-foreground">
-																	{sections[row.sectionIndex]?.description ||
-																		t("noDescription")}
+																	{sections[row.sectionIndex]?.description
+																		? renderInlineMarkdown(
+																				sections[row.sectionIndex].description!
+																			)
+																		: t("noDescription")}
 																</span>
 															)}
 														</div>
@@ -379,8 +382,11 @@ export function SpreadsheetView({
 																)
 															) : (
 																<span className="text-xs text-muted-foreground">
-																	{sections[row.sectionIndex]?.instruction ||
-																		t("noInstruction")}
+																	{sections[row.sectionIndex]?.instruction
+																		? renderInlineMarkdown(
+																				sections[row.sectionIndex]!.instruction
+																			)
+																		: t("noInstruction")}
 																</span>
 															)}
 														</div>
@@ -398,8 +404,11 @@ export function SpreadsheetView({
 																)
 															) : (
 																<span className="text-xs text-muted-foreground">
-																	{sections[row.sectionIndex]?.notes_prompt ||
-																		t("noNotesPrompt")}
+																	{sections[row.sectionIndex]?.notes_prompt
+																		? renderInlineMarkdown(
+																				sections[row.sectionIndex].notes_prompt!
+																			)
+																		: t("noNotesPrompt")}
 																</span>
 															)}
 														</div>

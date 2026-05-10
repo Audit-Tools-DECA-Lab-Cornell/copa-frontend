@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, FileUp, Plus } from "lucide-react";
+import { FileUp, Plus } from "lucide-react";
 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -37,8 +37,6 @@ export function InstrumentsAdminClient() {
 
 	const [editingContent, setEditingContent] = useState<InstrumentContent | null>(null);
 	const [editingVersion, setEditingVersion] = useState<string>("");
-	const [selectedVersion, setSelectedVersion] = useState<InstrumentVersionRow | null>(null);
-
 	const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
 	const [versionToActivate, setVersionToActivate] = useState<InstrumentVersionRow | null>(null);
 	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
@@ -96,7 +94,7 @@ export function InstrumentsAdminClient() {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 			setEditingContent(null);
 			if (params.activate) {
-				setSelectedVersion(null);
+				// Success handling
 			}
 		},
 		onError: (error: Error) => {
@@ -116,7 +114,6 @@ export function InstrumentsAdminClient() {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 			setIsActivateDialogOpen(false);
 			setVersionToActivate(null);
-			setSelectedVersion(null);
 		},
 		onError: (error: Error) => {
 			toast.error(t("toast.activateError"), {
@@ -126,7 +123,11 @@ export function InstrumentsAdminClient() {
 	});
 
 	async function handleSaveDraft(version: string, content: InstrumentContent, activate = false) {
-		const result = await setInstrumentMutation.mutateAsync({ version, content: content as InstrumentContentPayload, activate });
+		const result = await setInstrumentMutation.mutateAsync({
+			version,
+			content: content as InstrumentContentPayload,
+			activate
+		});
 		return result;
 	}
 
@@ -141,9 +142,6 @@ export function InstrumentsAdminClient() {
 	}
 
 	const isPending = setInstrumentMutation.isPending || activateVersionMutation.isPending;
-
-	const displayingVersion = selectedVersion ?? activeVersion;
-	const isDisplayingActive = activeVersion && displayingVersion?.version === activeVersion.version;
 
 	const headerActions = !editingContent ? (
 		<div className="flex items-center gap-2">
@@ -166,7 +164,16 @@ export function InstrumentsAdminClient() {
 
 	return (
 		<div className="space-y-6">
-			<DashboardHeader title={t("title")} description={t("description")} actions={headerActions} />
+			<DashboardHeader
+				eyebrow={t("header.eyebrow")}
+				title={t("title")}
+				description={t("description")}
+				breadcrumbs={[
+					{ label: t("breadcrumbs.dashboard"), href: "/admin/dashboard" },
+					{ label: t("breadcrumbs.instruments") }
+				]}
+				actions={headerActions}
+			/>
 
 			{isActiveLoading ? (
 				<div className="flex h-48 items-center justify-center">
@@ -178,11 +185,11 @@ export function InstrumentsAdminClient() {
 						<VersionHistory
 							versions={allVersions}
 							isPending={isPending}
-							onSelectVersion={v => setSelectedVersion(v)}
 							onActivateVersion={v => {
 								setVersionToActivate(v);
 								setIsActivateDialogOpen(true);
 							}}
+							onEditDraft={handleEditDraft}
 						/>
 					)}
 
@@ -194,64 +201,16 @@ export function InstrumentsAdminClient() {
 							onSave={handleSaveDraft}
 							onCancel={() => setEditingContent(null)}
 						/>
-					) : displayingVersion ? (
-						<div className="space-y-4">
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-3">
-									{selectedVersion && !isDisplayingActive && (
-										<Button
-											variant="ghost"
-											size="sm"
-											className="-ml-2 px-2 text-muted-foreground"
-											onClick={() => setSelectedVersion(null)}>
-											<ChevronLeft className="mr-1 h-4 w-4" />
-											{t("backToActive")}
-										</Button>
-									)}
-									<h2 className="text-lg font-semibold flex items-center gap-2">
-										{isDisplayingActive ? t("activeVersion") : t("viewingVersion")}
-										<span className="font-mono text-muted-foreground">
-											v{displayingVersion.version}
-										</span>
-									</h2>
-								</div>
-								{!isDisplayingActive && (
-									<Button
-										variant="secondary"
-										size="sm"
-										onClick={() => {
-											setVersionToActivate(displayingVersion);
-											setIsActivateDialogOpen(true);
-										}}>
-										{t("versionHistory.makeActive")}
-									</Button>
-								)}
-								{isDisplayingActive && (
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() =>
-											handleEditDraft(
-												displayingVersion.version,
-												displayingVersion.content as unknown as InstrumentContent
-											)
-										}>
-										<Plus className="mr-2 h-4 w-4" />
-										{t("createDraftFromHere")}
-									</Button>
-								)}
-							</div>
-							<InstrumentContentViewer
-								content={displayingVersion.content as unknown as InstrumentContent}
-								version={displayingVersion.version}
-							/>
-						</div>
 					) : (
-						<EmptyState
-							title={t("empty.title")}
-							description={t("empty.description")}
-							action={<Button onClick={() => setIsUploadDialogOpen(true)}>{t("empty.action")}</Button>}
-						/>
+						(!allVersions || allVersions.length === 0) && (
+							<EmptyState
+								title={t("empty.title")}
+								description={t("empty.description")}
+								action={
+									<Button onClick={() => setIsUploadDialogOpen(true)}>{t("empty.action")}</Button>
+								}
+							/>
+						)
 					)}
 				</>
 			)}

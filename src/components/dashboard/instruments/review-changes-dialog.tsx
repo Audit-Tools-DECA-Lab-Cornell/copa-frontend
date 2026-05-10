@@ -77,7 +77,7 @@ export function ReviewChangesDialog({
 				</div>
 
 				<AlertDialogFooter>
-					<AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
+					<AlertDialogCancel onClick={onCancel}>{t("cancel")}</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={onConfirm}
 						disabled={isPending}
@@ -89,4 +89,3 @@ export function ReviewChangesDialog({
 		</AlertDialog>
 	);
 }
-

@@ -123,7 +123,7 @@ export function SectionEditorList({
 										<div className="col-span-full">
 											<EditableField
 												label={t("sectionDescription")}
-												value={section.description || "Description Unavailable"}
+												value={section.description || t("noDescription")}
 												multiline
 												onChange={v =>
 													updateSection(sIdx, s => {

@@ -1,18 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import {
-	Download,
-	FileJson,
-	FileSpreadsheet,
-	FileText,
-	Check,
-	Copy,
-	Pencil,
-	Save,
-	X,
-	Plus,
-	Sparkles
-} from "lucide-react";
+import { Download, FileJson, FileSpreadsheet, FileText, Check, Copy, Pencil, Save, X, Plus } from "lucide-react";
 
 import { Lang, type InstrumentContent } from "./types";
 import { exportInstrument } from "@/lib/export/instrument";
@@ -59,7 +47,7 @@ export function InstrumentEditor({
 
 	const [draftContent, setDraftContent] = useState<InstrumentContent>(content);
 	const [draftVersion, setDraftVersion] = useState(version);
-	const [activeLang, setActiveLang] = useState<Lang>(Object.keys(content)[0] as Lang ?? "en");
+	const [activeLang, setActiveLang] = useState<Lang>((Object.keys(content)[0] as Lang) ?? "en");
 	const [activeTab, setActiveTab] = useState<
 		"overview" | "sections" | "spreadsheet" | "preAudit" | "scales" | "legalDocuments"
 	>("overview");
@@ -101,7 +89,7 @@ export function InstrumentEditor({
 	function handleRenameLanguage(oldLang: string, newLang: string) {
 		if (oldLang === newLang || !newLang) return;
 		if (draftContent[newLang as Lang]) {
-			alert(t("languageExists"));
+			window.alert(t("languageExists"));
 			return;
 		}
 		setDraftContent(prev => {
@@ -115,15 +103,14 @@ export function InstrumentEditor({
 
 	function handleRemoveLanguage(lang: string) {
 		if (languages.length <= 1) return;
-		if (confirm(t("confirmRemoveLanguage", { lang }))) {
-			setDraftContent(prev => {
-				const next = structuredClone(prev);
-				delete next[lang as Lang];
-				return next;
-			});
-			if (activeLang === lang) {
-				setActiveLang(Object.keys(draftContent).find(k => k !== lang) as Lang ?? "en" as Lang);
-			}
+		if (!window.confirm(t("confirmRemoveLanguage", { lang }))) return;
+		setDraftContent(prev => {
+			const next = structuredClone(prev);
+			delete next[lang as Lang];
+			return next;
+		});
+		if (activeLang === lang) {
+			setActiveLang((Object.keys(draftContent).find(k => k !== lang) as Lang) ?? ("en" as Lang));
 		}
 	}
 
@@ -224,7 +211,9 @@ export function InstrumentEditor({
 						{/* Version pill — always visible, reinforces draft context */}
 						<div className="flex items-center gap-1.5 rounded-md border border-border/50 bg-muted/20 px-3 py-1.5">
 							<Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-								draft
+								<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">
+									{t("draft")}
+								</span>
 							</Badge>
 							{editingVersion ? (
 								<div className="flex items-center gap-1">
@@ -261,31 +250,31 @@ export function InstrumentEditor({
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="sm">
+								<Button variant="outline" size="sm" className="h-9">
 									<Download className="mr-2 h-4 w-4" />
-									Export
+									{t("export")}
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="w-40">
 								<DropdownMenuItem
 									onClick={() => exportInstrument(draftContent, draftVersion, "pdf", activeLang)}>
 									<FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-									PDF
+									{t("formatPdf")}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => exportInstrument(draftContent, draftVersion, "xlsx", activeLang)}>
 									<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
-									Excel (.xlsx)
+									{t("formatExcel")}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => exportInstrument(draftContent, draftVersion, "csv", activeLang)}>
 									<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
-									CSV
+									{t("formatCsv")}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => exportInstrument(draftContent, draftVersion, "json", activeLang)}>
 									<FileJson className="mr-2 h-4 w-4 text-muted-foreground" />
-									JSON
+									{t("formatJson")}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>

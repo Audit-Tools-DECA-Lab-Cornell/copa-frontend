@@ -302,7 +302,7 @@ export async function downloadInstrumentPdf(
 			if (row.sectionInstruction) {
 				pushBannerRow(row.sectionInstruction, "bolditalic", PALETTE.sectionInstrColor, 7.5, 1, 2);
 				registerRichCell(pdfBodyRowIndex, 0, {
-					segments: [{ text: "Instruction: ", bold: false }, ...row.sectionInstructionSegments],
+					segments: [{ text: "Instruction: ", bold: false, type: "text" }, ...row.sectionInstructionSegments],
 					baseFontStyle: "bolditalic",
 					textColor: PALETTE.sectionInstrColor
 				});
@@ -312,7 +312,7 @@ export async function downloadInstrumentPdf(
 			if (row.sectionNotesPrompt) {
 				pushBannerRow(row.sectionNotesPrompt, "italic", PALETTE.sectionNotesColor, 7.5, 1, 5);
 				registerRichCell(pdfBodyRowIndex, 0, {
-					segments: [{ text: "Notes Prompt: ", bold: false }, ...row.sectionNotesPromptSegments],
+					segments: [{ text: "Notes Prompt: ", bold: false, type: "text" }, ...row.sectionNotesPromptSegments],
 					baseFontStyle: "italic",
 					textColor: PALETTE.sectionNotesColor
 				});

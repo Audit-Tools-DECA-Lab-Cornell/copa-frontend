@@ -1,5 +1,6 @@
 import React from "react";
 import type { InstrumentQuestion, InstrumentSection, QuestionScale, ScaleDefinition } from "@/types/audit";
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 /**
  * Format a backend question key (e.g. `q_8_1`) like the execution question card (`Q 8.1`).
@@ -118,34 +119,53 @@ export function collectSectionScaleKeys(questions: InstrumentQuestion[]): string
 	return Array.from(keys);
 }
 
-const BOLD_REGEX = /\\*\\*(.+?)\\*\\*/g;
-
 /**
  * Renders a string that may contain `**bold**` markers into React nodes,
  * splitting on the markers and wrapping matched segments in `<strong>`.
  */
 export function renderInlineMarkdown(text: string): React.ReactNode {
-	if (!BOLD_REGEX.test(text)) return text;
+	const segments = parsePromptSegments(text);
+	if (segments.length === 0) return text;
+	if (segments.length === 1 && segments[0].type === "text") return text;
 
-	BOLD_REGEX.lastIndex = 0;
-	const parts: React.ReactNode[] = [];
-	let lastIndex = 0;
-	let match: RegExpExecArray | null = null;
-	let keyCounter = 0;
-
-	while ((match = BOLD_REGEX.exec(text)) !== null) {
-		if (match.index > lastIndex) {
-			parts.push(text.slice(lastIndex, match.index));
+	return segments.map((segment, idx) => {
+		switch (segment.type) {
+			case "bold":
+				return <strong key={idx}>{segment.text}</strong>;
+			case "h1":
+				return (
+					<h1 key={idx} className="mt-4 mb-2 text-xl font-bold text-foreground">
+						{segment.text}
+					</h1>
+				);
+			case "h2":
+				return (
+					<h2 key={idx} className="mt-3 mb-1 text-lg font-bold text-foreground">
+						{segment.text}
+					</h2>
+				);
+			case "h3":
+				return (
+					<h3 key={idx} className="mt-2 mb-1 text-base font-bold text-foreground">
+						{segment.text}
+					</h3>
+				);
+			case "h4":
+				return (
+					<h4 key={idx} className="mt-2 mb-1 text-sm font-bold text-foreground">
+						{segment.text}
+					</h4>
+				);
+			case "h5":
+				return (
+					<h5 key={idx} className="mt-1 mb-1 text-xs font-bold text-foreground">
+						{segment.text}
+					</h5>
+				);
+			default:
+				return <React.Fragment key={idx}>{segment.text}</React.Fragment>;
 		}
-		parts.push(React.createElement("strong", { key: keyCounter++ }, match[1]));
-		lastIndex = match.index + match[0].length;
-	}
-
-	if (lastIndex < text.length) {
-		parts.push(text.slice(lastIndex));
-	}
-
-	return parts;
+	});
 }
 
 /**

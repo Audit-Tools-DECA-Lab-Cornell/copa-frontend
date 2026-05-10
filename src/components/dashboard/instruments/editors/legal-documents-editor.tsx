@@ -100,7 +100,7 @@ export function LegalDocumentsEditor({
 					<AccordionItem key={docIndex} value={`doc-${docIndex}`}>
 						<AccordionTrigger className="text-sm hover:no-underline border border-border/60 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
 							<span className="flex items-center gap-2">
-								<span className="font-medium text-left">{doc.title || "Untitled Document"}</span>
+								<span className="font-medium text-left">{doc.title || t("untitledDocument")}</span>
 								<span className="text-xs text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded">
 									{doc.key}
 								</span>

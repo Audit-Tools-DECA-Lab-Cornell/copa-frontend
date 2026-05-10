@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, Download, FileJson, FileSpreadsheet, FileText, ListChecks, Ruler, Sparkles } from "lucide-react";
+import { CheckCircle2, Download, FileJson, FileSpreadsheet, FileText, ListChecks, Ruler } from "lucide-react";
 
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import { exportInstrument } from "@/lib/export/instrument";
@@ -40,8 +40,9 @@ import { DisplayConditionBadge, ScaleKeyBadge, StatBox } from "./shared-componen
 
 export function InstrumentContentViewer({
 	content,
-	version
-}: Readonly<{ content: InstrumentContent; version: string }>) {
+	version,
+	hideBorder = false
+}: Readonly<{ content: InstrumentContent; version: string; hideBorder?: boolean }>) {
 	const t = useTranslations("admin.instruments.content");
 	const languages = Object.keys(content);
 	const [activeLang, setActiveLang] = useState(languages[0] ?? "en");
@@ -64,7 +65,7 @@ export function InstrumentContentViewer({
 	}
 
 	return (
-		<div className="mt-4 space-y-5 border-t border-border pt-4">
+		<div className={`space-y-5 ${hideBorder ? "" : "mt-4 border-t border-border pt-4"}`}>
 			{/* Language switcher & Export */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
@@ -85,25 +86,25 @@ export function InstrumentContentViewer({
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
 							<Download className="mr-2 h-4 w-4" />
-							Export
+							{t("export")}
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-40">
 						<DropdownMenuItem onClick={() => exportInstrument(content, version, "pdf", activeLang)}>
 							<FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-							PDF
+							{t("formatPdf")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => exportInstrument(content, version, "xlsx", activeLang)}>
 							<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
-							Excel (.xlsx)
+							{t("formatExcel")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => exportInstrument(content, version, "csv", activeLang)}>
 							<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
-							CSV
+							{t("formatCsv")}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => exportInstrument(content, version, "json", activeLang)}>
 							<FileJson className="mr-2 h-4 w-4 text-muted-foreground" />
-							JSON
+							{t("formatJson")}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -151,7 +152,7 @@ export function InstrumentContentViewer({
 									<div
 										key={idx}
 										className="rounded-md border border-border/40 bg-muted/30 p-3 text-sm leading-relaxed whitespace-pre-line">
-										{text}
+										{renderInlineMarkdown(text)}
 									</div>
 								))}
 							</CardContent>
@@ -243,7 +244,9 @@ function LegalDocumentsViewer({ documents }: Readonly<{ documents: LegalDocument
 							</Badge>
 						</div>
 						{doc.summary && (
-							<p className="mt-2 text-sm text-muted-foreground leading-relaxed">{doc.summary}</p>
+							<div className="mt-2 text-sm text-muted-foreground leading-relaxed">
+								{renderInlineMarkdown(doc.summary)}
+							</div>
 						)}
 					</CardHeader>
 
@@ -252,9 +255,9 @@ function LegalDocumentsViewer({ documents }: Readonly<{ documents: LegalDocument
 							<div key={sectionIndex} className="space-y-2">
 								<h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
 								{section.body.map((para, paraIndex) => (
-									<p key={paraIndex} className="text-sm text-muted-foreground leading-relaxed">
-										{para}
-									</p>
+									<div key={paraIndex} className="text-sm text-muted-foreground leading-relaxed">
+										{renderInlineMarkdown(para) || "\u2014"}
+									</div>
 								))}
 								{section.bullets.length > 0 && (
 									<ul className="space-y-1 pl-4">
@@ -262,7 +265,7 @@ function LegalDocumentsViewer({ documents }: Readonly<{ documents: LegalDocument
 											<li
 												key={bulletIndex}
 												className="text-sm text-muted-foreground leading-relaxed list-disc">
-												{bullet}
+												{renderInlineMarkdown(bullet)}
 											</li>
 										))}
 									</ul>
@@ -370,10 +373,10 @@ function ScaleGuidanceViewer({ scales }: Readonly<{ scales: ScaleDefinition[] }>
 							<ScaleKeyBadge scaleKey={scale.key} />
 							{scale.title}
 						</CardTitle>
-						<p className="text-xs text-muted-foreground">{scale.prompt}</p>
+						<p className="text-xs text-muted-foreground">{renderInlineMarkdown(scale.prompt)}</p>
 					</CardHeader>
 					<CardContent>
-						<p className="mb-2 text-xs text-muted-foreground">{scale.description}</p>
+						<p className="mb-2 text-xs text-muted-foreground">{renderInlineMarkdown(scale.description)}</p>
 						<div className="space-y-1.5">
 							{scale.options.map(opt => (
 								<ScaleOptionRow key={opt.key} option={opt} />
@@ -452,19 +455,20 @@ function ViewerSectionAccordion({
 						<AccordionContent>
 							<div className="space-y-3 pl-2">
 								{section.description && (
-									<p className="text-xs leading-relaxed text-muted-foreground">
-										{section.description}
-									</p>
+									<div className="text-xs leading-relaxed text-muted-foreground">
+										{renderInlineMarkdown(section.description)}
+									</div>
 								)}
 								{section.instruction && (
 									<div className="rounded-md border border-status-info-border bg-status-info-surface px-3 py-2 text-xs text-foreground">
 										<strong className="text-text-secondary">{t("sectionInstruction")}:</strong>{" "}
-										{section.instruction}
+										{renderInlineMarkdown(section.instruction)}
 									</div>
 								)}
 								{section.notes_prompt && (
 									<div className="rounded-md border border-border/40 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-										<strong>{t("sectionNotesPrompt")}:</strong> {section.notes_prompt}
+										<strong>{t("sectionNotesPrompt")}:</strong>{" "}
+										{renderInlineMarkdown(section.notes_prompt)}
 									</div>
 								)}
 
@@ -515,7 +519,7 @@ function ViewerQuestionCard({
 					</p>
 					{question.notes_prompt ? (
 						<p className="mt-2 text-xs text-muted-foreground">
-							<strong>{t("questionNotesPrompt")}:</strong> {question.notes_prompt}
+							<strong>{t("questionNotesPrompt")}:</strong> {renderInlineMarkdown(question.notes_prompt)}
 						</p>
 					) : null}
 
@@ -604,7 +608,6 @@ function ViewerScaleRow({
 					<Badge
 						variant="outline"
 						className="gap-1 border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta text-[10px] px-1.5 py-0">
-						<Sparkles className="h-3 w-3" />
 						{t("customOptions")}
 					</Badge>
 				)}
@@ -621,12 +624,13 @@ function ViewerScaleRow({
 				{scale.options.map(opt => (
 					<span
 						key={opt.key}
-						className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] border ${opt.is_not_applicable
+						className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] border ${
+							opt.is_not_applicable
 								? "border-dashed border-muted-foreground/40 text-muted-foreground"
 								: opt.allows_follow_up_scales
 									? "border-status-success-border bg-status-success-surface text-foreground font-medium"
 									: "border-border/60 bg-muted/40"
-							}`}>
+						}`}>
 						{opt.label}
 						{opt.addition_value > 0 && (
 							<span className="ml-1 font-mono text-[10px] text-muted-foreground">

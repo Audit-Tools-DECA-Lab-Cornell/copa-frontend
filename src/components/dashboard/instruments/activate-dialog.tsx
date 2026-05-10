@@ -20,7 +20,7 @@ export function ActivateDialog({
 	onConfirm: () => void;
 	onCancel: () => void;
 }>) {
-	const t = useTranslations("admin.instruments.versionHistory");
+	const t = useTranslations("admin.instruments");
 	return (
 		<Dialog
 			open={open}
@@ -29,15 +29,15 @@ export function ActivateDialog({
 			}}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>{t("confirmActivateTitle")}</DialogTitle>
-					<DialogDescription>{t("confirmActivate")}</DialogDescription>
+					<DialogTitle>{t("versionHistory.confirmActivateTitle")}</DialogTitle>
+					<DialogDescription>{t("versionHistory.confirmActivate")}</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
 					<Button variant="outline" onClick={onCancel}>
-						{t("cancel")}
+						{t("versionHistory.cancel")}
 					</Button>
 					<Button onClick={onConfirm} disabled={isPending}>
-						{t("activate")}
+						{t("versionHistory.activate")}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
