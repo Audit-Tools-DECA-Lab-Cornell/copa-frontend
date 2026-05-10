@@ -231,7 +231,7 @@ export function ProjectDialog({
 										</Label>
 										<Input
 											id={field.name}
-											placeholder="e.g. Summer 2026 Playspace Audit"
+											placeholder="e.g. Summer 2026 COPA program"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}

@@ -1,7 +1,7 @@
 {
 	"metadata": {
-		"title": "Playspace Audit Tool",
-		"description": "Playspace Play Value- und Usability-Audit-Tool"
+		"title": "COPA Tool",
+		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) — strukturierte Audits zu Spielwert und Nutzbarkeit."
 	},
 	"common": {
 		"roles": {
@@ -43,12 +43,12 @@
 		}
 	},
 	"shell": {
-		"productName": "Playspace Audit Tool",
+		"productName": "COPA Tool",
 		"productTagline": "Spielwert & Nutzbarkeit",
 		"workspaceLabel": "Arbeitsbereich",
 		"openMenu": "Menü öffnen",
 		"navigationTitle": "Navigation",
-		"mobileBrand": "Playspace",
+		"mobileBrand": "COPA",
 		"navigation": {
 			"dashboard": "Dashboard",
 			"accounts": "Konten",
@@ -793,7 +793,7 @@
 	},
 	"signup": {
 		"title": "Konto erstellen",
-		"description": "Registrieren Sie sich, um mit Playspace zu starten.",
+		"description": "Registrieren Sie sich, um mit dem COPA Tool zu starten.",
 		"emailPlaceholder": "sie@firma.com",
 		"namePlaceholder": "Ihr vollständiger Name",
 		"fields": {
@@ -819,7 +819,7 @@
 	},
 	"managerInvite": {
 		"title": "Treten Sie Ihrem Team bei",
-		"subtitle": "Sie wurden eingeladen, einen Audit-Tools-Arbeitsbereich zu verwalten.",
+		"subtitle": "Sie wurden eingeladen, einen COPA-Tool-Arbeitsbereich zu verwalten.",
 		"description": "Legen Sie Ihren Namen und Ihr Passwort fest, um loszulegen. Sie werden anschließend zum Manager-Dashboard weitergeleitet.",
 		"fields": {
 			"name": "Vollständiger Name",
@@ -1826,7 +1826,7 @@
 			"title": "Ihr Konto",
 			"description": "Überprüfen Sie die in diesem Arbeitsbereich angezeigte Identität und Rolle.",
 			"managerFallback": "Manager",
-			"adminDisplayName": "Playspace Administrator",
+			"adminDisplayName": "COPA Administrator",
 			"auditorWithCode": "Prüfer {code}",
 			"auditorFallback": "Prüfer",
 			"managerWorkspaceFallback": "Manager-Arbeitsbereich",

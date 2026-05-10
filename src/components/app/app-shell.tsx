@@ -214,7 +214,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 								)}>
 								<div className="flex min-w-0 items-center gap-3">
 									<div className="flex size-10 items-center justify-end ml-0.5 shadow-focus">
-										<Image src="/icon.png" alt="Playspace Audit Tools" width={40} height={40} />
+										<Image src="/icon.png" alt="COPA Tool" width={40} height={40} />
 									</div>
 									<div className={cn("grid", isSidebarCollapsed && "hidden")}>
 										<span className="text-base font-semibold leading-5">

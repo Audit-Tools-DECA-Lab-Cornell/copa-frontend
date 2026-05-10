@@ -1,7 +1,7 @@
 {
 	"metadata": {
-		"title": "Playspace Audit Tool",
-		"description": "Playspace Play Value and Usability Audit Tool"
+		"title": "COPA Tool",
+		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool — structured outdoor playspace audits covering play value and usability."
 	},
 	"common": {
 		"roles": {
@@ -43,12 +43,12 @@
 		}
 	},
 	"shell": {
-		"productName": "Playspace Audit Tool",
+		"productName": "COPA Tool",
 		"productTagline": "Play Value & Usability",
 		"workspaceLabel": "Workspace",
 		"openMenu": "Open menu",
 		"navigationTitle": "Navigation",
-		"mobileBrand": "Playspace",
+		"mobileBrand": "COPA",
 		"navigation": {
 			"dashboard": "Dashboard",
 			"accounts": "Accounts",
@@ -811,7 +811,7 @@
 	},
 	"signup": {
 		"title": "Create an account",
-		"description": "Sign up to get started with Playspace.",
+		"description": "Sign up to get started with the COPA Tool.",
 		"emailPlaceholder": "manager@example.org",
 		"namePlaceholder": "Your full name",
 		"fields": {
@@ -837,7 +837,7 @@
 	},
 	"managerInvite": {
 		"title": "Join your team",
-		"subtitle": "You've been invited to manage an Audit Tools workspace.",
+		"subtitle": "You've been invited to manage a COPA Tool workspace.",
 		"description": "Set up your name and password to get started. You'll be taken to the manager dashboard once you're done.",
 		"workspaceContext": {
 			"label": "You are joining",
@@ -1906,7 +1906,7 @@
 			"title": "Your account",
 			"description": "Review the identity and role shown in this workspace.",
 			"managerFallback": "Manager",
-			"adminDisplayName": "Playspace Administrator",
+			"adminDisplayName": "COPA Administrator",
 			"auditorWithCode": "Auditor {code}",
 			"auditorFallback": "Auditor",
 			"managerWorkspaceFallback": "Manager workspace",
