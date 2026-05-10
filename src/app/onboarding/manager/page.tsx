@@ -92,14 +92,14 @@ function ProfileStep({ onComplete }: Readonly<{ onComplete: (profile: MyManagerP
 	const [position, setPosition] = React.useState("");
 	const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-	React.useEffect(() => {
-		if (profileQuery.data) {
-			setFullName(profileQuery.data.full_name);
-			setEmail(profileQuery.data.email);
-			setPhone(profileQuery.data.phone ?? "");
-			setPosition(profileQuery.data.position ?? "");
-		}
-	}, [profileQuery.data]);
+	const [prevData, setPrevData] = React.useState(profileQuery.data);
+	if (profileQuery.data && profileQuery.data !== prevData) {
+		setPrevData(profileQuery.data);
+		setFullName(profileQuery.data.full_name);
+		setEmail(profileQuery.data.email);
+		setPhone(profileQuery.data.phone ?? "");
+		setPosition(profileQuery.data.position ?? "");
+	}
 
 	const canSubmit = fullName.trim().length > 0;
 

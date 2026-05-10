@@ -34,16 +34,17 @@ export default function AdminProjectsPage() {
 	const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>([]);
 	const selectedAccountIdsKey = selectedAccountIds.join("|");
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0
-				? currentValue
-				: {
-						...currentValue,
-						pageIndex: 0
-					};
-		});
-	}, [searchValue, sortParam, selectedAccountIdsKey]);
+	const [prevDeps, setPrevDeps] = React.useState({ searchValue, sortParam, selectedAccountIdsKey });
+	if (
+		searchValue !== prevDeps.searchValue ||
+		sortParam !== prevDeps.sortParam ||
+		selectedAccountIdsKey !== prevDeps.selectedAccountIdsKey
+	) {
+		setPrevDeps({ searchValue, sortParam, selectedAccountIdsKey });
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	const accountsQuery = useQuery({
 		queryKey: ["playspace", "admin", "projects", "accounts-for-filter"],
@@ -73,21 +74,14 @@ export default function AdminProjectsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!projectsQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(projectsQuery.data);
+	if (projectsQuery.data && projectsQuery.data !== prevData) {
+		setPrevData(projectsQuery.data);
 		const maxPageIndex = Math.max(projectsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [pagination.pageIndex, projectsQuery.data]);
+	}
 
 	const accountOptions = React.useMemo(
 		() =>

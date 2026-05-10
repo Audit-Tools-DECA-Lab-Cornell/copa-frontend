@@ -11,7 +11,7 @@ import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
-import type { PreAuditQuestion } from "@/types/audit";
+import type { InstrumentQuestion, PreAuditQuestion } from "@/types/audit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -179,26 +179,61 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 	const sectionRows = React.useMemo(() => {
 		return audit ? Object.values(audit.sections) : [];
 	}, [audit]);
+
+	// Collect question notes per section key from responses.
+	// Only include notes from questions that actually have notes_prompt (using instrument if available).
+	const questionNotesBySectionKey = React.useMemo(() => {
+		if (!audit) return {} as Readonly<Record<string, { questionKey: string; note: string }[]>>;
+		const result: Record<string, { questionKey: string; note: string }[]> = {};
+		const questionHasPrompt = new Set<string>();
+		if (instrument) {
+			instrument.sections.forEach(sec => {
+				sec.questions.forEach((q: InstrumentQuestion) => {
+					if (q.notes_prompt) questionHasPrompt.add(q.question_key);
+				});
+			});
+		}
+		Object.entries(audit.sections).forEach(([sectionKey, sectionState]) => {
+			const notes: { questionKey: string; note: string }[] = [];
+			const responses = sectionState.responses ?? {};
+			Object.entries(responses).forEach(([questionKey, payload]) => {
+				if (instrument && !questionHasPrompt.has(questionKey)) return;
+				const raw = (payload as Record<string, unknown>).question_note;
+				if (typeof raw === "string" && raw.trim().length > 0) {
+					notes.push({ questionKey, note: raw.trim() });
+				}
+			});
+			if (notes.length > 0) result[sectionKey] = notes;
+		});
+		return result as Readonly<Record<string, { questionKey: string; note: string }[]>>;
+	}, [audit, instrument]);
+
 	const canResumeAudit = audit ? audit.status !== "SUBMITTED" : false;
 	const notedSectionCount = sectionRows.filter(section => {
-		return typeof section.note === "string" && section.note.trim().length > 0;
+		const hasNote = typeof section.note === "string" && section.note.trim().length > 0;
+		const hasQuestionNotes = (questionNotesBySectionKey[section.section_key]?.length ?? 0) > 0;
+		return hasNote || hasQuestionNotes;
 	}).length;
 	const emptySectionCount = sectionRows.length - notedSectionCount;
 	const [showEmptySections, setShowEmptySections] = React.useState(false);
 	const [showSectionCodes, setShowSectionCodes] = React.useState(false);
 
-	React.useEffect(() => {
-		if (notedSectionCount === 0) {
+	const [prevNotedCount, setPrevNotedCount] = React.useState(notedSectionCount);
+	if (notedSectionCount !== prevNotedCount) {
+		setPrevNotedCount(notedSectionCount);
+		if (notedSectionCount === 0 && !showEmptySections) {
 			setShowEmptySections(true);
 		}
-	}, [notedSectionCount]);
+	}
 
 	const orderedSectionRows = React.useMemo(() => {
 		const sectionsWithNotes: typeof sectionRows = [];
 		const sectionsWithoutNotes: typeof sectionRows = [];
 
 		for (const section of sectionRows) {
-			if (typeof section.note === "string" && section.note.trim().length > 0) {
+			const hasNote = typeof section.note === "string" && section.note.trim().length > 0;
+			const hasQuestionNotes = (questionNotesBySectionKey[section.section_key]?.length ?? 0) > 0;
+			if (hasNote || hasQuestionNotes) {
 				sectionsWithNotes.push(section);
 				continue;
 			}
@@ -207,7 +242,7 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 		}
 
 		return showEmptySections ? [...sectionsWithNotes, ...sectionsWithoutNotes] : sectionsWithNotes;
-	}, [sectionRows, showEmptySections]);
+	}, [sectionRows, showEmptySections, questionNotesBySectionKey]);
 
 	if (auditQuery.isLoading || !auditId) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
@@ -399,6 +434,8 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 									{orderedSectionRows.map(section => {
 										const hasNote =
 											typeof section.note === "string" && section.note.trim().length > 0;
+										const questionNotes = questionNotesBySectionKey[section.section_key] ?? [];
+										const hasAnyNote = hasNote || questionNotes.length > 0;
 
 										return (
 											<div
@@ -416,24 +453,36 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 															</code>
 														) : null}
 													</div>
-													{hasNote ? (
+													{hasAnyNote ? (
 														<Badge variant="secondary" className="font-medium">
 															{t("sectionNotes.capturedNote")}
 														</Badge>
 													) : null}
 												</div>
-												<p className="mt-3 text-sm text-muted-foreground">
-													{hasNote ? (
-														section.note
-													) : (
-														<>
-															<span aria-hidden="true">-</span>
-															<span className="sr-only">
-																{t("sectionNotes.noNoteCaptured")}
-															</span>
-														</>
-													)}
-												</p>
+												{hasNote ? (
+													<p className="mt-3 text-sm text-muted-foreground">{section.note}</p>
+												) : !hasAnyNote ? (
+													<p className="mt-3 text-sm text-muted-foreground">
+														<span aria-hidden="true">-</span>
+														<span className="sr-only">
+															{t("sectionNotes.noNoteCaptured")}
+														</span>
+													</p>
+												) : null}
+												{questionNotes.length > 0 ? (
+													<div className="mt-3 space-y-2">
+														{questionNotes.map(({ questionKey, note }) => (
+															<div
+																key={questionKey}
+																className="rounded-md bg-muted/40 px-3 py-2 text-sm">
+																<p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+																	{questionKey} — {t("sectionNotes.comment")}
+																</p>
+																<p className="text-foreground">{note}</p>
+															</div>
+														))}
+													</div>
+												) : null}
 											</div>
 										);
 									})}

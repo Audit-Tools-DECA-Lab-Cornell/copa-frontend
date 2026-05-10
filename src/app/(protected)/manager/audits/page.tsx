@@ -59,23 +59,34 @@ export default function ManagerAuditsPage() {
 	const selectedPlaceIdsKey = selectedPlaceIds.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0
-				? currentValue
-				: {
-						...currentValue,
-						pageIndex: 0
-					};
-		});
-	}, [
+	const [prevDeps, setPrevDeps] = React.useState({
 		searchValue,
 		selectedStatusesKey,
 		selectedProjectIdsKey,
 		selectedAuditorIdsKey,
 		selectedPlaceIdsKey,
 		sortParam
-	]);
+	});
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedStatusesKey !== prevDeps.selectedStatusesKey ||
+		selectedProjectIdsKey !== prevDeps.selectedProjectIdsKey ||
+		selectedAuditorIdsKey !== prevDeps.selectedAuditorIdsKey ||
+		selectedPlaceIdsKey !== prevDeps.selectedPlaceIdsKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({
+			searchValue,
+			selectedStatusesKey,
+			selectedProjectIdsKey,
+			selectedAuditorIdsKey,
+			selectedPlaceIdsKey,
+			sortParam
+		});
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	/** Fetch all projects for this manager account (used by the project filter). */
 	const projectsQuery = useQuery({
@@ -166,21 +177,14 @@ export default function ManagerAuditsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!auditsQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(auditsQuery.data);
+	if (auditsQuery.data && auditsQuery.data !== prevData) {
+		setPrevData(auditsQuery.data);
 		const maxPageIndex = Math.max(auditsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [auditsQuery.data, pagination.pageIndex]);
+	}
 
 	if (!accountId) {
 		return (

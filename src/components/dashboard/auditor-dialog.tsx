@@ -192,16 +192,19 @@ export function AuditorDialog({
 		}
 	});
 
-	React.useEffect(() => {
-		if (!open) {
-			return;
-		}
+	const [prevOpen, setPrevOpen] = React.useState(open);
+	const [prevDefaultValues, setPrevDefaultValues] = React.useState(defaultValues);
 
-		form.reset(defaultValues);
-		setSubmitError(null);
-		setCreatedSummary(null);
-		setCodeCopied(false);
-	}, [defaultValues, form, open]);
+	if (open !== prevOpen || defaultValues !== prevDefaultValues) {
+		setPrevOpen(open);
+		setPrevDefaultValues(defaultValues);
+		if (open) {
+			form.reset(defaultValues);
+			setSubmitError(null);
+			setCreatedSummary(null);
+			setCodeCopied(false);
+		}
+	}
 
 	/** Copy auditor code to clipboard and briefly flash a "Copied" label. */
 	function handleCopyCode(code: string) {

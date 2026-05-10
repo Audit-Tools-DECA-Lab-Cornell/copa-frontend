@@ -519,6 +519,7 @@
 				"sectionDescription": "Beschreibung",
 				"sectionInstruction": "Anweisung",
 				"sectionNotesPrompt": "Notizen-Eingabeaufforderung",
+				"questionNotesPrompt": "Notizhinweis für Frage",
 				"instrumentName": "Instrumentname",
 				"instrumentVersion": "Version",
 				"totalQuestions": "Gesamtfragen",
@@ -578,6 +579,8 @@
 				"addQuestion": "Frage hinzufügen",
 				"removeQuestion": "Frage entfernen",
 				"addOption": "Option hinzufügen",
+				"moveOptionUp": "Nach oben",
+				"moveOptionDown": "Nach unten",
 				"removeOption": "Entfernen",
 				"addScale": "Skala hinzufügen",
 				"removeScale": "Skala entfernen",
@@ -774,7 +777,7 @@
 		"passwordHelp": "Mindestens 8 Zeichen.",
 		"actions": {
 			"accept": "Annehmen & beitreten",
-			"accepting": "Konto wird eingerichtet\u2026"
+			"accepting": "Konto wird eingerichtet…"
 		},
 		"errors": {
 			"nameRequired": "Ihr Name ist erforderlich.",
@@ -1624,7 +1627,8 @@
 				"noCapturedNotesDescription": "Leere Abschnitte sind derzeit ausgeblendet. Blenden Sie sie ein, wenn Sie die vollständige Instrumentstruktur prüfen möchten.",
 				"capturedNote": "Erfasste Notiz",
 				"emptyBadge": "Leer",
-				"noNoteCaptured": "Keine Notiz erfasst."
+				"noNoteCaptured": "Keine Notiz erfasst.",
+				"comment": "Kommentar"
 			},
 			"status": {
 				"in_progress": "in Bearbeitung",
@@ -1724,7 +1728,8 @@
 			},
 			"questionCard": {
 				"thisPlayspace": "Dieser Playspace",
-				"followUpScalesHidden": "Folge-Skalen bleiben ausgeblendet, bis die ausgewählte Mengenoption sie zulässt."
+				"followUpScalesHidden": "Folge-Skalen bleiben ausgeblendet, bis die ausgewählte Mengenoption sie zulässt.",
+				"enterComments": "Kommentare eingeben"
 			},
 			"submittedCard": {
 				"title": "Audit übermittelt",
@@ -1919,7 +1924,7 @@
 				"emailPlaceholder": "kollege@organisation.com",
 				"cancelButton": "Abbrechen",
 				"sendButton": "Einladung senden",
-				"sendingButton": "Wird gesendet\u2026",
+				"sendingButton": "Wird gesendet…",
 				"errors": {
 					"emailRequired": "E-Mail-Adresse ist erforderlich.",
 					"emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",

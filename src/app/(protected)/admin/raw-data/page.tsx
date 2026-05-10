@@ -589,9 +589,25 @@ export default function AdminRawDataPage() {
 		(v): v is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" => v === "IN_PROGRESS" || v === "PAUSED" || v === "SUBMITTED"
 	);
 
-	React.useEffect(() => {
+	const [prevDeps, setPrevDeps] = React.useState({
+		searchValue,
+		sortParam,
+		accountIdsKey,
+		projectIdsKey,
+		auditStatusesKey,
+		surveyStatusesKey
+	});
+	if (
+		searchValue !== prevDeps.searchValue ||
+		sortParam !== prevDeps.sortParam ||
+		accountIdsKey !== prevDeps.accountIdsKey ||
+		projectIdsKey !== prevDeps.projectIdsKey ||
+		auditStatusesKey !== prevDeps.auditStatusesKey ||
+		surveyStatusesKey !== prevDeps.surveyStatusesKey
+	) {
+		setPrevDeps({ searchValue, sortParam, accountIdsKey, projectIdsKey, auditStatusesKey, surveyStatusesKey });
 		setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
-	}, [searchValue, sortParam, accountIdsKey, projectIdsKey, auditStatusesKey, surveyStatusesKey]);
+	}
 
 	// ── Filter option queries ─────────────────────────────────────────────────
 	const accountsQuery = useQuery({
@@ -804,12 +820,9 @@ export default function AdminRawDataPage() {
 	// ── Column definitions ────────────────────────────────────────────────────
 
 	// Current-page items for select-all header logic
-	const projectPageItems = (previewQuery.data?.items as AdminProjectRow[] | undefined) ?? [];
-	const placePageItems = (previewQuery.data?.items as AdminPlaceRow[] | undefined) ?? [];
-	const auditPageItems = (previewQuery.data?.items as AdminAuditRow[] | undefined) ?? [];
-
-	const projectColumns = React.useMemo<ColumnDef<AdminProjectRow>[]>(
-		() => [
+	const projectColumns = React.useMemo<ColumnDef<AdminProjectRow>[]>(() => {
+		const projectPageItems = (previewQuery.data?.items as AdminProjectRow[] | undefined) ?? [];
+		return [
 			// ── Selection column ──────────────────────────────────────────────
 			{
 				id: "select",
@@ -893,13 +906,12 @@ export default function AdminRawDataPage() {
 					</span>
 				)
 			}
-		],
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[formatT, selectedRowIds, projectPageItems, toggleRowSelection, togglePageSelection]
-	);
+		];
+	}, [formatT, selectedRowIds, previewQuery.data, toggleRowSelection, togglePageSelection]);
 
-	const placeColumns = React.useMemo<ColumnDef<AdminPlaceRow>[]>(
-		() => [
+	const placeColumns = React.useMemo<ColumnDef<AdminPlaceRow>[]>(() => {
+		const placePageItems = (previewQuery.data?.items as AdminPlaceRow[] | undefined) ?? [];
+		return [
 			// ── Selection column ──────────────────────────────────────────────
 			{
 				id: "select",
@@ -1006,10 +1018,8 @@ export default function AdminRawDataPage() {
 					</span>
 				)
 			}
-		],
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[formatT, selectedRowIds, placePageItems, toggleRowSelection, togglePageSelection]
-	);
+		];
+	}, [formatT, selectedRowIds, previewQuery.data, toggleRowSelection, togglePageSelection]);
 
 	// ── Shared table props ────────────────────────────────────────────────────
 

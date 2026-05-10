@@ -161,11 +161,13 @@ export function AuditorDashboardClient() {
 
 	/** Reset pagination when filters change. */
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
-	React.useEffect(() => {
+	const [prevProjectIdsKey, setPrevProjectIdsKey] = React.useState(selectedProjectIdsKey);
+	if (selectedProjectIdsKey !== prevProjectIdsKey) {
+		setPrevProjectIdsKey(selectedProjectIdsKey);
 		setPagination(currentValue =>
 			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
 		);
-	}, [selectedProjectIdsKey]);
+	}
 
 	/** Build the href for the execute/resume page. */
 	function getExecuteHref(place: AuditorPlace): string {

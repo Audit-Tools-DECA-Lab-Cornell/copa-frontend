@@ -115,7 +115,8 @@ export function buildSingleAuditResponseRows(
 
 			// Per-question auditor comment row — emitted directly after the
 			// question item row, before score rows, matching the PDF layout.
-			const questionComment = typeof questionAnswers.comment === "string" ? questionAnswers.comment.trim() : "";
+			const questionComment =
+				typeof questionAnswers.question_note === "string" ? questionAnswers.question_note.trim() : "";
 			if (questionComment.length > 0) {
 				rows.push(
 					buildQuestionCommentRow(

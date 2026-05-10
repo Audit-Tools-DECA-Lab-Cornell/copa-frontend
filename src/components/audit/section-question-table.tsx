@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { getActiveScaleKeysForQuestion } from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, ScaleKey } from "@/types/audit";
@@ -19,6 +20,7 @@ export interface SectionQuestionTableProps {
 	readonly rows: readonly QuestionTableRow[];
 	readonly disabled?: boolean;
 	readonly onSelectAnswer: (questionKey: string, scaleKey: string, optionKey: string) => void;
+	readonly onChangeQuestionNote?: (questionKey: string, nextNote: string) => void;
 }
 
 const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["provision", "diversity", "challenge", "sociability"];
@@ -26,7 +28,12 @@ const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["provision", "diversity", "chal
 /**
  * Desktop and tablet matrix layout for audit questions.
  */
-export function SectionQuestionTable({ rows, disabled = false, onSelectAnswer }: Readonly<SectionQuestionTableProps>) {
+export function SectionQuestionTable({
+	rows,
+	disabled = false,
+	onSelectAnswer,
+	onChangeQuestionNote
+}: Readonly<SectionQuestionTableProps>) {
 	const t = useTranslations("auditor.execute.sectionTable");
 	const visibleScaleKeys = getVisibleScaleKeys(rows);
 
@@ -63,7 +70,12 @@ export function SectionQuestionTable({ rows, disabled = false, onSelectAnswer }:
 										"border-r border-t border-border px-4 py-4",
 										rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
 									)}>
-									<QuestionPrompt question={row.question} />
+									<QuestionPrompt
+										question={row.question}
+										selectedAnswers={row.selectedAnswers}
+										disabled={disabled}
+										onChangeQuestionNote={onChangeQuestionNote}
+									/>
 								</div>
 								{visibleScaleKeys.map(scaleKey => {
 									const scale = row.question.scales.find(
@@ -155,12 +167,15 @@ export function SectionQuestionTable({ rows, disabled = false, onSelectAnswer }:
 
 interface QuestionPromptProps {
 	readonly question: InstrumentQuestion;
+	readonly selectedAnswers: QuestionResponsePayload;
+	readonly disabled: boolean;
+	readonly onChangeQuestionNote?: (questionKey: string, nextNote: string) => void;
 }
 
 /**
  * Render the left prompt cell for one matrix row.
  */
-function QuestionPrompt({ question }: Readonly<QuestionPromptProps>) {
+function QuestionPrompt({ question, selectedAnswers, disabled, onChangeQuestionNote }: Readonly<QuestionPromptProps>) {
 	const t = useTranslations("auditor.execute.questionCard");
 	const promptSegments = parsePromptSegments(question.prompt);
 
@@ -177,6 +192,20 @@ function QuestionPrompt({ question }: Readonly<QuestionPromptProps>) {
 					</Fragment>
 				))}
 			</p>
+			{question.notes_prompt ? (
+				<div className="space-y-2 rounded-field border border-border/70 bg-secondary/30 p-3">
+					<p className="text-xs font-medium leading-5 text-foreground">{question.notes_prompt}</p>
+					<Textarea
+						rows={4}
+						disabled={disabled}
+						value={typeof selectedAnswers.question_note === "string" ? selectedAnswers.question_note : ""}
+						onChange={event => {
+							onChangeQuestionNote?.(question.question_key, event.target.value);
+						}}
+						placeholder={t("enterComments")}
+					/>
+				</div>
+			) : null}
 		</div>
 	);
 }

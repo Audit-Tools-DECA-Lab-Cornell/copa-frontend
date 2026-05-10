@@ -7,6 +7,7 @@ import { FileTextIcon, PlusCircleIcon, Trash2Icon, ExternalLinkIcon, LayersIcon 
 
 import type { SavedPlaceReportEntry } from "@/lib/api/playspace";
 import { playspaceApi } from "@/lib/api/playspace";
+import { getPlaceReportCopy, getPlaceReportSourceCountLabel } from "@/components/dashboard/place-report-copy";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,6 +25,13 @@ function formatDate(iso: string): string {
 	return Number.isNaN(d.getTime())
 		? iso
 		: d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+/**
+ * Keep long UUID-based source identifiers scan-friendly inside saved report cards.
+ */
+function formatShortSourceId(value: string): string {
+	return `${value.slice(0, 8)}…`;
 }
 
 export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix }: PlaceReportsCardProps) {
@@ -87,68 +95,70 @@ export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix 
 					<Separator />
 					<CardContent className="pt-4">
 						<div className="grid gap-3 lg:grid-cols-2">
-							{savedReports.map((report, index) => (
-								<div
-									key={`${report.report_type}-${report.created_at}-${index}`}
-									className="flex flex-col gap-4 rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-accent/20">
-									<div className="flex items-start gap-3">
-										<div className="rounded-lg bg-primary/10 p-2 text-primary">
-											<LayersIcon className="size-4" />
-										</div>
-										<div className="min-w-0 flex-1 space-y-2">
-											<div className="flex flex-wrap items-center gap-2">
-												<Badge
-													variant={
-														report.report_type === "combined" ? "default" : "secondary"
-													}>
-													{report.report_type === "combined"
-														? "Audit + survey"
-														: "Full assessment"}
-												</Badge>
-												<span className="text-xs text-muted-foreground">
-													Saved {formatDate(report.created_at)}
-												</span>
+							{savedReports.map((report, index) => {
+								const reportCopy = getPlaceReportCopy(report.report_type);
+								const sourceCountLabel = getPlaceReportSourceCountLabel(report.report_type);
+
+								return (
+									<div
+										key={`${report.report_type}-${report.created_at}-${index}`}
+										className="flex flex-col gap-4 rounded-xl border bg-card p-4 transition-colors hover:border-primary/35 hover:bg-accent/20">
+										<div className="flex items-start gap-3">
+											<div className="rounded-lg bg-primary/10 p-2 text-primary">
+												<LayersIcon className="size-4" />
 											</div>
-											<p className="text-sm text-muted-foreground">
-												{report.report_type === "combined"
-													? "Saved combination of one place audit and one place survey."
-													: "Saved single submission with the full assessment."}
-											</p>
-											{report.report_type === "combined" &&
-												report.audit_id &&
-												report.survey_id && (
+											<div className="min-w-0 flex-1 space-y-3">
+												<div className="flex flex-wrap items-center gap-2">
+													<Badge
+														variant={
+															report.report_type === "combined" ? "default" : "secondary"
+														}>
+														{reportCopy.title}
+													</Badge>
+													<Badge variant="outline">{sourceCountLabel}</Badge>
+													<span className="text-xs text-muted-foreground">
+														Saved {formatDate(report.created_at)}
+													</span>
+												</div>
+												<p className="text-sm text-muted-foreground">
+													{reportCopy.savedCardDescription}
+												</p>
+												{report.report_type === "combined" &&
+													report.audit_id &&
+													report.survey_id && (
+														<p className="font-mono text-xs text-muted-foreground">
+															Audit {formatShortSourceId(report.audit_id)} · Survey{" "}
+															{formatShortSourceId(report.survey_id)}
+														</p>
+													)}
+												{report.report_type === "full_assessment" && report.submission_id && (
 													<p className="font-mono text-xs text-muted-foreground">
-														A: {report.audit_id.slice(0, 8)}… · S:{" "}
-														{report.survey_id.slice(0, 8)}…
+														Submission {formatShortSourceId(report.submission_id)}
 													</p>
 												)}
-											{report.report_type === "full_assessment" && report.submission_id && (
-												<p className="font-mono text-xs text-muted-foreground">
-													Submission: {report.submission_id.slice(0, 8)}…
-												</p>
-											)}
+											</div>
+										</div>
+										<div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+											<Button asChild variant="outline" size="sm">
+												<Link href={buildReportHref(report)}>
+													<ExternalLinkIcon data-icon="inline-start" />
+													Open report
+												</Link>
+											</Button>
+											<Button
+												type="button"
+												variant="ghost"
+												size="sm"
+												disabled={deleteMutation.isPending}
+												onClick={() => deleteMutation.mutate(index)}
+												className="text-destructive hover:text-destructive">
+												<Trash2Icon data-icon="inline-start" />
+												Remove
+											</Button>
 										</div>
 									</div>
-									<div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-										<Button asChild variant="outline" size="sm">
-											<Link href={buildReportHref(report)}>
-												<ExternalLinkIcon data-icon="inline-start" />
-												Open report
-											</Link>
-										</Button>
-										<Button
-											type="button"
-											variant="ghost"
-											size="sm"
-											disabled={deleteMutation.isPending}
-											onClick={() => deleteMutation.mutate(index)}
-											className="text-destructive hover:text-destructive">
-											<Trash2Icon data-icon="inline-start" />
-											Remove
-										</Button>
-									</div>
-								</div>
-							))}
+								);
+							})}
 						</div>
 					</CardContent>
 				</>

@@ -52,6 +52,7 @@ export type InstrumentScaleTranslation = Readonly<{
  */
 export type InstrumentQuestionTranslation = Readonly<{
 	prompt?: string;
+	notesPrompt?: string | null;
 }>;
 
 /**
@@ -260,6 +261,7 @@ function localizeInstrumentQuestion(
 	return {
 		...baseQuestion,
 		prompt: resolveString(baseQuestion.prompt, translation?.prompt),
+		notes_prompt: resolveNullableString(baseQuestion.notes_prompt, translation?.notesPrompt),
 		scales: baseQuestion.scales.map(scale => localizeQuestionScale(scale, scaleTranslations?.[scale.key]))
 	};
 }

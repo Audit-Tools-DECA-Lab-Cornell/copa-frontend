@@ -135,23 +135,34 @@ export default function AdminPlacesPage() {
 	const selectedSurveyStatusesKey = selectedSurveyStatuses.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0
-				? currentValue
-				: {
-						...currentValue,
-						pageIndex: 0
-					};
-		});
-	}, [
+	const [prevDeps, setPrevDeps] = React.useState({
 		searchValue,
 		selectedAccountIdsKey,
 		selectedProjectIdsKey,
 		selectedAuditStatusesKey,
 		selectedSurveyStatusesKey,
 		sortParam
-	]);
+	});
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedAccountIdsKey !== prevDeps.selectedAccountIdsKey ||
+		selectedProjectIdsKey !== prevDeps.selectedProjectIdsKey ||
+		selectedAuditStatusesKey !== prevDeps.selectedAuditStatusesKey ||
+		selectedSurveyStatusesKey !== prevDeps.selectedSurveyStatusesKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({
+			searchValue,
+			selectedAccountIdsKey,
+			selectedProjectIdsKey,
+			selectedAuditStatusesKey,
+			selectedSurveyStatusesKey,
+			sortParam
+		});
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	const accountsQuery = useQuery({
 		queryKey: ["playspace", "admin", "places", "accounts-for-filter"],
@@ -193,21 +204,14 @@ export default function AdminPlacesPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!placesQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(placesQuery.data);
+	if (placesQuery.data && placesQuery.data !== prevData) {
+		setPrevData(placesQuery.data);
 		const maxPageIndex = Math.max(placesQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [pagination.pageIndex, placesQuery.data]);
+	}
 
 	const accountOptions = React.useMemo(() => {
 		return (accountsQuery.data?.items ?? []).map(a => ({

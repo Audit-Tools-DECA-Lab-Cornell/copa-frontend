@@ -148,8 +148,6 @@ export function DataTable<TData, TValue>({
 		[onPaginationStateChange, pagination]
 	);
 
-	// TanStack Table returns stable instance methods that the React compiler plugin currently flags incorrectly.
-	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable({
 		data,
 		columns,

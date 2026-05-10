@@ -261,7 +261,8 @@ export function buildNextQuestionAnswers(
 		return nextAnswers;
 	}
 
-	return { provision: optionKey };
+	const questionNote = typeof currentAnswers.question_note === "string" ? currentAnswers.question_note : null;
+	return questionNote === null ? { provision: optionKey } : { provision: optionKey, question_note: questionNote };
 }
 
 /**

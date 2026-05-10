@@ -240,17 +240,21 @@ export function PlaceSheet({
 		form.setFieldValue("longitude", "");
 	}, [form]);
 
-	React.useEffect(() => {
-		if (!open) {
-			return;
+	const [prevOpen, setPrevOpen] = React.useState(open);
+	const [prevDefaultValues, setPrevDefaultValues] = React.useState(defaultValues);
+
+	if (open !== prevOpen || defaultValues !== prevDefaultValues) {
+		setPrevOpen(open);
+		setPrevDefaultValues(defaultValues);
+		if (open) {
+			form.reset(defaultValues);
+			setSubmitError(null);
+			setAddressLookupError(null);
+			setAddressSearchTerm(defaultValues.address);
+			setAddressSuggestions([]);
+			setIsAddressDropdownOpen(false);
 		}
-		form.reset(defaultValues);
-		setSubmitError(null);
-		setAddressLookupError(null);
-		setAddressSearchTerm(defaultValues.address);
-		setAddressSuggestions([]);
-		setIsAddressDropdownOpen(false);
-	}, [defaultValues, form, open]);
+	}
 
 	const handleAddressFieldEdit = React.useCallback(
 		(fieldName: "address" | "city" | "province" | "country" | "postalCode", value: string) => {
@@ -289,10 +293,20 @@ export function PlaceSheet({
 		[form]
 	);
 
-	React.useEffect(() => {
+	const [prevAddressSearchTerm, setPrevAddressSearchTerm] = React.useState(addressSearchTerm);
+	const [prevOpenForSearch, setPrevOpenForSearch] = React.useState(open);
+
+	if (open !== prevOpenForSearch || addressSearchTerm !== prevAddressSearchTerm) {
+		setPrevOpenForSearch(open);
+		setPrevAddressSearchTerm(addressSearchTerm);
 		if (!open || addressSearchTerm.trim().length < 3) {
 			setAddressSuggestions([]);
 			setIsSearchingAddresses(false);
+		}
+	}
+
+	React.useEffect(() => {
+		if (!open || addressSearchTerm.trim().length < 3) {
 			return;
 		}
 

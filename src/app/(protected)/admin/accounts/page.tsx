@@ -37,16 +37,17 @@ export default function AdminAccountsPage() {
 	const selectedAccountTypesKey = selectedAccountTypes.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0
-				? currentValue
-				: {
-						...currentValue,
-						pageIndex: 0
-					};
-		});
-	}, [searchValue, selectedAccountTypesKey, sortParam]);
+	const [prevDeps, setPrevDeps] = React.useState({ searchValue, selectedAccountTypesKey, sortParam });
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedAccountTypesKey !== prevDeps.selectedAccountTypesKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({ searchValue, selectedAccountTypesKey, sortParam });
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	const accountsQuery = useQuery({
 		queryKey: [
@@ -70,21 +71,14 @@ export default function AdminAccountsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!accountsQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(accountsQuery.data);
+	if (accountsQuery.data && accountsQuery.data !== prevData) {
+		setPrevData(accountsQuery.data);
 		const maxPageIndex = Math.max(accountsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [accountsQuery.data, pagination.pageIndex]);
+	}
 
 	const isInitialLoading = accountsQuery.isLoading && !accountsQuery.data;
 

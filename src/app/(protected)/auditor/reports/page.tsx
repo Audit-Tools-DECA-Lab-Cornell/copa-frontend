@@ -120,11 +120,17 @@ export default function AuditorReportsPage() {
 	const sortParam = toBackendSortParam(sorting);
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
 
-	React.useEffect(() => {
+	const [prevDeps, setPrevDeps] = React.useState({ searchValue, selectedProjectIdsKey, sortParam });
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedProjectIdsKey !== prevDeps.selectedProjectIdsKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({ searchValue, selectedProjectIdsKey, sortParam });
 		setPagination(currentValue =>
 			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
 		);
-	}, [searchValue, selectedProjectIdsKey, sortParam]);
+	}
 
 	const summaryQuery = useQuery({
 		queryKey: ["playspace", "auditor", "dashboardSummary", "reportsPage"],
@@ -153,17 +159,14 @@ export default function AuditorReportsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!reportsQuery.data) return;
-
+	const [prevData, setPrevData] = React.useState(reportsQuery.data);
+	if (reportsQuery.data && reportsQuery.data !== prevData) {
+		setPrevData(reportsQuery.data);
 		const maxPageIndex = Math.max(reportsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) return;
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [reportsQuery.data, pagination.pageIndex]);
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
+		}
+	}
 
 	/** Derive project filter options from the loaded audit rows. */
 	const projectOptions = React.useMemo(() => {

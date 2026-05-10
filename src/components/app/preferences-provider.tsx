@@ -213,9 +213,13 @@ export function PreferencesProvider({
 
 	React.useEffect(() => {
 		const nextSystemTheme = getSystemTheme();
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setSystemTheme(nextSystemTheme);
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setSystemLanguage(resolveSupportedLanguage(globalThis.window?.navigator.language ?? initialResolvedLanguage));
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setPreferences(readStoredPreferences(initialPreferences));
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setIsHydrated(true);
 
 		if (globalThis.window === undefined) {

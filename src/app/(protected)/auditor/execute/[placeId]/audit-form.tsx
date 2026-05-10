@@ -475,15 +475,16 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	const standaloneSpaceAuditQuestions = React.useMemo(() => {
 		return spaceAuditQuestions.filter(question => question.group_key !== "current_users_matrix");
 	}, [spaceAuditQuestions]);
+	const instrumentRef = instrument!;
 	const visibleSections = React.useMemo(() => {
 		return getVisibleSections(
-			instrument!,
+			instrumentRef,
 			executionMode,
 			Object.fromEntries(
 				Object.entries(sectionDrafts).map(([sectionKey, draft]) => [sectionKey, draft.responses])
 			)
 		);
-	}, [executionMode, instrument!, sectionDrafts, instrument]);
+	}, [executionMode, instrumentRef, sectionDrafts]);
 
 	const sectionRows = React.useMemo<SectionProgressRow[]>(() => {
 		return visibleSections.map(section => ({
@@ -494,6 +495,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 
 	React.useEffect(() => {
 		if (sectionRows.length === 0) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect -- sync active section with visible sections
 			setActiveSectionKey(null);
 			return;
 		}

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-	CodeIcon,
 	CalendarIcon,
 	UserIcon,
 	MapPinIcon,
@@ -25,11 +24,10 @@ import { JsonViewer } from "./raw-json";
 import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
 import type { AuditSession } from "@/lib/api/playspace";
 import { getEffectiveScoreTotals, getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
-import type { DomainReportRow, DomainQuestionRow, ConstructRanking } from "@/lib/audit/report-helpers";
+import type { DomainQuestionRow, ConstructRanking } from "@/lib/audit/report-helpers";
 import {
 	buildDomainReportRows,
 	buildConstructRankings,
-	countUniqueScaledQuestionsWithDomains,
 	toDomainTitle,
 	formatConstructDomainLine,
 	reportBarScoreTier,
@@ -42,6 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { formatAuditCodeReference } from "@/components/dashboard/utils";
 
 // ── Layout constants ─────────────────────────────────────────────────────────
 // Fixed column widths shared between bar cells and table cells for alignment.
@@ -551,91 +550,6 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 	);
 }
 
-// ── Export buttons ────────────────────────────────────────────────────────────
-
-function ExportSection({
-	audit,
-	instrument
-}: Readonly<{ audit: AuditSession; instrument: PlayspaceInstrument | null }>) {
-	const [activeKey, setActiveKey] = React.useState<string | null>(null);
-
-	const handleExport = React.useCallback(
-		async (format: AuditExportFormat) => {
-			setActiveKey(format);
-			try {
-				await downloadSingleAuditExport(
-					{
-						auditSession: audit,
-						context: {
-							projectName: audit.project_name,
-							city: null,
-							province: null,
-							country: null
-						},
-						auditorProfile: null
-					},
-					instrument,
-					format
-				);
-			} catch (error) {
-				const message = error instanceof Error ? error.message : "Export failed";
-				globalThis.console.error("Export error:", message);
-			} finally {
-				setActiveKey(null);
-			}
-		},
-		[audit, instrument]
-	);
-
-	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="flex items-center gap-2 text-base">
-					<DownloadIcon className="size-4 text-primary" />
-					Export Report
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<div className="flex flex-wrap gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						className="gap-1.5"
-						disabled={activeKey !== null}
-						onClick={() => {
-							handleExport("pdf").catch(() => undefined);
-						}}>
-						<FileTextIcon className="size-3.5" />
-						{activeKey === "pdf" ? "Generating…" : "PDF"}
-					</Button>
-					<Button
-						variant="outline"
-						size="sm"
-						className="gap-1.5"
-						disabled={activeKey !== null}
-						onClick={() => {
-							handleExport("csv").catch(() => undefined);
-						}}>
-						<FileSpreadsheetIcon className="size-3.5" />
-						{activeKey === "csv" ? "Generating…" : "CSV"}
-					</Button>
-					<Button
-						variant="outline"
-						size="sm"
-						className="gap-1.5"
-						disabled={activeKey !== null}
-						onClick={() => {
-							handleExport("xlsx").catch(() => undefined);
-						}}>
-						<FileSpreadsheetIcon className="size-3.5" />
-						{activeKey === "xlsx" ? "Generating…" : "Excel"}
-					</Button>
-				</div>
-			</CardContent>
-		</Card>
-	);
-}
-
 // ── Main component ───────────────────────────────────────────────────────────
 
 export interface AuditReportViewProps {
@@ -660,11 +574,6 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 		if (instrument === null) return [];
 		return buildDomainReportRows(audit, instrument);
 	}, [audit, instrument]);
-
-	const overallItemCount = React.useMemo(() => {
-		if (instrument === null) return 0;
-		return countUniqueScaledQuestionsWithDomains(instrument);
-	}, [instrument]);
 
 	const rankings = React.useMemo(() => {
 		if (domainRows.length < 2) return [];
@@ -724,10 +633,21 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 				<CardContent>
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						<MetadataRow icon={HashIcon} label="Audit Code">
-							<code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">{audit.audit_code}</code>
+							<div className="space-y-1.5">
+								<p className="font-medium text-foreground">
+									{formatAuditCodeReference(audit.audit_code)}
+								</p>
+								<div className="overflow-x-auto no-scrollbar">
+									<code className="inline-block min-w-max whitespace-nowrap rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+										{audit.audit_code}
+									</code>
+								</div>
+							</div>
 						</MetadataRow>
 						<MetadataRow icon={UserIcon} label="Auditor">
-							{audit.auditor_code}
+							<code className="inline-flex break-all rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+								{audit.auditor_code}
+							</code>
 						</MetadataRow>
 						<MetadataRow icon={MapPinIcon} label="Place">
 							{audit.place_name}
@@ -791,9 +711,6 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 					/>
 				</div>
 			</div>
-
-			{/* ── 3. Export ────────────────────────────────────────── */}
-			<ExportSection audit={audit} instrument={instrument} />
 
 			{/* ── 4. Domain breakdown ─────────────────────────────── */}
 			{hasDomains ? (

@@ -21,6 +21,7 @@ export function AuthSessionProvider({ initialSession, children }: Readonly<AuthS
 	React.useEffect(() => {
 		const browserSession = getBrowserAuthSession();
 		if (browserSession !== null) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setSession(browserSession);
 		}
 	}, []);

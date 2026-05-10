@@ -47,11 +47,25 @@ export default function AdminAuditorsPage() {
 	const selectedPlaceIdsKey = selectedPlaceIds.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 };
-		});
-	}, [searchValue, selectedAccountIdsKey, selectedProjectIdsKey, selectedPlaceIdsKey, sortParam]);
+	const [prevDeps, setPrevDeps] = React.useState({
+		searchValue,
+		selectedAccountIdsKey,
+		selectedProjectIdsKey,
+		selectedPlaceIdsKey,
+		sortParam
+	});
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedAccountIdsKey !== prevDeps.selectedAccountIdsKey ||
+		selectedProjectIdsKey !== prevDeps.selectedProjectIdsKey ||
+		selectedPlaceIdsKey !== prevDeps.selectedPlaceIdsKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({ searchValue, selectedAccountIdsKey, selectedProjectIdsKey, selectedPlaceIdsKey, sortParam });
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	const accountsQuery = useQuery({
 		queryKey: ["playspace", "admin", "auditors", "accounts-for-filter"],
@@ -97,21 +111,14 @@ export default function AdminAuditorsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!auditorsQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(auditorsQuery.data);
+	if (auditorsQuery.data && auditorsQuery.data !== prevData) {
+		setPrevData(auditorsQuery.data);
 		const maxPageIndex = Math.max(auditorsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [auditorsQuery.data, pagination.pageIndex]);
+	}
 
 	const accountOptions = React.useMemo(() => {
 		return (accountsQuery.data?.items ?? []).map(a => ({

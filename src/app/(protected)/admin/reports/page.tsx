@@ -35,7 +35,7 @@ export default function AdminReportsPage() {
 	const placesQuery = useQuery({
 		queryKey: ["playspace", "admin", "reports", "places-for-filter"],
 		queryFn: async (): Promise<PaginatedResponse<AdminPlaceRow>> =>
-			playspaceApi.admin.places({ page: 1, pageSize: 200 })
+			playspaceApi.admin.places({ page: 1, pageSize: 100 })
 	});
 
 	const auditorsQuery = useQuery({
@@ -152,53 +152,9 @@ export default function AdminReportsPage() {
 			<DashboardHeader
 				eyebrow="Admin Workspace"
 				title="Audit Reports"
-				description="View all submitted audit reports grouped by place."
+				description="Review submitted reports across all places and build place reports when the required submissions are ready."
 				breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
 			/>
-
-			{/* Filters */}
-			<div className="flex flex-wrap items-center gap-2">
-				<FilterPopover
-					title="Projects"
-					options={projectOptions}
-					selectedValues={selectedProjectIds}
-					onChange={setSelectedProjectIds}
-				/>
-				<FilterPopover
-					title="Places"
-					options={placeOptions}
-					selectedValues={selectedPlaceIds}
-					onChange={setSelectedPlaceIds}
-				/>
-				<FilterPopover
-					title="Auditors"
-					options={auditorOptions}
-					selectedValues={selectedAuditorIds}
-					onChange={setSelectedAuditorIds}
-				/>
-				<FilterPopover
-					title="Managers"
-					options={accountOptions}
-					selectedValues={selectedAccountIds}
-					onChange={setSelectedAccountIds}
-				/>
-				{hasActiveFilters && (
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						className="gap-1.5"
-						onClick={() => {
-							setSelectedProjectIds([]);
-							setSelectedPlaceIds([]);
-							setSelectedAuditorIds([]);
-							setSelectedAccountIds([]);
-						}}>
-						<XIcon className="size-3.5" />
-						Clear filters
-					</Button>
-				)}
-			</div>
 
 			<GroupedReportsView
 				rows={rows}
@@ -207,6 +163,50 @@ export default function AdminReportsPage() {
 				searchValue={reportSearch}
 				onSearchValueChange={setReportSearch}
 				isSearching={reportsQuery.isFetching}
+				toolbarFilters={
+					<>
+						<FilterPopover
+							title="Projects"
+							options={projectOptions}
+							selectedValues={selectedProjectIds}
+							onChange={setSelectedProjectIds}
+						/>
+						<FilterPopover
+							title="Places"
+							options={placeOptions}
+							selectedValues={selectedPlaceIds}
+							onChange={setSelectedPlaceIds}
+						/>
+						<FilterPopover
+							title="Auditors"
+							options={auditorOptions}
+							selectedValues={selectedAuditorIds}
+							onChange={setSelectedAuditorIds}
+						/>
+						<FilterPopover
+							title="Managers"
+							options={accountOptions}
+							selectedValues={selectedAccountIds}
+							onChange={setSelectedAccountIds}
+						/>
+						{hasActiveFilters ? (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={() => {
+									setSelectedProjectIds([]);
+									setSelectedPlaceIds([]);
+									setSelectedAuditorIds([]);
+									setSelectedAccountIds([]);
+								}}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						) : null}
+					</>
+				}
 			/>
 		</div>
 	);

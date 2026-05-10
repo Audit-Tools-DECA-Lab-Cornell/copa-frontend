@@ -183,14 +183,17 @@ export function ProjectDialog({
 		}
 	});
 
-	React.useEffect(() => {
-		if (!open) {
-			return;
-		}
+	const [prevOpen, setPrevOpen] = React.useState(open);
+	const [prevDefaultValues, setPrevDefaultValues] = React.useState(defaultValues);
 
-		form.reset(defaultValues);
-		setSubmitError(null);
-	}, [defaultValues, form, open]);
+	if (open !== prevOpen || defaultValues !== prevDefaultValues) {
+		setPrevOpen(open);
+		setPrevDefaultValues(defaultValues);
+		if (open) {
+			form.reset(defaultValues);
+			setSubmitError(null);
+		}
+	}
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>

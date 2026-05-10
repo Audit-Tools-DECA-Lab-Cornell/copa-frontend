@@ -363,18 +363,31 @@ export function AssignAuditorDialog({ open, onOpenChange, prefill, onAssigned }:
 	}>({});
 
 	/* ── Reset on open/close ── */
-	React.useEffect(() => {
-		if (!open) {
-			return;
+	const [prevOpen, setPrevOpen] = React.useState(open);
+	const [prevPrefillProjectId, setPrevPrefillProjectId] = React.useState(prefill?.projectId);
+	const [prevPrefillPlaceIds, setPrevPrefillPlaceIds] = React.useState(prefill?.placeIds);
+	const [prevPrefillAuditorIds, setPrevPrefillAuditorIds] = React.useState(prefill?.auditorIds);
+
+	if (
+		open !== prevOpen ||
+		prefill?.projectId !== prevPrefillProjectId ||
+		prefill?.placeIds !== prevPrefillPlaceIds ||
+		prefill?.auditorIds !== prevPrefillAuditorIds
+	) {
+		setPrevOpen(open);
+		setPrevPrefillProjectId(prefill?.projectId);
+		setPrevPrefillPlaceIds(prefill?.placeIds);
+		setPrevPrefillAuditorIds(prefill?.auditorIds);
+		if (open) {
+			setActiveTab("assign");
+			setSelectedProjectId(prefill?.projectId ?? "");
+			setSelectedPlaceIds(prefill?.placeIds ? [...prefill.placeIds] : []);
+			setSelectedAuditorIds(prefill?.auditorIds ? [...prefill.auditorIds] : []);
+			setFormError(null);
+			setSuccessMessage(null);
+			setFieldErrors({});
 		}
-		setActiveTab("assign");
-		setSelectedProjectId(prefill?.projectId ?? "");
-		setSelectedPlaceIds(prefill?.placeIds ? [...prefill.placeIds] : []);
-		setSelectedAuditorIds(prefill?.auditorIds ? [...prefill.auditorIds] : []);
-		setFormError(null);
-		setSuccessMessage(null);
-		setFieldErrors({});
-	}, [open, prefill?.projectId, prefill?.placeIds, prefill?.auditorIds]);
+	}
 
 	/* ── Data fetching ── */
 	const auditorsQuery = useQuery({
@@ -579,12 +592,13 @@ export function AssignAuditorDialog({ open, onOpenChange, prefill, onAssigned }:
 		}
 	});
 
-	React.useEffect(() => {
-		if (!open) {
-			return;
+	const [prevOpenForInvite, setPrevOpenForInvite] = React.useState(open);
+	if (open !== prevOpenForInvite) {
+		setPrevOpenForInvite(open);
+		if (open) {
+			inviteForm.reset();
 		}
-		inviteForm.reset();
-	}, [open, inviteForm]);
+	}
 
 	const isLoading = auditorsQuery.isLoading || projectsQuery.isLoading;
 

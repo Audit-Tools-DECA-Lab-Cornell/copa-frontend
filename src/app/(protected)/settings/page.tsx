@@ -747,11 +747,17 @@ function ManagerWorkspaceSection({
 	const [saveError, setSaveError] = React.useState<string | null>(null);
 	const [saveSuccess, setSaveSuccess] = React.useState<string | null>(null);
 
-	React.useEffect(() => {
+	const [prevAccount, setPrevAccount] = React.useState({
+		id: account?.id,
+		name: account?.name,
+		email: account?.email
+	});
+	if (account?.id !== prevAccount.id || account?.name !== prevAccount.name || account?.email !== prevAccount.email) {
+		setPrevAccount({ id: account?.id, name: account?.name, email: account?.email });
 		setAccountNameInput(account?.name ?? "");
 		setAccountEmailInput(account?.email ?? "");
 		setIsEditingOrganization(false);
-	}, [account?.id, account?.name, account?.email]);
+	}
 
 	const updateAccountMutation = useMutation({
 		mutationFn: async () => {
@@ -1282,12 +1288,29 @@ function ManagerSelfServiceCard({ profile }: Readonly<{ profile: MyManagerProfil
 	const [newPassword, setNewPassword] = React.useState("");
 	const [passwordMessage, setPasswordMessage] = React.useState<{ text: string; isError: boolean } | null>(null);
 
-	React.useEffect(() => {
+	const [prevProfile, setPrevProfile] = React.useState({
+		email: profile?.email,
+		full_name: profile?.full_name,
+		phone: profile?.phone,
+		position: profile?.position
+	});
+	if (
+		profile?.email !== prevProfile.email ||
+		profile?.full_name !== prevProfile.full_name ||
+		profile?.phone !== prevProfile.phone ||
+		profile?.position !== prevProfile.position
+	) {
+		setPrevProfile({
+			email: profile?.email,
+			full_name: profile?.full_name,
+			phone: profile?.phone,
+			position: profile?.position
+		});
 		setFullName(profile?.full_name ?? "");
 		setEmail(profile?.email ?? "");
 		setPhone(profile?.phone ?? "");
 		setPosition(profile?.position ?? "");
-	}, [profile?.email, profile?.full_name, profile?.phone, profile?.position]);
+	}
 
 	const updateProfileMutation = useMutation({
 		mutationFn: () =>
@@ -1536,13 +1559,33 @@ function AuditorSelfServiceCard({ profile }: Readonly<{ profile: MyAuditorProfil
 	const [newPassword, setNewPassword] = React.useState("");
 	const [passwordMessage, setPasswordMessage] = React.useState<string | null>(null);
 
-	React.useEffect(() => {
+	const [prevProfile, setPrevProfile] = React.useState({
+		country: profile?.country,
+		email: profile?.email,
+		full_name: profile?.full_name,
+		phone: profile?.phone,
+		role: profile?.role
+	});
+	if (
+		profile?.country !== prevProfile.country ||
+		profile?.email !== prevProfile.email ||
+		profile?.full_name !== prevProfile.full_name ||
+		profile?.phone !== prevProfile.phone ||
+		profile?.role !== prevProfile.role
+	) {
+		setPrevProfile({
+			country: profile?.country,
+			email: profile?.email,
+			full_name: profile?.full_name,
+			phone: profile?.phone,
+			role: profile?.role
+		});
 		setFullName(profile?.full_name ?? "");
 		setEmail(profile?.email ?? "");
 		setPhone(profile?.phone ?? "");
 		setRole(profile?.role ?? "");
 		setCountry(profile?.country ?? "");
-	}, [profile?.country, profile?.email, profile?.full_name, profile?.phone, profile?.role]);
+	}
 
 	const updateProfileMutation = useMutation({
 		mutationFn: () =>

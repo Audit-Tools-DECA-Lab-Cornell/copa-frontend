@@ -127,7 +127,7 @@ export default function ManagerReportsPage() {
 				<DashboardHeader
 					eyebrow="Manager Workspace"
 					title="Audit Reports"
-					description="View submitted audit reports from your auditors."
+					description="Review submitted reports for your places and build place reports when the required submissions are ready."
 					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 				/>
 				<Card>
@@ -147,7 +147,7 @@ export default function ManagerReportsPage() {
 				<DashboardHeader
 					eyebrow="Manager Workspace"
 					title="Audit Reports"
-					description="View submitted audit reports grouped by place."
+					description="Review submitted reports for your places and build place reports when the required submissions are ready."
 					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -182,16 +182,16 @@ export default function ManagerReportsPage() {
 			<DashboardHeader
 				eyebrow="Manager Workspace"
 				title="Audit Reports"
-				description="View submitted audit reports grouped by place. Select a place to build a combined report."
+				description="Review submitted reports for your places and build place reports when the required submissions are ready."
 				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Reports" }]}
 			/>
 
 			{/* Summary stats */}
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
-					title="Total Reports"
+					title="Submitted reports"
 					value={String(data?.summary.submitted_audits ?? 0)}
-					helper="Submitted audits ready for review."
+					helper="Reports ready to review."
 					tone="info"
 				/>
 				<StatCard
@@ -201,58 +201,21 @@ export default function ManagerReportsPage() {
 							? `PV ${data.summary.average_scores.pv} | U ${data.summary.average_scores.u}`
 							: "Pending"
 					}
-					helper="Mean score across all submitted audits."
+					helper="Average score across submitted reports."
 					tone="success"
 				/>
 				<StatCard
-					title="Auditors"
+					title="Auditors represented"
 					value={String(new Set(data?.items.map(a => a.auditor_code)).size)}
-					helper="Unique auditors with submitted reports."
+					helper="Auditors represented in these reports."
 					tone="warning"
 				/>
 				<StatCard
-					title="Places"
+					title="Places represented"
 					value={String(new Set(data?.items.map(a => a.place_id)).size)}
-					helper="Unique places with submitted audits."
+					helper="Places that already have submitted reports."
 					tone="violet"
 				/>
-			</div>
-
-			{/* Filters */}
-			<div className="flex flex-wrap items-center gap-2">
-				<FilterPopover
-					title="Projects"
-					options={projectOptions}
-					selectedValues={selectedProjectIds}
-					onChange={setSelectedProjectIds}
-				/>
-				<FilterPopover
-					title="Places"
-					options={placeOptions}
-					selectedValues={selectedPlaceIds}
-					onChange={setSelectedPlaceIds}
-				/>
-				<FilterPopover
-					title="Auditors"
-					options={auditorOptions}
-					selectedValues={selectedAuditorIds}
-					onChange={setSelectedAuditorIds}
-				/>
-				{hasActiveFilters && (
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						className="gap-1.5"
-						onClick={() => {
-							setSelectedProjectIds([]);
-							setSelectedAuditorIds([]);
-							setSelectedPlaceIds([]);
-						}}>
-						<XIcon className="size-3.5" />
-						Clear filters
-					</Button>
-				)}
 			</div>
 
 			<GroupedReportsView
@@ -262,6 +225,43 @@ export default function ManagerReportsPage() {
 				searchValue={reportSearch}
 				onSearchValueChange={setReportSearch}
 				isSearching={reportsQuery.isFetching}
+				toolbarFilters={
+					<>
+						<FilterPopover
+							title="Projects"
+							options={projectOptions}
+							selectedValues={selectedProjectIds}
+							onChange={setSelectedProjectIds}
+						/>
+						<FilterPopover
+							title="Places"
+							options={placeOptions}
+							selectedValues={selectedPlaceIds}
+							onChange={setSelectedPlaceIds}
+						/>
+						<FilterPopover
+							title="Auditors"
+							options={auditorOptions}
+							selectedValues={selectedAuditorIds}
+							onChange={setSelectedAuditorIds}
+						/>
+						{hasActiveFilters ? (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={() => {
+									setSelectedProjectIds([]);
+									setSelectedAuditorIds([]);
+									setSelectedPlaceIds([]);
+								}}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						) : null}
+					</>
+				}
 			/>
 		</div>
 	);

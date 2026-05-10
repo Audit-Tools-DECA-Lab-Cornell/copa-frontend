@@ -2,54 +2,60 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { ColumnDef, ExpandedState, GroupingState, Row, RowSelectionState } from "@tanstack/react-table";
+import type { ColumnDef, ExpandedState, SortingState } from "@tanstack/react-table";
 import {
 	flexRender,
 	getCoreRowModel,
 	getExpandedRowModel,
 	getFilteredRowModel,
-	getGroupedRowModel,
 	getSortedRowModel,
 	useReactTable
 } from "@tanstack/react-table";
 import {
+	ArrowDownIcon,
+	ArrowUpDownIcon,
+	ArrowUpIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ChevronRightIcon,
 	CopyIcon,
 	DownloadIcon,
 	FileTextIcon,
-	InfoIcon,
 	PlusCircleIcon,
-	SearchIcon,
-	SparklesIcon
+	SearchIcon
 } from "lucide-react";
 
 import type { AuditActivityRow } from "./audits-table";
+import { BuildPlaceReportDialogView } from "./build-place-report-dialog";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import { cn } from "@/lib/utils";
 
-import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
-
+/**
+ * Parent row data shown in the main expandable table.
+ */
 interface PlaceGroup {
+	id: string;
 	placeId: string;
-	placeName: string;
 	projectId: string;
+	placeName: string;
 	projectName: string;
+	accountNames: string[];
 	rows: AuditActivityRow[];
-}
-
-interface ReportTableRow extends AuditActivityRow {
-	projectGroupKey: string;
-	placeGroupKey: string;
+	submittedRows: AuditActivityRow[];
+	reportCount: number;
+	auditCount: number;
+	surveyCount: number;
+	fullCount: number;
+	latestSubmittedAt: string | null;
+	latestSubmittedRow: AuditActivityRow | null;
 	searchText: string;
 }
 
@@ -61,6 +67,7 @@ export interface GroupedReportsViewProps {
 	searchValue?: string;
 	onSearchValueChange?: (value: string) => void;
 	isSearching?: boolean;
+	toolbarFilters?: React.ReactNode;
 }
 
 const fallbackText = (key: string) => {
@@ -71,6 +78,9 @@ const fallbackText = (key: string) => {
 	return values[key] ?? key;
 };
 
+/**
+ * Build a stable human-readable name for each project/place grouping.
+ */
 function getProjectName(row: AuditActivityRow): string {
 	return row.projectName ?? "Unknown project";
 }
@@ -87,15 +97,66 @@ function getPlaceId(row: AuditActivityRow): string {
 	return row.placeId ?? "unknown-place";
 }
 
-function toReportTableRows(rows: AuditActivityRow[]): ReportTableRow[] {
-	return rows.map(row => {
-		const projectName = getProjectName(row);
-		const placeName = getPlaceName(row);
+/**
+ * Keep report rows ordered by most recent submission first within each place.
+ */
+function getSubmittedRows(rows: AuditActivityRow[]): AuditActivityRow[] {
+	return rows
+		.filter(row => row.status === "SUBMITTED")
+		.sort((left, right) => new Date(right.submittedAt ?? 0).getTime() - new Date(left.submittedAt ?? 0).getTime());
+}
+
+/**
+ * Format the score consistently across the place summary and submission rows.
+ */
+function formatSubmissionScore(row: AuditActivityRow): string {
+	return row.scorePair
+		? formatScorePairLabel(row.scorePair, fallbackText)
+		: formatScoreLabel(row.score, fallbackText);
+}
+
+/**
+ * Group submissions by project-place pair so expansion stays correct even when a place appears in multiple projects.
+ */
+function buildPlaceGroups(rows: AuditActivityRow[]): PlaceGroup[] {
+	const groupedRows = new Map<string, AuditActivityRow[]>();
+	for (const row of rows) {
+		const groupKey = `${getProjectId(row)}:::${getPlaceId(row)}`;
+		const currentRows = groupedRows.get(groupKey) ?? [];
+		groupedRows.set(groupKey, [...currentRows, row]);
+	}
+
+	return Array.from(groupedRows.entries()).map(([groupKey, groupRows]) => {
+		const submittedRows = getSubmittedRows(groupRows);
+		const latestSubmittedRow = submittedRows[0] ?? null;
+		const accountNames = Array.from(
+			new Set(groupRows.map(row => row.accountName?.trim()).filter((value): value is string => Boolean(value)))
+		);
+
 		return {
-			...row,
-			projectGroupKey: `${projectName}:::${getProjectId(row)}`,
-			placeGroupKey: `${placeName}:::${getPlaceId(row)}`,
-			searchText: [row.auditCode, row.auditorCode, projectName, placeName, row.accountName]
+			id: groupKey,
+			placeId: getPlaceId(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
+			projectId: getProjectId(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
+			placeName: getPlaceName(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
+			projectName: getProjectName(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
+			accountNames,
+			rows: groupRows,
+			submittedRows,
+			reportCount: submittedRows.length,
+			auditCount: submittedRows.filter(row => row.executionMode === "audit").length,
+			surveyCount: submittedRows.filter(row => row.executionMode === "survey").length,
+			fullCount: submittedRows.filter(row => row.executionMode === "both").length,
+			latestSubmittedAt: latestSubmittedRow?.submittedAt ?? null,
+			latestSubmittedRow,
+			searchText: groupRows
+				.flatMap(row => [
+					row.auditCode,
+					row.auditorCode,
+					row.accountName,
+					getProjectName(row),
+					getPlaceName(row),
+					row.executionMode
+				])
 				.filter((value): value is string => Boolean(value))
 				.join(" ")
 				.toLowerCase()
@@ -103,305 +164,62 @@ function toReportTableRows(rows: AuditActivityRow[]): ReportTableRow[] {
 	});
 }
 
-function makePlaceGroup(rows: AuditActivityRow[]): PlaceGroup {
-	const firstRow = rows[0];
+/**
+ * Provide the secondary line under the place name without spending a whole column on project text.
+ */
+function formatPlaceContext(group: PlaceGroup): string {
+	if (group.accountNames.length === 0) {
+		return group.projectName;
+	}
+
+	return [group.projectName, group.accountNames.join(", ")].join(" · ");
+}
+
+/**
+ * Resolve whether the place has enough submitted data to build a place report.
+ */
+function getBuildAvailability(group: PlaceGroup): { canBuild: boolean; reason: string | null } {
+	if (group.fullCount > 0 || (group.auditCount > 0 && group.surveyCount > 0)) {
+		return { canBuild: true, reason: null };
+	}
+
+	if (group.auditCount === 0 && group.surveyCount === 0) {
+		return {
+			canBuild: false,
+			reason: "No submitted place audits or surveys are available for this place yet."
+		};
+	}
+
+	if (group.auditCount === 0) {
+		return {
+			canBuild: false,
+			reason: "Need at least one submitted place audit before building a place report."
+		};
+	}
+
+	if (group.surveyCount === 0) {
+		return {
+			canBuild: false,
+			reason: "Need at least one submitted place survey before building a place report."
+		};
+	}
+
 	return {
-		placeId: firstRow ? getPlaceId(firstRow) : "unknown-place",
-		placeName: firstRow ? getPlaceName(firstRow) : "Unknown place",
-		projectId: firstRow ? getProjectId(firstRow) : "unknown-project",
-		projectName: firstRow ? getProjectName(firstRow) : "Unknown project",
-		rows
+		canBuild: false,
+		reason: "Need either one full assessment or both a submitted audit and survey."
 	};
 }
 
-function getSubmittedRows(rows: AuditActivityRow[]): AuditActivityRow[] {
-	return rows
-		.filter(row => row.status === "SUBMITTED")
-		.sort((a, b) => new Date(b.submittedAt ?? 0).getTime() - new Date(a.submittedAt ?? 0).getTime());
-}
-
-function getModeRows(rows: AuditActivityRow[], mode: "audit" | "survey" | "both"): AuditActivityRow[] {
-	return getSubmittedRows(rows).filter(row => row.executionMode === mode);
-}
-
-function scoreLabel(row: AuditActivityRow): string {
-	return row.scorePair
-		? formatScorePairLabel(row.scorePair, fallbackText)
-		: formatScoreLabel(row.score, fallbackText);
-}
-
-function submissionMeta(row: AuditActivityRow): string {
-	return [row.auditorCode, formatDateTimeLabel(row.submittedAt, fallbackText)].filter(Boolean).join(" · ");
-}
-
-interface SelectableSubmissionCardProps {
-	row: AuditActivityRow;
-	selected: boolean;
-	name: string;
-	onSelect: () => void;
-}
-
-function SelectableSubmissionCard({ row, selected, name, onSelect }: SelectableSubmissionCardProps) {
-	return (
-		<label
-			className={cn(
-				"group flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-3 transition-all hover:border-primary/40 hover:bg-accent/40",
-				selected && "border-primary bg-primary/5 shadow-sm"
-			)}>
-			<input type="radio" name={name} className="sr-only" checked={selected} onChange={onSelect} />
-			<div
-				className={cn(
-					"mt-0.5 flex size-5 items-center justify-center rounded-full border text-primary transition-colors",
-					selected ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/35"
-				)}>
-				{selected ? <CheckIcon className="size-3.5" /> : null}
-			</div>
-			<div className="min-w-0 flex-1 space-y-2">
-				<div className="flex flex-wrap items-center gap-2">
-					<code className="rounded-sm bg-secondary px-2 py-1 font-mono text-xs text-foreground">
-						{formatAuditCodeReference(row.auditCode)}
-					</code>
-					{row.executionMode ? (
-						<Badge variant="outline" className="text-[11px]">
-							{getExecutionModeLabel(row.executionMode as "audit" | "survey" | "both")}
-						</Badge>
-					) : null}
-				</div>
-				<p className="text-xs text-muted-foreground">{submissionMeta(row)}</p>
-				<p className="text-xs font-medium text-foreground">Score: {scoreLabel(row)}</p>
-			</div>
-		</label>
-	);
-}
-
-interface BuildPlaceReportDialogProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	placeGroup: PlaceGroup;
-	rolePrefix: "admin" | "manager";
-}
-
-function BuildPlaceReportDialog({ open, onOpenChange, placeGroup, rolePrefix }: BuildPlaceReportDialogProps) {
-	const router = useRouter();
-	const auditRows = React.useMemo(() => getModeRows(placeGroup.rows, "audit"), [placeGroup.rows]);
-	const surveyRows = React.useMemo(() => getModeRows(placeGroup.rows, "survey"), [placeGroup.rows]);
-	const fullRows = React.useMemo(() => getModeRows(placeGroup.rows, "both"), [placeGroup.rows]);
-	const [selectedAuditId, setSelectedAuditId] = React.useState<string | null>(auditRows[0]?.id ?? null);
-	const [selectedSurveyId, setSelectedSurveyId] = React.useState<string | null>(surveyRows[0]?.id ?? null);
-	const [selectedFullAssessmentId, setSelectedFullAssessmentId] = React.useState<string | null>(
-		fullRows[0]?.id ?? null
-	);
-	const [mode, setMode] = React.useState<"pair" | "full">(
-		auditRows.length > 0 && surveyRows.length > 0 ? "pair" : "full"
-	);
-
-	const canBuildPair = selectedAuditId !== null && selectedSurveyId !== null;
-	const canBuildFull = selectedFullAssessmentId !== null;
-	const canBuild = mode === "pair" ? canBuildPair : canBuildFull;
-	const selectedAudit = auditRows.find(row => row.id === selectedAuditId);
-	const selectedSurvey = surveyRows.find(row => row.id === selectedSurveyId);
-	const selectedFull = fullRows.find(row => row.id === selectedFullAssessmentId);
-
-	function handleBuild() {
-		if (mode === "pair" && canBuildPair) {
-			router.push(
-				`/${rolePrefix}/reports/place-report?audit=${selectedAuditId}&survey=${selectedSurveyId}&placeId=${placeGroup.placeId}`
-			);
-			onOpenChange(false);
-		} else if (mode === "full" && canBuildFull) {
-			router.push(
-				`/${rolePrefix}/reports/place-report?submission=${selectedFullAssessmentId}&placeId=${placeGroup.placeId}`
-			);
-			onOpenChange(false);
-		}
-	}
-
-	React.useEffect(() => {
-		if (open) {
-			setSelectedAuditId(auditRows[0]?.id ?? null);
-			setSelectedSurveyId(surveyRows[0]?.id ?? null);
-			setSelectedFullAssessmentId(fullRows[0]?.id ?? null);
-			setMode(auditRows.length > 0 && surveyRows.length > 0 ? "pair" : "full");
-		}
-	}, [auditRows, fullRows, open, surveyRows]);
-
-	const buildHint =
-		mode === "pair"
-			? "Choose one submitted place audit and one submitted place survey. The builder combines both into a single full-assessment report."
-			: "Choose one submission that was already completed as a full assessment.";
-
-	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto p-0">
-				<div className="border-b bg-muted/30 px-6 py-5">
-					<DialogHeader>
-						<DialogTitle className="flex items-center gap-2 text-xl">
-							<SparklesIcon className="size-5 text-primary" />
-							Build a place report
-						</DialogTitle>
-						<DialogDescription>
-							Create a clear, shareable report for {placeGroup.placeName} in {placeGroup.projectName}.
-						</DialogDescription>
-					</DialogHeader>
-				</div>
-
-				<div className="space-y-5 p-6">
-					<div className="grid gap-3 md:grid-cols-2">
-						<button
-							type="button"
-							className={cn(
-								"rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:bg-accent/35",
-								mode === "pair" && "border-primary bg-primary/5 shadow-sm"
-							)}
-							onClick={() => setMode("pair")}>
-							<div className="flex items-center justify-between gap-3">
-								<p className="font-semibold">Audit + survey pair</p>
-								<Badge variant={canBuildPair ? "default" : "secondary"}>
-									{auditRows.length} audit · {surveyRows.length} survey
-								</Badge>
-							</div>
-							<p className="mt-2 text-sm text-muted-foreground">
-								Best when the place was evaluated with separate audit and survey submissions.
-							</p>
-						</button>
-						<button
-							type="button"
-							className={cn(
-								"rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:bg-accent/35",
-								mode === "full" && "border-primary bg-primary/5 shadow-sm"
-							)}
-							onClick={() => setMode("full")}>
-							<div className="flex items-center justify-between gap-3">
-								<p className="font-semibold">Existing full assessment</p>
-								<Badge variant={canBuildFull ? "default" : "secondary"}>
-									{fullRows.length} available
-								</Badge>
-							</div>
-							<p className="mt-2 text-sm text-muted-foreground">
-								Use a submission that already contains audit and survey answers together.
-							</p>
-						</button>
-					</div>
-
-					<div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
-						<div className="flex gap-2">
-							<InfoIcon className="mt-0.5 size-4 shrink-0 text-primary" />
-							<p>{buildHint}</p>
-						</div>
-					</div>
-
-					{mode === "pair" ? (
-						<div className="grid gap-4 lg:grid-cols-2">
-							<div className="space-y-2">
-								<div className="flex items-center justify-between">
-									<h4 className="text-sm font-semibold">1. Select place audit</h4>
-									<Badge variant="outline">{auditRows.length}</Badge>
-								</div>
-								{auditRows.length === 0 ? (
-									<p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-										No submitted place audits are available for this place.
-									</p>
-								) : (
-									<div className="max-h-80 space-y-2 overflow-y-auto pr-1">
-										{auditRows.map(row => (
-											<SelectableSubmissionCard
-												key={row.id}
-												row={row}
-												name="audit-selection"
-												selected={selectedAuditId === row.id}
-												onSelect={() => setSelectedAuditId(row.id)}
-											/>
-										))}
-									</div>
-								)}
-							</div>
-							<div className="space-y-2">
-								<div className="flex items-center justify-between">
-									<h4 className="text-sm font-semibold">2. Select place survey</h4>
-									<Badge variant="outline">{surveyRows.length}</Badge>
-								</div>
-								{surveyRows.length === 0 ? (
-									<p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-										No submitted place surveys are available for this place.
-									</p>
-								) : (
-									<div className="max-h-80 space-y-2 overflow-y-auto pr-1">
-										{surveyRows.map(row => (
-											<SelectableSubmissionCard
-												key={row.id}
-												row={row}
-												name="survey-selection"
-												selected={selectedSurveyId === row.id}
-												onSelect={() => setSelectedSurveyId(row.id)}
-											/>
-										))}
-									</div>
-								)}
-							</div>
-						</div>
-					) : (
-						<div className="space-y-2">
-							<div className="flex items-center justify-between">
-								<h4 className="text-sm font-semibold">Select one full assessment</h4>
-								<Badge variant="outline">{fullRows.length}</Badge>
-							</div>
-							{fullRows.length === 0 ? (
-								<p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-									No submitted full assessments are available for this place.
-								</p>
-							) : (
-								<div className="grid max-h-96 gap-2 overflow-y-auto pr-1 md:grid-cols-2">
-									{fullRows.map(row => (
-										<SelectableSubmissionCard
-											key={row.id}
-											row={row}
-											name="full-selection"
-											selected={selectedFullAssessmentId === row.id}
-											onSelect={() => setSelectedFullAssessmentId(row.id)}
-										/>
-									))}
-								</div>
-							)}
-						</div>
-					)}
-
-					<div className="rounded-xl border bg-muted/25 p-4">
-						<p className="text-sm font-semibold">Report preview</p>
-						<p className="mt-1 text-sm text-muted-foreground">
-							{mode === "pair" && selectedAudit && selectedSurvey
-								? `Combines ${formatAuditCodeReference(selectedAudit.auditCode)} with ${formatAuditCodeReference(selectedSurvey.auditCode)}.`
-								: mode === "full" && selectedFull
-									? `Builds from ${formatAuditCodeReference(selectedFull.auditCode)}.`
-									: "Select the required submissions to continue."}
-						</p>
-					</div>
-
-					<div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-						<Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-							Cancel
-						</Button>
-						<Button type="button" disabled={!canBuild} onClick={handleBuild}>
-							<FileTextIcon data-icon="inline-start" />
-							Build Report
-						</Button>
-					</div>
-				</div>
-			</DialogContent>
-		</Dialog>
-	);
-}
-
-interface CopyCodeButtonProps {
-	value: string;
-}
-
-function CopyCodeButton({ value }: CopyCodeButtonProps) {
+/**
+ * Reusable copy action for report identifiers in the expanded detail rows.
+ */
+function CopyCodeButton({ value }: Readonly<{ value: string }>) {
 	const [isCopied, setIsCopied] = React.useState(false);
 	const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	React.useEffect(() => {
 		return () => {
-			if (timeoutRef.current) {
+			if (timeoutRef.current !== null) {
 				globalThis.clearTimeout(timeoutRef.current);
 			}
 		};
@@ -411,10 +229,12 @@ function CopyCodeButton({ value }: CopyCodeButtonProps) {
 		try {
 			await navigator.clipboard.writeText(value);
 			setIsCopied(true);
-			if (timeoutRef.current) {
+			if (timeoutRef.current !== null) {
 				globalThis.clearTimeout(timeoutRef.current);
 			}
-			timeoutRef.current = globalThis.setTimeout(() => setIsCopied(false), 1500);
+			timeoutRef.current = globalThis.setTimeout(() => {
+				setIsCopied(false);
+			}, 1500);
 		} catch {
 			setIsCopied(false);
 		}
@@ -427,40 +247,199 @@ function CopyCodeButton({ value }: CopyCodeButtonProps) {
 	);
 }
 
-interface GroupRowActionProps {
-	row: Row<ReportTableRow>;
-	placeGroup?: PlaceGroup;
-	onBuildReport: (placeGroup: PlaceGroup) => void;
+/**
+ * Small sortable table header used in the place-level summary table.
+ */
+function SortableHeader({
+	title,
+	sorted,
+	onClick,
+	align = "left"
+}: Readonly<{
+	title: string;
+	sorted: false | "asc" | "desc";
+	onClick: () => void;
+	align?: "left" | "right";
+}>) {
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={cn(
+				"flex w-full items-center gap-2 text-left transition-colors hover:text-foreground",
+				align === "right" && "justify-end"
+			)}>
+			<span>{title}</span>
+			{sorted === "asc" ? (
+				<ArrowUpIcon className="size-3.5" />
+			) : sorted === "desc" ? (
+				<ArrowDownIcon className="size-3.5" />
+			) : (
+				<ArrowUpDownIcon className="size-3.5 opacity-60" />
+			)}
+		</button>
+	);
 }
 
-function GroupRowAction({ row, placeGroup, onBuildReport }: GroupRowActionProps) {
-	if (!row.getIsGrouped() || row.depth !== 1 || !placeGroup) {
-		return null;
-	}
+/**
+ * Render the build action on the place row and keep any tooltip inside the table card.
+ */
+function BuildPlaceReportButton({
+	group,
+	onBuild,
+	tooltipContainer
+}: Readonly<{
+	group: PlaceGroup;
+	onBuild: (group: PlaceGroup) => void;
+	tooltipContainer: HTMLElement | null;
+}>) {
+	const availability = getBuildAvailability(group);
 
-	const submittedCount = getSubmittedRows(placeGroup.rows).length;
-	const canBuild =
-		getModeRows(placeGroup.rows, "both").length > 0 ||
-		(getModeRows(placeGroup.rows, "audit").length > 0 && getModeRows(placeGroup.rows, "survey").length > 0);
-
-	return (
-		<div className="flex items-center justify-end gap-2">
-			<Badge variant="outline" className="hidden sm:inline-flex">
-				{submittedCount} submitted
-			</Badge>
-			<Button
-				type="button"
-				size="sm"
-				variant="outline"
-				disabled={!canBuild}
-				onClick={() => onBuildReport(placeGroup)}>
+	if (availability.canBuild) {
+		return (
+			<Button type="button" variant="outline" size="sm" onClick={() => onBuild(group)}>
 				<PlusCircleIcon data-icon="inline-start" />
 				Build place report
 			</Button>
+		);
+	}
+
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<span className="inline-flex">
+					<Button type="button" variant="outline" size="sm" disabled>
+						<PlusCircleIcon data-icon="inline-start" />
+						Build place report
+					</Button>
+				</span>
+			</TooltipTrigger>
+			{availability.reason ? (
+				<TooltipContent container={tooltipContainer} side="top" align="end" className="max-w-56 text-left">
+					{availability.reason}
+				</TooltipContent>
+			) : null}
+		</Tooltip>
+	);
+}
+
+/**
+ * Expanded inline sub-table showing the actual submissions for one place.
+ */
+function PlaceSubmissionTable({
+	group,
+	basePath,
+	showSelection,
+	selectedReportIds,
+	onReportSelectionChange,
+	onPlaceSelectionChange
+}: Readonly<{
+	group: PlaceGroup;
+	basePath: string;
+	showSelection: boolean;
+	selectedReportIds: Record<string, boolean>;
+	onReportSelectionChange: (reportId: string, checked: boolean) => void;
+	onPlaceSelectionChange: (group: PlaceGroup, checked: boolean) => void;
+}>) {
+	const selectedCount = group.submittedRows.filter(row => selectedReportIds[row.id]).length;
+	const allSelected = group.reportCount > 0 && selectedCount === group.reportCount;
+	const someSelected = selectedCount > 0 && selectedCount < group.reportCount;
+
+	return (
+		<div className="space-y-3 rounded-md border bg-background p-4 shadow-sm">
+			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+				<div>
+					<p className="text-sm font-semibold text-foreground">Submitted reports</p>
+					<p className="text-xs text-muted-foreground">
+						Expand a place to review individual submissions without leaving the table.
+					</p>
+				</div>
+				<Badge variant="secondary">{group.reportCount} reports</Badge>
+			</div>
+
+			<Table>
+				<TableHeader>
+					<TableRow className="hover:bg-transparent">
+						{showSelection ? (
+							<TableHead className="w-14 text-center">
+								<Checkbox
+									checked={allSelected ? true : someSelected ? "indeterminate" : false}
+									onCheckedChange={checked => onPlaceSelectionChange(group, checked === true)}
+									aria-label={`Select reports for ${group.placeName}`}
+								/>
+							</TableHead>
+						) : null}
+						<TableHead>Report</TableHead>
+						<TableHead>Type</TableHead>
+						<TableHead>Auditor</TableHead>
+						<TableHead>Submitted</TableHead>
+						<TableHead>Score</TableHead>
+						<TableHead className="text-right">Action</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{group.submittedRows.map(row => {
+						const mode = row.executionMode as "audit" | "survey" | "both" | null;
+
+						return (
+							<TableRow key={row.id}>
+								{showSelection ? (
+									<TableCell className="w-14 text-center">
+										<Checkbox
+											checked={Boolean(selectedReportIds[row.id])}
+											onCheckedChange={checked =>
+												onReportSelectionChange(row.id, checked === true)
+											}
+											aria-label={`Select ${row.auditCode}`}
+										/>
+									</TableCell>
+								) : null}
+								<TableCell className="min-w-[280px] py-3">
+									<div className="space-y-2">
+										<div className="flex flex-wrap items-center gap-2">
+											<Link
+												href={`${basePath}/${encodeURIComponent(row.id)}`}
+												className="font-medium text-foreground transition-colors hover:text-primary">
+												{formatAuditCodeReference(row.auditCode)}
+											</Link>
+											<CopyCodeButton value={row.auditCode} />
+										</div>
+										<p className="text-xs text-muted-foreground">{formatPlaceContext(group)}</p>
+									</div>
+								</TableCell>
+								<TableCell className="py-3">
+									{mode ? (
+										<Badge variant="outline" className="whitespace-nowrap text-xs font-medium">
+											{getExecutionModeLabel(mode)}
+										</Badge>
+									) : (
+										<span className="text-sm text-muted-foreground">—</span>
+									)}
+								</TableCell>
+								<TableCell className="py-3 font-mono text-sm">{row.auditorCode}</TableCell>
+								<TableCell className="py-3 text-sm text-muted-foreground">
+									{formatDateTimeLabel(row.submittedAt, fallbackText)}
+								</TableCell>
+								<TableCell className="py-3 font-mono text-sm tabular-nums">
+									{formatSubmissionScore(row)}
+								</TableCell>
+								<TableCell className="py-3 text-right">
+									<Button asChild variant="ghost" size="sm">
+										<Link href={`${basePath}/${encodeURIComponent(row.id)}`}>View</Link>
+									</Button>
+								</TableCell>
+							</TableRow>
+						);
+					})}
+				</TableBody>
+			</Table>
 		</div>
 	);
 }
 
+/**
+ * Expandable place-first reports view that keeps TanStack state management but removes the sparse grouped columns.
+ */
 export function GroupedReportsView({
 	rows,
 	basePath,
@@ -468,31 +447,39 @@ export function GroupedReportsView({
 	rolePrefix,
 	searchValue,
 	onSearchValueChange,
-	isSearching = false
-}: GroupedReportsViewProps) {
-	const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
-	const [grouping, setGrouping] = React.useState<GroupingState>(["projectGroupKey", "placeGroupKey"]);
-	const [expanded, setExpanded] = React.useState<ExpandedState>(true);
+	isSearching = false,
+	toolbarFilters
+}: Readonly<GroupedReportsViewProps>) {
+	const tableCardContentRef = React.useRef<HTMLDivElement | null>(null);
 	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
-	const tableRows = React.useMemo(() => toReportTableRows(rows), [rows]);
-	const placeGroupsByKey = React.useMemo(() => {
-		const groupedRows = new Map<string, AuditActivityRow[]>();
-		for (const row of rows) {
-			const key = `${getPlaceName(row)}:::${getPlaceId(row)}`;
-			groupedRows.set(key, [...(groupedRows.get(key) ?? []), row]);
-		}
-		return new Map(Array.from(groupedRows, ([key, groupRows]) => [key, makePlaceGroup(groupRows)]));
-	}, [rows]);
+	const [expanded, setExpanded] = React.useState<ExpandedState>({});
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "latestSubmittedAt", desc: true }]);
+	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
+	const [selectedReportIds, setSelectedReportIds] = React.useState<Record<string, boolean>>({});
+	const previousSearchValueRef = React.useRef(searchValue);
+	const skipNextSearchChangeRef = React.useRef(false);
 
-	React.useEffect(() => {
-		if (searchValue !== undefined) {
+	const placeGroups = React.useMemo(() => buildPlaceGroups(rows), [rows]);
+
+	const [prevSearchValue, setPrevSearchValue] = React.useState(searchValue);
+
+	if (searchValue !== prevSearchValue) {
+		setPrevSearchValue(searchValue);
+		if (searchValue !== undefined && searchValue !== globalFilter) {
+			skipNextSearchChangeRef.current = true;
 			setGlobalFilter(searchValue);
 		}
-	}, [searchValue]);
+	}
 
 	React.useEffect(() => {
-		if (!onSearchValueChange) return;
+		if (!onSearchValueChange) {
+			return;
+		}
+
+		if (skipNextSearchChangeRef.current) {
+			skipNextSearchChangeRef.current = false;
+			return;
+		}
 
 		const timeout = globalThis.setTimeout(() => {
 			onSearchValueChange(globalFilter.trim());
@@ -501,183 +488,200 @@ export function GroupedReportsView({
 		return () => globalThis.clearTimeout(timeout);
 	}, [globalFilter, onSearchValueChange]);
 
-	const columns = React.useMemo<ColumnDef<ReportTableRow>[]>(
+	const [prevRows, setPrevRows] = React.useState(rows);
+
+	if (rows !== prevRows) {
+		setPrevRows(rows);
+		const validReportIds = new Set(rows.map(row => row.id));
+		setSelectedReportIds(currentSelection => {
+			const nextSelection = Object.fromEntries(
+				Object.entries(currentSelection).filter(
+					([reportId, isSelected]) => validReportIds.has(reportId) && isSelected
+				)
+			);
+			return Object.keys(nextSelection).length === Object.keys(currentSelection).length
+				? currentSelection
+				: nextSelection;
+		});
+	}
+
+	/**
+	 * Update one report selection entry without disturbing the rest of the expanded place state.
+	 */
+	function handleReportSelectionChange(reportId: string, checked: boolean) {
+		setSelectedReportIds(currentSelection => {
+			if (checked) {
+				return { ...currentSelection, [reportId]: true };
+			}
+
+			const nextSelection = { ...currentSelection };
+			delete nextSelection[reportId];
+			return nextSelection;
+		});
+	}
+
+	function handlePlaceSelectionChange(group: PlaceGroup, checked: boolean) {
+		setSelectedReportIds(currentSelection => {
+			const nextSelection = { ...currentSelection };
+			for (const row of group.submittedRows) {
+				if (checked) {
+					nextSelection[row.id] = true;
+				} else {
+					delete nextSelection[row.id];
+				}
+			}
+			return nextSelection;
+		});
+	}
+
+	function clearSelection() {
+		setSelectedReportIds({});
+	}
+
+	const columns = React.useMemo<ColumnDef<PlaceGroup>[]>(
 		() => [
 			{
-				id: "select",
-				header: "",
-				enableGrouping: false,
-				cell: ({ row, table }) => {
-					if (row.getIsGrouped()) {
-						return null;
-					}
-					const selection = table.getState().rowSelection;
-					return (
-						<Checkbox
-							checked={Boolean(selection[row.id])}
-							onCheckedChange={checked => row.toggleSelected(checked === true)}
-							aria-label={`Select ${row.original.auditCode}`}
-						/>
-					);
-				}
-			},
-			{
-				accessorKey: "projectGroupKey",
-				header: "Project",
-				cell: ({ row, getValue }) => {
-					if (row.getIsGrouped()) {
-						const label = String(getValue()).split(":::")[0];
-						return (
-							<button
-								type="button"
-								className="flex min-w-[240px] items-center gap-2 text-left font-semibold text-foreground"
-								onClick={row.getToggleExpandedHandler()}>
+				id: "place",
+				accessorFn: row => row.placeName,
+				header: ({ column }) => (
+					<SortableHeader
+						title="Place"
+						sorted={column.getIsSorted()}
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					/>
+				),
+				cell: ({ row }) => (
+					<div className="min-w-[320px] py-1">
+						<button
+							type="button"
+							className="flex w-full items-start gap-3 text-left"
+							onClick={row.getToggleExpandedHandler()}>
+							<span className="mt-0.5 rounded-md border border-border/70 p-1 text-muted-foreground">
 								{row.getIsExpanded() ? (
 									<ChevronDownIcon className="size-4" />
 								) : (
 									<ChevronRightIcon className="size-4" />
 								)}
-								<span>{label}</span>
-								<Badge variant="secondary">{row.getLeafRows().length}</Badge>
-							</button>
-						);
-					}
-					return <span className="text-muted-foreground">{row.original.projectName ?? "—"}</span>;
-				}
-			},
-			{
-				accessorKey: "placeGroupKey",
-				header: "Place",
-				cell: ({ row, getValue }) => {
-					if (row.getIsGrouped()) {
-						const label = String(getValue()).split(":::")[0];
-						return (
-							<button
-								type="button"
-								className="flex min-w-[220px] items-center gap-2 text-left font-semibold text-foreground"
-								onClick={row.getToggleExpandedHandler()}>
-								{row.getIsExpanded() ? (
-									<ChevronDownIcon className="size-4" />
-								) : (
-									<ChevronRightIcon className="size-4" />
-								)}
-								<span>{label}</span>
-								<Badge variant="secondary">{row.getLeafRows().length}</Badge>
-							</button>
-						);
-					}
-					return <span>{row.original.placeName ?? "—"}</span>;
-				}
-			},
-			{
-				accessorKey: "auditCode",
-				header: "Report",
-				enableGrouping: false,
-				cell: ({ row }) => {
-					if (row.getIsGrouped()) return null;
-					const mode = row.original.executionMode as "audit" | "survey" | "both" | null;
-					return (
-						<div className="min-w-[260px] space-y-2">
-							<div className="flex items-center gap-2">
-								<Link
-									href={`${basePath}/${encodeURIComponent(row.original.id)}`}
-									className="font-medium text-foreground hover:text-primary">
-									{formatAuditCodeReference(row.original.auditCode)}
-								</Link>
-								<CopyCodeButton value={row.original.auditCode} />
-							</div>
-							<div className="flex flex-wrap items-center gap-2">
-								{mode ? (
-									<Badge variant="outline" className="text-xs">
-										{getExecutionModeLabel(mode)}
-									</Badge>
-								) : null}
-								<span className="text-xs text-muted-foreground">
-									Auditor {row.original.auditorCode}
+							</span>
+							<span className="min-w-0 space-y-1">
+								<span className="block font-semibold text-foreground">{row.original.placeName}</span>
+								<span className="block text-sm text-muted-foreground">
+									{formatPlaceContext(row.original)}
 								</span>
-							</div>
+							</span>
+						</button>
+					</div>
+				)
+			},
+			{
+				id: "reportCount",
+				accessorFn: row => row.reportCount,
+				header: ({ column }) => (
+					<SortableHeader
+						title="Submitted reports"
+						sorted={column.getIsSorted()}
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					/>
+				),
+				cell: ({ row }) => (
+					<div className="min-w-[220px] space-y-2 py-1">
+						<p className="font-medium text-foreground">{row.original.reportCount} submitted</p>
+						<div className="flex flex-wrap gap-2">
+							{row.original.auditCount > 0 ? (
+								<Badge variant="outline" className="text-xs">
+									{row.original.auditCount} audit{row.original.auditCount === 1 ? "" : "s"}
+								</Badge>
+							) : null}
+							{row.original.surveyCount > 0 ? (
+								<Badge variant="outline" className="text-xs">
+									{row.original.surveyCount} survey{row.original.surveyCount === 1 ? "" : "s"}
+								</Badge>
+							) : null}
+							{row.original.fullCount > 0 ? (
+								<Badge variant="outline" className="text-xs">
+									{row.original.fullCount} full
+								</Badge>
+							) : null}
 						</div>
-					);
-				}
+					</div>
+				)
 			},
 			{
-				accessorKey: "submittedAt",
-				header: "Submitted",
-				enableGrouping: false,
-				cell: ({ row }) =>
-					row.getIsGrouped() ? null : (
-						<span>{formatDateTimeLabel(row.original.submittedAt, fallbackText)}</span>
-					)
-			},
-			{
-				id: "score",
-				header: "Score",
-				enableGrouping: false,
-				cell: ({ row }) =>
-					row.getIsGrouped() ? null : (
-						<span className="font-mono text-sm tabular-nums">{scoreLabel(row.original)}</span>
-					)
+				id: "latestSubmittedAt",
+				accessorFn: row => row.latestSubmittedAt ?? "",
+				header: ({ column }) => (
+					<SortableHeader
+						title="Latest submission"
+						sorted={column.getIsSorted()}
+						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+					/>
+				),
+				cell: ({ row }) => (
+					<div className="min-w-[190px] space-y-1 py-1">
+						<p className="text-sm font-medium text-foreground">
+							{formatDateTimeLabel(row.original.latestSubmittedAt, fallbackText)}
+						</p>
+						<p className="text-xs text-muted-foreground">
+							{row.original.latestSubmittedRow
+								? `Latest auditor ${row.original.latestSubmittedRow.auditorCode}`
+								: "No submitted reports yet"}
+						</p>
+					</div>
+				)
 			},
 			{
 				id: "actions",
-				header: "Actions",
-				enableGrouping: false,
-				cell: ({ row }) => {
-					if (row.getIsGrouped()) {
-						const placeGroup = placeGroupsByKey.get(String(row.getValue("placeGroupKey")));
-						return <GroupRowAction row={row} placeGroup={placeGroup} onBuildReport={setBuildPlaceGroup} />;
-					}
-
-					return (
-						<Button asChild variant="ghost" size="sm">
-							<Link href={`${basePath}/${encodeURIComponent(row.original.id)}`}>View</Link>
-						</Button>
-					);
-				}
+				enableSorting: false,
+				header: () => <span className="block text-right">Actions</span>,
+				cell: ({ row }) => (
+					<div className="flex justify-end py-1">
+						<BuildPlaceReportButton
+							group={row.original}
+							onBuild={setBuildPlaceGroup}
+							tooltipContainer={tableCardContentRef.current}
+						/>
+					</div>
+				)
 			}
 		],
-		[basePath, placeGroupsByKey]
+		[]
 	);
 
-	// TanStack Table exposes stable instance methods; the React compiler lint can over-report this integration.
-	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable({
-		data: tableRows,
+		data: placeGroups,
 		columns,
 		state: {
-			grouping,
 			expanded,
-			globalFilter,
-			rowSelection
+			sorting,
+			globalFilter
 		},
 		getRowId: row => row.id,
-		onGroupingChange: setGrouping,
 		onExpandedChange: setExpanded,
-		onRowSelectionChange: setRowSelection,
+		onSortingChange: setSorting,
 		onGlobalFilterChange: updater => {
-			setGlobalFilter(previous => String(typeof updater === "function" ? updater(previous) : (updater ?? "")));
+			setGlobalFilter(previousValue =>
+				String(typeof updater === "function" ? updater(previousValue) : (updater ?? ""))
+			);
 		},
+		getRowCanExpand: row => row.original.reportCount > 0,
 		globalFilterFn: (row, _columnId, filterValue) => {
 			const query = String(filterValue).trim().toLowerCase();
 			return query.length === 0 || row.original.searchText.includes(query);
 		},
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
-		getGroupedRowModel: getGroupedRowModel(),
 		getExpandedRowModel: getExpandedRowModel(),
 		getSortedRowModel: getSortedRowModel()
 	});
 
-	const selectedReportIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
-	const selectedCount = selectedReportIds.length;
-
-	function clearSelection() {
-		setRowSelection({});
-	}
-
-	const filteredLeafCount = table.getFilteredRowModel().rows.length;
-	const placeCount = new Set(tableRows.map(row => row.placeGroupKey)).size;
-	const projectCount = new Set(tableRows.map(row => row.projectGroupKey)).size;
+	const selectedIds = React.useMemo(
+		() => Object.keys(selectedReportIds).filter(reportId => selectedReportIds[reportId]),
+		[selectedReportIds]
+	);
+	const selectedCount = selectedIds.length;
+	const filteredPlaceCount = table.getRowModel().rows.length;
+	const totalPlaceCount = placeGroups.length;
+	const totalReportCount = rows.length;
 
 	if (rows.length === 0) {
 		return (
@@ -691,140 +695,179 @@ export function GroupedReportsView({
 	}
 
 	return (
-		<div className="space-y-4">
-			<Card className="overflow-hidden">
-				<CardHeader className="gap-4 border-b border-border/70">
-					<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-						<div>
-							<CardTitle>Grouped reports table</CardTitle>
-							<CardDescription>
-								Review submissions by project and place, then build a place report from the relevant
-								group.
-							</CardDescription>
+		<TooltipProvider>
+			<div className="space-y-4">
+				<Card className="overflow-hidden">
+					<CardHeader className="gap-4 border-b border-border/70">
+						<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+							<div>
+								<CardTitle>Place reports</CardTitle>
+								<CardDescription>
+									Open a place to review submitted reports and build a place report once the right
+									submissions are available.
+								</CardDescription>
+							</div>
+							<div className="flex flex-wrap gap-2">
+								<Badge variant="secondary">{totalPlaceCount} places</Badge>
+								<Badge variant="secondary">{totalReportCount} reports</Badge>
+								{isSearching ? <Badge variant="outline">Searching…</Badge> : null}
+							</div>
 						</div>
-						<div className="flex flex-wrap gap-2">
-							<Badge variant="secondary">{projectCount} projects</Badge>
-							<Badge variant="secondary">{placeCount} places</Badge>
-							<Badge variant="secondary">{rows.length} reports</Badge>
-							{isSearching ? <Badge variant="outline">Searching…</Badge> : null}
-						</div>
-					</div>
-					<div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-						<div className="relative max-w-xl flex-1">
-							<SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Input
-								value={globalFilter}
-								onChange={event => setGlobalFilter(event.target.value)}
-								placeholder="Search report code, auditor, project, or place…"
-								className="pl-9"
-							/>
-							{onSearchValueChange ? (
-								<p className="mt-2 text-xs text-muted-foreground">
-									Searches submitted reports on the server, then refines the grouped table locally.
-								</p>
-							) : null}
-						</div>
-						<div className="flex flex-wrap gap-2">
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => table.toggleAllRowsExpanded(true)}>
-								Expand all
-							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => table.toggleAllRowsExpanded(false)}>
-								Collapse all
-							</Button>
-							{selectedCount > 0 ? (
-								<Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
-									Clear selection
-								</Button>
-							) : null}
-							{onExportSelected && selectedCount > 0 ? (
-								<Button type="button" size="sm" onClick={() => onExportSelected(selectedReportIds)}>
-									<DownloadIcon data-icon="inline-start" />
-									Export {selectedCount}
-								</Button>
-							) : null}
-						</div>
-					</div>
-				</CardHeader>
-				<CardContent className="p-0">
-					<Table>
-						<TableHeader>
-							{table.getHeaderGroups().map(headerGroup => (
-								<TableRow key={headerGroup.id} className="hover:bg-transparent">
-									{headerGroup.headers.map(header => (
-										<TableHead
-											key={header.id}
-											className={cn(header.id === "actions" && "text-right")}>
-											{header.isPlaceholder
-												? null
-												: flexRender(header.column.columnDef.header, header.getContext())}
-										</TableHead>
+					</CardHeader>
+
+					<CardContent className="p-0">
+						<div ref={tableCardContentRef} className="relative">
+							<div className="flex flex-col gap-4 border-b border-border/70 px-6 py-5">
+								<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+									<div className="min-w-0 flex-1 lg:max-w-sm">
+										<div className="relative">
+											<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+												<SearchIcon className="size-4 text-muted-foreground" />
+											</div>
+											<Input
+												value={globalFilter}
+												onChange={event => setGlobalFilter(event.target.value)}
+												placeholder="Search report code, auditor, project, or place…"
+												className="h-10 pl-10"
+											/>
+										</div>
+									</div>
+
+									<div className="flex flex-wrap items-center gap-2 sm:justify-end">
+										{isSearching ? <Badge variant="outline">Updating results…</Badge> : null}
+									</div>
+								</div>
+
+								<div className="flex flex-1 flex-col justify-between gap-3 sm:flex-row sm:flex-wrap sm:items-start">
+									<div className="flex flex-wrap items-center gap-2">{toolbarFilters}</div>
+
+									<div className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											onClick={() => table.toggleAllRowsExpanded(true)}>
+											Expand all
+										</Button>
+										<Button
+											type="button"
+											variant="outline"
+											size="sm"
+											onClick={() => table.toggleAllRowsExpanded(false)}>
+											Collapse all
+										</Button>
+										{selectedCount > 0 ? (
+											<Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
+												Clear selection
+											</Button>
+										) : null}
+										{onExportSelected && selectedCount > 0 ? (
+											<Button
+												type="button"
+												size="sm"
+												onClick={() => onExportSelected(selectedIds)}>
+												<DownloadIcon data-icon="inline-start" />
+												Export {selectedCount}
+											</Button>
+										) : null}
+									</div>
+								</div>
+							</div>
+
+							<Table>
+								<TableHeader>
+									{table.getHeaderGroups().map(headerGroup => (
+										<TableRow key={headerGroup.id} className="hover:bg-transparent">
+											{headerGroup.headers.map(header => (
+												<TableHead
+													key={header.id}
+													className={cn(header.id === "actions" && "text-right")}>
+													{header.isPlaceholder
+														? null
+														: flexRender(
+																header.column.columnDef.header,
+																header.getContext()
+															)}
+												</TableHead>
+											))}
+										</TableRow>
 									))}
-								</TableRow>
-							))}
-						</TableHeader>
-						<TableBody>
-							{table.getRowModel().rows.length > 0 ? (
-								table.getRowModel().rows.map(row => (
-									<TableRow
-										key={row.id}
-										data-state={!row.getIsGrouped() && row.getIsSelected() ? "selected" : undefined}
-										className={cn(
-											row.getIsGrouped() && row.depth === 0 && "bg-muted/45 hover:bg-muted/55",
-											row.getIsGrouped() && row.depth === 1 && "bg-primary/5 hover:bg-primary/10"
-										)}>
-										{row.getVisibleCells().map(cell => (
+								</TableHeader>
+								<TableBody>
+									{table.getRowModel().rows.length > 0 ? (
+										table.getRowModel().rows.map(row => (
+											<React.Fragment key={row.id}>
+												<TableRow data-state={row.getIsExpanded() ? "selected" : undefined}>
+													{row.getVisibleCells().map(cell => (
+														<TableCell
+															key={cell.id}
+															className={cn(
+																cell.column.id === "actions" && "text-right"
+															)}>
+															{flexRender(cell.column.columnDef.cell, cell.getContext())}
+														</TableCell>
+													))}
+												</TableRow>
+												{row.getIsExpanded() ? (
+													<TableRow className="bg-muted/25 hover:bg-muted/25">
+														<TableCell
+															colSpan={row.getVisibleCells().length}
+															className="px-6 py-5">
+															<PlaceSubmissionTable
+																group={row.original}
+																basePath={basePath}
+																showSelection={Boolean(onExportSelected)}
+																selectedReportIds={selectedReportIds}
+																onReportSelectionChange={handleReportSelectionChange}
+																onPlaceSelectionChange={handlePlaceSelectionChange}
+															/>
+														</TableCell>
+													</TableRow>
+												) : null}
+											</React.Fragment>
+										))
+									) : (
+										<TableRow className="hover:bg-transparent">
 											<TableCell
-												key={cell.id}
-												className={cn(
-													row.getIsGrouped() && "py-3",
-													cell.column.id === "actions" && "text-right"
-												)}>
-												{cell.getIsPlaceholder()
-													? null
-													: flexRender(cell.column.columnDef.cell, cell.getContext())}
+												colSpan={columns.length}
+												className="h-28 text-center text-sm text-muted-foreground">
+												No places match the current search.
 											</TableCell>
-										))}
-									</TableRow>
-								))
-							) : (
-								<TableRow className="hover:bg-transparent">
-									<TableCell
-										colSpan={table.getVisibleLeafColumns().length}
-										className="h-28 text-center text-sm text-muted-foreground">
-										No reports match the current search.
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-				</CardContent>
-			</Card>
+										</TableRow>
+									)}
+								</TableBody>
+							</Table>
+						</div>
+					</CardContent>
+				</Card>
 
-			<div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
-				<span>
-					Showing {filteredLeafCount} of {rows.length} reports with TanStack project/place grouping.
-				</span>
-				<span>Select individual rows for exports; use place group actions to build combined reports.</span>
+				<div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
+					<span>
+						Showing {filteredPlaceCount} of {totalPlaceCount} places with {totalReportCount} submitted
+						reports.
+					</span>
+					<span>
+						Open a place to review its submissions
+						{selectedCount > 0
+							? ` or export ${selectedCount} selected report${selectedCount === 1 ? "" : "s"}`
+							: ""}
+						.
+					</span>
+				</div>
+
+				{buildPlaceGroup ? (
+					<BuildPlaceReportDialogView
+						open
+						onOpenChange={open => {
+							if (!open) {
+								setBuildPlaceGroup(null);
+							}
+						}}
+						placeGroup={buildPlaceGroup}
+						rolePrefix={rolePrefix}
+					/>
+				) : null}
 			</div>
-
-			{buildPlaceGroup ? (
-				<BuildPlaceReportDialog
-					open
-					onOpenChange={open => {
-						if (!open) setBuildPlaceGroup(null);
-					}}
-					placeGroup={buildPlaceGroup}
-					rolePrefix={rolePrefix}
-				/>
-			) : null}
-		</div>
+		</TooltipProvider>
 	);
 }

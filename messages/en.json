@@ -537,6 +537,7 @@
 				"sectionDescription": "Description",
 				"sectionInstruction": "Instruction",
 				"sectionNotesPrompt": "Notes Prompt",
+				"questionNotesPrompt": "Question Notes Prompt",
 				"instrumentName": "Instrument Name",
 				"instrumentVersion": "Version",
 				"totalQuestions": "Total Questions",
@@ -596,6 +597,8 @@
 				"addQuestion": "Add question",
 				"removeQuestion": "Remove question",
 				"addOption": "Add option",
+				"moveOptionUp": "Move up",
+				"moveOptionDown": "Move down",
 				"removeOption": "Remove",
 				"addScale": "Add scale",
 				"removeScale": "Remove scale",
@@ -800,7 +803,7 @@
 		"passwordHelp": "At least 8 characters.",
 		"actions": {
 			"accept": "Accept & join workspace",
-			"accepting": "Setting up your account\u2026"
+			"accepting": "Setting up your account…"
 		},
 		"errors": {
 			"nameRequired": "Your name is required.",
@@ -1668,7 +1671,8 @@
 				"noCapturedNotesDescription": "Empty sections are currently hidden. Show them if you want to review the full instrument structure.",
 				"capturedNote": "Captured note",
 				"emptyBadge": "Empty",
-				"noNoteCaptured": "No note captured."
+				"noNoteCaptured": "No note captured.",
+				"comment": "Comment"
 			},
 			"status": {
 				"in_progress": "in progress",
@@ -1792,7 +1796,8 @@
 			},
 			"questionCard": {
 				"thisPlayspace": "This playspace",
-				"followUpScalesHidden": "Follow-up scales stay hidden until the selected provision option allows them."
+				"followUpScalesHidden": "Follow-up scales stay hidden until the selected provision option allows them.",
+				"enterComments": "Enter any comments"
 			},
 			"sectionTable": {
 				"intro": "On larger screens the question prompt stays on the left and the active scoring scales stay aligned in columns on the right.",
@@ -1999,7 +2004,7 @@
 				"emailPlaceholder": "colleague@organization.com",
 				"cancelButton": "Cancel",
 				"sendButton": "Send invitation",
-				"sendingButton": "Sending\u2026",
+				"sendingButton": "Sending…",
 				"errors": {
 					"emailRequired": "Email address is required.",
 					"emailInvalid": "Please enter a valid email address.",
@@ -2071,7 +2076,7 @@
 			},
 			"actions": {
 				"save": "Save profile",
-				"saving": "Saving\u2026"
+				"saving": "Saving…"
 			}
 		},
 		"managerPassword": {
@@ -2090,7 +2095,7 @@
 			},
 			"actions": {
 				"update": "Update password",
-				"updating": "Updating\u2026"
+				"updating": "Updating…"
 			}
 		}
 	},

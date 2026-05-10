@@ -4,8 +4,6 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import {
-	ArrowDown,
-	ArrowUp,
 	Check,
 	CheckCircle2,
 	ChevronDown,
@@ -117,78 +115,6 @@ function countTotalQuestions(sections: InstrumentSection[]): number {
 	return sections.reduce((acc, s) => acc + s.questions.length, 0);
 }
 
-function moveArrayItem<T>(items: readonly T[], index: number, direction: "up" | "down"): T[] {
-	const targetIndex = direction === "up" ? index - 1 : index + 1;
-	if (targetIndex < 0 || targetIndex >= items.length) {
-		return [...items];
-	}
-	const next = [...items];
-	const currentItem = next[index];
-	const targetItem = next[targetIndex];
-	if (currentItem === undefined || targetItem === undefined) {
-		return next;
-	}
-	next[index] = targetItem;
-	next[targetIndex] = currentItem;
-	return next;
-}
-
-function titleCaseToken(value: string): string {
-	return value
-		.split("_")
-		.map(token => (token.length === 0 ? token : token.charAt(0).toUpperCase() + token.slice(1)))
-		.join(" ");
-}
-
-function formatIndexedDiffSegment(segment: string, index: number): string {
-	switch (segment) {
-		case "sections":
-			return `Section ${index + 1}`;
-		case "questions":
-			return `Question ${index + 1}`;
-		case "scales":
-			return `Scale ${index + 1}`;
-		case "options":
-			return `Scale Option ${index + 1}`;
-		case "scale_guidance":
-			return `Scale Guidance ${index + 1}`;
-		case "pre_audit_questions":
-			return `Pre-Audit Question ${index + 1}`;
-		case "execution_modes":
-			return `Execution Mode ${index + 1}`;
-		case "legal_documents":
-			return `Legal Document ${index + 1}`;
-		case "sections.body":
-			return `Paragraph ${index + 1}`;
-		case "sections.bullets":
-			return `Bullet ${index + 1}`;
-		default:
-			return `${titleCaseToken(segment)} ${index + 1}`;
-	}
-}
-
-function formatDiffPath(path: readonly (string | number)[]): string {
-	const labels: string[] = [];
-	for (let index = 0; index < path.length; index += 1) {
-		const segment = path[index];
-		if (typeof segment === "number") {
-			const previousSegment = path[index - 1];
-			if (typeof previousSegment === "string") {
-				labels.push(formatIndexedDiffSegment(previousSegment, segment));
-				continue;
-			}
-			labels.push(String(segment + 1));
-			continue;
-		}
-		const nextSegment = path[index + 1];
-		if (typeof nextSegment === "number") {
-			continue;
-		}
-		labels.push(titleCaseToken(segment));
-	}
-	return labels.join(" → ");
-}
-
 function collectSectionScaleKeys(questions: InstrumentQuestion[]): string[] {
 	const keys = new Set<string>();
 	for (const q of questions) {
@@ -296,8 +222,7 @@ function makeDefaultQuestion(sectionKey: string, index: number): InstrumentQuest
 		scales: [],
 		options: [],
 		required: true,
-		display_if: null,
-		notes_prompt: null
+		display_if: null
 	};
 }
 
@@ -1219,7 +1144,7 @@ function SpreadsheetView({
 			}
 		}
 		return rows;
-	}, [sections, scaleGuidanceMap]);
+	}, [sections, scaleGuidanceMap, t]);
 
 	const filteredRows = useMemo(() => {
 		const searchLower = search.toLowerCase();
@@ -1786,6 +1711,8 @@ function SpreadsheetView({
 /* -------------------------------------------------------------------------- */
 
 function ScaleGuidanceViewer({ scales }: Readonly<{ scales: ScaleDefinition[] }>) {
+	const t = useTranslations("admin.instruments.content");
+
 	return (
 		<div className="grid gap-4 lg:grid-cols-2">
 			{scales.map(scale => (
@@ -1946,11 +1873,6 @@ function ViewerQuestionCard({
 					<p className="text-sm leading-relaxed">
 						<span className="font-medium">{renderInlineMarkdown(question.prompt)}</span>
 					</p>
-					{question.notes_prompt ? (
-						<p className="mt-2 text-xs text-muted-foreground">
-							<strong>{t("questionNotesPrompt")}:</strong> {question.notes_prompt}
-						</p>
-					) : null}
 
 					<div className="mt-2 flex flex-wrap gap-1.5">
 						<Badge variant={isChecklist ? "secondary" : "default"} className="gap-1 text-xs">
@@ -2415,7 +2337,7 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 												{d.type}
 											</Badge>
 											<span className="font-mono text-muted-foreground break-all">
-												{formatDiffPath(d.path)}
+												{d.path.join(" → ")}
 											</span>
 										</div>
 										<div className="grid grid-cols-2 gap-2 mt-2">
@@ -2754,10 +2676,6 @@ function ScaleOptionsEditor({
 		onChange(options.filter((_, i) => i !== index));
 	}
 
-	function moveOption(index: number, direction: "up" | "down") {
-		onChange(moveArrayItem(options, index, direction));
-	}
-
 	return (
 		<div className="space-y-2">
 			<div className="flex items-center justify-between">
@@ -2826,26 +2744,6 @@ function ScaleOptionsEditor({
 							className="mt-5 shrink-0 text-destructive hover:text-destructive"
 							onClick={() => removeOption(oIdx)}>
 							<Minus className="h-4 w-4" />
-						</Button>
-					</div>
-					<div className="flex items-center gap-2">
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							disabled={oIdx === 0}
-							onClick={() => moveOption(oIdx, "up")}>
-							<ArrowUp className="mr-1 h-3.5 w-3.5" />
-							{t("moveOptionUp")}
-						</Button>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							disabled={oIdx === options.length - 1}
-							onClick={() => moveOption(oIdx, "down")}>
-							<ArrowDown className="mr-1 h-3.5 w-3.5" />
-							{t("moveOptionDown")}
 						</Button>
 					</div>
 					<div className="flex items-center gap-4">
@@ -3484,16 +3382,6 @@ function QuestionEditor({
 						onChange={v =>
 							onUpdate(q => {
 								q.prompt = v;
-							})
-						}
-					/>
-					<EditableField
-						label={t("questionNotesPrompt")}
-						value={question.notes_prompt ?? ""}
-						multiline
-						onChange={v =>
-							onUpdate(q => {
-								q.notes_prompt = v || null;
 							})
 						}
 					/>

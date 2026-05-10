@@ -9,6 +9,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BackButton } from "@/components/dashboard/back-button";
+import { AuditExportActions } from "@/components/dashboard/audit-export-actions";
 
 /**
  * Admin-facing individual audit report detail page.
@@ -52,7 +53,14 @@ export function AdminReportDetailClient({ auditId }: Readonly<AdminReportDetailC
 					{ label: "Reports", href: "/admin/reports" },
 					{ label: audit?.audit_code ?? "Report" }
 				]}
-				actions={<BackButton href="/admin/reports" label="Back to Reports" />}
+				actions={
+					<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+						{audit !== undefined && instrumentQuery.data !== undefined && (
+							<AuditExportActions audit={audit} instrument={instrumentQuery.data} />
+						)}
+						<BackButton href="/admin/reports" label="Back to Reports" />
+					</div>
+				}
 			/>
 
 			{auditQuery.isLoading ? (

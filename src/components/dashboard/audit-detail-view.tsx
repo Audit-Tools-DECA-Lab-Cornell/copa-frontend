@@ -10,8 +10,7 @@ import {
 	MapPinIcon,
 	FolderOpenIcon,
 	UserIcon,
-	CheckCircle2Icon,
-	DownloadIcon
+	CheckCircle2Icon
 } from "lucide-react";
 
 import type { AuditSession } from "@/lib/api/playspace";
@@ -23,9 +22,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { StatCard } from "./stat-card";
-import { formatDateTimeLabel, formatScoreLabel, formatScorePairLabel, type DashboardTranslator } from "./utils";
-import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/export/audit";
+import { formatDateTimeLabel, formatScoreLabel, type DashboardTranslator } from "./utils";
+
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import { AuditExportActions } from "./audit-export-actions";
 
 // ── Internal Helpers ──────────────────────────────────────────────────
 
@@ -454,6 +454,7 @@ interface QuestionRowProps {
  */
 function QuestionRow({ question, answers }: QuestionRowProps) {
 	const promptSegments = parsePromptSegments(question.prompt);
+	const questionComment = typeof answers.question_note === "string" ? answers.question_note.trim() : "";
 
 	const promptNode = (
 		<p className="text-sm font-medium text-foreground">
@@ -470,6 +471,14 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 			<div className="rounded-lg border border-border/40 bg-card p-4">
 				{promptNode}
 				<p className="mt-1.5 text-sm text-muted-foreground">{formatChecklistAnswerText(question, answers)}</p>
+				{questionComment.length > 0 ? (
+					<div className="mt-3 rounded-md border border-border/60 bg-muted/30 p-3">
+						<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+							Auditor Comment
+						</p>
+						<p className="mt-1 text-sm whitespace-pre-wrap text-foreground">{questionComment}</p>
+					</div>
+				) : null}
 			</div>
 		);
 	}
@@ -499,6 +508,14 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 			) : (
 				<p className="mt-1.5 text-sm text-muted-foreground">No response recorded</p>
 			)}
+			{questionComment.length > 0 ? (
+				<div className="mt-3 rounded-md border border-border/60 bg-muted/30 p-3">
+					<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+						Auditor Comment
+					</p>
+					<p className="mt-1 text-sm whitespace-pre-wrap text-foreground">{questionComment}</p>
+				</div>
+			) : null}
 		</div>
 	);
 }
@@ -553,89 +570,6 @@ function UnsubmittedAuditCard({ audit }: UnsubmittedAuditCardProps) {
 				</div>
 			</CardContent>
 		</Card>
-	);
-}
-
-// ── Export Actions ───────────────────────────────────────────────────
-
-interface ExportActionsProps {
-	readonly audit: AuditSession;
-}
-
-/**
- * Export buttons for downloading the submitted audit in PDF, CSV, or Excel format.
- */
-function ExportActions({ audit }: ExportActionsProps) {
-	const [isExporting, setIsExporting] = React.useState(false);
-	const instrument = audit.instrument;
-
-	if (instrument === undefined) {
-		return null;
-	}
-
-	async function handleExport(format: AuditExportFormat) {
-		if (instrument === undefined) {
-			return;
-		}
-		setIsExporting(true);
-		try {
-			await downloadSingleAuditExport(
-				{
-					auditSession: audit,
-					context: {
-						projectName: audit.project_name,
-						city: null,
-						province: null,
-						country: null
-					},
-					auditorProfile: {
-						auditorCode: audit.auditor_code,
-						ageRange: null,
-						gender: null,
-						country: null,
-						role: null
-					}
-				},
-				instrument,
-				format
-			);
-		} catch {
-			/* export error silently */
-		} finally {
-			setIsExporting(false);
-		}
-	}
-
-	return (
-		<div className="flex flex-wrap items-center gap-2">
-			<Button
-				variant="outline"
-				size="sm"
-				disabled={isExporting}
-				onClick={() => void handleExport("pdf")}
-				className="gap-1.5">
-				<DownloadIcon className="size-3.5" />
-				PDF
-			</Button>
-			<Button
-				variant="outline"
-				size="sm"
-				disabled={isExporting}
-				onClick={() => void handleExport("xlsx")}
-				className="gap-1.5">
-				<DownloadIcon className="size-3.5" />
-				Excel
-			</Button>
-			<Button
-				variant="outline"
-				size="sm"
-				disabled={isExporting}
-				onClick={() => void handleExport("csv")}
-				className="gap-1.5">
-				<DownloadIcon className="size-3.5" />
-				CSV
-			</Button>
-		</div>
 	);
 }
 
@@ -718,7 +652,9 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow, basePath }: Audit
 									</Button>
 								</a>
 							)}
-							{isSubmitted && <ExportActions audit={audit} />}
+							{isSubmitted && instrument !== undefined && (
+								<AuditExportActions audit={audit} instrument={instrument} />
+							)}
 						</div>
 					</div>
 				</div>

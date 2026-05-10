@@ -182,21 +182,36 @@ export function DataTableToolbar<TData>({
 		});
 	}, [draftColumnVisibility, hideableColumns]);
 
-	React.useEffect(() => {
+	const [prevCommittedSearchValue, setPrevCommittedSearchValue] = React.useState(committedSearchValue);
+	if (committedSearchValue !== prevCommittedSearchValue) {
+		setPrevCommittedSearchValue(committedSearchValue);
 		setDraftSearchValue(committedSearchValue);
-	}, [committedSearchValue]);
+	}
 
-	React.useEffect(() => {
+	const [prevIsFiltersMenuOpen, setPrevIsFiltersMenuOpen] = React.useState(isFiltersMenuOpen);
+	const [prevCommittedFilterSignature, setPrevCommittedFilterSignature] = React.useState(committedFilterSignature);
+	if (isFiltersMenuOpen !== prevIsFiltersMenuOpen || committedFilterSignature !== prevCommittedFilterSignature) {
+		setPrevIsFiltersMenuOpen(isFiltersMenuOpen);
+		setPrevCommittedFilterSignature(committedFilterSignature);
 		if (!isFiltersMenuOpen) {
 			setDraftFilterValues(committedFilterValues);
 		}
-	}, [committedFilterSignature, committedFilterValues, isFiltersMenuOpen]);
+	}
 
-	React.useEffect(() => {
+	const [prevIsColumnsMenuOpen, setPrevIsColumnsMenuOpen] = React.useState(isColumnsMenuOpen);
+	const [prevCommittedColumnVisibilitySignature, setPrevCommittedColumnVisibilitySignature] = React.useState(
+		committedColumnVisibilitySignature
+	);
+	if (
+		isColumnsMenuOpen !== prevIsColumnsMenuOpen ||
+		committedColumnVisibilitySignature !== prevCommittedColumnVisibilitySignature
+	) {
+		setPrevIsColumnsMenuOpen(isColumnsMenuOpen);
+		setPrevCommittedColumnVisibilitySignature(committedColumnVisibilitySignature);
 		if (!isColumnsMenuOpen) {
 			setDraftColumnVisibility(committedColumnVisibility);
 		}
-	}, [committedColumnVisibility, committedColumnVisibilitySignature, isColumnsMenuOpen]);
+	}
 
 	const commitSearchValue = React.useCallback(
 		(rawValue: string) => {

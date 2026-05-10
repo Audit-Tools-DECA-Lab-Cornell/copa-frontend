@@ -54,11 +54,7 @@ export default function AdminAuditsPage() {
 	const selectedAuditorIdsKey = selectedAuditorIds.join("|");
 	const selectedAccountIdsKey = selectedAccountIds.join("|");
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 };
-		});
-	}, [
+	const [prevDeps, setPrevDeps] = React.useState({
 		searchValue,
 		selectedStatusesKey,
 		selectedProjectIdsKey,
@@ -66,7 +62,29 @@ export default function AdminAuditsPage() {
 		selectedAuditorIdsKey,
 		selectedAccountIdsKey,
 		sortParam
-	]);
+	});
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedStatusesKey !== prevDeps.selectedStatusesKey ||
+		selectedProjectIdsKey !== prevDeps.selectedProjectIdsKey ||
+		selectedPlaceIdsKey !== prevDeps.selectedPlaceIdsKey ||
+		selectedAuditorIdsKey !== prevDeps.selectedAuditorIdsKey ||
+		selectedAccountIdsKey !== prevDeps.selectedAccountIdsKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({
+			searchValue,
+			selectedStatusesKey,
+			selectedProjectIdsKey,
+			selectedPlaceIdsKey,
+			selectedAuditorIdsKey,
+			selectedAccountIdsKey,
+			sortParam
+		});
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "admin", "audits", "projects-for-filter"],
@@ -122,21 +140,14 @@ export default function AdminAuditsPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!auditsQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(auditsQuery.data);
+	if (auditsQuery.data && auditsQuery.data !== prevData) {
+		setPrevData(auditsQuery.data);
 		const maxPageIndex = Math.max(auditsQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [auditsQuery.data, pagination.pageIndex]);
+	}
 
 	const projectOptions = React.useMemo(() => {
 		return (projectsQuery.data?.items ?? []).map((p: AdminProjectRow) => ({

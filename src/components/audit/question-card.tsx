@@ -53,6 +53,7 @@ export function AuditQuestionCard({
 						question={question}
 						selectedOptionKeys={selectedChecklistOptionKeys}
 						otherText={otherChecklistText}
+						currentAnswers={selectedAnswers}
 						onChangeAnswers={onChangeAnswers}
 						disabled={disabled}
 					/>
@@ -85,6 +86,26 @@ export function AuditQuestionCard({
 
 				{question.question_type === "scaled" && question.scales.length > 1 && !showFollowUpScales ? (
 					<p className="text-xs text-muted-foreground">{t("followUpScalesHidden")}</p>
+				) : null}
+
+				{question.notes_prompt ? (
+					<div className="space-y-2 rounded-field border border-border/70 bg-secondary/30 p-4">
+						<p className="text-sm font-medium text-foreground">{question.notes_prompt}</p>
+						<Textarea
+							rows={4}
+							disabled={disabled}
+							value={
+								typeof selectedAnswers.question_note === "string" ? selectedAnswers.question_note : ""
+							}
+							onChange={event => {
+								onChangeAnswers(question.question_key, {
+									...selectedAnswers,
+									question_note: event.target.value || null
+								});
+							}}
+							placeholder={t("enterComments")}
+						/>
+					</div>
 				) : null}
 			</div>
 		</div>
@@ -155,6 +176,7 @@ interface ChecklistSelectorProps {
 	readonly question: InstrumentQuestion;
 	readonly selectedOptionKeys: readonly string[];
 	readonly otherText: string;
+	readonly currentAnswers: QuestionResponsePayload;
 	readonly onChangeAnswers: (questionKey: string, nextAnswers: QuestionResponsePayload) => void;
 	readonly disabled: boolean;
 }
@@ -163,6 +185,7 @@ function ChecklistSelector({
 	question,
 	selectedOptionKeys,
 	otherText,
+	currentAnswers,
 	onChangeAnswers,
 	disabled
 }: Readonly<ChecklistSelectorProps>) {
@@ -187,7 +210,7 @@ function ChecklistSelector({
 							onClick={() => {
 								onChangeAnswers(
 									question.question_key,
-									toggleChecklistOption(selectedOptionKeys, option.key, otherText)
+									toggleChecklistOption(selectedOptionKeys, option.key, otherText, currentAnswers)
 								);
 							}}>
 							{option.label}
@@ -203,7 +226,7 @@ function ChecklistSelector({
 					onChange={event => {
 						onChangeAnswers(
 							question.question_key,
-							setChecklistOtherText(selectedOptionKeys, event.target.value)
+							setChecklistOtherText(selectedOptionKeys, event.target.value, currentAnswers)
 						);
 					}}
 					placeholder="Describe other"
@@ -235,7 +258,8 @@ function readChecklistOtherText(selectedAnswers: QuestionResponsePayload): strin
 function toggleChecklistOption(
 	selectedOptionKeys: readonly string[],
 	optionKey: string,
-	otherText: string
+	otherText: string,
+	currentAnswers: QuestionResponsePayload
 ): QuestionResponsePayload {
 	const nextSelectedOptionKeys = selectedOptionKeys.includes(optionKey)
 		? selectedOptionKeys.filter(currentKey => currentKey !== optionKey)
@@ -249,16 +273,30 @@ function toggleChecklistOption(
 		nextAnswers.other_details = { text: otherText };
 	}
 
+	const questionNote = typeof currentAnswers.question_note === "string" ? currentAnswers.question_note : null;
+	if (questionNote !== null) {
+		nextAnswers.question_note = questionNote;
+	}
+
 	return nextAnswers;
 }
 
-function setChecklistOtherText(selectedOptionKeys: readonly string[], nextText: string): QuestionResponsePayload {
+function setChecklistOtherText(
+	selectedOptionKeys: readonly string[],
+	nextText: string,
+	currentAnswers: QuestionResponsePayload
+): QuestionResponsePayload {
 	const nextAnswers: QuestionResponsePayload = {
 		selected_option_keys: [...selectedOptionKeys]
 	};
 
 	if (nextText.trim().length > 0) {
 		nextAnswers.other_details = { text: nextText };
+	}
+
+	const questionNote = typeof currentAnswers.question_note === "string" ? currentAnswers.question_note : null;
+	if (questionNote !== null) {
+		nextAnswers.question_note = questionNote;
 	}
 
 	return nextAnswers;
@@ -283,6 +321,11 @@ function buildNextScaledQuestionAnswers(
 	const selectedOption = provisionScale?.options.find(option => option.key === optionKey);
 	if (selectedOption?.allows_follow_up_scales !== false) {
 		return nextAnswers;
+	}
+
+	const questionNote = typeof currentAnswers.question_note === "string" ? currentAnswers.question_note : null;
+	if (questionNote !== null) {
+		return { provision: optionKey, question_note: questionNote };
 	}
 
 	return { provision: optionKey };

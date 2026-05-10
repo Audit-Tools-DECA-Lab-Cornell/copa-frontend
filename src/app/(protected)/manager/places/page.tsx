@@ -141,23 +141,34 @@ export default function ManagerPlacesPage() {
 	const selectedSurveyStatusesKey = selectedSurveyStatuses.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
-	React.useEffect(() => {
-		setPagination(currentValue => {
-			return currentValue.pageIndex === 0
-				? currentValue
-				: {
-						...currentValue,
-						pageIndex: 0
-					};
-		});
-	}, [
+	const [prevDeps, setPrevDeps] = React.useState({
 		searchValue,
 		selectedProjectIdsKey,
 		selectedAuditorIdsKey,
 		selectedAuditStatusesKey,
 		selectedSurveyStatusesKey,
 		sortParam
-	]);
+	});
+	if (
+		searchValue !== prevDeps.searchValue ||
+		selectedProjectIdsKey !== prevDeps.selectedProjectIdsKey ||
+		selectedAuditorIdsKey !== prevDeps.selectedAuditorIdsKey ||
+		selectedAuditStatusesKey !== prevDeps.selectedAuditStatusesKey ||
+		selectedSurveyStatusesKey !== prevDeps.selectedSurveyStatusesKey ||
+		sortParam !== prevDeps.sortParam
+	) {
+		setPrevDeps({
+			searchValue,
+			selectedProjectIdsKey,
+			selectedAuditorIdsKey,
+			selectedAuditStatusesKey,
+			selectedSurveyStatusesKey,
+			sortParam
+		});
+		setPagination(currentValue =>
+			currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 }
+		);
+	}
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "manager", "places", "projects", accountId],
@@ -217,21 +228,14 @@ export default function ManagerPlacesPage() {
 		placeholderData: preservePreviousData
 	});
 
-	React.useEffect(() => {
-		if (!placesQuery.data) {
-			return;
-		}
-
+	const [prevData, setPrevData] = React.useState(placesQuery.data);
+	if (placesQuery.data && placesQuery.data !== prevData) {
+		setPrevData(placesQuery.data);
 		const maxPageIndex = Math.max(placesQuery.data.total_pages - 1, 0);
-		if (pagination.pageIndex <= maxPageIndex) {
-			return;
+		if (pagination.pageIndex > maxPageIndex) {
+			setPagination(currentValue => ({ ...currentValue, pageIndex: maxPageIndex }));
 		}
-
-		setPagination(currentValue => ({
-			...currentValue,
-			pageIndex: maxPageIndex
-		}));
-	}, [pagination.pageIndex, placesQuery.data]);
+	}
 
 	const projectOptions = React.useMemo(() => {
 		return (projectsQuery.data ?? []).map(p => ({ label: p.name, value: p.id }));
