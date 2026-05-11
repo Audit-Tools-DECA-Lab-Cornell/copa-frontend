@@ -215,11 +215,11 @@ export function PreferencesProvider({
 		const nextSystemTheme = getSystemTheme();
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setSystemTheme(nextSystemTheme);
-		 
+
 		setSystemLanguage(resolveSupportedLanguage(globalThis.window?.navigator.language ?? initialResolvedLanguage));
-		 
+
 		setPreferences(readStoredPreferences(initialPreferences));
-		 
+
 		setIsHydrated(true);
 
 		if (globalThis.window === undefined) {

@@ -312,7 +312,10 @@ export async function downloadInstrumentPdf(
 			if (row.sectionNotesPrompt) {
 				pushBannerRow(row.sectionNotesPrompt, "italic", PALETTE.sectionNotesColor, 7.5, 1, 5);
 				registerRichCell(pdfBodyRowIndex, 0, {
-					segments: [{ text: "Notes Prompt: ", bold: false, type: "text" }, ...row.sectionNotesPromptSegments],
+					segments: [
+						{ text: "Notes Prompt: ", bold: false, type: "text" },
+						...row.sectionNotesPromptSegments
+					],
 					baseFontStyle: "italic",
 					textColor: PALETTE.sectionNotesColor
 				});

@@ -646,7 +646,6 @@ export function GroupedReportsView({
 		[]
 	);
 
-	 
 	const table = useReactTable({
 		data: placeGroups,
 		columns,

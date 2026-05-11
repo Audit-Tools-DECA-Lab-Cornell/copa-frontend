@@ -175,10 +175,11 @@ function QuestionCard({
 												: [...q.visible_modes, m];
 										})
 									}
-									className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 ${checked
+									className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 ${
+										checked
 											? "border-primary bg-primary text-primary-foreground shadow-sm"
 											: "border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground"
-										}`}>
+									}`}>
 									{t.has(`modes.${m}`) ? t(`modes.${m}`) : m}
 								</button>
 							);
@@ -272,7 +273,9 @@ export function PreAuditQuestionsEditor({
 			{questions.length === 0 && (
 				<div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/60 bg-muted/20 py-12 text-center">
 					<p className="text-sm font-medium text-muted-foreground">No questions yet</p>
-					<p className="text-xs text-muted-foreground/70 mt-1">Click &ldquo;Add question&ldquo; to get started</p>
+					<p className="text-xs text-muted-foreground/70 mt-1">
+						Click &ldquo;Add question&ldquo; to get started
+					</p>
 				</div>
 			)}
 

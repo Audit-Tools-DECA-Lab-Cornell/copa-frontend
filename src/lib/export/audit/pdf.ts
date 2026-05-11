@@ -348,12 +348,12 @@ export async function generatePdfBlob(
 	// Right table — Auditor Profile
 	const auditorBody: [string, string][] = auditorProfile
 		? [
-			["Auditor Code", auditorProfile.auditorCode],
-			["Age Range", auditorProfile.ageRange ?? "—"],
-			["Gender", auditorProfile.gender ?? "—"],
-			["Country", auditorProfile.country ?? "—"],
-			["Role", auditorProfile.role ?? "—"]
-		]
+				["Auditor Code", auditorProfile.auditorCode],
+				["Age Range", auditorProfile.ageRange ?? "—"],
+				["Gender", auditorProfile.gender ?? "—"],
+				["Country", auditorProfile.country ?? "—"],
+				["Role", auditorProfile.role ?? "—"]
+			]
 		: [["Auditor", "Not available"]];
 
 	autoTable(doc, {
@@ -772,34 +772,34 @@ export async function generatePdfBlob(
 				question.question_type === "checklist"
 					? formatChecklistAnswer(question, answers)
 					: formatQuestionAnswer(
-						question,
-						"provision",
-						typeof rawProvision === "string" ? rawProvision : undefined
-					);
+							question,
+							"provision",
+							typeof rawProvision === "string" ? rawProvision : undefined
+						);
 			const diversityAnswer =
 				question.question_type === "checklist"
 					? ""
 					: formatQuestionAnswer(
-						question,
-						"diversity",
-						typeof rawDiversity === "string" ? rawDiversity : undefined
-					);
+							question,
+							"diversity",
+							typeof rawDiversity === "string" ? rawDiversity : undefined
+						);
 			const sociabilityAnswer =
 				question.question_type === "checklist"
 					? ""
 					: formatQuestionAnswer(
-						question,
-						"sociability",
-						typeof rawSociability === "string" ? rawSociability : undefined
-					);
+							question,
+							"sociability",
+							typeof rawSociability === "string" ? rawSociability : undefined
+						);
 			const challengeAnswer =
 				question.question_type === "checklist"
 					? ""
 					: formatQuestionAnswer(
-						question,
-						"challenge",
-						typeof rawChallenge === "string" ? rawChallenge : undefined
-					);
+							question,
+							"challenge",
+							typeof rawChallenge === "string" ? rawChallenge : undefined
+						);
 
 			const pvScore = question.constructs.includes("play_value") ? String(scores.play_value_total) : "N/A";
 			const uScore = question.constructs.includes("usability") ? String(scores.usability_total) : "N/A";
