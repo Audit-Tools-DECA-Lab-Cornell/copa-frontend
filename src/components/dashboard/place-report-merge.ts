@@ -24,10 +24,25 @@ function addScoreTotals(a: ScoreTotals, b: ScoreTotals): ScoreTotals {
  * Merge two submitted sessions into one synthetic combined report session.
  */
 export function mergeAuditSessions(auditSession: AuditSession, surveySession: AuditSession): AuditSession {
-	const mergedSections = {
-		...surveySession.aggregate.sections,
-		...auditSession.aggregate.sections
-	};
+	const allSectionKeys = new Set([
+		...Object.keys(surveySession.aggregate.sections),
+		...Object.keys(auditSession.aggregate.sections)
+	]);
+	const mergedSections: typeof auditSession.aggregate.sections = {};
+	for (const sectionKey of allSectionKeys) {
+		const surveySection = surveySession.aggregate.sections[sectionKey];
+		const auditSection = auditSession.aggregate.sections[sectionKey];
+		if (surveySection === undefined) {
+			mergedSections[sectionKey] = auditSection!;
+		} else if (auditSection === undefined) {
+			mergedSections[sectionKey] = surveySection;
+		} else {
+			mergedSections[sectionKey] = {
+				...auditSection,
+				responses: { ...surveySection.responses, ...auditSection.responses }
+			};
+		}
+	}
 
 	const mergedByDomain: Record<string, ScoreTotals> = { ...surveySession.scores.by_domain };
 	for (const [key, totals] of Object.entries(auditSession.scores.by_domain)) {
