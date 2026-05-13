@@ -9,12 +9,10 @@ import { getPublicResourceKindLabel, getPublicResources } from "@/lib/resources/
 
 export const metadata: Metadata = {
 	title: "Resources | Playspace",
-	description:
-		"Read the Playspace Privacy Notice and Terms and Conditions for the web and mobile audit platform.",
+	description: "Read the Playspace Privacy Notice and Terms and Conditions for the web and mobile audit platform.",
 	openGraph: {
 		title: "Resources | Playspace",
-		description:
-			"Read the Playspace Privacy Notice and Terms and Conditions for the web and mobile audit platform."
+		description: "Read the Playspace Privacy Notice and Terms and Conditions for the web and mobile audit platform."
 	},
 	robots: { index: true, follow: true }
 };
@@ -26,9 +24,7 @@ export default function PublicResourcesIndexPage() {
 		<div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
 			<header className="flex flex-col gap-4">
 				<div className="space-y-3">
-					<h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-						Resources
-					</h1>
+					<h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Resources</h1>
 					<p className="max-w-3xl text-base leading-7 text-muted-foreground">
 						Privacy and legal documents for Playspace. These pages are always publicly accessible and
 						reflect the current version of each document.

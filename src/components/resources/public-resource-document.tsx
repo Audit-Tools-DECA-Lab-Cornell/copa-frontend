@@ -4,11 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-	getPublicResourceKindLabel,
-	getPublicResources,
-	type PublicResource
-} from "@/lib/resources/public-resources";
+import { getPublicResourceKindLabel, getPublicResources, type PublicResource } from "@/lib/resources/public-resources";
 
 export function PublicResourceDocument({ resource }: Readonly<{ resource: PublicResource }>) {
 	const { document } = resource;

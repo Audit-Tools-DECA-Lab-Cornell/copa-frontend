@@ -153,7 +153,9 @@ const publicLegalDocumentsData = [
 			{
 				key: "information-collected",
 				title: "2. Information we may collect",
-				body: ["The information processed by Playspace depends on your role, your organization's configuration, and the audit workflow you use."],
+				body: [
+					"The information processed by Playspace depends on your role, your organization's configuration, and the audit workflow you use."
+				],
 				bullets: [
 					"Account information: name, email address, password credentials, verification status, approval status, login timestamps, and account role.",
 					"Profile information: full name, email, phone number, age range, gender, country, province, city, role, organization, position, and auditor code where applicable.",

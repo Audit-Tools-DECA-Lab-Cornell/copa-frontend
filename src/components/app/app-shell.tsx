@@ -213,7 +213,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 									isSidebarCollapsed ? "justify-between" : "justify-between"
 								)}>
 								<div className="flex min-w-0 items-center gap-3">
-									<div className="flex size-10 items-center justify-end ml-0.5 shadow-focus">
+									<div className="flex size-18 items-center justify-end ml-0.5 shadow-focus">
 										<Image src="/icon.png" alt="COPA Tool" width={40} height={40} />
 									</div>
 									<div className={cn("grid", isSidebarCollapsed && "hidden")}>
@@ -230,7 +230,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 									variant="ghost"
 									size="icon"
 									className={cn(
-										"shrink-0 size-11 flex px-4 absolute -right-2.5 top-5 z-10 items-center rounded-xl transition-all hover:bg-accent",
+										"shrink-0 size-11 flex px-4 absolute -right-4.5 top-19 z-10 items-center rounded-xl transition-all hover:bg-accent",
 										isSidebarCollapsed && "hidden"
 									)}
 									aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}

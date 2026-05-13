@@ -46,12 +46,10 @@ export function PublicResourcesShell({ children }: Readonly<{ children: React.Re
 			<footer className="border-t border-border/70 bg-card/70">
 				<div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
 					<div className="space-y-3">
-						<p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-							Playspace
-						</p>
+						<p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Playspace</p>
 						<p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-							This area contains the current privacy and legal documents for Playspace. These pages
-							are always publicly accessible and reflect the most recent version of each document.
+							This area contains the current privacy and legal documents for Playspace. These pages are
+							always publicly accessible and reflect the most recent version of each document.
 						</p>
 					</div>
 
