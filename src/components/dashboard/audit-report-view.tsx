@@ -406,6 +406,12 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 											</React.Fragment>
 										))}
 									</span>
+									{q.checklistAnswerLabel !== null ? (
+										<p className="mt-1.5 rounded-sm border border-border/60 bg-muted/40 px-2 py-1 text-[11px] leading-4 text-muted-foreground">
+											<span className="font-semibold text-foreground">Selected: </span>
+											{q.checklistAnswerLabel}
+										</p>
+									) : null}
 								</td>
 								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
 									{q.provisionLabel ?? "—"}

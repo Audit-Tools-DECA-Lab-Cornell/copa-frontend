@@ -40,6 +40,7 @@ export interface DomainQuestionRow {
 	readonly playValueMax: number | null;
 	readonly usabilityScore: number | null;
 	readonly usabilityMax: number | null;
+	readonly checklistAnswerLabel: string | null;
 }
 
 /**
@@ -312,6 +313,26 @@ function readStringAnswer(answers: QuestionResponsePayload, key: string): string
 	return typeof raw === "string" ? raw : undefined;
 }
 
+function formatChecklistAnswerLabel(question: InstrumentQuestion, answers: QuestionResponsePayload): string | null {
+	const selectedOptionKeys = answers.selected_option_keys;
+	if (!Array.isArray(selectedOptionKeys) || selectedOptionKeys.length === 0) {
+		return null;
+	}
+
+	const labels = selectedOptionKeys
+		.filter((key): key is string => typeof key === "string")
+		.map(key => question.options.find(option => option.key === key)?.label ?? key);
+	const otherDetails = answers.other_details;
+	if (typeof otherDetails === "object" && otherDetails !== null && !Array.isArray(otherDetails)) {
+		const text = otherDetails.text;
+		if (typeof text === "string" && text.trim().length > 0) {
+			labels.push(`Other: ${text.trim()}`);
+		}
+	}
+
+	return labels.length > 0 ? labels.join(" | ") : null;
+}
+
 function buildDomainQuestionRow(question: InstrumentQuestion, answers: QuestionResponsePayload): DomainQuestionRow {
 	const scores = calculateQuestionScores(question, answers);
 	const provisionLabel = resolveScaleOptionLabel(question, "provision", readStringAnswer(answers, "provision"));
@@ -337,7 +358,9 @@ function buildDomainQuestionRow(question: InstrumentQuestion, answers: QuestionR
 		playValueScore: playValueMax <= 0 ? null : scores.play_value_total,
 		playValueMax: playValueMax <= 0 ? null : playValueMax,
 		usabilityScore: usabilityMax <= 0 ? null : scores.usability_total,
-		usabilityMax: usabilityMax <= 0 ? null : usabilityMax
+		usabilityMax: usabilityMax <= 0 ? null : usabilityMax,
+		checklistAnswerLabel:
+			question.question_type === "checklist" ? formatChecklistAnswerLabel(question, answers) : null
 	};
 }
 
@@ -646,7 +669,7 @@ export function buildDomainReportRows(auditSession: AuditSession, instrument: Pl
 				itemCount += 1;
 				const responses =
 					auditSession.aggregate.sections[section.section_key]?.responses[question.question_key] ?? {};
-				if (question.question_type === "scaled") {
+				if (question.question_type === "scaled" || question.question_type === "checklist") {
 					questions.push(buildDomainQuestionRow(question, responses));
 				}
 				const questionNote = collectQuestionNote(question, responses, sectionIndex + 1);
