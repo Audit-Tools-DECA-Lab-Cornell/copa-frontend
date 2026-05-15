@@ -136,6 +136,9 @@ function formatChecklistAnswerText(question: InstrumentQuestion, answers: Questi
 	const labels: string[] = selectedKeys
 		.filter((key): key is string => typeof key === "string")
 		.map(key => {
+			if (key === "other") {
+				return Object.values(answers["other_details"] as Record<string, string>).join(", ");
+			}
 			const option = question.options.find(o => o.key === key);
 			return option?.label ?? key;
 		});
