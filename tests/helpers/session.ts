@@ -11,10 +11,7 @@ function getFrontendBaseUrl(): string {
  * Seeds the browser with the same cookie-backed auth session shape the
  * frontend reads on both the server and client.
  */
-export async function seedBrowserSession(
-	context: BrowserContext,
-	session: BrowserSessionSeed
-): Promise<void> {
+export async function seedBrowserSession(context: BrowserContext, session: BrowserSessionSeed): Promise<void> {
 	await context.clearCookies();
 
 	const baseUrl = getFrontendBaseUrl();
