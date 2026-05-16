@@ -99,6 +99,14 @@ pnpm build
 pnpm start
 ```
 
+### Visual testing
+
+Visual regression coverage lives in `tests/visual/` and uses **Playwright for navigation/state setup** plus **Percy for visual review and diffing**.
+
+- Percy snapshots are the canonical regression/review surface.
+- `public/screenshots/` remains the home for curated README/docs assets.
+- Local and CI setup, auth bootstrapping, and snapshot naming conventions are documented in `docs/visual-testing.md`.
+
 ### Environment variables
 
 Configure the FastAPI base URL in `.env.local`:
