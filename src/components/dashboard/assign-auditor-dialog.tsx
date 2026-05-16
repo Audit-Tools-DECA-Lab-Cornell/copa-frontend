@@ -420,7 +420,7 @@ export function AssignAuditorDialog({ open, onOpenChange, prefill, onAssigned }:
 
 	const auditors = auditorsQuery.data ?? EMPTY_AUDITORS;
 	const projects = projectsQuery.data ?? [];
-	const places = projectPlacesQuery.data ?? [];
+	const places = React.useMemo(() => projectPlacesQuery.data ?? [], [projectPlacesQuery.data]);
 
 	/* ── Handlers ── */
 	const handleProjectChange = React.useCallback((nextId: string) => {

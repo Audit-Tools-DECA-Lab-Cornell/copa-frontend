@@ -1,6 +1,6 @@
-## Playspace Play Value & Usability Audit Tool (Frontend)
+## Comprehensive Outdoor Playspace Audit (COPA) Tool (Frontend)
 
-Enterprise-grade frontend for the **Playspace Play Value and Usability Audit Tool**.
+Enterprise-grade frontend for the **Comprehensive Outdoor Playspace Audit (COPA) Tool**.
 
 This app is part of a hierarchical Audit Management System (Account → Projects → Places → Audits) and is designed to integrate with a FastAPI backend.
 

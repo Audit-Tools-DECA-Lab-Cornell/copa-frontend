@@ -1,7 +1,7 @@
 {
 	"metadata": {
-		"title": "Playspace Audit Tool",
-		"description": "Playspace Play Value- und Usability-Audit-Tool"
+		"title": "COPA Tool",
+		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) — strukturierte Audits zu Spielwert und Nutzbarkeit."
 	},
 	"common": {
 		"roles": {
@@ -43,12 +43,12 @@
 		}
 	},
 	"shell": {
-		"productName": "Playspace Audit Tool",
+		"productName": "Comprehensive Outdoor Playspace Audit Tool",
 		"productTagline": "Spielwert & Nutzbarkeit",
 		"workspaceLabel": "Arbeitsbereich",
 		"openMenu": "Menü öffnen",
 		"navigationTitle": "Navigation",
-		"mobileBrand": "Playspace",
+		"mobileBrand": "COPA",
 		"navigation": {
 			"dashboard": "Dashboard",
 			"accounts": "Konten",
@@ -445,54 +445,56 @@
 			}
 		},
 		"instruments": {
-			"error": {
-				"title": "Instrumente konnten nicht geladen werden",
-				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen.",
-				"retry": "Erneut versuchen"
-			},
 			"header": {
-				"eyebrow": "Administratorbereich",
-				"title": "Instrumentenverwaltung",
-				"description": "Verwalten Sie Audit-Instrumentversionen, Übersetzungen und veröffentlichen Sie neue Definitionen.",
-				"back": "Zurück zum Dashboard"
+				"eyebrow": "Administrator-Arbeitsbereich"
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard",
 				"instruments": "Instrumente"
 			},
+			"title": "Instrumentenverwaltung",
+			"description": "Verwalten Sie Audit-Instrumentversionen, Übersetzungen und veröffentlichen Sie neue Definitionen.",
+			"uploadAction": "JSON hochladen",
+			"createDraft": "Neuen Entwurf erstellen",
+			"activeVersion": "Aktive Version",
+			"viewingVersion": "Version anzeigen",
+			"backToActive": "Zurück zur aktiven Version",
+			"editThisVersion": "",
+			"error": {
+				"title": "Instrumente konnten nicht geladen werden",
+				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen.",
+				"retry": "Erneut versuchen"
+			},
+			"toast": {
+				"saveSuccess": "Instrument gespeichert",
+				"saveActiveDesc": "Version {version} wurde gespeichert und aktiviert.",
+				"saveDraftDesc": "Version {version} wurde als Entwurf gespeichert.",
+				"saveError": "Fehler beim Speichern des Instruments",
+				"activateSuccess": "Instrument aktiviert",
+				"activateDesc": "Version {version} ist jetzt die aktive Version.",
+				"activateError": "Fehler beim Aktivieren des Instruments"
+			},
+			"empty": {
+				"title": "Keine Instrumente gefunden",
+				"description": "Laden Sie Ihre erste Instrumentendefinition hoch, um zu beginnen.",
+				"action": "Instrument hochladen"
+			},
 			"versionHistory": {
 				"title": "Versionshistorie",
-				"description": "Alle Instrumentversionen. Nur eine kann gleichzeitig aktiv sein.",
-				"version": "Version",
-				"status": "Status",
-				"created": "Erstellt",
-				"actions": "Aktionen",
-				"active": "Aktiv",
-				"inactive": "Inaktiv",
-				"activate": "Aktivieren",
-				"deactivate": "Deaktivieren",
+				"versions": "{count} {count, plural, one {Version} other {Versionen}}",
+				"viewDetails": "Details anzeigen",
+				"hideDetails": "Details ausblenden",
+				"activated": "Aktiviert am {date}",
+				"created": "Erstellt am {date}",
+				"makeActive": "Aktivieren",
+				"showMore": "Weitere Historie anzeigen",
+				"showLess": "Weniger Historie anzeigen",
+				"active": "aktiv",
 				"noVersions": "Keine Instrumentversionen gefunden.",
-				"confirmActivate": "Dadurch werden alle anderen Versionen deaktiviert und diese wird zur aktiven Quelle der Wahrheit. Fortfahren?",
-				"confirmActivateTitle": "Instrumentversion aktivieren"
-			},
-			"actions": {
-				"publishNew": "Neue Version veröffentlichen",
-				"uploadJson": "JSON hochladen",
-				"viewContent": "Inhalt anzeigen",
-				"editDuplicate": "Bearbeiten & Duplizieren"
-			},
-			"editor": {
-				"title": "Instrumenten-Editor",
-				"breadcrumb": "Editor",
-				"description": "Bearbeitung einer Kopie von Version {version}. Änderungen werden als neue Version gespeichert.",
-				"cancel": "Abbrechen",
-				"saveDraft": "Als Entwurf speichern",
-				"publish": "Veröffentlichen & Aktivieren",
-				"publishTitle": "Neue Instrumentversion veröffentlichen",
-				"publishConfirm": "Dadurch werden alle anderen Versionen deaktiviert und die neue Version wird zur aktiven Quelle der Wahrheit für alle Clients.",
-				"draftTitle": "Als Entwurf speichern",
-				"draftConfirm": "Die neue Version wird gespeichert, aber nicht aktiviert. Sie können sie später über die Versionshistorie aktivieren.",
-				"newVersionLabel": "Neue Versionsnummer"
+				"confirmActivateTitle": "Diese Version aktivieren?",
+				"confirmActivate": "Dies ersetzt sofort das aktuelle aktive Instrument für alle Prüfer. Laufende Audits werden mit ihrer gestarteten Version fortgesetzt.",
+				"activate": "Version aktivieren",
+				"cancel": "Abbrechen"
 			},
 			"upload": {
 				"title": "Instrument-JSON hochladen",
@@ -503,9 +505,30 @@
 				"filePlaceholder": "Klicken oder ziehen Sie eine .json-Datei hierher",
 				"fileLoaded": "Geladen ({keys} Schlüssel auf oberster Ebene)",
 				"saveDraft": "Als Entwurf speichern",
-				"publishActive": "Veröffentlichen & Aktivieren"
+				"publishActive": "Veröffentlichen & Aktivieren",
+				"cancel": "Abbrechen",
+				"errorJsonObj": "Die Datei muss ein JSON-Objekt enthalten.",
+				"errorInvalidJson": "Ungültige JSON-Datei."
+			},
+			"activate": {
+				"title": "Instrumentversion aktivieren",
+				"description": "Dadurch werden alle anderen Versionen deaktiviert und diese wird zur aktiven Quelle der Wahrheit. Fortfahren?",
+				"cancel": "Abbrechen",
+				"confirm": "Version aktivieren"
 			},
 			"content": {
+				"editDraft": "Instrumenten-Editor",
+				"editDraftDesc": "Bearbeitung einer Kopie von Version {version}. Änderungen werden als neue Version gespeichert.",
+				"cancel": "Abbrechen",
+				"saveDraft": "Als Entwurf speichern",
+				"publish": "Veröffentlichen & Aktivieren",
+				"draft": "Entwurf",
+				"export": "Exportieren",
+				"formatPdf": "PDF",
+				"formatExcel": "Excel (.xlsx)",
+				"formatCsv": "CSV",
+				"formatJson": "JSON",
+				"overview": "Übersicht",
 				"title": "Instrumentinhalt",
 				"sections": "Abschnitte",
 				"questions": "Fragen",
@@ -515,6 +538,10 @@
 				"executionModes": "Ausführungsmodi",
 				"languages": "Sprachen",
 				"noContent": "Kein Inhalt für diese Sprache verfügbar.",
+				"newLanguagePrompt": "Geben Sie den Sprachcode für die neue Übersetzung ein (z. B. 'de', 'es'):",
+				"languageExists": "Diese Sprache existiert bereits.",
+				"confirmRemoveLanguage": "Sind Sie sicher, dass Sie die Übersetzung {lang} entfernen möchten? Dies kann nicht rückgängig gemacht werden.",
+				"copyFrom": "Von {lang} kopieren",
 				"sectionTitle": "Abschnittstitel",
 				"sectionDescription": "Beschreibung",
 				"sectionInstruction": "Anweisung",
@@ -564,6 +591,10 @@
 				"groupKey": "Gruppe",
 				"additionValue": "Addieren",
 				"boostValue": "Boost",
+				"flags": "Flags",
+				"notApplicableDesc": "Nicht zutreffende Option",
+				"allowsFollowUpDesc": "Schaltet Folge-Skalen frei",
+				"followUpBadge": "Folge-Skala",
 				"allowsFollowUp": "Schaltet Folgefragen frei",
 				"blocksFollowUp": "Blockiert Folgefragen",
 				"notApplicable": "N/V",
@@ -576,6 +607,10 @@
 				"customOptionsSummary": "{count} Optionen (Standard: {defaultCount})",
 				"addParagraph": "Absatz hinzufügen",
 				"removeParagraph": "Entfernen",
+				"addSection": "Abschnitt hinzufügen",
+				"removeSection": "Abschnitt entfernen",
+				"moveUp": "Nach oben",
+				"moveDown": "Nach unten",
 				"addQuestion": "Frage hinzufügen",
 				"removeQuestion": "Frage entfernen",
 				"addOption": "Option hinzufügen",
@@ -590,12 +625,20 @@
 				"removeScaleDefinition": "Entfernen",
 				"addPreAuditQuestion": "Frage hinzufügen",
 				"removePreAuditQuestion": "Entfernen",
+				"noQuestions": "Keine Fragen in diesem Abschnitt.",
+				"questionCount": "{count, plural, one {# Frage} other {# Fragen}}",
+				"sectionDetails": "Abschnittsdetails",
+				"noDescription": "Keine Beschreibung",
+				"noInstruction": "Keine Anweisung",
+				"noNotesPrompt": "Keine Notizhinweis",
 				"questionKey": "Frageschlüssel",
 				"sectionKey": "Abschnittsschlüssel",
 				"scaleKey": "Skalenschlüssel",
 				"optionKey": "Optionsschlüssel",
 				"optionLabel": "Bezeichnung",
 				"optionDescription": "Beschreibung",
+				"questionLabel": "Frage-Label",
+				"questionDescription": "Beschreibung",
 				"responseKey": "Antwortschlüssel",
 				"anyOfOptionKeys": "Optionsschlüssel (kommagetrennt)",
 				"clearCondition": "Bedingung löschen",
@@ -637,6 +680,10 @@
 				"legalDocuments": "Rechtliche Dokumente",
 				"legalDocumentsDescription": "Nutzungsbedingungen und Datenschutzhinweis für Prüfer beim Onboarding.",
 				"addLegalDocument": "Dokument hinzufügen",
+				"addLegalDoc": "Dokument hinzufügen",
+				"removeLegalDoc": "Dokument entfernen",
+				"documentDetails": "Dokumentendetails",
+				"untitledDocument": "Unbenanntes Dokument",
 				"noLegalDocuments": "Keine rechtlichen Dokumente. Fügen Sie ein Dokument hinzu.",
 				"legalDocKey": "Dokumentschlüssel",
 				"legalDocShortTitle": "Kurztitel",
@@ -652,7 +699,13 @@
 				"legalSectionBody": "Textabsätze",
 				"legalSectionBullets": "Aufzählungspunkte",
 				"addBullet": "Punkt hinzufügen",
-				"noBullets": "Keine Aufzählungspunkte in diesem Abschnitt."
+				"noBullets": "Keine Aufzählungspunkte in diesem Abschnitt.",
+				"reviewTitle": "Neue Instrumentversion veröffentlichen",
+				"reviewDescription": "Überprüfen Sie die erkannten Änderungen vor der Veröffentlichung. Dies wird alle anderen Versionen deaktivieren.",
+				"detectedChanges": "Erkannte Änderungen ({count})",
+				"noChanges": "Keine Änderungen zwischen diesen Versionen erkannt.",
+				"publishing": "Veröffentliche...",
+				"publishAndActivate": "Veröffentlichen & Aktivieren"
 			}
 		},
 		"system": {
@@ -740,7 +793,7 @@
 	},
 	"signup": {
 		"title": "Konto erstellen",
-		"description": "Registrieren Sie sich, um mit Playspace zu starten.",
+		"description": "Registrieren Sie sich, um mit dem COPA Tool zu starten.",
 		"emailPlaceholder": "sie@firma.com",
 		"namePlaceholder": "Ihr vollständiger Name",
 		"fields": {
@@ -766,7 +819,7 @@
 	},
 	"managerInvite": {
 		"title": "Treten Sie Ihrem Team bei",
-		"subtitle": "Sie wurden eingeladen, einen Audit-Tools-Arbeitsbereich zu verwalten.",
+		"subtitle": "Sie wurden eingeladen, einen COPA-Tool-Arbeitsbereich zu verwalten.",
 		"description": "Legen Sie Ihren Namen und Ihr Passwort fest, um loszulegen. Sie werden anschließend zum Manager-Dashboard weitergeleitet.",
 		"fields": {
 			"name": "Vollständiger Name",
@@ -1773,7 +1826,7 @@
 			"title": "Ihr Konto",
 			"description": "Überprüfen Sie die in diesem Arbeitsbereich angezeigte Identität und Rolle.",
 			"managerFallback": "Manager",
-			"adminDisplayName": "Playspace Administrator",
+			"adminDisplayName": "COPA Administrator",
 			"auditorWithCode": "Prüfer {code}",
 			"auditorFallback": "Prüfer",
 			"managerWorkspaceFallback": "Manager-Arbeitsbereich",

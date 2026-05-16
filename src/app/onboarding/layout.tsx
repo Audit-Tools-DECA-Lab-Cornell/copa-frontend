@@ -31,8 +31,8 @@ export default async function OnboardingLayout({ children }: Readonly<{ children
 		<div className="min-h-dvh bg-background">
 			<header className="border-b border-border/60 bg-background/95 backdrop-blur">
 				<div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
-					<Image src="/icon.png" alt="Audit Tools" width={28} height={28} className="rounded-md" />
-					<span className="text-sm font-semibold text-foreground">Audit Tools</span>
+					<Image src="/icon.png" alt="COPA Tool" width={28} height={28} className="rounded-md" />
+					<span className="text-sm font-semibold text-foreground">COPA Tool</span>
 				</div>
 			</header>
 			<main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>

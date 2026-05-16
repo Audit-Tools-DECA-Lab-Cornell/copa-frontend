@@ -35,6 +35,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import { Fragment } from "react";
+
 export interface AuditExecuteFormProps {
 	placeId: string;
 	projectId: string;
@@ -54,11 +57,6 @@ interface SectionProgressRow {
 		readonly answeredQuestionCount: number;
 		readonly isComplete: boolean;
 	};
-}
-
-interface PromptSegment {
-	readonly text: string;
-	readonly bold: boolean;
 }
 
 interface PreambleLine {
@@ -240,21 +238,6 @@ function getInitialActiveSectionKey(sectionRows: readonly SectionProgressRow[]):
 /**
  * Parse `**bold**` prompt markers into renderable text segments.
  */
-function parsePromptSegments(raw: string): PromptSegment[] {
-	const segments: PromptSegment[] = [];
-	const parts = raw.split("**");
-
-	for (let index = 0; index < parts.length; index += 1) {
-		const part = parts[index] ?? "";
-		if (part.length === 0) {
-			continue;
-		}
-
-		segments.push({ text: part, bold: index % 2 === 1 });
-	}
-
-	return segments;
-}
 
 /**
  * Parse one markdown-like preamble block into headings and content lines.
@@ -975,9 +958,13 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 						<CardTitle>{activeSection.section.title}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						<p className="text-sm text-muted-foreground">
-							{activeSection.section.description ?? activeSection.section.instruction}
-						</p>
+						<RichTextLine
+							text={activeSection.section.description ?? "Description Unavailable"}
+							secondaryText={
+								"**Instructions:** " + (activeSection.section.instruction ?? "Instruction Unavailable")
+							}
+							className="text-sm text-muted-foreground"
+						/>
 
 						<div className="space-y-4">
 							<div
@@ -1200,24 +1187,41 @@ function PreambleBlockCard({ block }: Readonly<PreambleBlockCardProps>) {
 
 interface RichTextLineProps {
 	readonly text: string;
+	readonly secondaryText?: string;
 	readonly className?: string;
 }
 
 /**
  * Render one line with inline bold markers preserved.
  */
-function RichTextLine({ text, className }: Readonly<RichTextLineProps>) {
+function RichTextLine({ text, secondaryText, className }: Readonly<RichTextLineProps>) {
 	const segments = parsePromptSegments(text);
+	const secondarySegments = parsePromptSegments(secondaryText ?? "");
 
 	return (
 		<p className={cn("text-sm leading-6 text-muted-foreground", className)}>
 			{segments.map((segment, index) => (
-				<span
-					key={`${segment.text}-${index.toString()}`}
-					className={segment.bold ? "font-semibold text-foreground" : undefined}>
-					{segment.text}
-				</span>
+				<Fragment key={`${segment.text}-${index.toString()}`}>
+					<span
+						key={`${segment.text}-${index.toString()}`}
+						className={segment.bold ? "font-semibold text-primary" : undefined}>
+						{segment.text}
+					</span>
+				</Fragment>
 			))}
+			{secondaryText ? (
+				<div className="text-sm leading-6 mt-4 text-muted-foreground">
+					{secondarySegments.map((segment, index) => (
+						<Fragment key={`${segment.text}-${index.toString()}`}>
+							<span
+								key={`${segment.text}-${index.toString()}`}
+								className={segment.bold ? "font-semibold text-primary" : undefined}>
+								{segment.text}
+							</span>
+						</Fragment>
+					))}
+				</div>
+			) : null}
 		</p>
 	);
 }
@@ -1342,7 +1346,7 @@ function MatrixPreAuditCard({ questions, values, disabled, onSelectOption }: Rea
 											className={cn(
 												"h-auto w-full justify-center whitespace-normal px-3 py-3 text-center",
 												isSelected
-													? "border-primary bg-primary/12 text-primary"
+													? "border-primary bg-primary text-primary-foreground"
 													: "border-action-outline-border bg-background text-foreground hover:bg-secondary/60"
 											)}
 											onClick={() => {

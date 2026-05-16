@@ -28,6 +28,9 @@ importers:
             clsx:
                 specifier: ^2.1.1
                 version: 2.1.1
+            date-fns:
+                specifier: ^4.1.0
+                version: 4.1.0
             jspdf:
                 specifier: ^4.2.1
                 version: 4.2.1
@@ -46,6 +49,9 @@ importers:
             next-intl:
                 specifier: ^4.12.0
                 version: 4.12.0(next@15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.60.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
+            next-themes:
+                specifier: ^0.4.6
+                version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
             prettier:
                 specifier: ^3.8.3
                 version: 3.8.3
@@ -58,6 +64,9 @@ importers:
             react-dom:
                 specifier: 19.2.3
                 version: 19.2.3(react@19.2.3)
+            sonner:
+                specifier: ^2.0.7
+                version: 2.0.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
             tailwind-merge:
                 specifier: ^3.6.0
                 version: 3.6.0
@@ -4054,6 +4063,12 @@ packages:
             }
         engines: { node: ">= 0.4" }
 
+    date-fns@4.1.0:
+        resolution:
+            {
+                integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==
+            }
+
     dateformat@4.6.3:
         resolution:
             {
@@ -5264,7 +5279,13 @@ packages:
             }
         engines: { node: ">=0.10.0" }
 
-    icu-minify@4.12.0:
+    icu-minify@4.11.2:
+        resolution:
+            {
+                integrity: sha512-vZRLaDpZiFNBXZ1tUtekAf4WXl/Tow/BoWx8MWQqQpGckXf11opUXYzG+mXUj+OsDuv9Zz+etLfUWwxaMnYnzw==
+            }
+
+    ieee754@1.2.1:
         resolution:
             {
                 integrity: sha512-zDmM05uav3t3+kxSfRrNlmyXOdj2b+uHA+p04CG32eJabtaHbugXujuL+YfRkwP9joAnf0Uh+RMGCKD5NLa5rQ==
@@ -6183,6 +6204,13 @@ packages:
     minimist@1.2.8:
         resolution:
             {
+                integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==
+            }
+        engines: { node: ">=16 || 14 >=14.17" }
+
+    minimist@1.2.8:
+        resolution:
+            {
                 integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
             }
 
@@ -6273,6 +6301,15 @@ packages:
         peerDependenciesMeta:
             typescript:
                 optional: true
+
+    next-themes@0.4.6:
+        resolution:
+            {
+                integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==
+            }
+        peerDependencies:
+            react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+            react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
     next@15.5.12:
         resolution:
@@ -7367,6 +7404,15 @@ packages:
             {
                 integrity: sha512-w6AxtubXa2wTXAUsZMMWERrsIRAdrK0Sc+FUytWvYAhBJLyuI4llrMIC1DtlNSdI99EI86KZum2MMq3EAZlF9Q==
             }
+
+    sonner@2.0.7:
+        resolution:
+            {
+                integrity: sha512-W6ZN4p58k8aDKA4XPcx2hpIQXBRAgyiWVkYhT7CvK6D3iAu7xjvVyhQHg2/iaKJZ1XVJ4r7XuwGL+WGEK37i9w==
+            }
+        peerDependencies:
+            react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+            react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
     source-map-js@1.2.1:
         resolution:
@@ -9292,6 +9338,23 @@ snapshots:
 
     "@protobufjs/utf8@1.1.1": {}
 
+    "@puppeteer/browsers@2.3.0":
+        dependencies:
+            debug: 4.4.3
+            extract-zip: 2.0.1
+            progress: 2.0.3
+            proxy-agent: 6.5.0
+            semver: 7.8.0
+            tar-fs: 3.1.2
+            unbzip2-stream: 1.4.3
+            yargs: 17.7.2
+        transitivePeerDependencies:
+            - bare-abort-controller
+            - bare-buffer
+            - react-native-b4a
+            - supports-color
+        optional: true
+
     "@radix-ui/number@1.1.1": {}
 
     "@radix-ui/primitive@1.1.3": {}
@@ -10934,6 +10997,8 @@ snapshots:
             es-errors: 1.3.0
             is-data-view: 1.0.2
 
+    date-fns@4.1.0: {}
+
     dateformat@4.6.3: {}
 
     debug@3.2.7:
@@ -12291,6 +12356,8 @@ snapshots:
 
     minimist@1.2.8: {}
 
+    minimist@1.2.8: {}
+
     ms@2.1.3: {}
 
     msw@2.14.6(@types/node@20.19.41)(typescript@5.9.3):
@@ -12351,7 +12418,12 @@ snapshots:
         transitivePeerDependencies:
             - "@swc/helpers"
 
-    next@15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.60.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+    next-themes@0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+        dependencies:
+            react: 19.2.3
+            react-dom: 19.2.3(react@19.2.3)
+
+    next@15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
         dependencies:
             "@next/env": 15.5.12
             "@swc/helpers": 0.5.15
@@ -13194,6 +13266,11 @@ snapshots:
     sonic-boom@4.2.1:
         dependencies:
             atomic-sleep: 1.0.0
+
+    sonner@2.0.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+        dependencies:
+            react: 19.2.3
+            react-dom: 19.2.3(react@19.2.3)
 
     source-map-js@1.2.1: {}
 

@@ -16,7 +16,6 @@ import type {
 	AuditExportAppearance,
 	ExportableAudit,
 	PlayspaceInstrument,
-	SpreadsheetCell,
 	SpreadsheetRow,
 	StyledCell,
 	WebExportPalette,
@@ -148,7 +147,7 @@ const SCALE_ACCENT_HEX: Record<"provision" | "diversity" | "sociability" | "chal
  * - `row[0]` is a plain integer with empty cols 1 & 2 → section header row
  * - Everything else                 → alternating body rows (scale cols get scale fill)
  */
-export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, palette: WebExportPalette): void {
+export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, _palette: WebExportPalette): void {
 	const ref = sheet["!ref"];
 	if (typeof ref !== "string" || ref.length === 0) {
 		return;

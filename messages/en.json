@@ -1,7 +1,7 @@
 {
 	"metadata": {
-		"title": "Playspace Audit Tool",
-		"description": "Playspace Play Value and Usability Audit Tool"
+		"title": "COPA Tool",
+		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool — structured outdoor playspace audits covering play value and usability."
 	},
 	"common": {
 		"roles": {
@@ -43,12 +43,12 @@
 		}
 	},
 	"shell": {
-		"productName": "Playspace Audit Tool",
+		"productName": "Comprehensive Outdoor Playspace Audit Tool",
 		"productTagline": "Play Value & Usability",
 		"workspaceLabel": "Workspace",
 		"openMenu": "Open menu",
 		"navigationTitle": "Navigation",
-		"mobileBrand": "Playspace",
+		"mobileBrand": "COPA",
 		"navigation": {
 			"dashboard": "Dashboard",
 			"accounts": "Accounts",
@@ -463,54 +463,56 @@
 			}
 		},
 		"instruments": {
-			"error": {
-				"title": "Unable to load instruments",
-				"description": "Refresh this page to retry.",
-				"retry": "Try again"
-			},
 			"header": {
-				"eyebrow": "Administrator Workspace",
-				"title": "Instrument Management",
-				"description": "Manage audit instrument versions, translations, and publish new definitions.",
-				"back": "Back to dashboard"
+				"eyebrow": "Administrator Workspace"
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard",
 				"instruments": "Instruments"
 			},
+			"title": "Instrument Management",
+			"description": "Manage audit instrument versions, translations, and publish new definitions.",
+			"uploadAction": "Upload JSON",
+			"createDraft": "Create New Draft",
+			"activeVersion": "Active Version",
+			"viewingVersion": "Viewing Version",
+			"backToActive": "Back to Active",
+			"editThisVersion": "Edit this version",
+			"error": {
+				"title": "Unable to load instruments",
+				"description": "Refresh this page to retry.",
+				"retry": "Try again"
+			},
+			"toast": {
+				"saveSuccess": "Instrument saved",
+				"saveActiveDesc": "Version {version} has been saved and activated.",
+				"saveDraftDesc": "Version {version} has been saved as a draft.",
+				"saveError": "Failed to save instrument",
+				"activateSuccess": "Instrument activated",
+				"activateDesc": "Version {version} is now the active version.",
+				"activateError": "Failed to activate instrument"
+			},
+			"empty": {
+				"title": "No instruments found",
+				"description": "Upload your first instrument definition to get started.",
+				"action": "Upload Instrument"
+			},
 			"versionHistory": {
 				"title": "Version History",
-				"description": "All instrument versions. Only one can be active at a time.",
-				"version": "Version",
-				"status": "Status",
-				"created": "Created",
-				"actions": "Actions",
-				"active": "Active",
-				"inactive": "Inactive",
-				"activate": "Activate",
-				"deactivate": "Deactivate",
+				"versions": "{count} {count, plural, one {version} other {versions}}",
+				"viewDetails": "View Details",
+				"hideDetails": "Hide Details",
+				"activated": "Activated {date}",
+				"created": "Created {date}",
+				"makeActive": "Make Active",
+				"showMore": "Show more history",
+				"showLess": "Show less history",
+				"active": "active",
 				"noVersions": "No instrument versions found.",
-				"confirmActivate": "This will deactivate all other versions and make this one the active source of truth. Continue?",
-				"confirmActivateTitle": "Activate instrument version"
-			},
-			"actions": {
-				"publishNew": "Publish New Version",
-				"uploadJson": "Upload JSON",
-				"viewContent": "View Content",
-				"editDuplicate": "Edit & Duplicate"
-			},
-			"editor": {
-				"title": "Instrument Editor",
-				"breadcrumb": "Editor",
-				"description": "Editing a copy of version {version}. Changes will be saved as a new version.",
-				"cancel": "Cancel",
-				"saveDraft": "Save as Draft",
-				"publish": "Publish & Activate",
-				"publishTitle": "Publish new instrument version",
-				"publishConfirm": "This will deactivate all other versions and make the new version the active source of truth for all clients.",
-				"draftTitle": "Save as draft",
-				"draftConfirm": "The new version will be saved but not activated. You can activate it later from the version history.",
-				"newVersionLabel": "New version number"
+				"confirmActivateTitle": "Activate this version?",
+				"confirmActivate": "This will immediately replace the current active instrument for all auditors. In-progress audits will continue using their started version.",
+				"activate": "Activate Version",
+				"cancel": "Cancel"
 			},
 			"upload": {
 				"title": "Upload Instrument JSON",
@@ -521,9 +523,30 @@
 				"filePlaceholder": "Click or drag a .json file here",
 				"fileLoaded": "Loaded ({keys} top-level keys)",
 				"saveDraft": "Save as Draft",
-				"publishActive": "Publish & Activate"
+				"publishActive": "Publish & Activate",
+				"cancel": "Cancel",
+				"errorJsonObj": "File must contain a JSON object.",
+				"errorInvalidJson": "Invalid JSON file."
+			},
+			"activate": {
+				"title": "Activate instrument version",
+				"description": "This will deactivate all other versions and make this one the active source of truth. Continue?",
+				"cancel": "Cancel",
+				"confirm": "Activate Version"
 			},
 			"content": {
+				"editDraft": "Instrument Editor",
+				"editDraftDesc": "Editing a copy of version {version}. Changes will be saved as a new version.",
+				"cancel": "Cancel",
+				"saveDraft": "Save as Draft",
+				"publish": "Publish & Activate",
+				"draft": "Draft",
+				"export": "Export",
+				"formatPdf": "PDF",
+				"formatExcel": "Excel (.xlsx)",
+				"formatCsv": "CSV",
+				"formatJson": "JSON",
+				"overview": "Overview",
 				"title": "Instrument Content",
 				"sections": "Sections",
 				"questions": "Questions",
@@ -533,6 +556,10 @@
 				"executionModes": "Execution Modes",
 				"languages": "Languages",
 				"noContent": "No content available for this language.",
+				"newLanguagePrompt": "Enter the language code for the new translation (e.g. 'de', 'es'):",
+				"languageExists": "This language already exists.",
+				"confirmRemoveLanguage": "Are you sure you want to remove the {lang} translation? This cannot be undone.",
+				"copyFrom": "Copy from {lang}",
 				"sectionTitle": "Section Title",
 				"sectionDescription": "Description",
 				"sectionInstruction": "Instruction",
@@ -582,6 +609,10 @@
 				"groupKey": "Group",
 				"additionValue": "Add",
 				"boostValue": "Boost",
+				"flags": "Flags",
+				"notApplicableDesc": "not applicable option",
+				"allowsFollowUpDesc": "unlocks follow-up scales",
+				"followUpBadge": "Follow-up",
 				"allowsFollowUp": "Unlocks follow-up",
 				"blocksFollowUp": "Blocks follow-up",
 				"notApplicable": "N/A",
@@ -594,6 +625,10 @@
 				"customOptionsSummary": "{count} options (default: {defaultCount})",
 				"addParagraph": "Add paragraph",
 				"removeParagraph": "Remove",
+				"addSection": "Add section",
+				"removeSection": "Remove section",
+				"moveUp": "Move up",
+				"moveDown": "Move down",
 				"addQuestion": "Add question",
 				"removeQuestion": "Remove question",
 				"addOption": "Add option",
@@ -608,12 +643,20 @@
 				"removeScaleDefinition": "Remove",
 				"addPreAuditQuestion": "Add question",
 				"removePreAuditQuestion": "Remove",
+				"noQuestions": "No questions in this section.",
+				"questionCount": "{count, plural, one {# question} other {# questions}}",
+				"sectionDetails": "Section Details",
+				"noDescription": "No description",
+				"noInstruction": "No instruction",
+				"noNotesPrompt": "No notes prompt",
 				"questionKey": "Question Key",
 				"sectionKey": "Section Key",
 				"scaleKey": "Scale Key",
 				"optionKey": "Option Key",
 				"optionLabel": "Label",
 				"optionDescription": "Description",
+				"questionLabel": "Question Label",
+				"questionDescription": "Description",
 				"responseKey": "Response Key",
 				"anyOfOptionKeys": "Any of option keys (comma-separated)",
 				"clearCondition": "Clear condition",
@@ -655,6 +698,10 @@
 				"legalDocuments": "Legal Documents",
 				"legalDocumentsDescription": "Terms and Privacy Notice shown to auditors during onboarding.",
 				"addLegalDocument": "Add document",
+				"addLegalDoc": "Add document",
+				"removeLegalDoc": "Remove document",
+				"documentDetails": "Document Details",
+				"untitledDocument": "Untitled Document",
 				"noLegalDocuments": "No legal documents. Add a Terms or Privacy document to display during onboarding.",
 				"legalDocKey": "Document Key",
 				"legalDocShortTitle": "Short Title",
@@ -670,7 +717,13 @@
 				"legalSectionBody": "Body paragraphs",
 				"legalSectionBullets": "Bullet points",
 				"addBullet": "Add bullet",
-				"noBullets": "No bullet points in this section."
+				"noBullets": "No bullet points in this section.",
+				"reviewTitle": "Publish new instrument version",
+				"reviewDescription": "Review the detected changes before publishing. This will deactivate all other versions.",
+				"detectedChanges": "Detected Changes ({count})",
+				"noChanges": "No changes detected between these versions.",
+				"publishing": "Publishing...",
+				"publishAndActivate": "Publish & Activate"
 			}
 		},
 		"system": {
@@ -758,7 +811,7 @@
 	},
 	"signup": {
 		"title": "Create an account",
-		"description": "Sign up to get started with Playspace.",
+		"description": "Sign up to get started with the COPA Tool.",
 		"emailPlaceholder": "manager@example.org",
 		"namePlaceholder": "Your full name",
 		"fields": {
@@ -784,7 +837,7 @@
 	},
 	"managerInvite": {
 		"title": "Join your team",
-		"subtitle": "You've been invited to manage an Audit Tools workspace.",
+		"subtitle": "You've been invited to manage a COPA Tool workspace.",
 		"description": "Set up your name and password to get started. You'll be taken to the manager dashboard once you're done.",
 		"workspaceContext": {
 			"label": "You are joining",
@@ -1774,7 +1827,8 @@
 				"skippedTitle": "Space audit step skipped",
 				"skippedDescription": "This execution mode only includes the survey, so the onsite setup step is not required.",
 				"matrixTitle": "Describe users currently in the playspace",
-				"matrixDescription": "Use the matrix to record how many users from each age group are currently present."
+				"matrixDescription": "Use the matrix to record how many users from each age group are currently present.",
+				"matrixAgeColumn": "Age group"
 			},
 			"sections": {
 				"title": "Sections",
@@ -1800,7 +1854,6 @@
 				"enterComments": "Enter any comments"
 			},
 			"sectionTable": {
-				"intro": "On larger screens the question prompt stays on the left and the active scoring scales stay aligned in columns on the right.",
 				"itemColumn": "Question item",
 				"notAvailable": "Not used for this item.",
 				"followUpPending": "Choose a positive provision answer to unlock this scale.",
@@ -1853,7 +1906,7 @@
 			"title": "Your account",
 			"description": "Review the identity and role shown in this workspace.",
 			"managerFallback": "Manager",
-			"adminDisplayName": "Playspace Administrator",
+			"adminDisplayName": "COPA Administrator",
 			"auditorWithCode": "Auditor {code}",
 			"auditorFallback": "Auditor",
 			"managerWorkspaceFallback": "Manager workspace",

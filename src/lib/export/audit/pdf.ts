@@ -714,7 +714,7 @@ export async function generatePdfBlob(
 			);
 			const instrSegments = parsePrompt(section.instruction ?? "");
 			registerRichCell(pdfBodyRowIndex, 0, {
-				segments: [{ text: "Instruction: ", bold: false }, ...instrSegments],
+				segments: [{ text: "Instruction: ", bold: false, type: "text" }, ...instrSegments],
 				baseFontStyle: "bolditalic",
 				textColor: AUDIT_PDF_PALETTE.sectionInstrColor
 			});
@@ -739,7 +739,7 @@ export async function generatePdfBlob(
 			);
 			const notesSegments = parsePrompt(section.notes_prompt ?? "");
 			registerRichCell(pdfBodyRowIndex, 0, {
-				segments: [{ text: "Notes Prompt: ", bold: false }, ...notesSegments],
+				segments: [{ text: "Notes Prompt: ", bold: false, type: "text" }, ...notesSegments],
 				baseFontStyle: "italic",
 				textColor: AUDIT_PDF_PALETTE.sectionNotesColor
 			});

@@ -39,7 +39,6 @@ export function SectionQuestionTable({
 
 	return (
 		<div className="space-y-4">
-			<p className="text-sm text-muted-foreground">{t("intro")}</p>
 			<div className="overflow-x-auto">
 				<div
 					className="grid min-w-[980px] rounded-card border border-border bg-card"
