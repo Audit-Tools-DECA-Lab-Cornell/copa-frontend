@@ -45,10 +45,10 @@ export default defineConfig({
 	],
 	webServer: isLocalBaseUrl
 		? {
-				command: `pnpm exec next dev --hostname 127.0.0.1 --port ${localPort}`,
-				url: baseURL,
-				reuseExistingServer: process.env.E2E_BASE_URL ? false : true,
-				timeout: 120_000
-			}
+			command: `pnpm exec next dev --hostname 127.0.0.1 --port ${localPort}`,
+			url: baseURL,
+			reuseExistingServer: true,
+			timeout: 120_000
+		}
 		: undefined
 });
