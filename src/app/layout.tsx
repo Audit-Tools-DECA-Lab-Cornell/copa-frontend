@@ -33,10 +33,11 @@ const initialDesignSystemStyle = getDesignSystemCssVariables({
 
 export async function generateMetadata(): Promise<Metadata> {
 	const t = await getTranslations("metadata");
-
+	const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
 	return {
 		title: t("title"),
-		description: t("description")
+		description: t("description"),
+		verification: { google: googleSiteVerification }
 	};
 }
 
