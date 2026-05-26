@@ -1685,6 +1685,7 @@
 				"started": "Started: {value}",
 				"submitted": "Submitted: {value}",
 				"executionMode": "Execution mode: {value}",
+				"finalComments": "Final comments: {value}",
 				"notSelected": "Not selected",
 				"readyToSubmit": "Ready to submit: {value}",
 				"yes": "Yes",
@@ -1785,6 +1786,9 @@
 				"title": "Submission readiness",
 				"readyDescription": "Everything required for submission is complete. Review your notes, then submit when you are ready.",
 				"incompleteDescription": "Complete the remaining checkpoints before submitting this audit.",
+				"finalCommentsHint": "Optional. Add any final observations or recommendations you want saved with this completed audit.",
+				"finalCommentsLabel": "Any final comments?",
+				"finalCommentsPlaceholder": "Add any final comments or recommendations...",
 				"readyBadge": "Ready to submit",
 				"remainingBadge": "{count} checkpoint{count, plural, one {} other {s}} remaining",
 				"blockers": {

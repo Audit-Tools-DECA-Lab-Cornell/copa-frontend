@@ -551,7 +551,8 @@ export const auditorDashboardSummarySchema = z.object({
 });
 
 export const auditMetaSchema = z.object({
-	execution_mode: executionModeSchema.nullable()
+	execution_mode: executionModeSchema.nullable(),
+	final_comments: z.string().nullable().optional().default(null)
 });
 
 export const auditPreAuditSchema = z.object({
@@ -666,7 +667,8 @@ export const auditAggregateWriteSchema = z.object({
 	schema_version: z.number().int().positive().optional(),
 	meta: z
 		.object({
-			execution_mode: executionModeSchema.nullable().optional()
+			execution_mode: executionModeSchema.nullable().optional(),
+			final_comments: z.string().nullable().optional()
 		})
 		.nullable()
 		.optional(),
@@ -700,7 +702,8 @@ export const auditDraftPatchSchema = z.object({
 	aggregate: auditAggregateWriteSchema.nullable().optional(),
 	meta: z
 		.object({
-			execution_mode: executionModeSchema.nullable().optional()
+			execution_mode: executionModeSchema.nullable().optional(),
+			final_comments: z.string().nullable().optional()
 		})
 		.nullable()
 		.optional(),

@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildAuditorNameLookup, getAuditorTableLabel } from "@/components/dashboard/auditor-display";
+import {
+	buildAuditorNameLookup,
+	getAuditorCodeSubtitle,
+	getAuditorTableLabel
+} from "@/components/dashboard/auditor-display";
 
 /**
  * The table lookup should only retain usable names so manager pages can
@@ -27,4 +31,14 @@ test("getAuditorTableLabel prefers the display name when available", () => {
 	assert.equal(getAuditorTableLabel("AKL-01", "Ariana Ngata"), "Ariana Ngata");
 	assert.equal(getAuditorTableLabel("AKL-01", "   "), "AKL-01");
 	assert.equal(getAuditorTableLabel("AKL-01", null), "AKL-01");
+});
+
+/**
+ * When the manager tables show a full name, they should still retain the code
+ * as supporting context. Code-only views should not duplicate the same value.
+ */
+test("getAuditorCodeSubtitle only returns code when a display name exists", () => {
+	assert.equal(getAuditorCodeSubtitle("AKL-01", "Ariana Ngata"), "AKL-01");
+	assert.equal(getAuditorCodeSubtitle("AKL-01", "   "), null);
+	assert.equal(getAuditorCodeSubtitle("AKL-01", null), null);
 });

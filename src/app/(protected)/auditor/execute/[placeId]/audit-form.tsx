@@ -104,6 +104,14 @@ function readMultiValue(value: string | string[] | undefined): string[] {
 }
 
 /**
+ * Normalize one optional free-text field by trimming blank values to null.
+ */
+function normalizeOptionalText(value: string): string | null {
+	const trimmedValue = value.trim();
+	return trimmedValue.length > 0 ? trimmedValue : null;
+}
+
+/**
  * Clone nested section response maps from one audit session.
  */
 function createSectionDrafts(
@@ -153,16 +161,26 @@ function cloneQuestionResponsePayload(value: QuestionResponsePayload): QuestionR
  */
 function buildDraftPatchFromState(input: {
 	selectedMode: ExecutionModeSelection;
+	finalComments: string;
 	preAuditValues: Record<string, string | string[]>;
 	sectionDrafts: Record<string, SectionDraftState>;
 	schemaVersion: number;
 	expectedRevision: number;
 }): AuditDraftPatch {
+	const normalizedFinalComments = normalizeOptionalText(input.finalComments);
+	const meta =
+		input.selectedMode || normalizedFinalComments
+			? {
+					execution_mode: input.selectedMode || null,
+					final_comments: normalizedFinalComments
+				}
+			: null;
+
 	return {
 		expected_revision: input.expectedRevision,
 		aggregate: {
 			schema_version: input.schemaVersion,
-			meta: input.selectedMode ? { execution_mode: input.selectedMode } : null,
+			meta,
 			pre_audit: {
 				place_size: readSingleValue(input.preAuditValues.place_size),
 				current_users_0_5: readSingleValue(input.preAuditValues.current_users_0_5),
@@ -299,6 +317,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	const [saveError, setSaveError] = React.useState<string | null>(null);
 	const [preAuditValues, setPreAuditValues] = React.useState<Record<string, string | string[]>>({});
 	const [sectionDrafts, setSectionDrafts] = React.useState<Record<string, SectionDraftState>>({});
+	const [finalComments, setFinalComments] = React.useState("");
 	const initializedAuditIdRef = React.useRef<string | null>(null);
 	const lastQueuedJsonRef = React.useRef<string | null>(null);
 	const lastSavedJsonRef = React.useRef<string | null>(null);
@@ -323,13 +342,14 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			incomingSession.selected_execution_mode ??
 			incomingSession.meta.execution_mode ??
 			(incomingSession.allowed_execution_modes.length === 1 ? incomingSession.allowed_execution_modes[0] : "");
-
+		const nextFinalComments = incomingSession.meta.final_comments ?? "";
 		const nextPreAuditValues = getPreAuditValues(incomingSession);
 		const nextSectionDrafts = createSectionDrafts(incomingSession, instrument!);
 
 		initializedAuditIdRef.current = incomingSession.audit_id;
 		const initialPatch = buildDraftPatchFromState({
 			selectedMode: nextSelectedMode,
+			finalComments: nextFinalComments,
 			preAuditValues: nextPreAuditValues,
 			sectionDrafts: nextSectionDrafts,
 			schemaVersion: incomingSession.schema_version,
@@ -340,6 +360,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 		lastSavedJsonRef.current = initialPatchJson;
 		setSession(incomingSession);
 		setSelectedMode(nextSelectedMode);
+		setFinalComments(nextFinalComments);
 		setPreAuditValues(nextPreAuditValues);
 		setSectionDrafts(nextSectionDrafts);
 		setSaveError(null);
@@ -381,6 +402,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			playspaceApi.auditor.submitAudit(input.auditId, input.expectedRevision),
 		onSuccess: updatedSession => {
 			setSession(updatedSession);
+			setFinalComments(updatedSession.meta.final_comments ?? "");
 			setLastSavedAt(new Date());
 			setSaveError(null);
 		},
@@ -405,12 +427,13 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 
 		return buildDraftPatchFromState({
 			selectedMode,
+			finalComments,
 			preAuditValues,
 			sectionDrafts,
 			schemaVersion: session.schema_version,
 			expectedRevision: session.revision
 		});
-	}, [preAuditValues, sectionDrafts, selectedMode, session]);
+	}, [finalComments, preAuditValues, sectionDrafts, selectedMode, session]);
 
 	React.useEffect(() => {
 		if (!session || session.status === "SUBMITTED") {
@@ -937,6 +960,25 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 					<p className="text-sm text-muted-foreground">
 						{readyToSubmit ? t("submission.readyDescription") : t("submission.incompleteDescription")}
 					</p>
+					{readyToSubmit ? (
+						<div className="space-y-2">
+							<Label htmlFor="submission-final-comments">{t("submission.finalCommentsLabel")}</Label>
+							<Textarea
+								id="submission-final-comments"
+								value={finalComments}
+								onChange={event => {
+									if (isReadOnly) {
+										return;
+									}
+									setFinalComments(event.target.value);
+								}}
+								placeholder={t("submission.finalCommentsPlaceholder")}
+								disabled={isReadOnly}
+								rows={6}
+							/>
+							<p className="text-sm text-muted-foreground">{t("submission.finalCommentsHint")}</p>
+						</div>
+					) : null}
 					{submissionBlockers.length > 0 ? (
 						<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
 							{submissionBlockers.map(blocker => (

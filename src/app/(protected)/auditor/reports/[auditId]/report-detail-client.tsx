@@ -317,6 +317,13 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 									: t("metadata.notSelected")
 							})}
 						</p>
+						{audit.meta.final_comments ? (
+							<p>
+								{t("metadata.finalComments", {
+									value: audit.meta.final_comments
+								})}
+							</p>
+						) : null}
 						<p>
 							{t("metadata.readyToSubmit", {
 								value: audit.progress.ready_to_submit ? t("metadata.yes") : t("metadata.no")

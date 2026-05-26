@@ -71,6 +71,12 @@ export interface WorkbookTable {
 	readonly title: string;
 	readonly rows: readonly SpreadsheetRow[];
 	readonly columnWidths?: readonly number[];
+	readonly rowMetadata?: readonly (WorkbookRowMetadata | null)[];
+}
+
+/** Optional per-row styling metadata consumed by XLSX renderers. */
+export interface WorkbookRowMetadata {
+	readonly sourceComponent?: "audit" | "survey";
 }
 
 /** Partial score contributed by a multiplier (diversity / challenge) scale. */

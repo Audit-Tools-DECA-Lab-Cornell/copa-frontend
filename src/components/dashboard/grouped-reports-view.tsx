@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 import type { AuditActivityRow } from "./audits-table";
-import { getAuditorTableLabel } from "./auditor-display";
+import { getAuditorCodeSubtitle, getAuditorTableLabel } from "./auditor-display";
 import { BuildPlaceReportDialogView } from "./build-place-report-dialog";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 import { Badge } from "@/components/ui/badge";
@@ -420,9 +420,14 @@ function PlaceSubmissionTable({
 								</TableCell>
 								<TableCell className="py-3 text-sm">
 									{row.auditorDisplayName ? (
-										<span className="font-medium text-foreground">
-											{getAuditorTableLabel(row.auditorCode, row.auditorDisplayName)}
-										</span>
+										<div className="space-y-0.5">
+											<p className="font-medium text-foreground">
+												{getAuditorTableLabel(row.auditorCode, row.auditorDisplayName)}
+											</p>
+											<p className="font-mono text-xs tracking-[0.04em] text-muted-foreground">
+												{getAuditorCodeSubtitle(row.auditorCode, row.auditorDisplayName)}
+											</p>
+										</div>
 									) : (
 										<span className="font-mono">{row.auditorCode}</span>
 									)}
@@ -632,10 +637,20 @@ export function GroupedReportsView({
 						</p>
 						<p className="text-xs text-muted-foreground">
 							{row.original.latestSubmittedRow
-								? `Latest auditor ${getAuditorTableLabel(
-										row.original.latestSubmittedRow.auditorCode,
-										row.original.latestSubmittedRow.auditorDisplayName
-									)}`
+								? (() => {
+										const auditorLabel = getAuditorTableLabel(
+											row.original.latestSubmittedRow.auditorCode,
+											row.original.latestSubmittedRow.auditorDisplayName
+										);
+										const auditorCodeSubtitle = getAuditorCodeSubtitle(
+											row.original.latestSubmittedRow.auditorCode,
+											row.original.latestSubmittedRow.auditorDisplayName
+										);
+
+										return `Latest auditor ${auditorLabel}${
+											auditorCodeSubtitle ? ` (${auditorCodeSubtitle})` : ""
+										}`;
+									})()
 								: "No submitted reports yet"}
 						</p>
 					</div>

@@ -402,14 +402,17 @@ test.describe("Combined report export", () => {
 
 		expect(combinedOverviewRows).toContainEqual([
 			"Component Legend",
-			"Warm item highlight = Place Audit source; cool item highlight = Place Survey source."
+			"Warm item highlight := source: Place Audit; cool item highlight := source: Place Survey."
 		]);
+		expect(combinedOverviewRows.some(row => row[0] === "Execution Mode")).toBeFalsy();
+		expect(combinedOverviewRows.some(row => row[0] === "Started At")).toBeFalsy();
+		expect(combinedOverviewRows.some(row => row[0] === "Submitted At")).toBeFalsy();
+		expect(combinedOverviewRows).toContainEqual(["Place Audit Auditor", auditSession.auditor_code]);
+		expect(combinedOverviewRows).toContainEqual(["Place Survey Auditor", surveySession.auditor_code]);
 
 		const sharedExportRows = combinedResponseRows.filter(row => row[0] === "Q 1.1");
 		expect(sharedExportRows).toHaveLength(2);
-		expect(sharedExportRows.map(row => String(row[1])).sort()).toEqual(
-			["Place Audit source · Survey + Audit", "Place Survey source · Survey + Audit"].sort()
-		);
+		expect(sharedExportRows.every(row => String(row[1]) === "Survey + Audit")).toBeTruthy();
 
 		const fullAssessmentOverviewRows = buildOverviewRows(
 			{

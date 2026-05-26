@@ -1641,6 +1641,7 @@
 				"started": "Gestartet: {value}",
 				"submitted": "Eingereicht: {value}",
 				"executionMode": "Ausführungsmodus: {value}",
+				"finalComments": "Abschließende Kommentare: {value}",
 				"notSelected": "Nicht ausgewählt",
 				"readyToSubmit": "Bereit zur Einreichung: {value}",
 				"yes": "Ja",
@@ -1741,6 +1742,9 @@
 				"title": "Bereitschaft zur Übermittlung",
 				"readyDescription": "Alles Erforderliche für die Übermittlung ist abgeschlossen. Prüfen Sie Ihre Notizen und übermitteln Sie dann, wenn Sie bereit sind.",
 				"incompleteDescription": "Schließen Sie die verbleibenden Prüfpunkte ab, bevor Sie dieses Audit übermitteln.",
+				"finalCommentsHint": "Optional. Add any final observations or recommendations you want saved with this completed audit.",
+				"finalCommentsLabel": "Any final comments?",
+				"finalCommentsPlaceholder": "Add any final comments or recommendations...",
 				"readyBadge": "Bereit zur Übermittlung",
 				"remainingBadge": "{count} Prüfpunkt{count, plural, one {} other {e}} verbleibend",
 				"blockers": {

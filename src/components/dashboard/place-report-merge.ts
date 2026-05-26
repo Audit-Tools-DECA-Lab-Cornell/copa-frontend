@@ -70,7 +70,7 @@ export function mergeAuditSessions(auditSession: AuditSession, surveySession: Au
 		meta: { ...auditSession.meta, execution_mode: "both" },
 		aggregate: {
 			...auditSession.aggregate,
-			meta: { execution_mode: "both" },
+			meta: { execution_mode: "both", final_comments: null },
 			sections: mergedSections
 		},
 		sections: mergedSections,

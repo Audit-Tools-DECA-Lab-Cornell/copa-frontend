@@ -18,7 +18,6 @@ import type {
 } from "./types";
 import type { AuditExportContext } from "./types";
 import { INVALID_SHEET_NAME_CHARACTERS } from "./types";
-import { getReportSourceLabel, type ReportSourceComponent } from "@/lib/audit/report-source-sessions";
 
 // ── Number formatting ────────────────────────────────────────────────────────
 
@@ -142,21 +141,6 @@ export function formatQuestionModeLabel(mode: ExecutionMode): string {
 		default:
 			return mode;
 	}
-}
-
-/**
- * Formats the mode cell for a response row, optionally prefixing the source component when
- * the export belongs to a combined place report.
- */
-export function formatQuestionModeWithSource(
-	mode: ExecutionMode,
-	sourceComponent: ReportSourceComponent | null
-): string {
-	const modeLabel = formatQuestionModeLabel(mode);
-	if (sourceComponent === null) {
-		return modeLabel;
-	}
-	return `${getReportSourceLabel(sourceComponent)} · ${modeLabel}`;
 }
 
 /**

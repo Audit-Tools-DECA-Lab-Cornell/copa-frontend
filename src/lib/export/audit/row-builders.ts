@@ -6,13 +6,19 @@
  * identical outputs with no side effects.
  */
 
-import type { AuditScoreTotals, ExportableAudit, PlayspaceInstrument, SpreadsheetRow } from "./types";
+import type {
+	AuditScoreTotals,
+	ExportableAudit,
+	PlayspaceInstrument,
+	SpreadsheetRow,
+	WorkbookRowMetadata
+} from "./types";
 import {
 	formatAuditStatusLabel,
 	formatChecklistAnswer,
 	formatConstructLabel,
 	formatExecutionModeLabel,
-	formatQuestionModeWithSource,
+	formatQuestionModeLabel,
 	formatLocality,
 	formatPercentage,
 	formatQuestionAnswer,
@@ -31,6 +37,11 @@ import {
 } from "@/lib/audit/report-source-sessions";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
 
+interface ResponseTableBuildResult {
+	readonly rows: readonly SpreadsheetRow[];
+	readonly rowMetadata: readonly (WorkbookRowMetadata | null)[];
+}
+
 // ── Overview sheet ────────────────────────────────────────────────────────────
 
 /**
@@ -44,16 +55,43 @@ export function buildOverviewRows(
 	const { auditSession, context, auditorProfile } = exportableAudit;
 	const overallScores = auditSession.scores.overall;
 	const combinedSources = getCombinedReportSources(auditSession);
+	const finalComments = auditSession.meta.final_comments?.trim() ?? "";
 
 	const sourceRows: SpreadsheetRow[] =
 		combinedSources === null
 			? []
 			: [
 					["Report Type", "Combined place report"],
-					["Audit Source Submission", combinedSources.audit.audit_code],
-					["Survey Source Submission", combinedSources.survey.audit_code],
+					["Place Audit Submission", combinedSources.audit.audit_code],
+					["Place Audit Auditor", combinedSources.audit.auditor_code],
+					["Place Audit Started", formatTimestampForDisplay(combinedSources.audit.started_at)],
+					["Place Audit Submitted", formatTimestampForDisplay(combinedSources.audit.submitted_at)],
+					["Place Survey Submission", combinedSources.survey.audit_code],
+					["Place Survey Auditor", combinedSources.survey.auditor_code],
+					["Place Survey Started", formatTimestampForDisplay(combinedSources.survey.started_at)],
+					["Place Survey Submitted", formatTimestampForDisplay(combinedSources.survey.submitted_at)],
 					["Component Legend", getCombinedReportLegend()]
 				];
+
+	const auditorRows: SpreadsheetRow[] =
+		combinedSources === null
+			? [
+					["Auditor Code", auditorProfile?.auditorCode ?? ""],
+					["Auditor Country", auditorProfile?.country ?? ""],
+					["Auditor Gender", auditorProfile?.gender ?? ""],
+					["Auditor Age", auditorProfile?.ageRange ?? ""],
+					["Auditor Role", auditorProfile?.role ?? ""]
+				]
+			: [];
+
+	const summaryMetadataRows: SpreadsheetRow[] =
+		combinedSources === null
+			? [
+					["Execution Mode", formatExecutionModeLabel(auditSession, instrument)],
+					["Started At", formatTimestampForDisplay(auditSession.started_at)],
+					["Submitted At", formatTimestampForDisplay(auditSession.submitted_at)]
+				]
+			: [];
 
 	return [
 		["Field", "Value"],
@@ -63,10 +101,9 @@ export function buildOverviewRows(
 		["Project Name", auditSession.project_name],
 		["Locality", formatLocality(context)],
 		["Status", formatAuditStatusLabel(auditSession.status)],
-		["Execution Mode", formatExecutionModeLabel(auditSession, instrument)],
-		["Started At", formatTimestampForDisplay(auditSession.started_at)],
-		["Submitted At", formatTimestampForDisplay(auditSession.submitted_at)],
+		...summaryMetadataRows,
 		["Total Minutes", auditSession.total_minutes ?? "Pending"],
+		...(finalComments.length > 0 ? ([["Final Comments", finalComments]] as SpreadsheetRow[]) : []),
 		...sourceRows,
 		["Summary Score", deriveSummaryScore(auditSession)],
 		["Play Value Total", overallScores?.play_value_total ?? "Pending"],
@@ -75,11 +112,7 @@ export function buildOverviewRows(
 		["Diversity Total", overallScores?.diversity_total ?? "Pending"],
 		["Sociability Total", overallScores?.sociability_total ?? "Pending"],
 		["Challenge Total", overallScores?.challenge_total ?? "Pending"],
-		["Auditor Code", auditorProfile?.auditorCode ?? ""],
-		["Auditor Country", auditorProfile?.country ?? ""],
-		["Auditor Gender", auditorProfile?.gender ?? ""],
-		["Auditor Age", auditorProfile?.ageRange ?? ""],
-		["Auditor Role", auditorProfile?.role ?? ""]
+		...auditorRows
 	];
 }
 
@@ -95,13 +128,14 @@ export function buildOverviewRows(
  * The header row (`SINGLE_RESPONSE_HEADERS`) is NOT prepended here — callers
  * add it as needed to support both XLSX (sheet prepend) and CSV (array prepend).
  */
-export function buildSingleAuditResponseRows(
+function buildSingleAuditResponseTable(
 	exportableAudit: ExportableAudit,
 	instrument: PlayspaceInstrument
-): readonly SpreadsheetRow[] {
+): ResponseTableBuildResult {
 	const { auditSession } = exportableAudit;
 	const combinedSources = getCombinedReportSources(auditSession);
 	const rows: SpreadsheetRow[] = [];
+	const rowMetadata: Array<WorkbookRowMetadata | null> = [];
 	let overallTotals = createEmptyScoreTotals();
 
 	for (const [sectionIndex, section] of instrument.sections.entries()) {
@@ -114,21 +148,14 @@ export function buildSingleAuditResponseRows(
 		let sectionTotals = createEmptyScoreTotals();
 
 		rows.push(buildSectionHeaderRow(sectionIndex, section.title, section.description, section.instruction));
+		rowMetadata.push(null);
 
 		for (const [questionIndex, visibleEntry] of visibleEntries.entries()) {
 			const { question, answers, sourceComponent } = visibleEntry;
 			const questionScores = calculateQuestionScores(question, answers);
 
-			rows.push(
-				buildQuestionResponseRow(
-					sectionIndex,
-					questionIndex,
-					question,
-					answers,
-					questionScores,
-					sourceComponent
-				)
-			);
+			rows.push(buildQuestionResponseRow(sectionIndex, questionIndex, question, answers, questionScores));
+			rowMetadata.push(sourceComponent === null ? null : { sourceComponent });
 
 			// Per-question auditor comment row — emitted directly after the
 			// question item row, before score rows, matching the PDF layout.
@@ -143,6 +170,7 @@ export function buildSingleAuditResponseRows(
 						sourceComponent
 					)
 				);
+				rowMetadata.push(null);
 			}
 
 			sectionTotals = addScoreTotals(sectionTotals, questionScores);
@@ -151,29 +179,29 @@ export function buildSingleAuditResponseRows(
 		const notesPrompt = typeof section.notes_prompt === "string" ? stripPromptMarkup(section.notes_prompt) : "";
 
 		if (notesPrompt.length > 0) {
-			rows.push(
-				...buildSectionNoteRow(
-					sectionIndex,
-					visibleEntries.length + 1,
-					questionDomainFallback(section.title),
-					notesPrompt,
-					""
-				)
+			const notePromptRows = buildSectionNoteRow(
+				sectionIndex,
+				visibleEntries.length + 1,
+				questionDomainFallback(section.title),
+				notesPrompt,
+				""
 			);
+			rows.push(...notePromptRows);
+			rowMetadata.push(...Array.from({ length: notePromptRows.length }, () => null));
 		}
 
 		if (combinedSources === null) {
 			const sectionNote = auditSession.sections[section.section_key]?.note ?? "";
 			if (sectionNote.trim().length > 0) {
-				rows.push(
-					...buildSectionNoteRow(
-						sectionIndex,
-						visibleEntries.length + 1,
-						questionDomainFallback(section.title),
-						"",
-						sectionNote
-					)
+				const noteRows = buildSectionNoteRow(
+					sectionIndex,
+					visibleEntries.length + 1,
+					questionDomainFallback(section.title),
+					"",
+					sectionNote
 				);
+				rows.push(...noteRows);
+				rowMetadata.push(...Array.from({ length: noteRows.length }, () => null));
 			}
 		} else {
 			(["audit", "survey"] as const).forEach(sourceComponent => {
@@ -182,28 +210,47 @@ export function buildSingleAuditResponseRows(
 				if (sectionNote.trim().length === 0) {
 					return;
 				}
-				rows.push(
-					...buildSectionNoteRow(
-						sectionIndex,
-						visibleEntries.length + 1,
-						questionDomainFallback(section.title),
-						"",
-						`${getReportSourceLabel(sourceComponent)}: ${sectionNote}`
-					)
+				const noteRows = buildSectionNoteRow(
+					sectionIndex,
+					visibleEntries.length + 1,
+					questionDomainFallback(section.title),
+					"",
+					`${getReportSourceLabel(sourceComponent)}: ${sectionNote}`
 				);
+				rows.push(...noteRows);
+				rowMetadata.push(...Array.from({ length: noteRows.length }, () => null));
 			});
 		}
 
 		rows.push(...buildSectionSummaryRows(sectionTotals));
+		rowMetadata.push(null, null, null);
 		overallTotals = addScoreTotals(overallTotals, sectionTotals);
 	}
 
 	if (rows.length > 0) {
 		rows.push(buildEmptyResponseRow());
 		rows.push(...buildOverallSummaryRows(overallTotals));
+		rowMetadata.push(null, null, null, null);
 	}
 
-	return rows;
+	return {
+		rows,
+		rowMetadata
+	};
+}
+
+export function buildSingleAuditResponseRows(
+	exportableAudit: ExportableAudit,
+	instrument: PlayspaceInstrument
+): readonly SpreadsheetRow[] {
+	return buildSingleAuditResponseTable(exportableAudit, instrument).rows;
+}
+
+export function buildSingleAuditResponseRowMetadata(
+	exportableAudit: ExportableAudit,
+	instrument: PlayspaceInstrument
+): readonly (WorkbookRowMetadata | null)[] {
+	return buildSingleAuditResponseTable(exportableAudit, instrument).rowMetadata;
 }
 
 // ── Individual row factories ──────────────────────────────────────────────────
@@ -238,13 +285,12 @@ export function buildQuestionResponseRow(
 	_questionIndex: number,
 	question: import("@/types/audit").InstrumentQuestion,
 	answers: import("@/types/audit").QuestionResponsePayload,
-	questionScores: AuditScoreTotals,
-	sourceComponent: ReportSourceComponent | null
+	questionScores: AuditScoreTotals
 ): SpreadsheetRow {
 	if (question.question_type === "checklist") {
 		return [
 			formatQuestionKeyForDisplay(question.question_key),
-			formatQuestionModeWithSource(question.mode, sourceComponent),
+			formatQuestionModeLabel(question.mode),
 			formatConstructLabel(question.constructs),
 			formatQuestionDomainLabel(question),
 			"",
@@ -266,7 +312,7 @@ export function buildQuestionResponseRow(
 
 	return [
 		formatQuestionKeyForDisplay(question.question_key),
-		formatQuestionModeWithSource(question.mode, sourceComponent),
+		formatQuestionModeLabel(question.mode),
 		formatConstructLabel(question.constructs),
 		formatQuestionDomainLabel(question),
 		"",

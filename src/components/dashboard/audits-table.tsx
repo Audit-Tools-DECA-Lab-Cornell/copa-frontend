@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
-import { getAuditorTableLabel } from "@/components/dashboard/auditor-display";
+import { getAuditorCodeSubtitle, getAuditorTableLabel } from "@/components/dashboard/auditor-display";
 
 import { DataTable, getMultiValueFilterFn } from "./data-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
@@ -91,6 +91,7 @@ function AuditIdentityCell({
 	const resetTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 	const primaryLabel = placeName ?? projectName ?? accountName ?? auditCode;
 	const auditorLabel = getAuditorTableLabel(auditorCode, auditorDisplayName);
+	const auditorCodeSubtitle = getAuditorCodeSubtitle(auditorCode, auditorDisplayName);
 	const lineage = [accountName, projectName]
 		.filter((value): value is string => Boolean(value && value.trim().length > 0))
 		.join(" · ");
@@ -151,14 +152,19 @@ function AuditIdentityCell({
 					<span>{isCopied ? t("copied") : t("copyId")}</span>
 				</Button>
 			</div>
-			<p className="text-sm text-muted-foreground">
-				{t("auditorLabel")}{" "}
-				{auditorDisplayName ? (
-					<span className="font-medium text-foreground">{auditorLabel}</span>
-				) : (
-					<span className="font-mono text-foreground tracking-[0.04em]">{auditorLabel}</span>
-				)}
-			</p>
+			<div className="text-sm text-muted-foreground">
+				<p>
+					{t("auditorLabel")}{" "}
+					{auditorDisplayName ? (
+						<span className="font-medium text-foreground">{auditorLabel}</span>
+					) : (
+						<span className="font-mono text-foreground tracking-[0.04em]">{auditorLabel}</span>
+					)}
+				</p>
+				{auditorCodeSubtitle ? (
+					<p className="font-mono text-xs tracking-[0.04em] text-muted-foreground">{auditorCodeSubtitle}</p>
+				) : null}
+			</div>
 		</div>
 	);
 }

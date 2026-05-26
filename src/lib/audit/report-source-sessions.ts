@@ -1,4 +1,5 @@
-import type { AuditSession } from "@/types/audit";
+import type { AuditSession as ExportAuditSession } from "@/types/audit";
+import type { AuditSession as SourceAuditSession } from "@/lib/api/playspace-types";
 
 /**
  * The source component attached to one question row inside a combined place report.
@@ -9,8 +10,8 @@ export type ReportSourceComponent = "audit" | "survey";
  * Original submitted sessions that were stitched together to build a combined place report.
  */
 export interface CombinedReportSources {
-	readonly audit: AuditSession;
-	readonly survey: AuditSession;
+	readonly audit: SourceAuditSession;
+	readonly survey: SourceAuditSession;
 }
 
 /**
@@ -26,23 +27,23 @@ export interface CombinedReportSession {
  */
 export const REPORT_SOURCE_STYLES = {
 	audit: {
-		label: "Place Audit source",
-		hex: "#FFF4E5",
-		rgb: [255, 244, 229] as const,
-		cssClassName: "bg-amber-50/80 dark:bg-amber-950/20"
+		label: "source: Place Audit",
+		hex: "#FEF3C7",
+		rgb: [254, 243, 199] as const,
+		cssClassName: "bg-amber-100/80 dark:bg-amber-950/25"
 	},
 	survey: {
-		label: "Place Survey source",
-		hex: "#EFF6FF",
-		rgb: [239, 246, 255] as const,
-		cssClassName: "bg-sky-50/80 dark:bg-sky-950/20"
+		label: "source: Place Survey",
+		hex: "#DBEAFE",
+		rgb: [219, 234, 254] as const,
+		cssClassName: "bg-sky-100/80 dark:bg-sky-950/30"
 	}
 } as const;
 
 /**
  * Safely reads the original report sources from a possibly synthetic audit session.
  */
-export function getCombinedReportSources(auditSession: AuditSession): CombinedReportSources | null {
+export function getCombinedReportSources(auditSession: ExportAuditSession): CombinedReportSources | null {
 	const candidate = (auditSession as Partial<CombinedReportSession>).report_sources;
 	if (candidate === undefined) {
 		return null;
@@ -57,8 +58,8 @@ export function getCombinedReportSources(auditSession: AuditSession): CombinedRe
  * Type guard for source-aware combined sessions.
  */
 export function hasCombinedReportSources(
-	auditSession: AuditSession
-): auditSession is AuditSession & CombinedReportSession {
+	auditSession: ExportAuditSession
+): auditSession is ExportAuditSession & CombinedReportSession {
 	return getCombinedReportSources(auditSession) !== null;
 }
 
@@ -73,5 +74,5 @@ export function getReportSourceLabel(component: ReportSourceComponent): string {
  * One-line legend shown only for truly combined reports.
  */
 export function getCombinedReportLegend(): string {
-	return "Warm item highlight = Place Audit source; cool item highlight = Place Survey source.";
+	return "Warm item highlight := source: Place Audit; cool item highlight := source: Place Survey.";
 }

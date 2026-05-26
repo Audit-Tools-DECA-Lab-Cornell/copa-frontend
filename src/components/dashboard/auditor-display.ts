@@ -43,3 +43,11 @@ export function buildAuditorNameLookup(entries: readonly AuditorNameLookupEntry[
 export function getAuditorTableLabel(auditorCode: string, auditorName: string | null | undefined): string {
 	return normalizeAuditorName(auditorName) ?? auditorCode;
 }
+
+/**
+ * Return the supporting code label only when the primary table label is the
+ * resolved auditor name.
+ */
+export function getAuditorCodeSubtitle(auditorCode: string, auditorName: string | null | undefined): string | null {
+	return normalizeAuditorName(auditorName) === null ? null : auditorCode;
+}

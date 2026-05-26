@@ -230,6 +230,14 @@ function MetaInfoCard({ audit }: MetaInfoCardProps) {
 			value: `${audit.instrument_key} v${audit.instrument_version}`
 		}
 	];
+	const finalComments = audit.meta.final_comments?.trim() ?? "";
+	if (finalComments.length > 0) {
+		rows.push({
+			icon: <FileTextIcon className="size-4" />,
+			label: "Final Comments",
+			value: finalComments
+		});
+	}
 
 	return (
 		<Card>

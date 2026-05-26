@@ -36,7 +36,7 @@ import {
 	formatConstructLabel,
 	formatExecutionModeLabel,
 	formatQuestionAnswer,
-	formatQuestionModeWithSource,
+	formatQuestionModeLabel,
 	formatScoreValue,
 	formatTimestampForDisplay,
 	stripPromptMarkup
@@ -263,6 +263,7 @@ export async function generatePdfBlob(
 	const { auditSession, context, auditorProfile } = exportableAudit;
 	const overallScores = auditSession.scores.overall;
 	const combinedSources = getCombinedReportSources(auditSession);
+	const finalComments = auditSession.meta.final_comments?.trim() ?? "";
 
 	// ── Page 1: summary (portrait) ────────────────────────────────────────────
 
@@ -279,7 +280,7 @@ export async function generatePdfBlob(
 	doc.setFontSize(13);
 	doc.setFont("helvetica", "bold");
 	doc.setTextColor(...AUDIT_PDF_PALETTE.headerText);
-	doc.text("PVUA Audit Export", PAGE_MARGIN, 10);
+	doc.text(combinedSources === null ? "PVUA Audit Export" : "PVUA Combined Report Export", PAGE_MARGIN, 10);
 	doc.setFontSize(9);
 	doc.setFont("helvetica", "normal");
 	doc.setTextColor(180, 190, 200);
@@ -292,15 +293,23 @@ export async function generatePdfBlob(
 	const detailsBody: [string, string][] = [
 		["Place", auditSession.place_name],
 		["Project", auditSession.project_name],
-		["Status", formatAuditStatusLabel(auditSession.status)],
-		["Mode", formatExecutionModeLabel(auditSession, instrument)],
-		["Started", formatTimestampForDisplay(auditSession.started_at)],
-		["Submitted", formatTimestampForDisplay(auditSession.submitted_at)]
+		["Status", formatAuditStatusLabel(auditSession.status)]
 	];
+
+	if (combinedSources === null) {
+		detailsBody.push(
+			["Mode", formatExecutionModeLabel(auditSession, instrument)],
+			["Started", formatTimestampForDisplay(auditSession.started_at)],
+			["Submitted", formatTimestampForDisplay(auditSession.submitted_at)]
+		);
+	}
 
 	if (context?.city || context?.province || context?.country) {
 		const locationParts = [context?.city, context?.province, context?.country].filter(Boolean);
 		detailsBody.push(["Location", locationParts.join(", ")]);
+	}
+	if (finalComments.length > 0) {
+		detailsBody.push(["Final Comments", finalComments]);
 	}
 
 	/** Shared cell styles for label/value info tables. */
@@ -327,52 +336,106 @@ export async function generatePdfBlob(
 		textColor: AUDIT_PDF_PALETTE.bodyText,
 		cellWidth: halfWidth * 0.62
 	};
-
-	// Left table — Audit Details
-	autoTable(doc, {
-		head: [["Audit Details", ""]],
-		body: detailsBody,
-		startY: 28,
-		theme: "plain",
-		styles: infoStyles,
-		headStyles: { ...infoHeadStyles, halign: "left" },
-		columnStyles: { 0: infoLabelStyles, 1: infoValueStyles },
-		margin: { left: PAGE_MARGIN, right: PAGE_MARGIN + halfWidth + 6 },
-		tableWidth: halfWidth
-	});
-
-	// Capture the bottom of the left table before the right table overwrites it.
 	const docWithAutoTable = doc as unknown as { lastAutoTable: { finalY: number } };
-	const detailsTableBottomY = docWithAutoTable.lastAutoTable?.finalY ?? 100;
+	let lastY = 28;
 
-	// Right table — Auditor Profile
-	const auditorBody: [string, string][] = auditorProfile
-		? [
-				["Auditor Code", auditorProfile.auditorCode],
-				["Age Range", auditorProfile.ageRange ?? "—"],
-				["Gender", auditorProfile.gender ?? "—"],
-				["Country", auditorProfile.country ?? "—"],
-				["Role", auditorProfile.role ?? "—"]
-			]
-		: [["Auditor", "Not available"]];
+	if (combinedSources === null) {
+		autoTable(doc, {
+			head: [["Audit Details", ""]],
+			body: detailsBody,
+			startY: 28,
+			theme: "plain",
+			styles: infoStyles,
+			headStyles: { ...infoHeadStyles, halign: "left" },
+			columnStyles: { 0: infoLabelStyles, 1: infoValueStyles },
+			margin: { left: PAGE_MARGIN, right: PAGE_MARGIN + halfWidth + 6 },
+			tableWidth: halfWidth
+		});
 
-	autoTable(doc, {
-		head: [["Auditor Profile", ""]],
-		body: auditorBody,
-		startY: 28,
-		theme: "plain",
-		styles: infoStyles,
-		headStyles: { ...infoHeadStyles, halign: "left" },
-		columnStyles: { 0: infoLabelStyles, 1: infoValueStyles },
-		margin: { left: PAGE_MARGIN + halfWidth + 6, right: PAGE_MARGIN },
-		tableWidth: halfWidth
-	});
+		const detailsTableBottomY = docWithAutoTable.lastAutoTable?.finalY ?? 100;
 
-	// ── Score summary table ────────────────────────────────────────────────────
+		const auditorBody: [string, string][] = auditorProfile
+			? [
+					["Auditor Code", auditorProfile.auditorCode],
+					["Age Range", auditorProfile.ageRange ?? "—"],
+					["Gender", auditorProfile.gender ?? "—"],
+					["Country", auditorProfile.country ?? "—"],
+					["Role", auditorProfile.role ?? "—"]
+				]
+			: [["Auditor", "Not available"]];
 
-	// Start below whichever of the two info tables is taller.
-	const auditorTableBottomY = docWithAutoTable.lastAutoTable?.finalY ?? 100;
-	const lastY = Math.max(detailsTableBottomY, auditorTableBottomY);
+		autoTable(doc, {
+			head: [["Auditor Profile", ""]],
+			body: auditorBody,
+			startY: 28,
+			theme: "plain",
+			styles: infoStyles,
+			headStyles: { ...infoHeadStyles, halign: "left" },
+			columnStyles: { 0: infoLabelStyles, 1: infoValueStyles },
+			margin: { left: PAGE_MARGIN + halfWidth + 6, right: PAGE_MARGIN },
+			tableWidth: halfWidth
+		});
+
+		const auditorTableBottomY = docWithAutoTable.lastAutoTable?.finalY ?? 100;
+		lastY = Math.max(detailsTableBottomY, auditorTableBottomY);
+	} else {
+		autoTable(doc, {
+			head: [["Combined Report Details", ""]],
+			body: detailsBody,
+			startY: 28,
+			theme: "plain",
+			styles: infoStyles,
+			headStyles: { ...infoHeadStyles, halign: "left" },
+			columnStyles: {
+				0: { ...infoLabelStyles, cellWidth: USABLE_WIDTH * 0.26 },
+				1: { ...infoValueStyles, cellWidth: USABLE_WIDTH * 0.74 }
+			},
+			margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+			tableWidth: USABLE_WIDTH
+		});
+
+		const combinedDetailsBottomY = docWithAutoTable.lastAutoTable?.finalY ?? 100;
+		const sourceTableStartY = combinedDetailsBottomY + 6;
+		const sourceBodyFor = (
+			sourceLabel: "Place Audit" | "Place Survey",
+			sourceSession: typeof combinedSources.audit
+		) =>
+			[
+				["Submission", sourceSession.audit_code],
+				["Auditor Code", sourceSession.auditor_code],
+				["Status", formatAuditStatusLabel(sourceSession.status)],
+				["Mode", formatExecutionModeLabel(sourceSession, instrument)],
+				["Started", formatTimestampForDisplay(sourceSession.started_at)],
+				["Submitted", formatTimestampForDisplay(sourceSession.submitted_at)]
+			] as [string, string][];
+
+		autoTable(doc, {
+			head: [["Place Audit Submission", ""]],
+			body: sourceBodyFor("Place Audit", combinedSources.audit),
+			startY: sourceTableStartY,
+			theme: "plain",
+			styles: infoStyles,
+			headStyles: { ...infoHeadStyles, halign: "left" },
+			columnStyles: { 0: infoLabelStyles, 1: infoValueStyles },
+			margin: { left: PAGE_MARGIN, right: PAGE_MARGIN + halfWidth + 6 },
+			tableWidth: halfWidth
+		});
+		const auditSourceBottomY = docWithAutoTable.lastAutoTable?.finalY ?? sourceTableStartY;
+
+		autoTable(doc, {
+			head: [["Place Survey Submission", ""]],
+			body: sourceBodyFor("Place Survey", combinedSources.survey),
+			startY: sourceTableStartY,
+			theme: "plain",
+			styles: infoStyles,
+			headStyles: { ...infoHeadStyles, halign: "left" },
+			columnStyles: { 0: infoLabelStyles, 1: infoValueStyles },
+			margin: { left: PAGE_MARGIN + halfWidth + 6, right: PAGE_MARGIN },
+			tableWidth: halfWidth
+		});
+		const surveySourceBottomY = docWithAutoTable.lastAutoTable?.finalY ?? sourceTableStartY;
+		lastY = Math.max(auditSourceBottomY, surveySourceBottomY);
+	}
 
 	/**
 	 * A score row with the metric label in col 0 and value in col 1.
@@ -534,12 +597,12 @@ export async function generatePdfBlob(
 		doc.rect(pdfMargin.left, legendTop, boxSize, boxSize, "F");
 		doc.setFontSize(7.5);
 		doc.setTextColor(...AUDIT_PDF_PALETTE.bodyText);
-		doc.text("Place Audit source", pdfMargin.left + boxSize + 1.2, legendTop + 2.7);
+		doc.text("source: Place Audit", pdfMargin.left + boxSize + 1.2, legendTop + 2.7);
 
 		const surveyLegendX = pdfMargin.left + 33;
 		doc.setFillColor(...REPORT_SOURCE_STYLES.survey.rgb);
 		doc.rect(surveyLegendX, legendTop, boxSize, boxSize, "F");
-		doc.text("Place Survey source", surveyLegendX + boxSize + 1.2, legendTop + 2.7);
+		doc.text("source: Place Survey", surveyLegendX + boxSize + 1.2, legendTop + 2.7);
 
 		doc.setFontSize(6.5);
 		doc.setTextColor(...AUDIT_PDF_PALETTE.mutedText);
@@ -769,13 +832,13 @@ export async function generatePdfBlob(
 
 			const isEven = questionRowIndex % 2 === 0;
 			const rowFill = isEven ? AUDIT_PDF_PALETTE.rowEven : AUDIT_PDF_PALETTE.rowOdd;
-			const promptFill =
+			const sourceFill =
 				sourceComponent === null
 					? rowFill
 					: ([...REPORT_SOURCE_STYLES[sourceComponent].rgb] as [number, number, number]);
 
 			const questionKeyDisplay = formatQuestionKeyForDisplay(question.question_key || "");
-			const modeLabel = formatQuestionModeWithSource(question.mode, sourceComponent);
+			const modeLabel = formatQuestionModeLabel(question.mode);
 			const constructsLabel = formatConstructLabel(question.constructs);
 			const promptPlain = stripPromptMarkup(question.prompt);
 			const promptSegments = parsePrompt(question.prompt);
@@ -826,7 +889,7 @@ export async function generatePdfBlob(
 				{
 					content: questionKeyDisplay,
 					styles: {
-						fillColor: rowFill,
+						fillColor: sourceFill,
 						textColor: AUDIT_PDF_PALETTE.bodyText,
 						fontStyle: "bold",
 						fontSize: 7
@@ -834,15 +897,15 @@ export async function generatePdfBlob(
 				},
 				{
 					content: modeLabel,
-					styles: { fillColor: rowFill, textColor: AUDIT_PDF_PALETTE.mutedText, fontSize: 6.5 }
+					styles: { fillColor: sourceFill, textColor: AUDIT_PDF_PALETTE.mutedText, fontSize: 6.5 }
 				},
 				{
 					content: constructsLabel,
-					styles: { fillColor: rowFill, textColor: AUDIT_PDF_PALETTE.mutedText, fontSize: 6.5 }
+					styles: { fillColor: sourceFill, textColor: AUDIT_PDF_PALETTE.mutedText, fontSize: 6.5 }
 				},
 				{
 					content: promptPlain,
-					styles: { fillColor: promptFill, textColor: AUDIT_PDF_PALETTE.bodyText, fontSize: 7 }
+					styles: { fillColor: sourceFill, textColor: AUDIT_PDF_PALETTE.bodyText, fontSize: 7 }
 				},
 				{
 					content: provisionAnswer,

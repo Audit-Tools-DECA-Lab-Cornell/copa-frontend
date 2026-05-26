@@ -34,6 +34,7 @@ import {
 	SCORE_ROW_SENTINEL,
 	SECTION_NOTE_SENTINEL,
 	SECTION_NOTE_RESPONSE_SENTINEL,
+	buildSingleAuditResponseRowMetadata,
 	buildOverviewRows,
 	buildSingleAuditResponseRows
 } from "./row-builders";
@@ -137,19 +138,9 @@ const SCALE_ACCENT_HEX: Record<"provision" | "diversity" | "sociability" | "chal
 	challenge: "0C4767"
 };
 
-const QUESTION_PROMPT_COLUMN_INDEX = 6;
-const COMBINED_AUDIT_SOURCE_FILL = "FFF4E5";
-const COMBINED_SURVEY_SOURCE_FILL = "EFF6FF";
-
-function getQuestionSourceFill(modeCellValue: string): string | null {
-	if (modeCellValue.startsWith("Place Audit source")) {
-		return COMBINED_AUDIT_SOURCE_FILL;
-	}
-	if (modeCellValue.startsWith("Place Survey source")) {
-		return COMBINED_SURVEY_SOURCE_FILL;
-	}
-	return null;
-}
+const QUESTION_CONTEXT_END_COLUMN_INDEX = 6;
+const COMBINED_AUDIT_SOURCE_FILL = "FEF3C7";
+const COMBINED_SURVEY_SOURCE_FILL = "DBEAFE";
 
 /**
  * Applies cell styles and row heights to a worksheet in-place.
@@ -202,7 +193,13 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 		const isSectionHeaderRow =
 			!isHeaderRow && typeof row[0] === "string" && /^\d+$/.test(row[0]) && row[1] === "" && row[2] === "";
 		const isEvenRow = rowIndex % 2 === 0;
-		const questionSourceFill = typeof row[1] === "string" ? getQuestionSourceFill(row[1]) : null;
+		const sourceComponent = table.rowMetadata?.[rowIndex]?.sourceComponent;
+		const questionSourceFill =
+			sourceComponent === "audit"
+				? COMBINED_AUDIT_SOURCE_FILL
+				: sourceComponent === "survey"
+					? COMBINED_SURVEY_SOURCE_FILL
+					: null;
 
 		// Register full-row merges for both section note banner row types.
 		if (isSectionNoteRow || isSectionNoteResponseRow) {
@@ -362,7 +359,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 					};
 				} else if (
 					isResponsesTable &&
-					colIndex === QUESTION_PROMPT_COLUMN_INDEX &&
+					colIndex <= QUESTION_CONTEXT_END_COLUMN_INDEX &&
 					questionSourceFill !== null
 				) {
 					cell.s = {
@@ -449,6 +446,7 @@ export function generateXlsxBlob(
 ): Blob {
 	const overviewRows = buildOverviewRows(exportableAudit, instrument);
 	const responseRows = buildSingleAuditResponseRows(exportableAudit, instrument);
+	const responseRowMetadata = buildSingleAuditResponseRowMetadata(exportableAudit, instrument);
 	const palette = resolveExportPalette(appearance);
 
 	const tables: WorkbookTable[] = [
@@ -462,7 +460,8 @@ export function generateXlsxBlob(
 			name: "Responses",
 			title: "PVUA Response Matrix",
 			rows: [[...SINGLE_RESPONSE_HEADERS], ...responseRows],
-			columnWidths: SINGLE_RESPONSE_COLUMN_WIDTHS
+			columnWidths: SINGLE_RESPONSE_COLUMN_WIDTHS,
+			rowMetadata: [null, ...responseRowMetadata]
 		}
 	];
 
