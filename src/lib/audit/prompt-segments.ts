@@ -50,6 +50,18 @@ const HEADER_LEVEL_MAP: Readonly<Record<number, PromptSegmentType>> = {
 const MAX_HEADER_DEPTH = 5;
 
 /**
+ * jsPDF's built-in fonts do not reliably render common Unicode punctuation.
+ * Normalize those code points to ASCII-safe equivalents before PDF rendering.
+ */
+const PDF_TYPOGRAPHY_REPLACEMENTS: ReadonlyArray<readonly [RegExp, string]> = [
+	[/\u00a0/g, " "],
+	[/[\u2010\u2011\u2012\u2013\u2014\u2212]/g, "-"],
+	[/[\u2018\u2019\u201b]/g, "'"],
+	[/[\u201c\u201d\u201f]/g, '"'],
+	[/\u2026/g, "..."]
+] as const;
+
+/**
  * ATX header pattern: one-to-five `#` chars at the very start of a trimmed
  * line, followed by at least one space, then the heading text.
  *
@@ -153,6 +165,31 @@ export function parsePromptSegments(raw: string): PromptSegment[] {
 	}
 
 	return segments;
+}
+
+/**
+ * Coerces typography that jsPDF's built-in fonts commonly mis-render into
+ * ASCII-safe equivalents for PDF export.
+ */
+export function normalizePromptTypographyForPdf(value: string): string {
+	let normalized = value;
+
+	for (const [pattern, replacement] of PDF_TYPOGRAPHY_REPLACEMENTS) {
+		normalized = normalized.replace(pattern, replacement);
+	}
+
+	return normalized;
+}
+
+/**
+ * Applies PDF-safe typography normalization without changing segment ordering
+ * or bold/header semantics.
+ */
+export function normalizePromptSegmentsForPdf(segments: readonly PromptSegment[]): PromptSegment[] {
+	return segments.map(segment => ({
+		...segment,
+		text: normalizePromptTypographyForPdf(segment.text)
+	}));
 }
 
 // ---------------------------------------------------------------------------

@@ -27,7 +27,11 @@
 
 import type { Cell, CellHookData } from "jspdf-autotable";
 import type { PromptSegment } from "@/lib/audit/prompt-segments";
-import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import {
+	normalizePromptSegmentsForPdf,
+	normalizePromptTypographyForPdf,
+	parsePromptSegments
+} from "@/lib/audit/prompt-segments";
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import type { AuditScoreTotals, ExportableAudit, PlayspaceInstrument } from "./types";
 import {
@@ -146,7 +150,7 @@ function segmentsToPlainText(segments: readonly PromptSegment[]): string {
 
 function parsePrompt(raw: string): readonly PromptSegment[] {
 	if (!raw) return [];
-	return parsePromptSegments(raw.replace(/\n/g, " "));
+	return normalizePromptSegmentsForPdf(parsePromptSegments(raw.replace(/\n/g, " ")));
 }
 
 /**
@@ -748,13 +752,17 @@ export async function generatePdfBlob(
 
 		// ── Section title banner ────────────────────────────────────────────
 
-		const sectionLabel = `Section ${sectionIndex + 1}  ·  ${stripPromptMarkup(section.title)}`;
+		const sectionLabel = normalizePromptTypographyForPdf(
+			`Section ${sectionIndex + 1}  ·  ${stripPromptMarkup(section.title)}`
+		);
 		pushBanner(sectionLabel, "bold", AUDIT_PDF_PALETTE.sectionTitleColor, AUDIT_PDF_PALETTE.sectionFill, 9, 5, 3);
 		pdfBodyRowIndex += 1;
 
 		// ── Section description ─────────────────────────────────────────────
 
-		const descriptionPlain = section.description ? stripPromptMarkup(section.description) : "";
+		const descriptionPlain = section.description
+			? normalizePromptTypographyForPdf(stripPromptMarkup(section.description))
+			: "";
 
 		if (descriptionPlain) {
 			pushBanner(
@@ -777,7 +785,9 @@ export async function generatePdfBlob(
 
 		// ── Section instruction ─────────────────────────────────────────────
 
-		const instructionPlain = section.instruction ? stripPromptMarkup(section.instruction) : "";
+		const instructionPlain = section.instruction
+			? normalizePromptTypographyForPdf(stripPromptMarkup(section.instruction))
+			: "";
 
 		if (instructionPlain) {
 			pushBanner(
@@ -800,7 +810,10 @@ export async function generatePdfBlob(
 
 		// ── Section notes prompt ────────────────────────────────────────────
 
-		const notesPlain = typeof section.notes_prompt === "string" ? stripPromptMarkup(section.notes_prompt) : "";
+		const notesPlain =
+			typeof section.notes_prompt === "string"
+				? normalizePromptTypographyForPdf(stripPromptMarkup(section.notes_prompt))
+				: "";
 
 		// Notes prompt is shown here as a banner even if there is no auditor
 		// comment, so the reader knows what was being asked.
@@ -840,7 +853,7 @@ export async function generatePdfBlob(
 			const questionKeyDisplay = formatQuestionKeyForDisplay(question.question_key || "");
 			const modeLabel = formatQuestionModeLabel(question.mode);
 			const constructsLabel = formatConstructLabel(question.constructs);
-			const promptPlain = stripPromptMarkup(question.prompt);
+			const promptPlain = normalizePromptTypographyForPdf(stripPromptMarkup(question.prompt));
 			const promptSegments = parsePrompt(question.prompt);
 
 			// Individual scale answers (cols 4–7)
