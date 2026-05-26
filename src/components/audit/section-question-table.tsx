@@ -187,7 +187,9 @@ function QuestionPrompt({ question, selectedAnswers, disabled, onChangeQuestionN
 				<span className="block text-sm font-bold tracking-[0.04em] text-primary">{t("thisPlayspace")}</span>
 				{promptSegments.map((segment, index) => (
 					<Fragment key={`${question.question_key}-${index.toString()}`}>
-						<span className={segment.bold ? "font-semibold text-primary" : undefined}>{segment.text}</span>
+						<span className={segment.bold ? "font-semibold text-primary" : "font-semibold"}>
+							{segment.text}
+						</span>
 					</Fragment>
 				))}
 			</p>
