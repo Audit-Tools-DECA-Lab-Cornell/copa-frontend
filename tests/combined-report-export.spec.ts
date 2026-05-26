@@ -413,6 +413,9 @@ test.describe("Combined report export", () => {
 		const sharedExportRows = combinedResponseRows.filter(row => row[0] === "Q 1.1");
 		expect(sharedExportRows).toHaveLength(2);
 		expect(sharedExportRows.every(row => String(row[1]) === "Survey + Audit")).toBeTruthy();
+		const checklistExportRows = combinedResponseRows.filter(row => row[0] === "Q 1.1.1");
+		expect(checklistExportRows).toHaveLength(2);
+		expect(checklistExportRows.map(row => String(row[7]))).toEqual(["Swing | Slide", "Swing | Slide"]);
 
 		const fullAssessmentOverviewRows = buildOverviewRows(
 			{
