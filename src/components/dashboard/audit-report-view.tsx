@@ -108,28 +108,28 @@ const SCALE_METRICS: readonly MetricDef[] = [
 	{
 		key: "provision",
 		label: "Provision",
-		shortLabel: "Prov",
+		shortLabel: "Provision",
 		getValue: t => t.provision_total,
 		getMax: t => t.provision_total_max
 	},
 	{
 		key: "diversity",
 		label: "Diversity",
-		shortLabel: "Div",
+		shortLabel: "Diversity",
 		getValue: t => t.diversity_total,
 		getMax: t => t.diversity_total_max
 	},
 	{
 		key: "challenge",
 		label: "Challenge",
-		shortLabel: "Chal",
+		shortLabel: "Challenge",
 		getValue: t => t.challenge_total,
 		getMax: t => t.challenge_total_max
 	},
 	{
 		key: "sociability",
 		label: "Sociability",
-		shortLabel: "Soc",
+		shortLabel: "Sociability",
 		getValue: t => t.sociability_total,
 		getMax: t => t.sociability_total_max
 	}
@@ -383,16 +383,16 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 							Item
 						</th>
 						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Prov
+							Provision
 						</th>
 						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Div
+							Diversity
 						</th>
 						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Chal
+							Challenge
 						</th>
 						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Soc
+							Sociability
 						</th>
 						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-primary">
 							PV
@@ -510,7 +510,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className="text-base">Best & Worst Scored Domains</CardTitle>
+				<CardTitle className="text-base">Highest & Lowest Scored Domains</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{rankings.length === 0 ? (
@@ -532,7 +532,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 												<div className="mb-1 flex items-center gap-1.5">
 													<div className="size-2 rounded-full bg-emerald-500" />
 													<span className="text-xs font-bold text-muted-foreground">
-														Best Scored
+														Highest Scored
 													</span>
 												</div>
 												{ranking?.bestDomain !== null && ranking?.bestDomain !== undefined ? (
@@ -557,7 +557,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 												<div className="mb-1 flex items-center gap-1.5">
 													<div className="size-2 rounded-full bg-rose-500" />
 													<span className="text-xs font-bold text-muted-foreground">
-														Worst Scored
+														Lowest Scored
 													</span>
 												</div>
 												{ranking?.worstDomain !== null && ranking?.worstDomain !== undefined ? (
