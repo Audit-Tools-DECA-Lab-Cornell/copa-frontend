@@ -31,6 +31,11 @@ import {
 	roundedPercentOfMax
 } from "@/lib/audit/report-helpers";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import {
+	getCombinedReportLegend,
+	REPORT_SOURCE_STYLES,
+	type ReportSourceComponent
+} from "@/lib/audit/report-source-sessions";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -355,95 +360,119 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 		return <p className="text-xs text-muted-foreground italic">No item-level data available.</p>;
 	}
 
-	return (
-		<div className="overflow-x-auto rounded-md border border-border">
-			<table className="w-full min-w-[800px] border-collapse text-xs">
-				<thead>
-					<tr className="bg-muted/60">
-						<th className="w-16 border-b border-r border-border px-3 py-2 text-left font-bold text-muted-foreground">
-							ID
-						</th>
-						<th className="border-b border-r border-border px-3 py-2 text-left font-bold text-muted-foreground">
-							Item
-						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Prov
-						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Div
-						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Chal
-						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
-							Soc
-						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-primary">
-							PV
-						</th>
-						<th className="w-20 border-b border-border px-3 py-2 text-center font-bold text-primary">U</th>
-					</tr>
-				</thead>
-				<tbody>
-					{questions.map((q, idx) => {
-						const idParts = q.questionKey.match(/\d+/g);
-						const formattedId = idParts !== null ? idParts.join(".") : String(idx + 1);
+	const hasSourceLegend = questions.some(question => question.sourceComponent !== null);
 
-						return (
-							<tr key={q.questionKey} className={idx % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-								<td className="border-r border-border px-3 py-2 font-mono tabular-nums text-muted-foreground">
-									{formattedId}
-								</td>
-								<td
-									className="border-r border-border px-3 py-2 text-foreground"
-									style={{ maxWidth: 360 }}>
-									<span className="line-clamp-2">
-										{parsePromptSegments(q.questionText).map((segment, index) => (
-											<React.Fragment key={`${q.questionKey}-seg-${index.toString()}`}>
-												<span className={segment.bold ? "font-semibold" : undefined}>
-													{segment.text}
-												</span>
-											</React.Fragment>
-										))}
-									</span>
-									{q.checklistAnswerLabel !== null ? (
-										<p className="mt-1.5 rounded-sm border border-border/60 bg-muted/40 px-2 py-1 text-[11px] leading-4 text-muted-foreground">
-											<span className="font-semibold text-foreground">Selected: </span>
-											{q.checklistAnswerLabel}
-										</p>
-									) : null}
-								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
-									{q.provisionLabel ?? "—"}
-								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
-									{q.diversityLabel ?? "—"}
-								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
-									{!q.challengeApplicable ? (
-										<span className="text-muted-foreground/50">N/A</span>
-									) : (
-										(q.challengeLabel ?? "—")
-									)}
-								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
-									{q.sociabilityLabel ?? "—"}
-								</td>
-								<td className="border-r border-border px-3 py-2 text-center font-mono tabular-nums">
-									{q.playValueScore !== null && q.playValueMax !== null
-										? `${q.playValueScore}/${q.playValueMax}`
-										: "—"}
-								</td>
-								<td className="px-3 py-2 text-center font-mono tabular-nums">
-									{q.usabilityScore !== null && q.usabilityMax !== null
-										? `${q.usabilityScore}/${q.usabilityMax}`
-										: "—"}
-								</td>
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
+	function getQuestionSourceCellClassName(sourceComponent: ReportSourceComponent | null): string {
+		if (sourceComponent === null) {
+			return "";
+		}
+		return REPORT_SOURCE_STYLES[sourceComponent].cssClassName;
+	}
+
+	return (
+		<div className="space-y-2">
+			{hasSourceLegend ? <p className="text-[11px] text-muted-foreground">{getCombinedReportLegend()}</p> : null}
+			<div className="overflow-x-auto rounded-md border border-border">
+				<table className="w-full min-w-[800px] border-collapse text-xs">
+					<thead>
+						<tr className="bg-muted/60">
+							<th className="w-16 border-b border-r border-border px-3 py-2 text-left font-bold text-muted-foreground">
+								ID
+							</th>
+							<th className="border-b border-r border-border px-3 py-2 text-left font-bold text-muted-foreground">
+								Item
+							</th>
+							<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+								Prov
+							</th>
+							<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+								Div
+							</th>
+							<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+								Chal
+							</th>
+							<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+								Soc
+							</th>
+							<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-primary">
+								PV
+							</th>
+							<th className="w-20 border-b border-border px-3 py-2 text-center font-bold text-primary">
+								U
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{questions.map((q, idx) => {
+							const idParts = q.questionKey.match(/\d+/g);
+							const formattedId = idParts !== null ? idParts.join(".") : String(idx + 1);
+
+							return (
+								<tr key={q.rowKey} className={idx % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+									<td className="border-r border-border px-3 py-2 font-mono tabular-nums text-muted-foreground">
+										{formattedId}
+									</td>
+									<td
+										className={cn(
+											"border-r border-border px-3 py-2 text-foreground",
+											getQuestionSourceCellClassName(q.sourceComponent)
+										)}
+										style={{ maxWidth: 360 }}>
+										{q.sourceLabel !== null ? (
+											<div className="mb-1.5">
+												<Badge variant="outline" className="text-[10px]">
+													{q.sourceLabel}
+												</Badge>
+											</div>
+										) : null}
+										<span className="line-clamp-2">
+											{parsePromptSegments(q.questionText).map((segment, index) => (
+												<React.Fragment key={`${q.questionKey}-seg-${index.toString()}`}>
+													<span className={segment.bold ? "font-semibold" : undefined}>
+														{segment.text}
+													</span>
+												</React.Fragment>
+											))}
+										</span>
+										{q.checklistAnswerLabel !== null ? (
+											<p className="mt-1.5 rounded-sm border border-border/60 bg-muted/40 px-2 py-1 text-[11px] leading-4 text-muted-foreground">
+												<span className="font-semibold text-foreground">Selected: </span>
+												{q.checklistAnswerLabel}
+											</p>
+										) : null}
+									</td>
+									<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+										{q.provisionLabel ?? "—"}
+									</td>
+									<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+										{q.diversityLabel ?? "—"}
+									</td>
+									<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+										{!q.challengeApplicable ? (
+											<span className="text-muted-foreground/50">N/A</span>
+										) : (
+											(q.challengeLabel ?? "—")
+										)}
+									</td>
+									<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+										{q.sociabilityLabel ?? "—"}
+									</td>
+									<td className="border-r border-border px-3 py-2 text-center font-mono tabular-nums">
+										{q.playValueScore !== null && q.playValueMax !== null
+											? `${q.playValueScore}/${q.playValueMax}`
+											: "—"}
+									</td>
+									<td className="px-3 py-2 text-center font-mono tabular-nums">
+										{q.usabilityScore !== null && q.usabilityMax !== null
+											? `${q.usabilityScore}/${q.usabilityMax}`
+											: "—"}
+									</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	);
 }

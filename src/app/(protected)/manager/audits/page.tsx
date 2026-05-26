@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
+import { buildAuditorNameLookup } from "@/components/dashboard/auditor-display";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
@@ -142,6 +143,19 @@ export default function ManagerAuditsPage() {
 		}));
 	}, [auditorsQuery.data]);
 
+	/**
+	 * Reuse the already-loaded manager auditors list so the table can display
+	 * names without issuing per-row lookup requests.
+	 */
+	const auditorNameLookup = React.useMemo(() => {
+		return buildAuditorNameLookup(
+			(auditorsQuery.data ?? []).map((auditor: AuditorSummary) => ({
+				auditorCode: auditor.auditor_code,
+				fullName: auditor.full_name
+			}))
+		);
+	}, [auditorsQuery.data]);
+
 	const auditsQuery = useQuery({
 		queryKey: [
 			"playspace",
@@ -253,6 +267,7 @@ export default function ManagerAuditsPage() {
 		auditCode: audit.audit_code,
 		status: audit.status,
 		auditorCode: audit.auditor_code,
+		auditorDisplayName: auditorNameLookup.get(audit.auditor_code) ?? null,
 		projectName: audit.project_name,
 		projectId: audit.project_id,
 		placeName: audit.place_name,

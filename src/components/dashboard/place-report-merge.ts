@@ -1,4 +1,5 @@
-import type { AuditSession, ScoreTotals } from "../../lib/api/playspace-types";
+import type { AuditSession, ScoreTotals } from "@/lib/api/playspace-types";
+import type { CombinedReportSources } from "@/lib/audit/report-source-sessions";
 
 /**
  * Add two score-total objects together field by field.
@@ -63,7 +64,7 @@ export function mergeAuditSessions(auditSession: AuditSession, surveySession: Au
 			? addScoreTotals(auditTotals, surveyTotals)
 			: (auditTotals ?? surveyTotals ?? null);
 
-	return {
+	const mergedSession: AuditSession & { readonly report_sources: CombinedReportSources } = {
 		...auditSession,
 		selected_execution_mode: "both",
 		meta: { ...auditSession.meta, execution_mode: "both" },
@@ -82,6 +83,12 @@ export function mergeAuditSessions(auditSession: AuditSession, surveySession: Au
 			by_domain: mergedByDomain,
 			by_section: mergedBySection
 		},
-		status: "SUBMITTED"
+		status: "SUBMITTED",
+		report_sources: {
+			audit: auditSession,
+			survey: surveySession
+		}
 	};
+
+	return mergedSession;
 }

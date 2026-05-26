@@ -36,19 +36,18 @@ import {
 	formatConstructLabel,
 	formatExecutionModeLabel,
 	formatQuestionAnswer,
-	formatQuestionModeLabel,
+	formatQuestionModeWithSource,
 	formatScoreValue,
 	formatTimestampForDisplay,
-	resolveExecutionMode,
 	stripPromptMarkup
 } from "./format-utils";
+import { buildVisibleQuestionEntries } from "@/lib/audit/report-helpers";
 import {
-	addScoreTotals,
-	calculateQuestionScores,
-	createEmptyScoreTotals,
-	deriveSummaryScore,
-	isQuestionVisible
-} from "./score-utils";
+	getCombinedReportLegend,
+	getCombinedReportSources,
+	REPORT_SOURCE_STYLES
+} from "@/lib/audit/report-source-sessions";
+import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
 
 // ── Palette (matches instrument-pdf.ts PALETTE / MOBILE_EXPORT_PALETTE) ──────
 
@@ -263,6 +262,7 @@ export async function generatePdfBlob(
 
 	const { auditSession, context, auditorProfile } = exportableAudit;
 	const overallScores = auditSession.scores.overall;
+	const combinedSources = getCombinedReportSources(auditSession);
 
 	// ── Page 1: summary (portrait) ────────────────────────────────────────────
 
@@ -527,6 +527,25 @@ export async function generatePdfBlob(
 	doc.setTextColor(...AUDIT_PDF_PALETTE.headerFill);
 	doc.text(`${auditSession.audit_code} — ${auditSession.place_name} — PVUA Response Matrix`, pdfMargin.left, 14);
 
+	if (combinedSources !== null) {
+		const legendTop = 16.5;
+		const boxSize = 3.2;
+		doc.setFillColor(...REPORT_SOURCE_STYLES.audit.rgb);
+		doc.rect(pdfMargin.left, legendTop, boxSize, boxSize, "F");
+		doc.setFontSize(7.5);
+		doc.setTextColor(...AUDIT_PDF_PALETTE.bodyText);
+		doc.text("Place Audit source", pdfMargin.left + boxSize + 1.2, legendTop + 2.7);
+
+		const surveyLegendX = pdfMargin.left + 33;
+		doc.setFillColor(...REPORT_SOURCE_STYLES.survey.rgb);
+		doc.rect(surveyLegendX, legendTop, boxSize, boxSize, "F");
+		doc.text("Place Survey source", surveyLegendX + boxSize + 1.2, legendTop + 2.7);
+
+		doc.setFontSize(6.5);
+		doc.setTextColor(...AUDIT_PDF_PALETTE.mutedText);
+		doc.text(getCombinedReportLegend(), pdfMargin.left, legendTop + 7);
+	}
+
 	// Rich-cell tracking (same mechanism as instrument-pdf.ts)
 	const pdfRichCells = new Map<string, PdfRichCell>();
 	const savedCellLines = new Map<string, string[]>();
@@ -628,8 +647,6 @@ export async function generatePdfBlob(
 	let pdfBodyRowIndex = 0;
 	let questionRowIndex = 0;
 
-	const executionMode = resolveExecutionMode(auditSession);
-
 	/**
 	 * Pushes a full-width banner row (colSpan = COL_COUNT).
 	 * Used for section headers, descriptions, instructions, notes, and score
@@ -661,12 +678,9 @@ export async function generatePdfBlob(
 	}
 
 	for (const [sectionIndex, section] of instrument.sections.entries()) {
-		const sectionResponses = auditSession.sections[section.section_key]?.responses ?? {};
-		const visibleQuestions = section.questions.filter(q => isQuestionVisible(q, executionMode, sectionResponses));
+		const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
 
-		if (visibleQuestions.length === 0) continue;
-
-		const sectionState = auditSession.sections[section.section_key];
+		if (visibleEntries.length === 0) continue;
 		let sectionTotals = createEmptyScoreTotals();
 
 		// ── Section title banner ────────────────────────────────────────────
@@ -748,16 +762,20 @@ export async function generatePdfBlob(
 
 		// ── Question rows ───────────────────────────────────────────────────
 
-		for (const question of visibleQuestions) {
-			const answers = sectionState?.responses[question.question_key] ?? {};
+		for (const visibleEntry of visibleEntries) {
+			const { question, answers, sourceComponent } = visibleEntry;
 			const scores = calculateQuestionScores(question, answers);
 			sectionTotals = addScoreTotals(sectionTotals, scores);
 
 			const isEven = questionRowIndex % 2 === 0;
 			const rowFill = isEven ? AUDIT_PDF_PALETTE.rowEven : AUDIT_PDF_PALETTE.rowOdd;
+			const promptFill =
+				sourceComponent === null
+					? rowFill
+					: ([...REPORT_SOURCE_STYLES[sourceComponent].rgb] as [number, number, number]);
 
 			const questionKeyDisplay = formatQuestionKeyForDisplay(question.question_key || "");
-			const modeLabel = formatQuestionModeLabel(question.mode);
+			const modeLabel = formatQuestionModeWithSource(question.mode, sourceComponent);
 			const constructsLabel = formatConstructLabel(question.constructs);
 			const promptPlain = stripPromptMarkup(question.prompt);
 			const promptSegments = parsePrompt(question.prompt);
@@ -824,7 +842,7 @@ export async function generatePdfBlob(
 				},
 				{
 					content: promptPlain,
-					styles: { fillColor: rowFill, textColor: AUDIT_PDF_PALETTE.bodyText, fontSize: 7 }
+					styles: { fillColor: promptFill, textColor: AUDIT_PDF_PALETTE.bodyText, fontSize: 7 }
 				},
 				{
 					content: provisionAnswer,
@@ -895,17 +913,35 @@ export async function generatePdfBlob(
 		// Always rendered — blank when the auditor left no note, so there is
 		// always a visual gap between the last question and the score rows.
 
-		const sectionNote = sectionState?.note ?? "";
-		pushBanner(
-			sectionNote.trim().length > 0 ? `Auditor Note: ${sectionNote.trim()}` : "",
-			"italic",
-			AUDIT_PDF_PALETTE.sectionNotesColor,
-			AUDIT_PDF_PALETTE.sectionFill,
-			7,
-			2,
-			2
-		);
-		pdfBodyRowIndex += 1;
+		if (combinedSources === null) {
+			const sectionNote = auditSession.sections[section.section_key]?.note ?? "";
+			pushBanner(
+				sectionNote.trim().length > 0 ? `Auditor Note: ${sectionNote.trim()}` : "",
+				"italic",
+				AUDIT_PDF_PALETTE.sectionNotesColor,
+				AUDIT_PDF_PALETTE.sectionFill,
+				7,
+				2,
+				2
+			);
+			pdfBodyRowIndex += 1;
+		} else {
+			(["audit", "survey"] as const).forEach(sourceComponent => {
+				const sectionNote = combinedSources[sourceComponent].sections[section.section_key]?.note ?? "";
+				pushBanner(
+					sectionNote.trim().length > 0
+						? `Auditor Note (${REPORT_SOURCE_STYLES[sourceComponent].label}): ${sectionNote.trim()}`
+						: "",
+					"italic",
+					AUDIT_PDF_PALETTE.sectionNotesColor,
+					AUDIT_PDF_PALETTE.sectionFill,
+					7,
+					2,
+					2
+				);
+				pdfBodyRowIndex += 1;
+			});
+		}
 
 		// ── Section score summary rows ───────────────────────────────────────
 		// Three structured rows — Total / Max / % — each value aligned under
@@ -923,15 +959,13 @@ export async function generatePdfBlob(
 		// a mutable outer var through the loop).
 		let overallTotals = createEmptyScoreTotals();
 		for (const section of instrument.sections) {
-			const sectionResponses = auditSession.sections[section.section_key]?.responses ?? {};
-			const visibleQuestions = section.questions.filter(q =>
-				isQuestionVisible(q, executionMode, sectionResponses)
-			);
-			if (visibleQuestions.length === 0) continue;
-			const sectionState = auditSession.sections[section.section_key];
-			for (const question of visibleQuestions) {
-				const answers = sectionState?.responses[question.question_key] ?? {};
-				overallTotals = addScoreTotals(overallTotals, calculateQuestionScores(question, answers));
+			const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
+			if (visibleEntries.length === 0) continue;
+			for (const visibleEntry of visibleEntries) {
+				overallTotals = addScoreTotals(
+					overallTotals,
+					calculateQuestionScores(visibleEntry.question, visibleEntry.answers)
+				);
 			}
 		}
 
@@ -949,7 +983,7 @@ export async function generatePdfBlob(
 	autoTable(doc, {
 		head: [Array.from(RESPONSE_HEADERS)],
 		body,
-		startY: 20,
+		startY: combinedSources === null ? 20 : 26,
 
 		willDrawCell: (data: CellHookData) => {
 			if (data.section !== "body") return;

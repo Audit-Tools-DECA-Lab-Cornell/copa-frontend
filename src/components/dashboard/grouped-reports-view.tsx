@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 import type { AuditActivityRow } from "./audits-table";
+import { getAuditorTableLabel } from "./auditor-display";
 import { BuildPlaceReportDialogView } from "./build-place-report-dialog";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 import { Badge } from "@/components/ui/badge";
@@ -152,6 +153,7 @@ function buildPlaceGroups(rows: AuditActivityRow[]): PlaceGroup[] {
 				.flatMap(row => [
 					row.auditCode,
 					row.auditorCode,
+					row.auditorDisplayName,
 					row.accountName,
 					getProjectName(row),
 					getPlaceName(row),
@@ -416,7 +418,15 @@ function PlaceSubmissionTable({
 										<span className="text-sm text-muted-foreground">—</span>
 									)}
 								</TableCell>
-								<TableCell className="py-3 font-mono text-sm">{row.auditorCode}</TableCell>
+								<TableCell className="py-3 text-sm">
+									{row.auditorDisplayName ? (
+										<span className="font-medium text-foreground">
+											{getAuditorTableLabel(row.auditorCode, row.auditorDisplayName)}
+										</span>
+									) : (
+										<span className="font-mono">{row.auditorCode}</span>
+									)}
+								</TableCell>
 								<TableCell className="py-3 text-sm text-muted-foreground">
 									{formatDateTimeLabel(row.submittedAt, fallbackText)}
 								</TableCell>
@@ -622,7 +632,10 @@ export function GroupedReportsView({
 						</p>
 						<p className="text-xs text-muted-foreground">
 							{row.original.latestSubmittedRow
-								? `Latest auditor ${row.original.latestSubmittedRow.auditorCode}`
+								? `Latest auditor ${getAuditorTableLabel(
+										row.original.latestSubmittedRow.auditorCode,
+										row.original.latestSubmittedRow.auditorDisplayName
+									)}`
 								: "No submitted reports yet"}
 						</p>
 					</div>

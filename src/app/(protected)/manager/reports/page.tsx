@@ -6,6 +6,7 @@ import { XIcon } from "lucide-react";
 
 import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
+import { buildAuditorNameLookup } from "@/components/dashboard/auditor-display";
 import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -96,6 +97,19 @@ export default function ManagerReportsPage() {
 		[auditorsQuery.data]
 	);
 
+	/**
+	 * Build one lookup from the manager's existing auditors query so the grouped
+	 * reports table can show names without any extra round-trips.
+	 */
+	const auditorNameLookup = React.useMemo(() => {
+		return buildAuditorNameLookup(
+			(auditorsQuery.data ?? []).map((auditor: AuditorSummary) => ({
+				auditorCode: auditor.auditor_code,
+				fullName: auditor.full_name
+			}))
+		);
+	}, [auditorsQuery.data]);
+
 	const rows = React.useMemo(
 		() =>
 			(reportsQuery.data?.items ?? []).map(audit => ({
@@ -103,6 +117,7 @@ export default function ManagerReportsPage() {
 				auditCode: audit.audit_code,
 				status: audit.status,
 				auditorCode: audit.auditor_code,
+				auditorDisplayName: auditorNameLookup.get(audit.auditor_code) ?? null,
 				placeName: audit.place_name,
 				placeId: audit.place_id,
 				projectName: audit.project_name,
@@ -114,7 +129,7 @@ export default function ManagerReportsPage() {
 				score: audit.summary_score,
 				scorePair: audit.score_pair
 			})),
-		[reportsQuery.data]
+		[auditorNameLookup, reportsQuery.data]
 	);
 
 	const hasActiveFilters =

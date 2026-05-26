@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
+import { getAuditorTableLabel } from "@/components/dashboard/auditor-display";
 
 import { DataTable, getMultiValueFilterFn } from "./data-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
@@ -22,6 +23,7 @@ export interface AuditActivityRow {
 	auditCode: string;
 	status: string;
 	auditorCode: string;
+	auditorDisplayName?: string | null;
 	placeName?: string | null;
 	placeId?: string | null;
 	projectName?: string | null;
@@ -65,6 +67,7 @@ export interface AuditsTableProps {
 interface AuditIdentityCellProps {
 	auditCode: string;
 	auditorCode: string;
+	auditorDisplayName?: string | null;
 	placeName?: string | null;
 	projectName?: string | null;
 	accountName?: string | null;
@@ -77,6 +80,7 @@ interface AuditIdentityCellProps {
 function AuditIdentityCell({
 	auditCode,
 	auditorCode,
+	auditorDisplayName,
 	placeName,
 	projectName,
 	accountName,
@@ -86,6 +90,7 @@ function AuditIdentityCell({
 	const [isCopied, setIsCopied] = React.useState(false);
 	const resetTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 	const primaryLabel = placeName ?? projectName ?? accountName ?? auditCode;
+	const auditorLabel = getAuditorTableLabel(auditorCode, auditorDisplayName);
 	const lineage = [accountName, projectName]
 		.filter((value): value is string => Boolean(value && value.trim().length > 0))
 		.join(" · ");
@@ -147,7 +152,12 @@ function AuditIdentityCell({
 				</Button>
 			</div>
 			<p className="text-sm text-muted-foreground">
-				{t("auditorLabel")} <span className="font-mono text-foreground tracking-[0.04em]">{auditorCode}</span>
+				{t("auditorLabel")}{" "}
+				{auditorDisplayName ? (
+					<span className="font-medium text-foreground">{auditorLabel}</span>
+				) : (
+					<span className="font-mono text-foreground tracking-[0.04em]">{auditorLabel}</span>
+				)}
 			</p>
 		</div>
 	);
@@ -187,7 +197,14 @@ export function AuditsTable({
 			{
 				id: "audit_code",
 				accessorFn: row =>
-					[row.auditCode, row.auditorCode, row.placeName, row.projectName, row.accountName]
+					[
+						row.auditCode,
+						row.auditorCode,
+						row.auditorDisplayName,
+						row.placeName,
+						row.projectName,
+						row.accountName
+					]
 						.filter(Boolean)
 						.join(" "),
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.audit")} />,
@@ -195,6 +212,7 @@ export function AuditsTable({
 					<AuditIdentityCell
 						auditCode={row.original.auditCode}
 						auditorCode={row.original.auditorCode}
+						auditorDisplayName={row.original.auditorDisplayName}
 						placeName={row.original.placeName}
 						projectName={row.original.projectName}
 						accountName={row.original.accountName}

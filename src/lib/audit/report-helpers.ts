@@ -1,12 +1,18 @@
 import type {
 	AuditScoreTotals,
 	AuditSession,
+	InstrumentSection,
 	InstrumentQuestion,
 	PlayspaceInstrument,
 	QuestionResponsePayload,
 	QuestionScale,
 	ScaleOption
 } from "@/types/audit";
+import {
+	getCombinedReportSources,
+	getReportSourceLabel,
+	type ReportSourceComponent
+} from "@/lib/audit/report-source-sessions";
 
 // ---------------------------------------------------------------------------
 // Exported interfaces
@@ -28,8 +34,11 @@ export interface DomainReportRow {
  * One instrument question row for the extended report items table.
  */
 export interface DomainQuestionRow {
+	readonly rowKey: string;
 	readonly questionKey: string;
 	readonly questionText: string;
+	readonly sourceComponent: ReportSourceComponent | null;
+	readonly sourceLabel: string | null;
 	readonly provisionLabel: string | null;
 	readonly diversityLabel: string | null;
 	/** When `false`, the challenge column must show N/A (scale not present on question). */
@@ -41,6 +50,18 @@ export interface DomainQuestionRow {
 	readonly usabilityScore: number | null;
 	readonly usabilityMax: number | null;
 	readonly checklistAnswerLabel: string | null;
+}
+
+/**
+ * One visible question row resolved against either a full-assessment session or one
+ * source session inside a combined place report.
+ */
+export interface VisibleQuestionEntry {
+	readonly rowKey: string;
+	readonly question: InstrumentQuestion;
+	readonly answers: QuestionResponsePayload;
+	readonly sourceComponent: ReportSourceComponent | null;
+	readonly sourceLabel: string | null;
 }
 
 /**
@@ -333,7 +354,11 @@ function formatChecklistAnswerLabel(question: InstrumentQuestion, answers: Quest
 	return labels.length > 0 ? labels.join(" | ") : null;
 }
 
-function buildDomainQuestionRow(question: InstrumentQuestion, answers: QuestionResponsePayload): DomainQuestionRow {
+function buildDomainQuestionRow(
+	question: InstrumentQuestion,
+	answers: QuestionResponsePayload,
+	sourceComponent: ReportSourceComponent | null
+): DomainQuestionRow {
 	const scores = calculateQuestionScores(question, answers);
 	const provisionLabel = resolveScaleOptionLabel(question, "provision", readStringAnswer(answers, "provision"));
 	const diversityLabel = resolveScaleOptionLabel(question, "diversity", readStringAnswer(answers, "diversity"));
@@ -348,8 +373,11 @@ function buildDomainQuestionRow(question: InstrumentQuestion, answers: QuestionR
 	const usabilityMax = scores.usability_total_max;
 
 	return {
+		rowKey: buildQuestionRowKey(question.question_key, sourceComponent),
 		questionKey: question.question_key,
 		questionText: question.prompt,
+		sourceComponent,
+		sourceLabel: sourceComponent === null ? null : getReportSourceLabel(sourceComponent),
 		provisionLabel,
 		diversityLabel,
 		challengeApplicable,
@@ -364,11 +392,32 @@ function buildDomainQuestionRow(question: InstrumentQuestion, answers: QuestionR
 	};
 }
 
+function compareReportSourceComponents(
+	left: ReportSourceComponent | null,
+	right: ReportSourceComponent | null
+): number {
+	const order: Record<ReportSourceComponent, number> = {
+		audit: 0,
+		survey: 1
+	};
+	if (left === right) {
+		return 0;
+	}
+	if (left === null) {
+		return -1;
+	}
+	if (right === null) {
+		return 1;
+	}
+	return order[left] - order[right];
+}
+
 function collectSectionNote(
 	auditSession: AuditSession,
 	sectionKey: string,
 	sectionIndex: number,
-	sectionTitle: string
+	sectionTitle: string,
+	sourceLabel: string | null
 ): string | null {
 	const sectionState = auditSession.aggregate.sections[sectionKey];
 	const raw = sectionState?.note;
@@ -379,13 +428,15 @@ function collectSectionNote(
 	if (trimmed.length === 0) {
 		return null;
 	}
-	return `${sectionIndex}. ${sectionTitle}: ${trimmed}`;
+	const sourceSuffix = sourceLabel === null ? "" : ` (${sourceLabel})`;
+	return `${sectionIndex}. ${sectionTitle}${sourceSuffix}: ${trimmed}`;
 }
 
 function collectQuestionNote(
 	question: InstrumentQuestion,
 	answers: QuestionResponsePayload,
-	sectionIndex: number
+	sectionIndex: number,
+	sourceLabel: string | null
 ): string | null {
 	const raw = answers.question_note;
 	if (typeof raw !== "string") {
@@ -395,7 +446,9 @@ function collectQuestionNote(
 	if (trimmed.length === 0) {
 		return null;
 	}
-	return `${sectionIndex}.${parseQuestionKeyParts(question.question_key).at(-1) ?? "?"} ${question.prompt.replaceAll("**", "")}: ${trimmed}`;
+	const questionIdentifier = `${sectionIndex}.${parseQuestionKeyParts(question.question_key).at(-1) ?? "?"}`;
+	const sourcePrefix = sourceLabel === null ? "" : `${sourceLabel} `;
+	return `${questionIdentifier} ${sourcePrefix}${question.prompt.replaceAll("**", "")}: ${trimmed}`;
 }
 
 function parseQuestionKeyParts(questionKey: string): number[] {
@@ -404,6 +457,13 @@ function parseQuestionKeyParts(questionKey: string): number[] {
 		return [];
 	}
 	return matches.map(part => Number.parseInt(part, 10)).filter(value => Number.isFinite(value));
+}
+
+function buildQuestionRowKey(questionKey: string, sourceComponent: ReportSourceComponent | null): string {
+	if (sourceComponent === null) {
+		return questionKey;
+	}
+	return `${questionKey}::${sourceComponent}`;
 }
 
 function compareQuestionRowsByIdentifier(a: DomainQuestionRow, b: DomainQuestionRow): number {
@@ -428,7 +488,17 @@ function compareQuestionRowsByIdentifier(a: DomainQuestionRow, b: DomainQuestion
 		}
 	}
 
-	return a.questionKey.localeCompare(b.questionKey);
+	const byQuestionKey = a.questionKey.localeCompare(b.questionKey);
+	if (byQuestionKey !== 0) {
+		return byQuestionKey;
+	}
+
+	const bySource = compareReportSourceComponents(a.sourceComponent, b.sourceComponent);
+	if (bySource !== 0) {
+		return bySource;
+	}
+
+	return a.rowKey.localeCompare(b.rowKey);
 }
 
 // ---------------------------------------------------------------------------
@@ -472,28 +542,54 @@ export function resolveScaleOptionLabel(
 	return option?.label ?? null;
 }
 
-/**
- * Return distinct non-empty domain keys for a question, preserving instrument order.
- * Questions may list multiple domains; each is included once.
- *
- * @param question - Instrument question with a `domains` array.
- * @returns Normalized domain keys in first-seen order.
- */
-export function getQuestionDomainKeys(question: InstrumentQuestion): string[] {
+function resolveQuestionDomainKeys(
+	question: InstrumentQuestion,
+	questionLookup: Readonly<Record<string, InstrumentQuestion>> | undefined,
+	visitedQuestionKeys: Set<string>
+): string[] {
 	const ordered: string[] = [];
 	const seen = new Set<string>();
 	question.domains.forEach(domainKey => {
 		const normalized = normalizeDomainKey(domainKey);
-		if (normalized.length === 0) {
-			return;
-		}
-		if (seen.has(normalized)) {
+		if (normalized.length === 0 || seen.has(normalized)) {
 			return;
 		}
 		seen.add(normalized);
 		ordered.push(normalized);
 	});
-	return ordered;
+	if (ordered.length > 0) {
+		return ordered;
+	}
+
+	const parentQuestionKey = question.display_if?.question_key;
+	if (questionLookup === undefined || parentQuestionKey === undefined || visitedQuestionKeys.has(parentQuestionKey)) {
+		return ordered;
+	}
+
+	const parentQuestion = questionLookup[parentQuestionKey];
+	if (parentQuestion === undefined) {
+		return ordered;
+	}
+
+	const nextVisitedQuestionKeys = new Set(visitedQuestionKeys);
+	nextVisitedQuestionKeys.add(parentQuestionKey);
+	return resolveQuestionDomainKeys(parentQuestion, questionLookup, nextVisitedQuestionKeys);
+}
+
+/**
+ * Return distinct non-empty domain keys for a question, preserving instrument order.
+ * Questions may list multiple domains; each is included once.
+ *
+ * @param question - Instrument question with a `domains` array.
+ * @param questionLookup - Optional lookup used when a domain-less child question
+ * inherits its domain assignment from a conditional parent question.
+ * @returns Normalized domain keys in first-seen order.
+ */
+export function getQuestionDomainKeys(
+	question: InstrumentQuestion,
+	questionLookup?: Readonly<Record<string, InstrumentQuestion>>
+): string[] {
+	return resolveQuestionDomainKeys(question, questionLookup, new Set([question.question_key]));
 }
 
 /**
@@ -505,13 +601,18 @@ export function getQuestionDomainKeys(question: InstrumentQuestion): string[] {
  * @returns Number of unique scaled questions with assigned domains.
  */
 export function countUniqueScaledQuestionsWithDomains(instrument: PlayspaceInstrument): number {
+	const questionLookup = Object.fromEntries(
+		instrument.sections.flatMap(section =>
+			section.questions.map(question => [question.question_key, question] as const)
+		)
+	) as Readonly<Record<string, InstrumentQuestion>>;
 	const questionKeys = new Set<string>();
 	instrument.sections.forEach(section => {
 		section.questions.forEach(question => {
 			if (question.question_type !== "scaled") {
 				return;
 			}
-			if (getQuestionDomainKeys(question).length === 0) {
+			if (getQuestionDomainKeys(question, questionLookup).length === 0) {
 				return;
 			}
 			questionKeys.add(question.question_key);
@@ -520,22 +621,110 @@ export function countUniqueScaledQuestionsWithDomains(instrument: PlayspaceInstr
 	return questionKeys.size;
 }
 
+function resolveExecutionMode(auditSession: AuditSession): "audit" | "survey" | "both" | null {
+	return auditSession.selected_execution_mode ?? auditSession.meta.execution_mode;
+}
+
 /**
- * Determine whether an instrument question is applicable to a given execution mode.
- * Mirrors the backend `_get_visible_questions` mode-gate logic.
- *
- * @param questionMode - The mode field on the instrument question ("audit" | "survey" | "both").
- * @param executionMode - The submission's execution mode, or null when not set.
- * @returns `true` when the question should be shown for the given execution mode.
+ * Mirrors the execution/runtime question visibility rules, including conditional children.
  */
-function isQuestionApplicableToMode(
-	questionMode: "audit" | "survey" | "both",
-	executionMode: "audit" | "survey" | "both" | null
+function isQuestionVisibleForSession(
+	question: InstrumentQuestion,
+	executionMode: "audit" | "survey" | "both" | null,
+	sectionResponses: Record<string, QuestionResponsePayload>
 ): boolean {
-	if (executionMode === null || executionMode === "both") {
+	if (
+		executionMode !== null &&
+		executionMode !== "both" &&
+		question.mode !== "both" &&
+		question.mode !== executionMode
+	) {
+		return false;
+	}
+
+	if (question.display_if === null || question.display_if === undefined) {
 		return true;
 	}
-	return questionMode === "both" || questionMode === executionMode;
+
+	const parentAnswers = sectionResponses[question.display_if.question_key];
+	if (parentAnswers === undefined) {
+		return false;
+	}
+
+	const selectedValue = parentAnswers[question.display_if.response_key];
+	if (typeof selectedValue === "string") {
+		return question.display_if.any_of_option_keys.includes(selectedValue);
+	}
+
+	if (Array.isArray(selectedValue)) {
+		return selectedValue.some(
+			entry => typeof entry === "string" && question.display_if?.any_of_option_keys.includes(entry)
+		);
+	}
+
+	return false;
+}
+
+function buildVisibleQuestionEntriesForSession(
+	auditSession: AuditSession,
+	section: InstrumentSection,
+	sourceComponent: ReportSourceComponent | null
+): VisibleQuestionEntry[] {
+	const sectionState = auditSession.aggregate.sections[section.section_key];
+	const sectionResponses = sectionState?.responses ?? {};
+	const executionMode = resolveExecutionMode(auditSession);
+	const visibleEntries: VisibleQuestionEntry[] = [];
+
+	section.questions.forEach(question => {
+		if (!isQuestionVisibleForSession(question, executionMode, sectionResponses)) {
+			return;
+		}
+		visibleEntries.push({
+			rowKey: buildQuestionRowKey(question.question_key, sourceComponent),
+			question,
+			answers: sectionResponses[question.question_key] ?? {},
+			sourceComponent,
+			sourceLabel: sourceComponent === null ? null : getReportSourceLabel(sourceComponent)
+		});
+	});
+
+	return visibleEntries;
+}
+
+/**
+ * Resolve the visible question rows for one section, preserving instrument order while
+ * duplicating shared questions when a combined report has separate audit and survey sources.
+ */
+export function buildVisibleQuestionEntries(
+	auditSession: AuditSession,
+	section: InstrumentSection
+): VisibleQuestionEntry[] {
+	const combinedSources = getCombinedReportSources(auditSession);
+	if (combinedSources === null) {
+		return buildVisibleQuestionEntriesForSession(auditSession, section, null);
+	}
+
+	const visibleEntries: VisibleQuestionEntry[] = [];
+	section.questions.forEach(question => {
+		(["audit", "survey"] as const).forEach(sourceComponent => {
+			const sourceSession = combinedSources[sourceComponent];
+			const sectionState = sourceSession.aggregate.sections[section.section_key];
+			const sectionResponses = sectionState?.responses ?? {};
+			const executionMode = resolveExecutionMode(sourceSession);
+			if (!isQuestionVisibleForSession(question, executionMode, sectionResponses)) {
+				return;
+			}
+			visibleEntries.push({
+				rowKey: buildQuestionRowKey(question.question_key, sourceComponent),
+				question,
+				answers: sectionResponses[question.question_key] ?? {},
+				sourceComponent,
+				sourceLabel: getReportSourceLabel(sourceComponent)
+			});
+		});
+	});
+
+	return visibleEntries;
 }
 
 /**
@@ -549,8 +738,12 @@ function isQuestionApplicableToMode(
  *          survey-only questions are excluded from Place Audit rows and vice versa.
  */
 export function buildDomainReportRows(auditSession: AuditSession, instrument: PlayspaceInstrument): DomainReportRow[] {
+	const questionLookup = Object.fromEntries(
+		instrument.sections.flatMap(section =>
+			section.questions.map(question => [question.question_key, question] as const)
+		)
+	) as Readonly<Record<string, InstrumentQuestion>>;
 	const byDomain = auditSession.scores.by_domain;
-	const executionMode = auditSession.scores.execution_mode;
 	const normalizedScoreByDomain = new Map<string, AuditScoreTotals | null>();
 	Object.entries(byDomain).forEach(([rawDomainKey, totals]) => {
 		const normalizedKey = normalizeDomainKey(rawDomainKey);
@@ -577,11 +770,8 @@ export function buildDomainReportRows(auditSession: AuditSession, instrument: Pl
 		const sectionFirstSeenIndex = new Map<string, number>();
 		let sectionOrderCounter = 0;
 
-		section.questions.forEach(question => {
-			if (!isQuestionApplicableToMode(question.mode, executionMode)) {
-				return;
-			}
-			getQuestionDomainKeys(question).forEach(domainKey => {
+		buildVisibleQuestionEntries(auditSession, section).forEach(({ question }) => {
+			getQuestionDomainKeys(question, questionLookup).forEach(domainKey => {
 				sectionDomainCounts.set(domainKey, (sectionDomainCounts.get(domainKey) ?? 0) + 1);
 				if (!sectionFirstSeenIndex.has(domainKey)) {
 					sectionFirstSeenIndex.set(domainKey, sectionOrderCounter);
@@ -657,30 +847,48 @@ export function buildDomainReportRows(auditSession: AuditSession, instrument: Pl
 
 		instrument.sections.forEach((section, sectionIndex) => {
 			let sectionTouchesDomain = false;
-			section.questions.forEach(question => {
-				if (!isQuestionApplicableToMode(question.mode, executionMode)) {
-					return;
-				}
-				const domainKeysForQuestion = getQuestionDomainKeys(question);
+			const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
+			visibleEntries.forEach(({ question, answers, sourceComponent, sourceLabel }) => {
+				const domainKeysForQuestion = getQuestionDomainKeys(question, questionLookup);
 				if (!domainKeysForQuestion.includes(domainKey)) {
 					return;
 				}
 				sectionTouchesDomain = true;
 				itemCount += 1;
-				const responses =
-					auditSession.aggregate.sections[section.section_key]?.responses[question.question_key] ?? {};
 				if (question.question_type === "scaled" || question.question_type === "checklist") {
-					questions.push(buildDomainQuestionRow(question, responses));
+					questions.push(buildDomainQuestionRow(question, answers, sourceComponent));
 				}
-				const questionNote = collectQuestionNote(question, responses, sectionIndex + 1);
+				const questionNote = collectQuestionNote(question, answers, sectionIndex + 1, sourceLabel);
 				if (questionNote !== null) {
 					sectionNotes.push(questionNote);
 				}
 			});
 			if (sectionTouchesDomain) {
-				const note = collectSectionNote(auditSession, section.section_key, sectionIndex + 1, section.title);
-				if (note !== null) {
-					sectionNotes.push(note);
+				const combinedSources = getCombinedReportSources(auditSession);
+				if (combinedSources === null) {
+					const note = collectSectionNote(
+						auditSession,
+						section.section_key,
+						sectionIndex + 1,
+						section.title,
+						null
+					);
+					if (note !== null) {
+						sectionNotes.push(note);
+					}
+				} else {
+					(["audit", "survey"] as const).forEach(sourceComponent => {
+						const note = collectSectionNote(
+							combinedSources[sourceComponent],
+							section.section_key,
+							sectionIndex + 1,
+							section.title,
+							getReportSourceLabel(sourceComponent)
+						);
+						if (note !== null) {
+							sectionNotes.push(note);
+						}
+					});
 				}
 			}
 		});

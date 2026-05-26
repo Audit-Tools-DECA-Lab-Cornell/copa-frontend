@@ -137,6 +137,20 @@ const SCALE_ACCENT_HEX: Record<"provision" | "diversity" | "sociability" | "chal
 	challenge: "0C4767"
 };
 
+const QUESTION_PROMPT_COLUMN_INDEX = 6;
+const COMBINED_AUDIT_SOURCE_FILL = "FFF4E5";
+const COMBINED_SURVEY_SOURCE_FILL = "EFF6FF";
+
+function getQuestionSourceFill(modeCellValue: string): string | null {
+	if (modeCellValue.startsWith("Place Audit source")) {
+		return COMBINED_AUDIT_SOURCE_FILL;
+	}
+	if (modeCellValue.startsWith("Place Survey source")) {
+		return COMBINED_SURVEY_SOURCE_FILL;
+	}
+	return null;
+}
+
 /**
  * Applies cell styles and row heights to a worksheet in-place.
  *
@@ -147,7 +161,8 @@ const SCALE_ACCENT_HEX: Record<"provision" | "diversity" | "sociability" | "chal
  * - `row[0]` is a plain integer with empty cols 1 & 2 → section header row
  * - Everything else                 → alternating body rows (scale cols get scale fill)
  */
-export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, _palette: WebExportPalette): void {
+export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, palette: WebExportPalette): void {
+	void palette;
 	const ref = sheet["!ref"];
 	if (typeof ref !== "string" || ref.length === 0) {
 		return;
@@ -187,6 +202,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 		const isSectionHeaderRow =
 			!isHeaderRow && typeof row[0] === "string" && /^\d+$/.test(row[0]) && row[1] === "" && row[2] === "";
 		const isEvenRow = rowIndex % 2 === 0;
+		const questionSourceFill = typeof row[1] === "string" ? getQuestionSourceFill(row[1]) : null;
 
 		// Register full-row merges for both section note banner row types.
 		if (isSectionNoteRow || isSectionNoteResponseRow) {
@@ -342,6 +358,16 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 						fill: scoreLabelFill,
 						font: { ...baseStyle.font, bold: true, color: { rgb: "FFFFFF" } },
 						alignment: { ...baseStyle.alignment, horizontal: "right" },
+						border: { bottom: lightBorder, right: noBorder }
+					};
+				} else if (
+					isResponsesTable &&
+					colIndex === QUESTION_PROMPT_COLUMN_INDEX &&
+					questionSourceFill !== null
+				) {
+					cell.s = {
+						...baseStyle,
+						fill: { patternType: "solid", fgColor: { rgb: questionSourceFill } },
 						border: { bottom: lightBorder, right: noBorder }
 					};
 				} else {
