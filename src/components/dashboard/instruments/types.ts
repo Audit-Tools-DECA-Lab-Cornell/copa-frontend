@@ -7,6 +7,7 @@ export interface InstrumentVersionRow {
 	id: string;
 	instrument_key: string;
 	version: string;
+	parent_instrument_id: string | null;
 	is_active: boolean;
 	content: InstrumentContent;
 	created_at: string;

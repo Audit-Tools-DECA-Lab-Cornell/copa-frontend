@@ -9,13 +9,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { instrumentContentSchema } from "@/lib/api/playspace-types";
 import type { z } from "zod";
 
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
-import { QUERY_KEY, INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
+import { INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
 import { bumpVersion } from "./utils";
 import { VersionHistory } from "./version-history";
 import { InstrumentEditor } from "./instrument-editor";
@@ -28,6 +29,7 @@ type SetInstrumentVars = {
 	version: string;
 	content: InstrumentContentPayload;
 	activate?: boolean;
+	parentInstrumentId?: string | null;
 };
 
 export function InstrumentsAdminClient() {
@@ -36,8 +38,10 @@ export function InstrumentsAdminClient() {
 
 	const [editingContent, setEditingContent] = useState<InstrumentContent | null>(null);
 	const [editingVersion, setEditingVersion] = useState<string>("");
+	const [editingParentInstrumentId, setEditingParentInstrumentId] = useState<string | null>(null);
 	const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
 	const [versionToActivate, setVersionToActivate] = useState<InstrumentVersionRow | null>(null);
+	const [versionToDelete, setVersionToDelete] = useState<InstrumentVersionRow | null>(null);
 	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
 	// Single source of truth for the version list. Both "all versions" and the
@@ -56,6 +60,7 @@ export function InstrumentsAdminClient() {
 				id: r.id,
 				instrument_key: r.instrument_key,
 				version: r.instrument_version,
+				parent_instrument_id: r.parent_instrument_id,
 				is_active: r.is_active,
 				content: r.content as unknown as InstrumentContent,
 				created_at: r.created_at,
@@ -66,12 +71,21 @@ export function InstrumentsAdminClient() {
 
 	const activeVersion = useMemo(() => allVersions.find(v => v.is_active) ?? null, [allVersions]);
 
+	async function refreshVersionHistory() {
+		await queryClient.refetchQueries({
+			queryKey: INSTRUMENTS_LIST_QUERY_KEY,
+			exact: true,
+			type: "active"
+		});
+	}
+
 	const setInstrumentMutation = useMutation<unknown, Error, SetInstrumentVars>({
 		mutationFn: (params: SetInstrumentVars) =>
 			playspaceApi.admin.instruments.create(
 				{
 					instrument_key: activeVersion?.instrument_key || "pvua_v5_2",
 					instrument_version: params.version,
+					parent_instrument_id: params.parentInstrumentId ?? null,
 					content: params.content
 				},
 				params.activate
@@ -83,10 +97,8 @@ export function InstrumentsAdminClient() {
 					: t("toast.saveDraftDesc", { version: params.version })
 			});
 			setEditingContent(null);
-			// Await the refetch so the version list reflects the new draft/active
-			// version before the editor closes back to the list — otherwise the
-			// list stayed stale until a manual refresh.
-			await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+			setEditingParentInstrumentId(null);
+			await refreshVersionHistory();
 		},
 		onError: (error: Error) => {
 			toast.error(t("toast.saveError"), {
@@ -104,10 +116,26 @@ export function InstrumentsAdminClient() {
 			});
 			setIsActivateDialogOpen(false);
 			setVersionToActivate(null);
-			await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+			await refreshVersionHistory();
 		},
 		onError: (error: Error) => {
 			toast.error(t("toast.activateError"), {
+				description: error.message
+			});
+		}
+	});
+
+	const deleteVersionMutation = useMutation({
+		mutationFn: (versionRow: InstrumentVersionRow) => playspaceApi.admin.instruments.delete(versionRow.id),
+		onSuccess: async (_, versionRow) => {
+			toast.success(t("toast.deleteSuccess"), {
+				description: t("toast.deleteDesc", { version: versionRow.version })
+			});
+			setVersionToDelete(null);
+			await refreshVersionHistory();
+		},
+		onError: (error: Error) => {
+			toast.error(t("toast.deleteError"), {
 				description: error.message
 			});
 		}
@@ -117,22 +145,30 @@ export function InstrumentsAdminClient() {
 		const result = await setInstrumentMutation.mutateAsync({
 			version,
 			content: content as InstrumentContentPayload,
-			activate
+			activate,
+			parentInstrumentId: editingParentInstrumentId
 		});
 		return result;
 	}
 
-	function handleEditDraft(baseVersion: string, baseContent: InstrumentContent) {
+	function handleEditDraft(baseVersion: string, baseContent: InstrumentContent, parentInstrumentId: string) {
 		setEditingVersion(bumpVersion(baseVersion));
+		setEditingParentInstrumentId(parentInstrumentId);
 		setEditingContent(structuredClone(baseContent));
 	}
 
 	function handleUpload(version: string, content: InstrumentContent, activate: boolean) {
-		setInstrumentMutation.mutate({ version, content: content as InstrumentContentPayload, activate });
+		setInstrumentMutation.mutate({
+			version,
+			content: content as InstrumentContentPayload,
+			activate,
+			parentInstrumentId: null
+		});
 		setIsUploadDialogOpen(false);
 	}
 
-	const isMutating = setInstrumentMutation.isPending || activateVersionMutation.isPending;
+	const isMutating =
+		setInstrumentMutation.isPending || activateVersionMutation.isPending || deleteVersionMutation.isPending;
 
 	const headerActions = !editingContent ? (
 		<div className="flex items-center gap-2">
@@ -144,7 +180,11 @@ export function InstrumentsAdminClient() {
 				<Button
 					size="sm"
 					onClick={() =>
-						handleEditDraft(activeVersion.version, activeVersion.content as unknown as InstrumentContent)
+						handleEditDraft(
+							activeVersion.version,
+							activeVersion.content as unknown as InstrumentContent,
+							activeVersion.id
+						)
 					}>
 					<Plus className="mr-2 h-4 w-4" />
 					{t("createDraft")}
@@ -181,6 +221,7 @@ export function InstrumentsAdminClient() {
 								setIsActivateDialogOpen(true);
 							}}
 							onEditDraft={handleEditDraft}
+							onDeleteVersion={setVersionToDelete}
 						/>
 					)}
 
@@ -190,7 +231,10 @@ export function InstrumentsAdminClient() {
 							version={editingVersion}
 							isPending={isMutating}
 							onSave={handleSaveDraft}
-							onCancel={() => setEditingContent(null)}
+							onCancel={() => {
+								setEditingContent(null);
+								setEditingParentInstrumentId(null);
+							}}
 						/>
 					) : (
 						allVersions.length === 0 && (
@@ -215,6 +259,28 @@ export function InstrumentsAdminClient() {
 				onCancel={() => {
 					setIsActivateDialogOpen(false);
 					setVersionToActivate(null);
+				}}
+			/>
+
+			<ConfirmDialog
+				open={versionToDelete !== null}
+				onOpenChange={open => {
+					if (!open) {
+						setVersionToDelete(null);
+					}
+				}}
+				title={t("versionHistory.confirmDeleteTitle")}
+				description={
+					versionToDelete
+						? t("versionHistory.confirmDelete", { version: versionToDelete.version })
+						: t("versionHistory.confirmDeleteGeneric")
+				}
+				confirmLabel={t("versionHistory.deleteConfirm")}
+				isPending={deleteVersionMutation.isPending}
+				onConfirm={() => {
+					if (versionToDelete) {
+						deleteVersionMutation.mutate(versionToDelete);
+					}
 				}}
 			/>
 
