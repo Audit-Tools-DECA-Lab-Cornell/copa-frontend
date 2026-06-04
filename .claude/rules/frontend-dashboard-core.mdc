@@ -1,5 +1,5 @@
 ---
-description: Next.js dashboard conventions — role guards, shared components, API client, and UI copy. Mirror in .cursor/rules/ — edit both when changing.
+description: Next.js dashboard conventions — role guards, shared components, API client, and UI copy. Mirror in .claude/rules/ — edit both when changing.
 alwaysApply: true
 ---
 
@@ -18,4 +18,4 @@ alwaysApply: true
 - Default git branch is `master` (there is no `main` on GitHub for this repo).
 - Never read or edit `.env`, `.env.*`, or secrets unless the user explicitly names that file in the current message.
 - Use semantic tokens from `src/lib/design-system.ts` (CSS custom properties like `--solid-primary`, `--status-danger`, `--surface-raised`) for theming — do not hard-code raw color values or override these tokens ad hoc.
-- Admin instrument editor: instruments have a branch/publish lifecycle. A draft branch is distinct from published version history — do not conflate branch state with version records. Branch state aligns to backend publication rules.
+- Admin instrument editor lives in `src/components/dashboard/instruments/`. Instruments have a branch/publish lifecycle — a draft branch is distinct from published version history; do not conflate branch state with version records. Branch state aligns to backend publication rules.

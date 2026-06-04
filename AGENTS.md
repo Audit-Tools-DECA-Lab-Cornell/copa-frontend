@@ -16,7 +16,7 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 ## Repo-local agent config
 
 | Path | Purpose |
-|------|---------|
+|------|-------|
 | `CLAUDE.md` | Quick reference for Claude Code |
 | `.claude/rules/*.mdc` | Scoped rules (source of truth) |
 | `.cursor/rules/*.mdc` | Cursor mirror — keep filenames in sync with `.claude/rules/` |
@@ -36,6 +36,7 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 - `messages/en.json`, `messages/de.json` — i18n (update both)
 - `src/lib/export/` — PDF/Excel exports
 - `src/components/dashboard/` — tables, reports, filters, instrument editor
+- `src/components/dashboard/instruments/` — instrument editor submodule (editors, version history, spreadsheet view)
 - `src/lib/design-system.ts` — design tokens and CSS custom properties
 - `tests/e2e/` — Playwright specs
 

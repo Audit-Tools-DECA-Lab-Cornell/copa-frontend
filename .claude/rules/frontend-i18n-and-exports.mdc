@@ -1,5 +1,5 @@
 ---
-description: Web i18n parity, report views, and PDF/Excel export pipeline. Mirror in .cursor/rules/ — edit both when changing.
+description: Web i18n parity, report views, and PDF/Excel export pipeline. Mirror in .claude/rules/ — edit both when changing.
 globs:
     [
         "messages/**/*.json",
@@ -8,6 +8,7 @@ globs:
         "src/lib/audit/prompt-segments.ts",
         "src/components/dashboard/**/*report*.tsx",
         "src/components/dashboard/audit-detail-view.tsx",
+        "src/components/dashboard/instruments/**/*.tsx",
         "src/app/(protected)/**/reports/**/*.tsx",
         "tests/unit/**/*.ts"
     ]

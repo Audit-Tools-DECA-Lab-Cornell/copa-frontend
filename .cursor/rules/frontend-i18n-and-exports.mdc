@@ -8,6 +8,7 @@ globs:
         "src/lib/audit/prompt-segments.ts",
         "src/components/dashboard/**/*report*.tsx",
         "src/components/dashboard/audit-detail-view.tsx",
+        "src/components/dashboard/instruments/**/*.tsx",
         "src/app/(protected)/**/reports/**/*.tsx",
         "tests/unit/**/*.ts"
     ]

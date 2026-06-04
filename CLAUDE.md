@@ -35,6 +35,7 @@ Cursor mirror: `.cursor/rules/` (same filenames — keep both in sync).
 - `messages/en.json` + `messages/de.json` — i18n (both required)
 - `src/lib/export/**` — PDF/Excel pipeline
 - `src/components/dashboard/**` — shared tables, reports, filters, instrument editor
+- `src/components/dashboard/instruments/` — instrument editor submodule (editors, version history, spreadsheet view)
 - `src/lib/design-system.ts` — design tokens and CSS custom properties
 
 <!-- caliber:managed:pre-commit -->
