@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EditableField } from "../shared-components";
 import { makeDefaultScaleDefinition } from "../defaults";
 import { ScaleOptionsEditor } from "./shared-editors";
+import { useInstrumentEdit } from "../instrument-edit-context";
 
 export function ScaleGuidanceEditor({
 	scales,
@@ -15,6 +16,7 @@ export function ScaleGuidanceEditor({
 	onChange: (scales: ScaleDefinition[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateScale(index: number, updater: (s: ScaleDefinition) => void) {
 		const next = structuredClone(scales);
@@ -34,10 +36,12 @@ export function ScaleGuidanceEditor({
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-semibold">{t("scaleGuidance")}</h3>
-				<Button onClick={addScale}>
-					<Plus className="mr-1.5 h-4 w-4" />
-					{t("addScale")}
-				</Button>
+				{!translationMode && (
+					<Button onClick={addScale}>
+						<Plus className="mr-1.5 h-4 w-4" />
+						{t("addScale")}
+					</Button>
+				)}
 			</div>
 
 			{/*
@@ -56,6 +60,7 @@ export function ScaleGuidanceEditor({
 										label={t("scaleKey")}
 										value={scale.key}
 										mono
+										isKey
 										onChange={v =>
 											updateScale(sIdx, s => {
 												s.key = v as ScaleKey;
@@ -95,18 +100,15 @@ export function ScaleGuidanceEditor({
 										/>
 									</div>
 								</div>
-								{/*
-								 * Toned down from text-destructive (high-contrast red) to
-								 * text-muted-foreground with a hover transition to destructive.
-								 * This reduces the visual pull toward the most irreversible action.
-								 */}
-								<Button
-									variant="ghost"
-									size="icon"
-									className="shrink-0 text-muted-foreground hover:text-destructive h-8 w-8 mt-1"
-									onClick={() => removeScale(sIdx)}>
-									<Trash2 className="h-4 w-4" />
-								</Button>
+								{!translationMode && (
+									<Button
+										variant="ghost"
+										size="icon"
+										className="shrink-0 text-muted-foreground hover:text-destructive h-8 w-8 mt-1"
+										onClick={() => removeScale(sIdx)}>
+										<Trash2 className="h-4 w-4" />
+									</Button>
+								)}
 							</div>
 						</CardHeader>
 						<CardContent className="px-4 pb-4">

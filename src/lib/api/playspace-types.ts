@@ -937,6 +937,8 @@ export const instrumentResponseSchema = z.object({
 	updated_at: z.string().datetime()
 });
 
+export type InstrumentResponse = z.infer<typeof instrumentResponseSchema>;
+
 export const instrumentCreateRequestSchema = z.object({
 	instrument_key: z.string().min(1),
 	instrument_version: z.string().min(1),

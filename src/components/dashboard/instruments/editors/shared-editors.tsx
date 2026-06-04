@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import {
 	ArrowDown,
 	ArrowUp,
+	Check,
 	ChevronDown,
 	GitBranch,
 	GripVertical,
@@ -31,6 +32,8 @@ import { EditableField, DisplayConditionBadge } from "../shared-components";
 import { makeDefaultChoiceOption, makeDefaultScaleOption, makeDefaultQuestionScale } from "../defaults";
 import { moveArrayItem, isScaleCustomized, formatQuestionKeyForDisplay, renderInlineMarkdown } from "../utils";
 import { CONSTRUCT_OPTIONS, MODE_OPTIONS, QUESTION_TYPE_OPTIONS, SCALE_KEY_OPTIONS } from "../constants";
+import { useInstrumentEdit } from "../instrument-edit-context";
+import { AiTranslateFieldButton } from "../ai-translate-button";
 
 export function ChoiceOptionsEditor({
 	options,
@@ -39,6 +42,8 @@ export function ChoiceOptionsEditor({
 	options: ChoiceOption[];
 	onChange: (opts: ChoiceOption[]) => void;
 }) {
+	const { translationMode } = useInstrumentEdit();
+
 	function updateOption(i: number, field: keyof ChoiceOption, val: string) {
 		const next = structuredClone(options);
 		next[i] = { ...next[i], [field]: val };
@@ -57,10 +62,12 @@ export function ChoiceOptionsEditor({
 		return (
 			<div className="flex items-center justify-between">
 				<span className="text-xs text-muted-foreground">No options</span>
-				<Button variant="ghost" size="sm" onClick={addOption} className="h-7 gap-1 text-xs">
-					<Plus className="h-3 w-3" />
-					Add option
-				</Button>
+				{!translationMode && (
+					<Button variant="ghost" size="sm" onClick={addOption} className="h-7 gap-1 text-xs">
+						<Plus className="h-3 w-3" />
+						Add option
+					</Button>
+				)}
 			</div>
 		);
 	}
@@ -72,10 +79,12 @@ export function ChoiceOptionsEditor({
 				<span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 					Options ({options.length})
 				</span>
-				<Button variant="ghost" size="sm" onClick={addOption} className="h-7 gap-1 text-xs">
-					<Plus className="h-3 w-3" />
-					Add
-				</Button>
+				{!translationMode && (
+					<Button variant="ghost" size="sm" onClick={addOption} className="h-7 gap-1 text-xs">
+						<Plus className="h-3 w-3" />
+						Add
+					</Button>
+				)}
 			</div>
 
 			{/* Column headers — shown ONCE, not per row */}
@@ -95,7 +104,11 @@ export function ChoiceOptionsEditor({
 							value={opt.key}
 							onChange={e => updateOption(i, "key", e.target.value)}
 							placeholder="option_key"
-							className="h-7 text-xs font-mono bg-background border-border/60"
+							readOnly={translationMode}
+							aria-disabled={translationMode}
+							className={`h-7 text-xs font-mono bg-background border-border/60 ${
+								translationMode ? "cursor-not-allowed text-muted-foreground" : ""
+							}`}
 						/>
 						<Input
 							value={opt.label}
@@ -103,14 +116,18 @@ export function ChoiceOptionsEditor({
 							placeholder="Display label"
 							className="h-7 text-xs bg-background border-border/60"
 						/>
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={() => removeOption(i)}
-							className="h-7 w-7 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
-							aria-label="Remove option">
-							<Trash2 className="h-3 w-3" />
-						</Button>
+						{translationMode ? (
+							<AiTranslateFieldButton className="h-7 w-7" />
+						) : (
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={() => removeOption(i)}
+								className="h-7 w-7 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
+								aria-label="Remove option">
+								<Trash2 className="h-3 w-3" />
+							</Button>
+						)}
 					</div>
 				))}
 			</div>
@@ -126,6 +143,7 @@ export function ScaleOptionsEditor({
 	onChange: (options: ScaleOption[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateOption(index: number, updater: (opt: ScaleOption) => void) {
 		const next = structuredClone(options);
@@ -151,10 +169,12 @@ export function ScaleOptionsEditor({
 				<Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 					{t("scaleOptions")} ({options.length})
 				</Label>
-				<Button variant="ghost" size="sm" onClick={addOption}>
-					<Plus className="mr-1 h-3 w-3" />
-					{t("addOption")}
-				</Button>
+				{!translationMode && (
+					<Button variant="ghost" size="sm" onClick={addOption}>
+						<Plus className="mr-1 h-3 w-3" />
+						{t("addOption")}
+					</Button>
+				)}
 			</div>
 
 			{options.length > 0 && (
@@ -162,9 +182,14 @@ export function ScaleOptionsEditor({
 					{/* Header — same grid template + padding as data rows so columns align exactly */}
 					<div className="grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-1.5 bg-muted/50 border-b border-border/40">
 						<span />
-						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-							Key → Label
-						</span>
+						<div className="leading-tight">
+							<span className="block text-[9px] font-mono uppercase text-muted-foreground/50">
+								{t("optionKey")}
+							</span>
+							<span className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+								{t("optionLabel")}
+							</span>
+						</div>
 						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
 							{t("additionValue")}
 						</span>
@@ -180,37 +205,41 @@ export function ScaleOptionsEditor({
 					{options.map((opt, oIdx) => (
 						<div
 							key={oIdx}
-							className={`grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-2${oIdx < options.length - 1 ? " border-b border-border/30" : ""}`}>
-							{/* Reorder controls */}
-							<div className="flex flex-col items-center gap-0.5">
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
-									disabled={oIdx === 0}
-									onClick={() => moveOption(oIdx, "up")}
-									aria-label={t("moveOptionUp")}>
-									<ArrowUp className="h-3 w-3" />
-								</Button>
-								<GripVertical className="h-3.5 w-3.5 text-muted-foreground/30" aria-hidden />
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
-									disabled={oIdx === options.length - 1}
-									onClick={() => moveOption(oIdx, "down")}
-									aria-label={t("moveOptionDown")}>
-									<ArrowDown className="h-3 w-3" />
-								</Button>
-							</div>
+							className={`grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 relative items-center-safe px-2 py-2 ${oIdx < options.length - 1 ? " border-b border-border/30" : ""}`}>
+							{/* Reorder controls — self-center keeps the grip aligned to the row's midline while the input cells share a bottom baseline */}
+							{translationMode ? (
+								<span />
+							) : (
+								<div className="flex flex-col items-center gap-0.5 self-center">
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
+										disabled={oIdx === 0}
+										onClick={() => moveOption(oIdx, "up")}
+										aria-label={t("moveOptionUp")}>
+										<ArrowUp className="h-3 w-3" />
+									</Button>
+									<GripVertical className="h-3.5 w-3.5 text-muted-foreground/30" aria-hidden />
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
+										disabled={oIdx === options.length - 1}
+										onClick={() => moveOption(oIdx, "down")}
+										aria-label={t("moveOptionDown")}>
+										<ArrowDown className="h-3 w-3" />
+									</Button>
+								</div>
+							)}
 
 							{/* Key (readonly) + Label (editable) */}
 							<div className="min-w-0">
-								<p className="font-mono text-[10px] text-muted-foreground/70 mb-0.5 truncate">
+								<span className="font-mono text-[10px] text-muted-foreground/70 top-2 truncate absolute">
 									{opt.key || "—"}
-								</p>
+								</span>
 								<Input
 									className="h-7 text-xs px-2"
 									value={opt.label}
@@ -223,11 +252,12 @@ export function ScaleOptionsEditor({
 								/>
 							</div>
 
-							{/* Addition value */}
+							{/* Addition value (scoring — owned by the base language) */}
 							<Input
 								type="number"
 								className="h-7 text-xs font-mono px-2 text-center"
 								value={opt.addition_value}
+								disabled={translationMode}
 								onChange={e =>
 									updateOption(oIdx, o => {
 										o.addition_value = Number(e.target.value) || 0;
@@ -235,11 +265,12 @@ export function ScaleOptionsEditor({
 								}
 							/>
 
-							{/* Boost value */}
+							{/* Boost value (scoring — owned by the base language) */}
 							<Input
 								type="number"
 								className="h-7 text-xs font-mono px-2 text-center"
 								value={opt.boost_value}
+								disabled={translationMode}
 								onChange={e =>
 									updateOption(oIdx, o => {
 										o.boost_value = Number(e.target.value) || 0;
@@ -251,44 +282,52 @@ export function ScaleOptionsEditor({
 							<div className="flex items-center gap-1.5 flex-wrap">
 								<button
 									type="button"
+									disabled={translationMode}
 									onClick={() =>
 										updateOption(oIdx, o => {
 											o.is_not_applicable = !o.is_not_applicable;
 										})
 									}
-									className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
+									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.is_not_applicable
 											? "border-amber-400/60 bg-amber-100 text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-300"
 											: "border-border bg-transparent text-muted-foreground hover:border-border/80"
 									}`}
 									title={t("isNotApplicable")}>
+									{opt.is_not_applicable && <Check className="h-2.5 w-2.5 shrink-0" />}
 									{t("notApplicable")}
 								</button>
 								<button
 									type="button"
+									disabled={translationMode}
 									onClick={() =>
 										updateOption(oIdx, o => {
 											o.allows_follow_up_scales = !o.allows_follow_up_scales;
 										})
 									}
-									className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
+									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.allows_follow_up_scales
 											? "border-violet-400/60 bg-violet-100 text-violet-800 dark:border-violet-500/40 dark:bg-violet-900/30 dark:text-violet-300"
 											: "border-border bg-transparent text-muted-foreground hover:border-border/80"
 									}`}
 									title={t("allowsFollowUp")}>
+									{opt.allows_follow_up_scales && <Check className="h-2.5 w-2.5 shrink-0" />}
 									{t("followUpBadge")}
 								</button>
 							</div>
 
-							{/* Delete */}
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
-								onClick={() => removeOption(oIdx)}>
-								<Minus className="h-3.5 w-3.5" />
-							</Button>
+							{/* Delete (translating: per-label AI translate affordance instead) */}
+							{translationMode ? (
+								<AiTranslateFieldButton className="h-6 w-6" />
+							) : (
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
+									onClick={() => removeOption(oIdx)}>
+									<Minus className="h-3.5 w-3.5" />
+								</Button>
+							)}
 						</div>
 					))}
 				</div>
@@ -324,8 +363,12 @@ export function DisplayConditionEditor({
 	onChange: (condition: QuestionDisplayCondition | null) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	if (!condition) {
+		// Display conditions are structural references to other keys; while
+		// translating there's nothing to localize, so the editor is hidden.
+		if (translationMode) return null;
 		return (
 			<Button
 				variant="outline"
@@ -344,31 +387,36 @@ export function DisplayConditionEditor({
 					<GitBranch className="h-3.5 w-3.5" />
 					{t("displayCondition")}
 				</Label>
-				<Button
-					variant="ghost"
-					size="sm"
-					className="text-muted-foreground hover:text-destructive"
-					onClick={() => onChange(null)}>
-					{t("clearCondition")}
-				</Button>
+				{!translationMode && (
+					<Button
+						variant="ghost"
+						size="sm"
+						className="text-muted-foreground hover:text-destructive"
+						onClick={() => onChange(null)}>
+						{t("clearCondition")}
+					</Button>
+				)}
 			</div>
 			<div className="grid gap-3 md:grid-cols-3">
 				<EditableField
 					label={t("questionKey")}
 					value={condition.question_key}
 					mono
+					isKey
 					onChange={v => onChange({ ...condition, question_key: v })}
 				/>
 				<EditableField
 					label={t("responseKey")}
 					value={condition.response_key}
 					mono
+					isKey
 					onChange={v => onChange({ ...condition, response_key: v })}
 				/>
 				<EditableField
 					label={t("anyOfOptionKeys")}
 					value={condition.any_of_option_keys.join(", ")}
 					mono
+					isKey
 					onChange={v =>
 						onChange({
 							...condition,
@@ -394,6 +442,7 @@ export function QuestionScalesEditor({
 	onChange: (scales: QuestionScale[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateScale(index: number, updater: (s: QuestionScale) => void) {
 		const next = structuredClone(scales);
@@ -415,10 +464,12 @@ export function QuestionScalesEditor({
 				<Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 					{t("scales")} ({scales.length})
 				</Label>
-				<Button variant="ghost" size="sm" onClick={addScale}>
-					<Plus className="mr-1 h-3 w-3" />
-					{t("addScale")}
-				</Button>
+				{!translationMode && (
+					<Button variant="ghost" size="sm" onClick={addScale}>
+						<Plus className="mr-1 h-3 w-3" />
+						{t("addScale")}
+					</Button>
+				)}
 			</div>
 
 			{scales.map((scale, sIdx) => {
@@ -439,12 +490,13 @@ export function QuestionScalesEditor({
 									<Label className="text-xs text-muted-foreground">{t("scaleKey")}</Label>
 									<Select
 										value={scale.key}
+										disabled={translationMode}
 										onValueChange={v =>
 											updateScale(sIdx, s => {
 												s.key = v as QuestionScale["key"];
 											})
 										}>
-										<SelectTrigger className="text-sm">
+										<SelectTrigger className="w-full text-sm data-[size=default]:h-10">
 											<SelectValue />
 										</SelectTrigger>
 										<SelectContent>
@@ -477,19 +529,23 @@ export function QuestionScalesEditor({
 							</div>
 							<div className="flex items-center gap-1 mt-5">
 								{customized && (
-									<Badge
-										variant="outline"
-										className="gap-1 border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta text-[10px] px-1.5 py-0">
+									<span className="inline-flex items-center gap-1 rounded-full border border-accent-terracotta/40 bg-accent-terracotta/10 px-2 py-0.5 text-[10px] font-medium text-accent-terracotta">
+										<span
+											className="h-1.5 w-1.5 rounded-full bg-accent-terracotta/70"
+											aria-hidden
+										/>
 										{t("customOptions")}
-									</Badge>
+									</span>
 								)}
-								<Button
-									variant="ghost"
-									size="icon"
-									className="shrink-0 text-muted-foreground hover:text-destructive h-8 w-8"
-									onClick={() => removeScale(sIdx)}>
-									<Trash2 className="h-4 w-4" />
-								</Button>
+								{!translationMode && (
+									<Button
+										variant="ghost"
+										size="icon"
+										className="shrink-0 text-muted-foreground hover:text-destructive h-8 w-8"
+										onClick={() => removeScale(sIdx)}>
+										<Trash2 className="h-4 w-4" />
+									</Button>
+								)}
 							</div>
 						</div>
 
@@ -520,13 +576,14 @@ export function QuestionEditor({
 	onRemove: () => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 	const [expanded, setExpanded] = useState(false);
 	const questionLabel = formatQuestionKeyForDisplay(question.question_key);
 	const questionType = question.question_type ?? "scaled";
 	const isChecklist = questionType === "checklist";
 
 	return (
-		<div className="rounded-lg border border-border/50 bg-card/40 p-3">
+		<div className="rounded-lg border border-border/50 bg-card p-3 shadow-sm">
 			{/* Collapsed header */}
 			<div className="flex items-start gap-2">
 				<Button
@@ -581,24 +638,29 @@ export function QuestionEditor({
 				{/*
 				 * Delete button toned down from always-red to muted with hover transition.
 				 * Prevents it from being the dominant colour in a list of questions.
+				 * Hidden while translating — removing a question is a structural change
+				 * owned by the base language.
 				 */}
-				<Button
-					variant="ghost"
-					size="icon"
-					className="shrink-0 text-muted-foreground hover:text-destructive"
-					onClick={onRemove}>
-					<Trash2 className="h-4 w-4" />
-				</Button>
+				{!translationMode && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="shrink-0 text-muted-foreground hover:text-destructive"
+						onClick={onRemove}>
+						<Trash2 className="h-4 w-4" />
+					</Button>
+				)}
 			</div>
 
 			{/* Expanded editor */}
 			{expanded && (
 				<div className="mt-4 space-y-4 border-t border-border/30 pt-4 pl-8">
-					<div className="grid gap-3 md:grid-cols-3">
+					<div className="grid gap-3 md:grid-cols-[1fr_160px_160px]">
 						<EditableField
 							label={t("questionKey")}
 							value={question.question_key}
 							mono
+							isKey
 							onChange={v =>
 								onUpdate(q => {
 									q.question_key = v;
@@ -609,12 +671,13 @@ export function QuestionEditor({
 							<Label className="text-xs text-muted-foreground">{t("questionType")}</Label>
 							<Select
 								value={questionType}
+								disabled={translationMode}
 								onValueChange={v =>
 									onUpdate(q => {
 										q.question_type = v as InstrumentQuestion["question_type"];
 									})
 								}>
-								<SelectTrigger className="text-sm">
+								<SelectTrigger className="w-full text-sm data-[size=default]:h-10">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
@@ -630,12 +693,13 @@ export function QuestionEditor({
 							<Label className="text-xs text-muted-foreground">{t("mode")}</Label>
 							<Select
 								value={question.mode}
+								disabled={translationMode}
 								onValueChange={v =>
 									onUpdate(q => {
 										q.mode = v as InstrumentQuestion["mode"];
 									})
 								}>
-								<SelectTrigger className="text-sm">
+								<SelectTrigger className="w-full text-sm data-[size=default]:h-10">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
@@ -679,6 +743,7 @@ export function QuestionEditor({
 									<button
 										key={c}
 										type="button"
+										disabled={translationMode}
 										onClick={() => {
 											onUpdate(q => {
 												if (checked) {
@@ -688,11 +753,16 @@ export function QuestionEditor({
 												}
 											});
 										}}
-										className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+										className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
 											checked
 												? "border-primary bg-primary text-primary-foreground"
 												: "border-border bg-muted/40 text-muted-foreground hover:border-primary/50"
 										}`}>
+										{checked ? (
+											<Check className="h-3 w-3 shrink-0" />
+										) : (
+											<Plus className="h-3 w-3 shrink-0 opacity-50" />
+										)}
 										{t.has(`constructLabels.${c}`) ? t(`constructLabels.${c}`) : c}
 									</button>
 								);
@@ -700,28 +770,33 @@ export function QuestionEditor({
 						</div>
 					</div>
 
-					<label className="flex items-center gap-2 text-sm cursor-pointer">
-						<input
-							type="checkbox"
-							checked={question.required !== false}
-							onChange={e =>
+					{/* Metadata row: Required + display condition grouped together */}
+					<div className="flex flex-wrap items-start gap-4">
+						<label
+							className={`flex items-center gap-2 text-sm pt-0.5 ${translationMode ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
+							<input
+								type="checkbox"
+								checked={question.required !== false}
+								disabled={translationMode}
+								onChange={e =>
+									onUpdate(q => {
+										q.required = e.target.checked;
+									})
+								}
+								className="rounded border-border"
+							/>
+							{t("required")}
+						</label>
+
+						<DisplayConditionEditor
+							condition={question.display_if ?? null}
+							onChange={c =>
 								onUpdate(q => {
-									q.required = e.target.checked;
+									q.display_if = c;
 								})
 							}
-							className="rounded border-border"
 						/>
-						{t("required")}
-					</label>
-
-					<DisplayConditionEditor
-						condition={question.display_if ?? null}
-						onChange={c =>
-							onUpdate(q => {
-								q.display_if = c;
-							})
-						}
-					/>
+					</div>
 
 					<Separator />
 

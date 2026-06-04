@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EditableField } from "../shared-components";
 import { makeDefaultExecutionMode } from "../defaults";
+import { useInstrumentEdit } from "../instrument-edit-context";
 
 export function ExecutionModesEditor({
 	modes,
@@ -14,6 +15,7 @@ export function ExecutionModesEditor({
 	onChange: (modes: ChoiceOption[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateMode(index: number, field: keyof ChoiceOption, value: string | null) {
 		const next = structuredClone(modes);
@@ -34,10 +36,12 @@ export function ExecutionModesEditor({
 			<CardHeader className="pb-3">
 				<div className="flex items-center justify-between">
 					<CardTitle className="text-sm">{t("executionModes")}</CardTitle>
-					<Button variant="outline" size="sm" onClick={addMode}>
-						<Plus className="mr-1.5 h-3.5 w-3.5" />
-						{t("addMode")}
-					</Button>
+					{!translationMode && (
+						<Button variant="outline" size="sm" onClick={addMode}>
+							<Plus className="mr-1.5 h-3.5 w-3.5" />
+							{t("addMode")}
+						</Button>
+					)}
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-3">
@@ -54,6 +58,7 @@ export function ExecutionModesEditor({
 								label={t("modeKey")}
 								value={mode.key}
 								mono
+								isKey
 								onChange={v => updateMode(idx, "key", v)}
 							/>
 							<EditableField
@@ -61,11 +66,6 @@ export function ExecutionModesEditor({
 								value={mode.label}
 								onChange={v => updateMode(idx, "label", v)}
 							/>
-							{/*
-							 * Previously rendered as a single-line Input.
-							 * Descriptions are full sentences that were visually truncated.
-							 * multiline renders a Textarea so the full text is always visible.
-							 */}
 							<EditableField
 								label={t("modeDescription")}
 								value={mode.description ?? ""}
@@ -73,13 +73,15 @@ export function ExecutionModesEditor({
 								onChange={v => updateMode(idx, "description", v || null)}
 							/>
 						</div>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="mt-5 shrink-0 text-muted-foreground hover:text-destructive"
-							onClick={() => removeMode(idx)}>
-							<Trash2 className="h-4 w-4" />
-						</Button>
+						{!translationMode && (
+							<Button
+								variant="ghost"
+								size="icon"
+								className="mt-5 shrink-0 text-muted-foreground hover:text-destructive"
+								onClick={() => removeMode(idx)}>
+								<Trash2 className="h-4 w-4" />
+							</Button>
+						)}
 					</div>
 				))}
 			</CardContent>

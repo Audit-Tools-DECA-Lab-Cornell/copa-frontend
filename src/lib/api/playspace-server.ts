@@ -7,11 +7,13 @@ import {
 	auditSessionSchema,
 	auditorDashboardSummarySchema,
 	auditorPlaceSchema,
+	instrumentResponseSchema,
 	paginatedResponseSchema,
 	PlayspaceApiError,
 	type AuditSession,
 	type AuditorDashboardSummary,
 	type AuditorPlace,
+	type InstrumentResponse,
 	type PaginatedResponse
 } from "@/lib/api/playspace-types";
 import { playspaceInstrumentSchema, type PlayspaceInstrument } from "@/types/audit";
@@ -168,6 +170,14 @@ export async function getServerInstrument(instrumentKey: string, lang: string = 
 			}
 		}
 	);
+}
+
+/** Server prefetch for admin instrument versions (`no-store`; mirrors `admin.instruments.list`). */
+export async function getServerAdminInstruments(instrumentKey: string = "pvua_v5_2"): Promise<InstrumentResponse[]> {
+	const query = new URLSearchParams({ instrument_key: instrumentKey });
+	return fetchServerJson(`/playspace/admin/instruments?${query.toString()}`, z.array(instrumentResponseSchema), {
+		cache: "no-store"
+	});
 }
 
 /**

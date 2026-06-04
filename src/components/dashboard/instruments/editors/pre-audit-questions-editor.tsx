@@ -10,6 +10,7 @@ import { EditableField } from "../shared-components";
 import { makeDefaultPreAuditQuestion } from "../defaults";
 import { ChoiceOptionsEditor } from "./shared-editors";
 import { INPUT_TYPE_OPTIONS, MODE_OPTIONS, PAGE_KEY_OPTIONS } from "../constants";
+import { useInstrumentEdit } from "../instrument-edit-context";
 import { useState } from "react";
 
 // Add this new component below PreAuditQuestionsEditor
@@ -26,6 +27,7 @@ function QuestionCard({
 	onRemove: () => void;
 }) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 	const [showGroup, setShowGroup] = useState(false);
 
 	return (
@@ -43,14 +45,16 @@ function QuestionCard({
 						</Badge>
 					)}
 				</div>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-					onClick={onRemove}
-					aria-label="Remove question">
-					<Trash2 className="h-3.5 w-3.5" />
-				</Button>
+				{!translationMode && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+						onClick={onRemove}
+						aria-label="Remove question">
+						<Trash2 className="h-3.5 w-3.5" />
+					</Button>
+				)}
 			</div>
 
 			{/* Card body */}
@@ -60,6 +64,7 @@ function QuestionCard({
 						label={t("questionKey")}
 						value={question.key}
 						mono
+						isKey
 						onChange={v =>
 							onUpdate(q => {
 								q.key = v;
@@ -94,6 +99,7 @@ function QuestionCard({
 						<Label className="text-xs font-medium text-muted-foreground">{t("inputType")}</Label>
 						<Select
 							value={question.input_type}
+							disabled={translationMode}
 							onValueChange={v =>
 								onUpdate(q => {
 									q.input_type = v as PreAuditQuestion["input_type"];
@@ -116,6 +122,7 @@ function QuestionCard({
 						<Label className="text-xs font-medium text-muted-foreground">{t("pageKey")}</Label>
 						<Select
 							value={question.page_key}
+							disabled={translationMode}
 							onValueChange={v =>
 								onUpdate(q => {
 									q.page_key = v as PreAuditQuestion["page_key"];
@@ -136,11 +143,12 @@ function QuestionCard({
 				</div>
 
 				{/* Group key — hidden until needed */}
-				{question.group_key || showGroup ? (
+				{question.group_key || (showGroup && !translationMode) ? (
 					<EditableField
 						label={t("groupKey")}
 						value={question.group_key ?? ""}
 						mono
+						isKey
 						onChange={v =>
 							onUpdate(q => {
 								q.group_key = v || null;
@@ -148,12 +156,14 @@ function QuestionCard({
 						}
 					/>
 				) : (
-					<button
-						type="button"
-						onClick={() => setShowGroup(true)}
-						className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors underline underline-offset-2">
-						+ Set group key
-					</button>
+					!translationMode && (
+						<button
+							type="button"
+							onClick={() => setShowGroup(true)}
+							className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors underline underline-offset-2">
+							+ Set group key
+						</button>
+					)
 				)}
 
 				<Separator className="opacity-50" />
@@ -168,6 +178,7 @@ function QuestionCard({
 								<button
 									key={m}
 									type="button"
+									disabled={translationMode}
 									onClick={() =>
 										onUpdate(q => {
 											q.visible_modes = checked
@@ -175,7 +186,7 @@ function QuestionCard({
 												: [...q.visible_modes, m];
 										})
 									}
-									className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 ${
+									className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed ${
 										checked
 											? "border-primary bg-primary text-primary-foreground shadow-sm"
 											: "border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground"
@@ -189,12 +200,15 @@ function QuestionCard({
 
 				{/* Required */}
 				<div
-					className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5 cursor-pointer hover:bg-muted/40 transition-colors"
-					onClick={() =>
+					className={`flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5 transition-colors ${
+						translationMode ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:bg-muted/40"
+					}`}
+					onClick={() => {
+						if (translationMode) return;
 						onUpdate(q => {
 							q.required = !q.required;
-						})
-					}>
+						});
+					}}>
 					<div>
 						<p className="text-sm font-medium leading-none">{t("required")}</p>
 						<p className="text-xs text-muted-foreground mt-0.5">Respondents must answer this question</p>
@@ -202,6 +216,7 @@ function QuestionCard({
 					<input
 						type="checkbox"
 						checked={question.required}
+						disabled={translationMode}
 						onChange={e =>
 							onUpdate(q => {
 								q.required = e.target.checked;
@@ -238,6 +253,7 @@ export function PreAuditQuestionsEditor({
 	onChange: (questions: PreAuditQuestion[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateQuestion(index: number, updater: (q: PreAuditQuestion) => void) {
 		const next = structuredClone(questions);
@@ -263,10 +279,12 @@ export function PreAuditQuestionsEditor({
 						{questions.length} {questions.length === 1 ? "question" : "questions"} configured
 					</p>
 				</div>
-				<Button onClick={addQuestion} size="sm" className="gap-1.5">
-					<Plus className="h-4 w-4" />
-					{t("addQuestion")}
-				</Button>
+				{!translationMode && (
+					<Button onClick={addQuestion} size="sm" className="gap-1.5">
+						<Plus className="h-4 w-4" />
+						{t("addQuestion")}
+					</Button>
+				)}
 			</div>
 
 			{/* Empty state */}

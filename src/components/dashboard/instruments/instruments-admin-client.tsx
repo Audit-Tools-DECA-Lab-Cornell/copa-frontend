@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileUp, Plus } from "lucide-react";
@@ -15,10 +15,9 @@ import { instrumentContentSchema } from "@/lib/api/playspace-types";
 import type { z } from "zod";
 
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
-import { QUERY_KEY } from "./constants";
+import { QUERY_KEY, INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
 import { bumpVersion } from "./utils";
 import { VersionHistory } from "./version-history";
-import { InstrumentContentViewer } from "./instrument-content-viewer";
 import { InstrumentEditor } from "./instrument-editor";
 import { ActivateDialog } from "./activate-dialog";
 import { UploadDialog } from "./upload-dialog";
@@ -41,11 +40,19 @@ export function InstrumentsAdminClient() {
 	const [versionToActivate, setVersionToActivate] = useState<InstrumentVersionRow | null>(null);
 	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
-	const { data: allVersions } = useQuery({
-		queryKey: [...QUERY_KEY, "all"],
-		queryFn: async () => {
-			const res = await playspaceApi.admin.instruments.list();
-			return res.map(r => ({
+	// Single source of truth for the version list. Both "all versions" and the
+	// "active version" are derived from this one query, so a single fetch backs
+	// the whole page and there is no race between two queries hitting the same
+	// endpoint (which previously caused an empty-state flash and stale UI). The
+	// server component prefetches this exact key, so the list hydrates populated.
+	const { data: versions, isPending } = useQuery({
+		queryKey: INSTRUMENTS_LIST_QUERY_KEY,
+		queryFn: () => playspaceApi.admin.instruments.list()
+	});
+
+	const allVersions = useMemo<InstrumentVersionRow[]>(
+		() =>
+			(versions ?? []).map(r => ({
 				id: r.id,
 				instrument_key: r.instrument_key,
 				version: r.instrument_version,
@@ -53,27 +60,11 @@ export function InstrumentsAdminClient() {
 				content: r.content as unknown as InstrumentContent,
 				created_at: r.created_at,
 				activated_at: r.updated_at
-			})) as InstrumentVersionRow[];
-		}
-	});
+			})),
+		[versions]
+	);
 
-	const { data: activeVersion, isLoading: isActiveLoading } = useQuery({
-		queryKey: [...QUERY_KEY, "active"],
-		queryFn: async () => {
-			const res = await playspaceApi.admin.instruments.list();
-			const active = res.find(r => r.is_active);
-			if (!active) return null;
-			return {
-				id: active.id,
-				instrument_key: active.instrument_key,
-				version: active.instrument_version,
-				is_active: active.is_active,
-				content: active.content as unknown as InstrumentContent,
-				created_at: active.created_at,
-				activated_at: active.updated_at
-			} as InstrumentVersionRow;
-		}
-	});
+	const activeVersion = useMemo(() => allVersions.find(v => v.is_active) ?? null, [allVersions]);
 
 	const setInstrumentMutation = useMutation<unknown, Error, SetInstrumentVars>({
 		mutationFn: (params: SetInstrumentVars) =>
@@ -85,17 +76,17 @@ export function InstrumentsAdminClient() {
 				},
 				params.activate
 			),
-		onSuccess: (_data, params) => {
+		onSuccess: async (_data, params) => {
 			toast.success(t("toast.saveSuccess"), {
 				description: params.activate
 					? t("toast.saveActiveDesc", { version: params.version })
 					: t("toast.saveDraftDesc", { version: params.version })
 			});
-			queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 			setEditingContent(null);
-			if (params.activate) {
-				// Success handling
-			}
+			// Await the refetch so the version list reflects the new draft/active
+			// version before the editor closes back to the list — otherwise the
+			// list stayed stale until a manual refresh.
+			await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 		},
 		onError: (error: Error) => {
 			toast.error(t("toast.saveError"), {
@@ -107,13 +98,13 @@ export function InstrumentsAdminClient() {
 	const activateVersionMutation = useMutation({
 		mutationFn: (versionRow: InstrumentVersionRow) =>
 			playspaceApi.admin.instruments.update(versionRow.id, { is_active: true }),
-		onSuccess: (_, versionRow) => {
+		onSuccess: async (_, versionRow) => {
 			toast.success(t("toast.activateSuccess"), {
 				description: t("toast.activateDesc", { version: versionRow.version })
 			});
-			queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 			setIsActivateDialogOpen(false);
 			setVersionToActivate(null);
+			await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 		},
 		onError: (error: Error) => {
 			toast.error(t("toast.activateError"), {
@@ -141,7 +132,7 @@ export function InstrumentsAdminClient() {
 		setIsUploadDialogOpen(false);
 	}
 
-	const isPending = setInstrumentMutation.isPending || activateVersionMutation.isPending;
+	const isMutating = setInstrumentMutation.isPending || activateVersionMutation.isPending;
 
 	const headerActions = !editingContent ? (
 		<div className="flex items-center gap-2">
@@ -175,16 +166,16 @@ export function InstrumentsAdminClient() {
 				actions={headerActions}
 			/>
 
-			{isActiveLoading ? (
+			{isPending ? (
 				<div className="flex h-48 items-center justify-center">
 					<div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
 				</div>
 			) : (
 				<>
-					{!editingContent && allVersions && allVersions.length > 0 && (
+					{!editingContent && allVersions.length > 0 && (
 						<VersionHistory
 							versions={allVersions}
-							isPending={isPending}
+							isPending={isMutating}
 							onActivateVersion={v => {
 								setVersionToActivate(v);
 								setIsActivateDialogOpen(true);
@@ -197,12 +188,12 @@ export function InstrumentsAdminClient() {
 						<InstrumentEditor
 							content={editingContent}
 							version={editingVersion}
-							isPending={isPending}
+							isPending={isMutating}
 							onSave={handleSaveDraft}
 							onCancel={() => setEditingContent(null)}
 						/>
 					) : (
-						(!allVersions || allVersions.length === 0) && (
+						allVersions.length === 0 && (
 							<EmptyState
 								title={t("empty.title")}
 								description={t("empty.description")}
@@ -217,7 +208,7 @@ export function InstrumentsAdminClient() {
 
 			<ActivateDialog
 				open={isActivateDialogOpen}
-				isPending={isPending}
+				isPending={isMutating}
 				onConfirm={() => {
 					if (versionToActivate) activateVersionMutation.mutate(versionToActivate);
 				}}
@@ -229,7 +220,7 @@ export function InstrumentsAdminClient() {
 
 			<UploadDialog
 				open={isUploadDialogOpen}
-				isPending={isPending}
+				isPending={isMutating}
 				onUpload={handleUpload}
 				onClose={() => setIsUploadDialogOpen(false)}
 			/>

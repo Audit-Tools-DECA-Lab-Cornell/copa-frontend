@@ -10,6 +10,7 @@ import { EditableField } from "../shared-components";
 import { makeDefaultQuestion, makeDefaultSection } from "../defaults";
 import { moveArrayItem } from "../utils";
 import { QuestionEditor } from "./shared-editors";
+import { useInstrumentEdit } from "../instrument-edit-context";
 
 export function SectionEditorList({
 	sections,
@@ -21,6 +22,7 @@ export function SectionEditorList({
 	onChange: (sections: InstrumentSection[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateSection(index: number, updater: (s: InstrumentSection) => void) {
 		const next = structuredClone(sections);
@@ -44,10 +46,12 @@ export function SectionEditorList({
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-semibold">{t("sections")}</h3>
-				<Button onClick={addSection}>
-					<Plus className="mr-1.5 h-4 w-4" />
-					{t("addSection")}
-				</Button>
+				{!translationMode && (
+					<Button onClick={addSection}>
+						<Plus className="mr-1.5 h-4 w-4" />
+						{t("addSection")}
+					</Button>
+				)}
 			</div>
 
 			<Accordion type="single" collapsible className="w-full">
@@ -66,30 +70,36 @@ export function SectionEditorList({
 						</AccordionTrigger>
 						<AccordionContent className="border-x border-b border-border/60 rounded-b-lg bg-card/30 p-4">
 							<div className="space-y-6">
-								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-2">
+								{!translationMode && (
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<Button
+												variant="outline"
+												size="sm"
+												disabled={sIdx === 0}
+												onClick={() => moveSection(sIdx, "up")}>
+												<ArrowUp className="mr-1.5 h-3.5 w-3.5" />
+												{t("moveUp")}
+											</Button>
+											<Button
+												variant="outline"
+												size="sm"
+												disabled={sIdx === sections.length - 1}
+												onClick={() => moveSection(sIdx, "down")}>
+												<ArrowDown className="mr-1.5 h-3.5 w-3.5" />
+												{t("moveDown")}
+											</Button>
+										</div>
 										<Button
-											variant="outline"
+											variant="ghost"
 											size="sm"
-											disabled={sIdx === 0}
-											onClick={() => moveSection(sIdx, "up")}>
-											<ArrowUp className="mr-1.5 h-3.5 w-3.5" />
-											{t("moveUp")}
-										</Button>
-										<Button
-											variant="outline"
-											size="sm"
-											disabled={sIdx === sections.length - 1}
-											onClick={() => moveSection(sIdx, "down")}>
-											<ArrowDown className="mr-1.5 h-3.5 w-3.5" />
-											{t("moveDown")}
+											className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+											onClick={() => removeSection(sIdx)}>
+											<Trash2 className="mr-1.5 h-3.5 w-3.5" />
+											{t("removeSection")}
 										</Button>
 									</div>
-									<Button variant="destructive" size="sm" onClick={() => removeSection(sIdx)}>
-										<Trash2 className="mr-1.5 h-3.5 w-3.5" />
-										{t("removeSection")}
-									</Button>
-								</div>
+								)}
 
 								{/* Section Details Editor */}
 								<Card>
@@ -101,6 +111,7 @@ export function SectionEditorList({
 											label={t("sectionKey")}
 											value={section.section_key}
 											mono
+											isKey
 											onChange={v =>
 												updateSection(sIdx, s => {
 													s.section_key = v;
@@ -167,19 +178,21 @@ export function SectionEditorList({
 										<h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
 											{t("questions")} ({section.questions.length})
 										</h4>
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() =>
-												updateSection(sIdx, s => {
-													s.questions.push(
-														makeDefaultQuestion(s.section_key, s.questions.length)
-													);
-												})
-											}>
-											<Plus className="mr-1.5 h-3.5 w-3.5" />
-											{t("addQuestion")}
-										</Button>
+										{!translationMode && (
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={() =>
+													updateSection(sIdx, s => {
+														s.questions.push(
+															makeDefaultQuestion(s.section_key, s.questions.length)
+														);
+													})
+												}>
+												<Plus className="mr-1.5 h-3.5 w-3.5" />
+												{t("addQuestion")}
+											</Button>
+										)}
 									</div>
 
 									{section.questions.length === 0 && (
@@ -190,32 +203,34 @@ export function SectionEditorList({
 
 									{section.questions.map((question, qIdx) => (
 										<div key={qIdx} className="flex items-stretch gap-2">
-											<div className="flex flex-col gap-1 pt-2">
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-6 w-6"
-													disabled={qIdx === 0}
-													onClick={() =>
-														updateSection(sIdx, s => {
-															s.questions = moveArrayItem(s.questions, qIdx, "up");
-														})
-													}>
-													<ArrowUp className="h-3 w-3" />
-												</Button>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-6 w-6"
-													disabled={qIdx === section.questions.length - 1}
-													onClick={() =>
-														updateSection(sIdx, s => {
-															s.questions = moveArrayItem(s.questions, qIdx, "down");
-														})
-													}>
-													<ArrowDown className="h-3 w-3" />
-												</Button>
-											</div>
+											{!translationMode && (
+												<div className="flex flex-col gap-1 pt-2">
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-6 w-6"
+														disabled={qIdx === 0}
+														onClick={() =>
+															updateSection(sIdx, s => {
+																s.questions = moveArrayItem(s.questions, qIdx, "up");
+															})
+														}>
+														<ArrowUp className="h-3 w-3" />
+													</Button>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-6 w-6"
+														disabled={qIdx === section.questions.length - 1}
+														onClick={() =>
+															updateSection(sIdx, s => {
+																s.questions = moveArrayItem(s.questions, qIdx, "down");
+															})
+														}>
+														<ArrowDown className="h-3 w-3" />
+													</Button>
+												</div>
+											)}
 											<div className="min-w-0 flex-1">
 												<QuestionEditor
 													question={question}

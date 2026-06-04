@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { EditableField } from "../shared-components";
 import { makeDefaultLegalDocument, makeDefaultLegalSection } from "../defaults";
+import { useInstrumentEdit } from "../instrument-edit-context";
+import { AiTranslateFieldButton } from "../ai-translate-button";
 
 export function LegalDocumentsEditor({
 	documents,
@@ -16,6 +18,7 @@ export function LegalDocumentsEditor({
 	onChange: (documents: LegalDocument[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 
 	function updateDocument(index: number, updater: (d: LegalDocument) => void) {
 		const next = structuredClone(documents);
@@ -89,10 +92,12 @@ export function LegalDocumentsEditor({
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-semibold">{t("legalDocuments")}</h3>
-				<Button onClick={addDocument}>
-					<Plus className="mr-1.5 h-4 w-4" />
-					{t("addLegalDoc")}
-				</Button>
+				{!translationMode && (
+					<Button onClick={addDocument}>
+						<Plus className="mr-1.5 h-4 w-4" />
+						{t("addLegalDoc")}
+					</Button>
+				)}
 			</div>
 
 			<Accordion type="single" collapsible className="w-full">
@@ -108,12 +113,17 @@ export function LegalDocumentsEditor({
 						</AccordionTrigger>
 						<AccordionContent className="border-x border-b border-border/60 rounded-b-lg bg-card/30 p-4">
 							<div className="space-y-6">
-								<div className="flex justify-end">
-									<Button variant="destructive" size="sm" onClick={() => removeDocument(docIndex)}>
-										<Trash2 className="mr-1.5 h-3.5 w-3.5" />
-										{t("removeLegalDoc")}
-									</Button>
-								</div>
+								{!translationMode && (
+									<div className="flex justify-end">
+										<Button
+											variant="destructive"
+											size="sm"
+											onClick={() => removeDocument(docIndex)}>
+											<Trash2 className="mr-1.5 h-3.5 w-3.5" />
+											{t("removeLegalDoc")}
+										</Button>
+									</div>
+								)}
 
 								{/* Document Metadata */}
 								<Card>
@@ -125,6 +135,7 @@ export function LegalDocumentsEditor({
 											label={t("legalDocKey")}
 											value={doc.key}
 											mono
+											isKey
 											onChange={v =>
 												updateDocument(docIndex, d => {
 													d.key = v;
@@ -188,10 +199,12 @@ export function LegalDocumentsEditor({
 										<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 											{t("legalSections")} ({doc.sections.length})
 										</p>
-										<Button variant="outline" size="sm" onClick={() => addSection(docIndex)}>
-											<Plus className="mr-1.5 h-3 w-3" />
-											{t("addLegalSection")}
-										</Button>
+										{!translationMode && (
+											<Button variant="outline" size="sm" onClick={() => addSection(docIndex)}>
+												<Plus className="mr-1.5 h-3 w-3" />
+												{t("addLegalSection")}
+											</Button>
+										)}
 									</div>
 
 									{doc.sections.map((section, sectionIndex) => (
@@ -203,6 +216,7 @@ export function LegalDocumentsEditor({
 															label={t("legalSectionKey")}
 															value={section.key}
 															mono
+															isKey
 															onChange={v =>
 																updateSection(docIndex, sectionIndex, s => {
 																	s.key = v;
@@ -219,13 +233,15 @@ export function LegalDocumentsEditor({
 															}
 														/>
 													</div>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-4"
-														onClick={() => removeSection(docIndex, sectionIndex)}>
-														<Trash2 className="h-3.5 w-3.5" />
-													</Button>
+													{!translationMode && (
+														<Button
+															variant="ghost"
+															size="icon"
+															className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-4"
+															onClick={() => removeSection(docIndex, sectionIndex)}>
+															<Trash2 className="h-3.5 w-3.5" />
+														</Button>
+													)}
 												</div>
 											</CardHeader>
 
@@ -236,14 +252,18 @@ export function LegalDocumentsEditor({
 														<p className="text-xs text-muted-foreground">
 															{t("legalSectionBody")}
 														</p>
-														<Button
-															variant="ghost"
-															size="sm"
-															className="h-6 text-xs"
-															onClick={() => addBodyParagraph(docIndex, sectionIndex)}>
-															<Plus className="mr-1 h-3 w-3" />
-															{t("addParagraph")}
-														</Button>
+														{!translationMode && (
+															<Button
+																variant="ghost"
+																size="sm"
+																className="h-6 text-xs"
+																onClick={() =>
+																	addBodyParagraph(docIndex, sectionIndex)
+																}>
+																<Plus className="mr-1 h-3 w-3" />
+																{t("addParagraph")}
+															</Button>
+														)}
 													</div>
 													{section.body.map((para, paraIndex) => (
 														<div key={paraIndex} className="flex gap-2">
@@ -259,19 +279,23 @@ export function LegalDocumentsEditor({
 																	)
 																}
 															/>
-															<Button
-																variant="ghost"
-																size="icon"
-																className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-1"
-																onClick={() =>
-																	removeBodyParagraph(
-																		docIndex,
-																		sectionIndex,
-																		paraIndex
-																	)
-																}>
-																<Trash2 className="h-3.5 w-3.5" />
-															</Button>
+															{translationMode ? (
+																<AiTranslateFieldButton className="mt-1" />
+															) : (
+																<Button
+																	variant="ghost"
+																	size="icon"
+																	className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-1"
+																	onClick={() =>
+																		removeBodyParagraph(
+																			docIndex,
+																			sectionIndex,
+																			paraIndex
+																		)
+																	}>
+																	<Trash2 className="h-3.5 w-3.5" />
+																</Button>
+															)}
 														</div>
 													))}
 												</div>
@@ -282,14 +306,16 @@ export function LegalDocumentsEditor({
 														<p className="text-xs text-muted-foreground">
 															{t("legalSectionBullets")}
 														</p>
-														<Button
-															variant="ghost"
-															size="sm"
-															className="h-6 text-xs"
-															onClick={() => addBullet(docIndex, sectionIndex)}>
-															<Plus className="mr-1 h-3 w-3" />
-															{t("addBullet")}
-														</Button>
+														{!translationMode && (
+															<Button
+																variant="ghost"
+																size="sm"
+																className="h-6 text-xs"
+																onClick={() => addBullet(docIndex, sectionIndex)}>
+																<Plus className="mr-1 h-3 w-3" />
+																{t("addBullet")}
+															</Button>
+														)}
 													</div>
 													{section.bullets.map((bullet, bulletIndex) => (
 														<div key={bulletIndex} className="flex gap-2">
@@ -305,15 +331,23 @@ export function LegalDocumentsEditor({
 																	)
 																}
 															/>
-															<Button
-																variant="ghost"
-																size="icon"
-																className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-1"
-																onClick={() =>
-																	removeBullet(docIndex, sectionIndex, bulletIndex)
-																}>
-																<Trash2 className="h-3.5 w-3.5" />
-															</Button>
+															{translationMode ? (
+																<AiTranslateFieldButton className="mt-1" />
+															) : (
+																<Button
+																	variant="ghost"
+																	size="icon"
+																	className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-1"
+																	onClick={() =>
+																		removeBullet(
+																			docIndex,
+																			sectionIndex,
+																			bulletIndex
+																		)
+																	}>
+																	<Trash2 className="h-3.5 w-3.5" />
+																</Button>
+															)}
 														</div>
 													))}
 													{section.bullets.length === 0 && (

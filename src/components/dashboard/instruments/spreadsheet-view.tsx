@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { isScaleCustomized, renderInlineMarkdown } from "./utils";
 import { ScaleKeyBadge } from "./shared-components";
 import { MODE_OPTIONS, QUESTION_TYPE_OPTIONS } from "./constants";
+import { useInstrumentEdit } from "./instrument-edit-context";
 
 interface SpreadsheetRow {
 	sectionIndex: number;
@@ -89,7 +90,9 @@ export function SpreadsheetView({
 	onEditSection?: (sectionIndex: number, field: string, value: string | null) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
+	const { translationMode } = useInstrumentEdit();
 	const editable = onEditQuestion !== undefined && onEditSection !== undefined;
+	const editableKeys = editable && !translationMode;
 
 	const [search, setSearch] = useState("");
 	const [sectionFilter, setSectionFilter] = useState<string>("__all__");
@@ -430,7 +433,7 @@ export function SpreadsheetView({
 											<TableCell
 												className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-background border-r border-border/50"
 												data-testid={`cell-question-key-${row.sectionIndex}-${row.questionIndex}`}>
-												{editable
+												{editableKeys
 													? renderEditableCell(
 															qKey,
 															"question_key",
@@ -496,7 +499,7 @@ export function SpreadsheetView({
 
 											<TableCell
 												data-testid={`cell-question-mode-${row.sectionIndex}-${row.questionIndex}`}>
-												{editable && onEditQuestion ? (
+												{editableKeys && onEditQuestion ? (
 													<Select
 														value={q.mode}
 														onValueChange={v =>
@@ -536,7 +539,7 @@ export function SpreadsheetView({
 
 											<TableCell
 												data-testid={`cell-question-constructs-${row.sectionIndex}-${row.questionIndex}`}>
-												{editable && onEditQuestion ? (
+												{editableKeys && onEditQuestion ? (
 													<Select
 														value={
 															q.constructs.length === 2 ? "both" : (q.constructs[0] ?? "")

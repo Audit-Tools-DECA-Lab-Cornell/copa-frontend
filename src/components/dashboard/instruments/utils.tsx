@@ -1,5 +1,11 @@
 import React from "react";
-import type { InstrumentQuestion, InstrumentSection, QuestionScale, ScaleDefinition } from "@/types/audit";
+import type {
+	InstrumentQuestion,
+	InstrumentSection,
+	PlayspaceInstrument,
+	QuestionScale,
+	ScaleDefinition
+} from "@/types/audit";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 /**
@@ -194,6 +200,110 @@ export function bumpVersion(version: string): string {
 		return `${version}.1`;
 	}
 	return [...parts.slice(0, -1), String(last + 1)].join(".");
+}
+
+/**
+ * Collect the translatable display strings of an instrument in a stable order.
+ *
+ * Keys, scoring values, and structural flags are deliberately excluded — only
+ * human-facing copy that a translator would localize is gathered. Because every
+ * language shares the same key-aligned structure, two languages produce arrays
+ * of the same length and ordering, which lets {@link getTranslationCoverage}
+ * compare them position-by-position.
+ */
+export function collectTranslatableStrings(instrument: PlayspaceInstrument): string[] {
+	const out: string[] = [];
+	const push = (value: string | null | undefined) => out.push(value ?? "");
+
+	push(instrument.instrument_name);
+	push(instrument.current_sheet);
+	for (const paragraph of instrument.preamble) push(paragraph);
+
+	for (const mode of instrument.execution_modes) {
+		push(mode.label);
+		push(mode.description);
+	}
+
+	for (const question of instrument.pre_audit_questions) {
+		push(question.label);
+		push(question.description);
+		for (const option of question.options) {
+			push(option.label);
+			push(option.description);
+		}
+	}
+
+	for (const scale of instrument.scale_guidance) {
+		push(scale.title);
+		push(scale.prompt);
+		push(scale.description);
+		for (const option of scale.options) push(option.label);
+	}
+
+	for (const section of instrument.sections) {
+		push(section.title);
+		push(section.description);
+		push(section.instruction);
+		push(section.notes_prompt);
+		for (const question of section.questions) {
+			push(question.prompt);
+			push(question.notes_prompt);
+			for (const scale of question.scales) {
+				push(scale.title);
+				push(scale.prompt);
+				for (const option of scale.options) push(option.label);
+			}
+		}
+	}
+
+	for (const doc of instrument.legal_documents) {
+		push(doc.short_title);
+		push(doc.title);
+		push(doc.eyebrow);
+		push(doc.summary);
+		for (const section of doc.sections) {
+			push(section.title);
+			for (const paragraph of section.body) push(paragraph);
+			for (const bullet of section.bullets) push(bullet);
+		}
+	}
+
+	return out;
+}
+
+/**
+ * Estimate how much of a translation language has actually been localized.
+ *
+ * A translatable field counts as "translated" when its value is non-empty and
+ * differs from the base language. Fields still identical to the base are
+ * treated as untranslated (the value falls back to English at runtime). Returns
+ * `null` when the structures don't line up, so callers can hide the indicator
+ * rather than show a misleading number.
+ */
+export function getTranslationCoverage(
+	base: PlayspaceInstrument,
+	target: PlayspaceInstrument
+): { translated: number; total: number; percent: number } | null {
+	const baseStrings = collectTranslatableStrings(base);
+	const targetStrings = collectTranslatableStrings(target);
+	if (baseStrings.length !== targetStrings.length) {
+		return null;
+	}
+
+	let total = 0;
+	let translated = 0;
+	for (let i = 0; i < baseStrings.length; i += 1) {
+		const baseValue = baseStrings[i].trim();
+		if (baseValue.length === 0) continue;
+		total += 1;
+		const targetValue = targetStrings[i].trim();
+		if (targetValue.length > 0 && targetValue !== baseValue) {
+			translated += 1;
+		}
+	}
+
+	const percent = total === 0 ? 100 : Math.round((translated / total) * 100);
+	return { translated, total, percent };
 }
 
 export interface InstrumentChange {
