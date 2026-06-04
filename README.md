@@ -185,6 +185,15 @@ Auto-save behavior:
     - `overall_scores`
 - Manager/admin UI should render score pairs as `PV {x} | U {y}`
 
+### Agent rules (Cursor + Claude Code)
+
+Scoped conventions for this repo (keep `.cursor/rules/` and `.claude/rules/` in sync):
+
+- `frontend-dashboard-core.mdc` — role guards, shared dashboard components, API contract, UI copy
+- `frontend-i18n-and-exports.mdc` — `messages/en.json` + `de.json`, report views, PDF/Excel exports
+
+See `CLAUDE.md` and `.claude/README.md`. Workspace routing: `../.claude/AGENT_ROUTING.md` → `web-dashboard-ui`.
+
 ### Project structure
 
 - `src/app/(public)` — unauthenticated pages

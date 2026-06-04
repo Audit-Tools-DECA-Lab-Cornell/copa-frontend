@@ -1,0 +1,19 @@
+---
+description: Next.js dashboard conventions — role guards, shared components, API client, and UI copy. Mirror in .claude/rules/ — edit both when changing.
+alwaysApply: true
+---
+
+# Frontend Dashboard Core
+
+- Respect `middleware.ts` role guards (`/admin`, `/manager`, `/auditor`, `/settings`). Auditor routes expose only in-progress, submitted, and unstarted audits plus the auditor's own reports — no place or project pages.
+- Use `session.userName` and `session.userEmail` for the logged-in user. Do not use `managerAccount.primary_manager.*` for the current user's name or email.
+- Reuse shared dashboard components (`FilterPopover`, `AuditDetailView`, dashboard tables, `auditor-display.ts`) instead of one-off list or filter markup.
+- Treat `src/lib/api/playspace.ts` and backend responses as the contract source of truth. Place list/filter UIs use `place_audit_status` and `place_survey_status`, not a legacy `status` field.
+- Keep `*Row` (preview/list) and `*ExportRecord` (export endpoint) shapes distinct. Use existing row-builder helpers (`auditRowExportRecord`, `projectRowExportRecord`, `placeRowExportRecord`, and full-export `*ExportRecord` helpers) — do not flatten or merge these types ad hoc.
+- Every user-visible string belongs in i18n (`messages/en.json` + `messages/de.json`), written from the reader's role and task. No internal model names, backend field names, or implementation jargon in the UI.
+- Path alias `@/*` → `./src/*`. Prefer TanStack Query + existing API helpers over new fetch wrappers.
+- Manager/admin dashboard page headers use inverted contrast (`bg-foreground` + `text-background`), not a plain `bg-card` shell.
+- Admin exports and raw-data views must never expose auditor PII — auditor code only, no names or contact details.
+- Contract or role-gated flow changes ship with matching Playwright specs under `tests/e2e/`; coordinate with `qa-e2e-regression` when the backend boundary moves.
+- Default git branch is `master` (there is no `main` on GitHub for this repo).
+- Never read or edit `.env`, `.env.*`, or secrets unless the user explicitly names that file in the current message.
