@@ -17,5 +17,6 @@ alwaysApply: true
 - Contract or role-gated flow changes ship with matching Playwright specs under `tests/e2e/`; coordinate with `qa-e2e-regression` when the backend boundary moves.
 - Default git branch is `master` (there is no `main` on GitHub for this repo).
 - Never read or edit `.env`, `.env.*`, or secrets unless the user explicitly names that file in the current message.
-- Use semantic tokens from `src/lib/design-system.ts` (CSS custom properties like `--solid-primary`, `--status-danger`, `--surface-raised`) for theming — do not hard-code raw color values or override these tokens ad hoc.
+- Use semantic tokens from `src/lib/design-system.ts` for theming — do not hard-code raw color values. Structural dividers: use `border-edge/<opacity>` (e.g. `border-edge/40`, `border-edge/60`) — not `border-border`. Shadows: `shadow-card` for cards/panels, `shadow-field` for selected-state interactive tiles; avoid generic `shadow-sm/md/lg`.
+- `DataTableToolbar` must not carry `border-b`; `CardHeader` in `data-table.tsx` owns that separator — two `border-b` elements in the table header area produce a double-line artifact.
 - Admin instrument editor lives in `src/components/dashboard/instruments/`. Instruments have a branch/publish lifecycle — a draft branch is distinct from published version history; do not conflate branch state with version records. Branch state aligns to backend publication rules.
