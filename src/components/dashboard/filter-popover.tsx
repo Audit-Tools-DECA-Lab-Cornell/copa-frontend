@@ -22,6 +22,8 @@ export interface FilterPopoverProps {
 	selectedValues: string[];
 	/** Called whenever the selection changes. */
 	onChange: (values: string[]) => void;
+	/** Render the trigger as a bru-btn-neutral block instead of a shadcn Button. */
+	bruTrigger?: boolean;
 }
 
 /**
@@ -29,7 +31,7 @@ export interface FilterPopoverProps {
  * toolbars.  Selections apply immediately (no staged draft state) and are
  * reflected on the trigger button as a count badge.
  */
-export function FilterPopover({ title, options, selectedValues, onChange }: FilterPopoverProps) {
+export function FilterPopover({ title, options, selectedValues, onChange, bruTrigger }: FilterPopoverProps) {
 	function handleCheckedChange(value: string, checked: boolean): void {
 		if (checked) {
 			onChange([...selectedValues, value]);
@@ -38,18 +40,29 @@ export function FilterPopover({ title, options, selectedValues, onChange }: Filt
 		}
 	}
 
+	const countPill =
+		selectedValues.length > 0 ? (
+			<span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded border-0 bg-white/20 px-1 font-mono text-[11px] leading-none">
+				{selectedValues.length}
+			</span>
+		) : null;
+
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button variant="secondary" size="sm" className="gap-2 px-3.5">
-					<FilterIcon className="size-3.5 shrink-0" />
-					{title}
-					{selectedValues.length > 0 && (
-						<span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded border-0 bg-white/20 px-1 font-mono text-[11px] leading-none">
-							{selectedValues.length}
-						</span>
-					)}
-				</Button>
+				{bruTrigger ? (
+					<button type="button" className="bru-btn bru-btn-neutral gap-2">
+						<FilterIcon className="size-3.5 shrink-0" />
+						{title}
+						{countPill}
+					</button>
+				) : (
+					<Button variant="secondary" size="sm" className="gap-2 px-3.5">
+						<FilterIcon className="size-3.5 shrink-0" />
+						{title}
+						{countPill}
+					</Button>
+				)}
 			</PopoverTrigger>
 			<PopoverContent className="w-64 p-3" align="start">
 				<div className="space-y-3">

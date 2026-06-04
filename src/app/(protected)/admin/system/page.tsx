@@ -119,7 +119,7 @@ export default function AdminSystemPage() {
 								{t("instrumentMetadata.key")}
 							</p>
 							<p className="font-mono text-sm text-foreground flex items-center">
-								<span className="rounded-md border-2 border-foreground/10 bg-foreground/20 p-1 text-sm text-violet-900">
+								<span className="rounded-md border-2 border-foreground/10 bg-foreground/20 p-1 text-sm">
 									{system.instrument_key}
 								</span>
 							</p>

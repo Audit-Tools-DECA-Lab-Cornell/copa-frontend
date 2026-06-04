@@ -14,9 +14,11 @@ import {
 	LogOut,
 	MapPin,
 	Menu,
+	Form,
 	PanelLeftClose,
 	PanelLeftOpen,
 	Settings,
+	MonitorCog,
 	Shield,
 	Users,
 	type LucideIcon
@@ -62,11 +64,11 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("projects"), href: "/admin/projects", icon: FolderKanban },
 			{ label: t("places"), href: "/admin/places", icon: MapPin },
 			{ label: t("auditors"), href: "/admin/auditors", icon: Users },
-			{ label: t("audits"), href: "/admin/audits", icon: ClipboardList },
+			{ label: t("audits"), href: "/admin/audits", icon: Form },
 			{ label: t("reports"), href: "/admin/reports", icon: ClipboardList },
 			{ label: t("rawData"), href: "/admin/raw-data", icon: DatabaseIcon },
 			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
-			{ label: t("system"), href: "/admin/system", icon: Settings },
+			{ label: t("system"), href: "/admin/system", icon: MonitorCog },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
 	}
@@ -77,7 +79,7 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("projects"), href: "/manager/projects", icon: FolderKanban },
 			{ label: t("places"), href: "/manager/places", icon: MapPin },
 			{ label: t("auditors"), href: "/manager/auditors", icon: Users },
-			{ label: t("audits"), href: "/manager/audits", icon: ClipboardList },
+			{ label: t("audits"), href: "/manager/audits", icon: Form },
 			{ label: t("reports"), href: "/manager/reports", icon: ClipboardList },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
