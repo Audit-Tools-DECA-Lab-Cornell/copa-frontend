@@ -260,6 +260,7 @@ export function InstrumentEditor({
 								{editingVersion ? (
 									<div className="flex items-center gap-1">
 										<Input
+											aria-label={t("versionLabel")}
 											className="h-7 w-24 px-2 text-sm"
 											value={draftVersion}
 											onChange={e => setDraftVersion(e.target.value)}

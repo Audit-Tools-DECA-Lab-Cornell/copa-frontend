@@ -472,7 +472,10 @@
 				"saveError": "Fehler beim Speichern des Instruments",
 				"activateSuccess": "Instrument aktiviert",
 				"activateDesc": "Version {version} ist jetzt die aktive Version.",
-				"activateError": "Fehler beim Aktivieren des Instruments"
+				"activateError": "Fehler beim Aktivieren des Instruments",
+				"deleteSuccess": "Instrumentversion gelöscht",
+				"deleteDesc": "Version {version} wurde gelöscht.",
+				"deleteError": "Fehler beim Löschen der Instrumentversion"
 			},
 			"empty": {
 				"title": "Keine Instrumente gefunden",
@@ -494,7 +497,19 @@
 				"confirmActivateTitle": "Diese Version aktivieren?",
 				"confirmActivate": "Dies ersetzt sofort das aktuelle aktive Instrument für alle Prüfer. Laufende Audits werden mit ihrer gestarteten Version fortgesetzt.",
 				"activate": "Version aktivieren",
-				"cancel": "Abbrechen"
+				"cancel": "Abbrechen",
+				"delete": "Löschen",
+				"confirmDeleteTitle": "Diese Version löschen?",
+				"confirmDelete": "Version {version} löschen? Dadurch wird der Entwurf aus der Versionshistorie entfernt. Diese Aktion kann nicht rückgängig gemacht werden. Aktive Versionen können nicht gelöscht werden.",
+				"confirmDeleteGeneric": "Diese Entwurfsversion löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"deleteConfirm": "Version löschen",
+				"draft": "Entwurf",
+				"branchLabel": "Entwurfszweig",
+				"branchHelp": "Klappen Sie eine Version auf, um daraus erstellte Entwurfszweige zu sehen.",
+				"branchCount": "{count} {count, plural, one {Entwurfszweig} other {Entwurfszweige}}",
+				"toggleBranches": "Entwurfszweige dieser Version ein- oder ausklappen",
+				"noBranches": "Für diese Version gibt es noch keine Entwurfszweige.",
+				"inactive": "Inaktiv"
 			},
 			"upload": {
 				"title": "Instrument-JSON hochladen",
@@ -730,7 +745,8 @@
 				"detectedChanges": "Erkannte Änderungen ({count})",
 				"noChanges": "Keine Änderungen zwischen diesen Versionen erkannt.",
 				"publishing": "Veröffentliche...",
-				"publishAndActivate": "Veröffentlichen & Aktivieren"
+				"publishAndActivate": "Veröffentlichen & Aktivieren",
+				"versionLabel": "Entwurfsversion"
 			}
 		},
 		"system": {

@@ -490,7 +490,10 @@
 				"saveError": "Failed to save instrument",
 				"activateSuccess": "Instrument activated",
 				"activateDesc": "Version {version} is now the active version.",
-				"activateError": "Failed to activate instrument"
+				"activateError": "Failed to activate instrument",
+				"deleteSuccess": "Instrument version deleted",
+				"deleteDesc": "Version {version} has been deleted.",
+				"deleteError": "Failed to delete instrument version"
 			},
 			"empty": {
 				"title": "No instruments found",
@@ -512,7 +515,19 @@
 				"confirmActivateTitle": "Activate this version?",
 				"confirmActivate": "This will immediately replace the current active instrument for all auditors. In-progress audits will continue using their started version.",
 				"activate": "Activate Version",
-				"cancel": "Cancel"
+				"cancel": "Cancel",
+				"delete": "Delete",
+				"confirmDeleteTitle": "Delete this version?",
+				"confirmDelete": "Delete version {version}? This removes the draft from version history and cannot be undone. Active versions cannot be deleted.",
+				"confirmDeleteGeneric": "Delete this draft version? This action cannot be undone.",
+				"deleteConfirm": "Delete version",
+				"draft": "Draft",
+				"branchLabel": "draft branch",
+				"branchHelp": "Toggle a version to view draft branches created from it.",
+				"branchCount": "{count} {count, plural, one {draft branch} other {draft branches}}",
+				"toggleBranches": "Toggle draft branches from this version",
+				"noBranches": "No draft branches from this version yet.",
+				"inactive": "Inactive"
 			},
 			"upload": {
 				"title": "Upload Instrument JSON",
@@ -748,7 +763,8 @@
 				"detectedChanges": "Detected Changes ({count})",
 				"noChanges": "No changes detected between these versions.",
 				"publishing": "Publishing...",
-				"publishAndActivate": "Publish & Activate"
+				"publishAndActivate": "Publish & Activate",
+				"versionLabel": "Draft version"
 			}
 		},
 		"system": {
