@@ -12,4 +12,6 @@ export interface InstrumentVersionRow {
 	content: InstrumentContent;
 	created_at: string;
 	activated_at?: string | null;
+	submission_count: number;
+	can_delete: boolean;
 }

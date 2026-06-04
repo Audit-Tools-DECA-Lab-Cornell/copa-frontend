@@ -193,13 +193,67 @@ export function buildScaleGuidanceMap(scaleGuidance: ScaleDefinition[]): Map<str
 	return map;
 }
 
-export function bumpVersion(version: string): string {
-	const parts = version.split(".");
-	const last = Number(parts[parts.length - 1]);
-	if (Number.isNaN(last)) {
-		return `${version}.1`;
+/** Next draft sub-version under a published parent (e.g. 5.23 -> 5.23.1). */
+export function suggestNextDraftVersion(parentVersion: string, existingVersions: readonly string[]): string {
+	const prefix = `${parentVersion}.`;
+	let maxSuffix = 0;
+	for (const version of existingVersions) {
+		if (!version.startsWith(prefix)) {
+			continue;
+		}
+		const suffix = version.slice(prefix.length);
+		if (/^\d+$/.test(suffix)) {
+			maxSuffix = Math.max(maxSuffix, Number(suffix));
+		}
 	}
-	return [...parts.slice(0, -1), String(last + 1)].join(".");
+	return `${parentVersion}.${maxSuffix + 1}`;
+}
+
+/** Parse a dotted numeric version into comparable integer segments, or null. */
+function parseNumericVersion(version: string): number[] | null {
+	const parts = version.split(".");
+	if (parts.length === 0 || !parts.every(part => /^\d+$/.test(part))) {
+		return null;
+	}
+	return parts.map(Number);
+}
+
+/** Compare two segment arrays the way tuples compare (shorter prefix sorts lower). */
+function compareNumericVersions(a: readonly number[], b: readonly number[]): number {
+	const length = Math.max(a.length, b.length);
+	for (let i = 0; i < length; i++) {
+		const diff = (a[i] ?? -1) - (b[i] ?? -1);
+		if (diff !== 0) {
+			return diff;
+		}
+	}
+	return 0;
+}
+
+/**
+ * Next publication number: one increment above the highest existing publication.
+ *
+ * Mirrors the backend so the dialog preview matches what the server assigns.
+ * Deriving from the highest publication (not the currently active version) keeps
+ * numbers monotonic even after a rollback to an older version.
+ */
+export function suggestNextPublishedVersion(publishedVersions: readonly string[]): string {
+	let highest: number[] | null = null;
+	for (const version of publishedVersions) {
+		const parsed = parseNumericVersion(version);
+		if (parsed === null) {
+			continue;
+		}
+		if (highest === null || compareNumericVersions(parsed, highest) > 0) {
+			highest = parsed;
+		}
+	}
+	if (highest === null) {
+		return "1.0";
+	}
+	const next = [...highest];
+	next[next.length - 1] += 1;
+	return next.join(".");
 }
 
 /**

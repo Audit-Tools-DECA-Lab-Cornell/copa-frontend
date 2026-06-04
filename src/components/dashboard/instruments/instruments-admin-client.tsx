@@ -17,7 +17,7 @@ import type { z } from "zod";
 
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
 import { INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
-import { bumpVersion } from "./utils";
+import { suggestNextDraftVersion, suggestNextPublishedVersion } from "./utils";
 import { VersionHistory } from "./version-history";
 import { InstrumentEditor } from "./instrument-editor";
 import { ActivateDialog } from "./activate-dialog";
@@ -64,12 +64,22 @@ export function InstrumentsAdminClient() {
 				is_active: r.is_active,
 				content: r.content as unknown as InstrumentContent,
 				created_at: r.created_at,
-				activated_at: r.updated_at
+				activated_at: r.updated_at,
+				submission_count: r.submission_count,
+				can_delete: r.can_delete
 			})),
 		[versions]
 	);
 
 	const activeVersion = useMemo(() => allVersions.find(v => v.is_active) ?? null, [allVersions]);
+
+	// Publications are the non-draft (root) rows: the active version plus any
+	// versions that were active before. The next publication number is derived
+	// from these, never from drafts.
+	const publishedVersions = useMemo(
+		() => allVersions.filter(v => v.parent_instrument_id === null).map(v => v.version),
+		[allVersions]
+	);
 
 	async function refreshVersionHistory() {
 		await queryClient.refetchQueries({
@@ -79,7 +89,11 @@ export function InstrumentsAdminClient() {
 		});
 	}
 
-	const setInstrumentMutation = useMutation<unknown, Error, SetInstrumentVars>({
+	const setInstrumentMutation = useMutation<
+		Awaited<ReturnType<typeof playspaceApi.admin.instruments.create>>,
+		Error,
+		SetInstrumentVars
+	>({
 		mutationFn: (params: SetInstrumentVars) =>
 			playspaceApi.admin.instruments.create(
 				{
@@ -90,11 +104,12 @@ export function InstrumentsAdminClient() {
 				},
 				params.activate
 			),
-		onSuccess: async (_data, params) => {
+		onSuccess: async (data, params) => {
+			const savedVersion = data.instrument_version;
 			toast.success(t("toast.saveSuccess"), {
 				description: params.activate
-					? t("toast.saveActiveDesc", { version: params.version })
-					: t("toast.saveDraftDesc", { version: params.version })
+					? t("toast.saveActiveDesc", { version: savedVersion })
+					: t("toast.saveDraftDesc", { version: savedVersion })
 			});
 			setEditingContent(null);
 			setEditingParentInstrumentId(null);
@@ -110,9 +125,11 @@ export function InstrumentsAdminClient() {
 	const activateVersionMutation = useMutation({
 		mutationFn: (versionRow: InstrumentVersionRow) =>
 			playspaceApi.admin.instruments.update(versionRow.id, { is_active: true }),
-		onSuccess: async (_, versionRow) => {
+		onSuccess: async updated => {
 			toast.success(t("toast.activateSuccess"), {
-				description: t("toast.activateDesc", { version: versionRow.version })
+				description: t("toast.activateDesc", {
+					version: updated.instrument_version
+				})
 			});
 			setIsActivateDialogOpen(false);
 			setVersionToActivate(null);
@@ -152,7 +169,8 @@ export function InstrumentsAdminClient() {
 	}
 
 	function handleEditDraft(baseVersion: string, baseContent: InstrumentContent, parentInstrumentId: string) {
-		setEditingVersion(bumpVersion(baseVersion));
+		const existingVersions = allVersions.map(versionRow => versionRow.version);
+		setEditingVersion(suggestNextDraftVersion(baseVersion, existingVersions));
 		setEditingParentInstrumentId(parentInstrumentId);
 		setEditingContent(structuredClone(baseContent));
 	}
@@ -215,6 +233,7 @@ export function InstrumentsAdminClient() {
 					{!editingContent && allVersions.length > 0 && (
 						<VersionHistory
 							versions={allVersions}
+							activeVersion={activeVersion?.version ?? null}
 							isPending={isMutating}
 							onActivateVersion={v => {
 								setVersionToActivate(v);
@@ -229,6 +248,7 @@ export function InstrumentsAdminClient() {
 						<InstrumentEditor
 							content={editingContent}
 							version={editingVersion}
+							lockVersion={true}
 							isPending={isMutating}
 							onSave={handleSaveDraft}
 							onCancel={() => {
@@ -253,6 +273,14 @@ export function InstrumentsAdminClient() {
 			<ActivateDialog
 				open={isActivateDialogOpen}
 				isPending={isMutating}
+				versionLabel={versionToActivate?.version ?? null}
+				nextPublishedVersion={
+					// Only a draft gets a fresh publication number on activation.
+					// Reactivating an existing publication (a rollback) keeps its number.
+					versionToActivate?.parent_instrument_id && publishedVersions.length > 0
+						? suggestNextPublishedVersion(publishedVersions)
+						: null
+				}
 				onConfirm={() => {
 					if (versionToActivate) activateVersionMutation.mutate(versionToActivate);
 				}}
@@ -272,7 +300,9 @@ export function InstrumentsAdminClient() {
 				title={t("versionHistory.confirmDeleteTitle")}
 				description={
 					versionToDelete
-						? t("versionHistory.confirmDelete", { version: versionToDelete.version })
+						? versionToDelete.parent_instrument_id
+							? t("versionHistory.confirmDeleteDraft", { version: versionToDelete.version })
+							: t("versionHistory.confirmDeleteInactive", { version: versionToDelete.version })
 						: t("versionHistory.confirmDeleteGeneric")
 				}
 				confirmLabel={t("versionHistory.deleteConfirm")}

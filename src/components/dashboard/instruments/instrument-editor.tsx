@@ -37,12 +37,14 @@ import { PlayspaceInstrument } from "@/types/audit";
 export function InstrumentEditor({
 	content,
 	version,
+	lockVersion = false,
 	isPending,
 	onSave,
 	onCancel
 }: Readonly<{
 	content: InstrumentContent;
 	version: string;
+	lockVersion?: boolean;
 	isPending: boolean;
 	onSave: (version: string, content: InstrumentContent, activate?: boolean) => void;
 	onCancel: () => void;
@@ -257,7 +259,18 @@ export function InstrumentEditor({
 									</span>
 								</Badge>
 								<span className="h-3 w-px bg-border/70 shrink-0" />
-								{editingVersion ? (
+								{lockVersion ? (
+									<div className="flex flex-col gap-0.5">
+										<span
+											data-testid="draft-version-label"
+											className="font-mono text-sm font-medium">
+											{draftVersion}
+										</span>
+										<span className="text-[10px] text-muted-foreground">
+											{t("draftVersionHelp")}
+										</span>
+									</div>
+								) : editingVersion ? (
 									<div className="flex items-center gap-1">
 										<Input
 											aria-label={t("versionLabel")}

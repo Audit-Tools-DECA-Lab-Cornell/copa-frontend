@@ -12,11 +12,15 @@ import {
 export function ActivateDialog({
 	open,
 	isPending,
+	versionLabel,
+	nextPublishedVersion,
 	onConfirm,
 	onCancel
 }: Readonly<{
 	open: boolean;
 	isPending: boolean;
+	versionLabel: string | null;
+	nextPublishedVersion: string | null;
 	onConfirm: () => void;
 	onCancel: () => void;
 }>) {
@@ -30,7 +34,14 @@ export function ActivateDialog({
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>{t("versionHistory.confirmActivateTitle")}</DialogTitle>
-					<DialogDescription>{t("versionHistory.confirmActivate")}</DialogDescription>
+					<DialogDescription>
+						{versionLabel && nextPublishedVersion
+							? t("versionHistory.confirmActivateWithVersion", {
+								version: versionLabel,
+								nextVersion: nextPublishedVersion
+							})
+							: t("versionHistory.confirmActivate")}
+					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
 					<Button variant="outline" onClick={onCancel}>

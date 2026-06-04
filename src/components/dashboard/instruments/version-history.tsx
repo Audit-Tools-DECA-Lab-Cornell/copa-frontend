@@ -15,12 +15,15 @@ import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { InstrumentContentViewer } from "./instrument-content-viewer";
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
+import { suggestNextPublishedVersion } from "./utils";
 
 interface VersionHistoryProps {
 	versions: InstrumentVersionRow[];
+	activeVersion: string | null;
 	isPending: boolean;
 	onActivateVersion: (v: InstrumentVersionRow) => void;
 	onEditDraft: (version: string, content: InstrumentContent, parentInstrumentId: string) => void;
@@ -62,6 +65,7 @@ function buildBranches(versions: InstrumentVersionRow[]): VersionBranch[] {
 
 export function VersionHistory({
 	versions,
+	activeVersion,
 	isPending,
 	onActivateVersion,
 	onEditDraft,
@@ -75,6 +79,13 @@ export function VersionHistory({
 	const branches = useMemo(() => buildBranches(versions), [versions]);
 	const displayBranches = expandedList ? branches : branches.slice(0, 3);
 	const hasMore = branches.length > 3;
+
+	// Publications are the non-draft (root) rows; the next publication number is
+	// derived from the highest of these, matching the server.
+	const publishedVersions = useMemo(
+		() => versions.filter(version => version.parent_instrument_id === null).map(version => version.version),
+		[versions]
+	);
 
 	if (branches.length === 0) return null;
 
@@ -95,12 +106,25 @@ export function VersionHistory({
 	}
 
 	function renderVersionActions(version: InstrumentVersionRow) {
+		const deleteButton = (
+			<Button
+				variant="outline"
+				size="sm"
+				disabled={!version.can_delete || isPending}
+				data-testid="delete-version-button"
+				onClick={() => onDeleteVersion(version)}>
+				<Trash2 className="mr-2 h-4 w-4" />
+				{t("versionHistory.delete")}
+			</Button>
+		);
+
 		return (
 			<div className="flex flex-wrap items-center justify-end gap-2">
 				{version.is_active && (
 					<Button
 						variant="outline"
 						size="sm"
+						data-testid="edit-duplicate-button"
 						onClick={() =>
 							onEditDraft(version.version, version.content as unknown as InstrumentContent, version.id)
 						}>
@@ -124,10 +148,24 @@ export function VersionHistory({
 				</Button>
 				{!version.is_active && (
 					<>
-						<Button variant="outline" size="sm" disabled={true} onClick={() => onDeleteVersion(version)}>
-							<Trash2 className="mr-2 h-4 w-4" />
-							{t("versionHistory.delete")}
-						</Button>
+						{version.can_delete ? (
+							deleteButton
+						) : (
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span>{deleteButton}</span>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>
+											{t("versionHistory.deleteBlockedInUse", {
+												count: version.submission_count
+											})}
+										</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						)}
 						<Button
 							variant="secondary"
 							size="sm"
@@ -163,6 +201,11 @@ export function VersionHistory({
 					{variant === "draft" && (
 						<Badge variant="outline" className="text-[10px]">
 							{t("versionHistory.branchLabel")}
+						</Badge>
+					)}
+					{!version.is_active && version.submission_count > 0 && version.parent_instrument_id === null && (
+						<Badge variant="outline" className="text-[10px]">
+							{t("versionHistory.auditUsage", { count: version.submission_count })}
 						</Badge>
 					)}
 				</div>
@@ -208,6 +251,15 @@ export function VersionHistory({
 					</Badge>
 				</div>
 				<p className="text-xs text-muted-foreground">{t("versionHistory.branchHelp")}</p>
+				{activeVersion ? (
+					<p className="text-xs text-muted-foreground">
+						{t("versionHistory.versioningHelp", {
+							activeVersion,
+							nextDraftExample: `${activeVersion}.1`,
+							nextPublishedExample: suggestNextPublishedVersion(publishedVersions)
+						})}
+					</p>
+				) : null}
 			</div>
 			<div className="divide-y divide-border/40">
 				{displayBranches.map(({ root, drafts }) => {

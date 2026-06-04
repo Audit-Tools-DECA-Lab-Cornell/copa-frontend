@@ -939,7 +939,9 @@ export const instrumentResponseSchema = z.object({
 	is_active: z.boolean(),
 	content: instrumentContentSchema,
 	created_at: z.string().datetime(),
-	updated_at: z.string().datetime()
+	updated_at: z.string().datetime(),
+	submission_count: z.number().int().nonnegative().default(0),
+	can_delete: z.boolean().default(true)
 });
 
 export type InstrumentResponse = z.infer<typeof instrumentResponseSchema>;
