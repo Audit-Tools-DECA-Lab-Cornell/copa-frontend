@@ -177,7 +177,7 @@ export const DESIGN_SYSTEM = {
 				solidDangerEdge: "#4a1818",
 				solidDangerText: "#f5d4d4",
 				solidDraft: "#4a3f28",
-				solidDraftText: "#d4c49a",
+				solidDraftText: "#f8f0dc",
 				solidOrphan: "#5c3d1e",
 				solidOrphanText: "#f0d4b0"
 			},
@@ -227,7 +227,7 @@ export const DESIGN_SYSTEM = {
 				solidDangerEdge: "#3d0f0f",
 				solidDangerText: "#ffe0e0",
 				solidDraft: "#3a3018",
-				solidDraftText: "#e8d8a4",
+				solidDraftText: "#faf4e4",
 				solidOrphan: "#4e2c10",
 				solidOrphanText: "#f8e0c0"
 			}
@@ -279,7 +279,7 @@ export const DESIGN_SYSTEM = {
 				solidDangerEdge: "#4a1818",
 				solidDangerText: "#f5d4d4",
 				solidDraft: "#4a3f28",
-				solidDraftText: "#d4c49a",
+				solidDraftText: "#f8f0dc",
 				solidOrphan: "#5c3d1e",
 				solidOrphanText: "#f0d4b0"
 			},
@@ -329,7 +329,7 @@ export const DESIGN_SYSTEM = {
 				solidDangerEdge: "#3d0f0f",
 				solidDangerText: "#ffe0e0",
 				solidDraft: "#3a3018",
-				solidDraftText: "#e8d8a4",
+				solidDraftText: "#faf4e4",
 				solidOrphan: "#4e2c10",
 				solidOrphanText: "#f8e0c0"
 			}

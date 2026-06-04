@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Download, FileJson, FileSpreadsheet, FileText, Check, Lock, Pencil, Save, X, Plus } from "lucide-react";
+import { Check, Download, FileJson, FileSpreadsheet, FileText, Lock, Pencil, Plus, Save, X } from "lucide-react";
 
 import { Lang, type InstrumentContent } from "./types";
 import { exportInstrument } from "@/lib/export/instrument";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { PreambleEditor } from "./editors/preamble-editor";
@@ -26,13 +26,22 @@ import { SectionEditorList } from "./editors/section-editor-list";
 import { SpreadsheetView } from "./spreadsheet-view";
 import { AddLanguageDialog } from "./editors/add-language-dialog";
 import { AiTranslateButton } from "./ai-translate-button";
+import {
+	AdminToolbar,
+	AdminToolbarGroup,
+	AdminToolbarRow,
+	ToolbarChip,
+	ToolbarDivider,
+	ToolbarLabel
+} from "./admin-toolbar";
 
-import { buildScaleGuidanceMap, getTranslationCoverage } from "./utils";
+import { buildScaleGuidanceMap, getInstrumentChanges, getTranslationCoverage } from "./utils";
 import { InstrumentEditProvider, languageLabel, resolveBaseLang } from "./instrument-edit-context";
 
 import { ReviewChangesDialog, InstrumentChange } from "./review-changes-dialog";
-import { getInstrumentChanges } from "./utils";
 import { PlayspaceInstrument } from "@/types/audit";
+
+type EditorTab = "overview" | "sections" | "spreadsheet" | "preAudit" | "scales" | "legalDocuments";
 
 export function InstrumentEditor({
 	content,
@@ -54,9 +63,7 @@ export function InstrumentEditor({
 	const [draftContent, setDraftContent] = useState<InstrumentContent>(content);
 	const [draftVersion, setDraftVersion] = useState(version);
 	const [activeLang, setActiveLang] = useState<Lang>((Object.keys(content)[0] as Lang) ?? "en");
-	const [activeTab, setActiveTab] = useState<
-		"overview" | "sections" | "spreadsheet" | "preAudit" | "scales" | "legalDocuments"
-	>("overview");
+	const [activeTab, setActiveTab] = useState<EditorTab>("overview");
 	const [editingVersion, setEditingVersion] = useState(false);
 	const [editingLang, setEditingLang] = useState<string | null>(null);
 	const [addLanguageOpen, setAddLanguageOpen] = useState(false);
@@ -150,93 +157,187 @@ export function InstrumentEditor({
 		setReviewModalOpen(false);
 	}
 
+	function renderLanguageSwitcher() {
+		return (
+			<AdminToolbarGroup>
+				<ToolbarLabel>{t("languages")}:</ToolbarLabel>
+				{languages.map(lang => {
+					const isBase = lang === baseLang;
+					const isActive = activeLang === lang;
+					return (
+						<div key={lang} className="flex items-center">
+							{editingLang === lang && !isBase ? (
+								<Input
+									className="h-9 w-20 px-2 text-sm"
+									autoFocus
+									defaultValue={lang}
+									onKeyDown={e => {
+										if (e.key === "Enter") {
+											handleRenameLanguage(lang, e.currentTarget.value);
+											setEditingLang(null);
+										} else if (e.key === "Escape") {
+											setEditingLang(null);
+										}
+									}}
+									onBlur={e => {
+										handleRenameLanguage(lang, e.currentTarget.value);
+										setEditingLang(null);
+									}}
+								/>
+							) : (
+								<div className="group relative flex items-center">
+									<Button
+										type="button"
+										size="sm"
+										variant={isActive ? "default" : "outline"}
+										className={cn("h-9 gap-1.5", !isBase && "pr-8")}
+										onClick={() => setActiveLang(lang as Lang)}
+										onDoubleClick={() => {
+											if (!isBase) setEditingLang(lang);
+										}}
+										title={isBase ? t("baseLanguageHint") : undefined}>
+										{lang.toUpperCase()}
+										{isBase && <Lock className="h-3 w-3 opacity-70" aria-hidden="true" />}
+									</Button>
+									{!isBase && (
+										<Button
+											type="button"
+											variant="ghost"
+											size="icon"
+											className="absolute right-0.5 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
+											onClick={() => handleRemoveLanguage(lang)}>
+											<X className="h-3 w-3" aria-hidden="true" />
+										</Button>
+									)}
+								</div>
+							)}
+						</div>
+					);
+				})}
+				<Button
+					type="button"
+					variant="outline"
+					size="icon"
+					className="h-9 w-9 shrink-0"
+					title={t("addLanguageTitle")}
+					onClick={() => setAddLanguageOpen(true)}>
+					<Plus className="h-4 w-4" aria-hidden="true" />
+				</Button>
+			</AdminToolbarGroup>
+		);
+	}
+
+	function renderDraftVersionControl() {
+		if (lockVersion) {
+			return (
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<ToolbarChip tone="draft" className="font-mono" title={t("draftVersionHelp")}>
+								<span className="font-sans text-[10px] font-bold uppercase tracking-wider">
+									{t("draft")}
+								</span>
+								<span data-testid="draft-version-label" className="text-sm font-semibold">
+									v{draftVersion}
+								</span>
+							</ToolbarChip>
+						</TooltipTrigger>
+						<TooltipContent className="max-w-[260px]">{t("draftVersionHelp")}</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			);
+		}
+
+		if (editingVersion) {
+			return (
+				<div className="flex items-center gap-2 rounded-md border border-edge/40 bg-muted/20 px-3 py-1.5">
+					<Input
+						aria-label={t("versionLabel")}
+						className="h-7 w-24 px-2 text-sm"
+						value={draftVersion}
+						onChange={e => setDraftVersion(e.target.value)}
+						autoFocus
+						onKeyDown={e => {
+							if (e.key === "Enter") setEditingVersion(false);
+						}}
+					/>
+					<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditingVersion(false)}>
+						<Check className="h-4 w-4 text-primary" aria-hidden="true" />
+					</Button>
+				</div>
+			);
+		}
+
+		return (
+			<ToolbarChip tone="neutral" className="font-mono">
+				<span className="font-sans text-[10px] font-bold uppercase tracking-wider">{t("draft")}</span>
+				<span className="text-sm font-semibold">v{draftVersion}</span>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					className="-mr-2 h-7 w-7 text-muted-foreground hover:text-foreground"
+					title="Edit version"
+					onClick={() => setEditingVersion(true)}>
+					<Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+				</Button>
+			</ToolbarChip>
+		);
+	}
+
+	function renderExportMenu() {
+		return (
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button type="button" variant="outline" size="sm" className="h-10 gap-2">
+						<Download className="h-4 w-4" aria-hidden="true" />
+						{t("export")}
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" className="w-40">
+					<DropdownMenuItem onClick={() => exportInstrument(draftContent, draftVersion, "pdf", activeLang)}>
+						<FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+						{t("formatPdf")}
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => exportInstrument(draftContent, draftVersion, "xlsx", activeLang)}>
+						<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
+						{t("formatExcel")}
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => exportInstrument(draftContent, draftVersion, "csv", activeLang)}>
+						<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
+						{t("formatCsv")}
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => exportInstrument(draftContent, draftVersion, "json", activeLang)}>
+						<FileJson className="mr-2 h-4 w-4 text-muted-foreground" />
+						{t("formatJson")}
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	}
+
 	if (!instrument) return null;
 
 	return (
 		<InstrumentEditProvider activeLang={activeLang} baseLang={baseLang}>
 			<div className="mt-4 space-y-4 border-t border-edge/40 pt-4">
-				<div className="sticky top-0 z-10 -mx-1 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 border-b border-edge/40 px-1 pb-3 pt-2">
-					<div className="flex flex-wrap items-center justify-between gap-3">
-						<div className="flex items-center gap-2">
-							<span className="text-xs font-semibold tracking-wide text-muted-foreground">
-								{t("languages")}:
-							</span>
-							{languages.map(lang => {
-								const isBase = lang === baseLang;
-								return (
-									<div key={lang} className="flex items-center">
-										{editingLang === lang && !isBase ? (
-											<div className="flex items-center gap-1">
-												<Input
-													className="h-8 w-16 px-2 text-sm"
-													autoFocus
-													defaultValue={lang}
-													onKeyDown={e => {
-														if (e.key === "Enter") {
-															handleRenameLanguage(lang, e.currentTarget.value);
-															setEditingLang(null);
-														} else if (e.key === "Escape") {
-															setEditingLang(null);
-														}
-													}}
-													onBlur={e => {
-														handleRenameLanguage(lang, e.currentTarget.value);
-														setEditingLang(null);
-													}}
-												/>
-											</div>
-										) : (
-											<div className="group relative flex items-center">
-												<Button
-													variant={activeLang === lang ? "default" : "outline"}
-													size="sm"
-													className={isBase ? "gap-1.5" : "pr-8"}
-													onClick={() => setActiveLang(lang as Lang)}
-													onDoubleClick={() => {
-														if (!isBase) setEditingLang(lang);
-													}}
-													title={isBase ? t("baseLanguageHint") : undefined}>
-													{lang.toUpperCase()}
-													{isBase && <Lock className="h-3 w-3 opacity-70" />}
-												</Button>
-												{!isBase && (
-													<Button
-														variant="ghost"
-														size="icon"
-														className="absolute right-0.5 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-														onClick={() => handleRemoveLanguage(lang)}>
-														<X className="h-3 w-3" />
-													</Button>
-												)}
-											</div>
-										)}
-									</div>
-								);
-							})}
-							<Button
-								variant="outline"
-								size="sm"
-								className="w-8 px-0"
-								title={t("addLanguageTitle")}
-								onClick={() => setAddLanguageOpen(true)}>
-								<Plus className="h-4 w-4" />
-							</Button>
+				<AdminToolbar>
+					<AdminToolbarRow>
+						{renderLanguageSwitcher()}
+
+						<AdminToolbarGroup className="lg:justify-end">
+							{renderDraftVersionControl()}
 							{isTranslation && (
-								<>
-									<Badge
-										variant="outline"
-										className="ml-1 gap-1 border-violet-400/40 bg-violet-500/10 text-[10px] font-medium text-violet-700 dark:text-violet-300">
-										{t("translatingBadge", { lang: activeLang.toUpperCase() })}
-									</Badge>
-									{coverage && (
+								<ToolbarChip tone="violet">
+									{languageLabel(activeLang)}
+									<span className="text-muted-foreground">·</span>
+									{coverage ? (
 										<TooltipProvider>
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<Badge
-														variant="secondary"
-														className="text-[10px] font-medium tabular-nums">
+													<span className="tabular-nums">
 														{t("coverageBadge", { percent: coverage.percent })}
-													</Badge>
+													</span>
 												</TooltipTrigger>
 												<TooltipContent>
 													{t("coverageTooltip", {
@@ -246,125 +347,53 @@ export function InstrumentEditor({
 												</TooltipContent>
 											</Tooltip>
 										</TooltipProvider>
+									) : (
+										t("translatingBadge", { lang: activeLang.toUpperCase() })
 									)}
-								</>
+								</ToolbarChip>
 							)}
-						</div>
+						</AdminToolbarGroup>
+					</AdminToolbarRow>
 
-						<div className="flex items-center gap-2">
-							<div className="flex items-center gap-2 rounded-md border border-edge/40 bg-muted/20 px-3 py-1.5">
-								<Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal shrink-0">
-									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-										{t("draft")}
-									</span>
-								</Badge>
-								<span className="h-3 w-px bg-border/70 shrink-0" />
-								{lockVersion ? (
-									<div className="flex flex-col gap-0.5">
-										<span
-											data-testid="draft-version-label"
-											className="font-mono text-sm font-medium">
-											{draftVersion}
-										</span>
-										<span className="text-[10px] text-muted-foreground">
-											{t("draftVersionHelp")}
-										</span>
-									</div>
-								) : editingVersion ? (
-									<div className="flex items-center gap-1">
-										<Input
-											aria-label={t("versionLabel")}
-											className="h-7 w-24 px-2 text-sm"
-											value={draftVersion}
-											onChange={e => setDraftVersion(e.target.value)}
-											autoFocus
-											onKeyDown={e => {
-												if (e.key === "Enter") setEditingVersion(false);
-											}}
-										/>
-										<Button
-											variant="ghost"
-											size="icon"
-											className="h-7 w-7"
-											onClick={() => setEditingVersion(false)}>
-											<Check className="h-4 w-4 text-primary" />
-										</Button>
-									</div>
-								) : (
-									<div className="flex items-center gap-1">
-										<span className="font-mono text-sm font-medium">{draftVersion}</span>
-										<Button
-											variant="ghost"
-											size="icon"
-											className="h-6 w-6 text-muted-foreground hover:text-foreground"
-											title="Edit version"
-											onClick={() => setEditingVersion(true)}>
-											<Pencil className="h-3.5 w-3.5" />
-										</Button>
-									</div>
-								)}
-							</div>
-
+					<AdminToolbarRow>
+						<AdminToolbarGroup>
 							{isTranslation && <AiTranslateButton targetLang={activeLang} baseLang={baseLang} />}
+							{renderExportMenu()}
+						</AdminToolbarGroup>
 
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button variant="outline" size="sm" className="h-9">
-										<Download className="mr-2 h-4 w-4" />
-										{t("export")}
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-40">
-									<DropdownMenuItem
-										onClick={() => exportInstrument(draftContent, draftVersion, "pdf", activeLang)}>
-										<FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-										{t("formatPdf")}
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onClick={() =>
-											exportInstrument(draftContent, draftVersion, "xlsx", activeLang)
-										}>
-										<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
-										{t("formatExcel")}
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onClick={() => exportInstrument(draftContent, draftVersion, "csv", activeLang)}>
-										<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
-										{t("formatCsv")}
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onClick={() =>
-											exportInstrument(draftContent, draftVersion, "json", activeLang)
-										}>
-										<FileJson className="mr-2 h-4 w-4 text-muted-foreground" />
-										{t("formatJson")}
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-
-							<div className="h-6 w-px bg-border" />
-
-							<Button variant="ghost" size="sm" onClick={onCancel} disabled={isPending}>
+						<AdminToolbarGroup className="lg:justify-end">
+							<ToolbarDivider />
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="h-10"
+								onClick={onCancel}
+								disabled={isPending}>
 								{t("cancel")}
 							</Button>
 							<Button
+								type="button"
 								variant="outline"
 								size="sm"
+								className="h-10 gap-2"
 								onClick={handleSaveDraft}
 								disabled={isPending || !draftVersion.trim()}>
-								<Save className="mr-1.5 h-4 w-4" />
+								<Save className="h-4 w-4" aria-hidden="true" />
 								{t("saveDraft")}
 							</Button>
 							<Button
+								type="button"
 								size="sm"
+								className="h-10 gap-2 bg-status-success text-primary-foreground hover:bg-status-success/90"
 								onClick={handleOpenReview}
-								disabled={isPending || !draftVersion.trim()}
-								className="bg-status-success hover:bg-status-success/90">
+								disabled={isPending || !draftVersion.trim()}>
+								<Check className="h-4 w-4" aria-hidden="true" />
 								{t("publish")}
 							</Button>
-						</div>
-					</div>
-				</div>
+						</AdminToolbarGroup>
+					</AdminToolbarRow>
+				</AdminToolbar>
 
 				<ReviewChangesDialog
 					open={reviewModalOpen}
@@ -375,22 +404,24 @@ export function InstrumentEditor({
 				/>
 
 				{isTranslation && (
-					<div className="flex items-start gap-3 rounded-lg border border-violet-400/30 bg-violet-500/5 px-4 py-3">
-						<Lock className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" />
-						<div className="space-y-0.5">
+					<div className="flex items-start gap-2 rounded-md border border-violet-400/25 bg-violet-500/5 px-3 py-2">
+						<Lock className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
+						<div className="min-w-0">
 							<p className="text-sm font-medium text-foreground">
 								{t("translationBannerTitle", {
 									lang: languageLabel(activeLang),
 									base: baseLang.toUpperCase()
 								})}
 							</p>
-							<p className="text-xs text-muted-foreground">{t("translationBannerBody")}</p>
+							<p className="text-xs leading-relaxed text-muted-foreground">
+								{t("translationBannerBody")}
+							</p>
 						</div>
 					</div>
 				)}
 
-				<Tabs value={activeTab} onValueChange={v => setActiveTab(v as typeof activeTab)}>
-					<TabsList>
+				<Tabs value={activeTab} onValueChange={v => setActiveTab(v as EditorTab)}>
+					<TabsList className="h-auto flex-wrap justify-start gap-1">
 						<TabsTrigger value="overview">{t("overview")}</TabsTrigger>
 						<TabsTrigger value="sections">
 							{t("sections")} ({instrument.sections.length})

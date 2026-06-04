@@ -72,12 +72,12 @@ export function AiTranslateButton({ targetLang, baseLang }: Readonly<{ targetLan
 					type="button"
 					variant="outline"
 					size="sm"
-					className="h-9 gap-1.5 border-violet-400/50 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 text-violet-700 hover:from-violet-500/20 hover:to-fuchsia-500/20 dark:text-violet-300">
+					className="h-10 gap-1.5 border-violet-400/50 bg-violet-500/10 text-violet-700 hover:bg-violet-500/15 dark:text-violet-300">
 					<Sparkles className="h-4 w-4" />
 					{t("aiTranslate")}
 					<Badge
 						variant="outline"
-						className="ml-0.5 border-violet-400/50 bg-violet-500/10 px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">
+						className="ml-0.5 border-violet-400/50 bg-background/40 px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">
 						{t("premiumBadge")}
 					</Badge>
 				</Button>

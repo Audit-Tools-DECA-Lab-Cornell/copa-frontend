@@ -322,7 +322,7 @@ html[data-dyslexic-font="true"] {
 		color: var(--color-solid-neutral-text);
 	}
 	.bru-badge-draft {
-		background: var(--color-solid-draft);
+		background-color: var(--color-solid-draft);
 		color: var(--color-solid-draft-text);
 	}
 	.bru-badge-orphan {
