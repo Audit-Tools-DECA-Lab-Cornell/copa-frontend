@@ -327,7 +327,7 @@ export function DataTableToolbar<TData>({
 	}, [draftColumnVisibility, hasPendingColumnVisibilityChanges, table]);
 
 	return (
-		<div className="flex flex-col gap-4 px-6 pb-4 lg:justify-between lg:pt-4">
+		<div className="flex flex-col gap-4 px-6 pb-2 lg:justify-between lg:pt-2">
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 				{searchColumn ? (
 					<div className="min-w-0 flex-1 lg:max-w-sm">
@@ -363,11 +363,13 @@ export function DataTableToolbar<TData>({
 					{filterConfigs.length > 0 ? (
 						<DropdownMenu open={isFiltersMenuOpen} onOpenChange={handleFiltersMenuOpenChange}>
 							<DropdownMenuTrigger asChild>
-								<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
-									<ListFilterIcon className="size-4" />
+								<Button type="button" variant="secondary" size="sm" className="gap-2 px-3.5">
+									<ListFilterIcon className="size-3.5 shrink-0" />
 									<span>{t("filters")}</span>
 									{appliedFilterCount > 0 ? (
-										<Badge variant="secondary">{appliedFilterCount}</Badge>
+										<span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded border-0 bg-white/20 px-1 font-mono text-[11px] leading-none">
+											{appliedFilterCount}
+										</span>
 									) : null}
 								</Button>
 							</DropdownMenuTrigger>
@@ -437,8 +439,8 @@ export function DataTableToolbar<TData>({
 					{hideableColumns.length > 0 ? (
 						<DropdownMenu open={isColumnsMenuOpen} onOpenChange={handleColumnsMenuOpenChange}>
 							<DropdownMenuTrigger asChild>
-								<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
-									<Settings2Icon className="size-4" />
+								<Button type="button" variant="secondary" size="sm" className="gap-2 px-3.5">
+									<Settings2Icon className="size-3.5 shrink-0" />
 									<span>{t("columns")}</span>
 								</Button>
 							</DropdownMenuTrigger>

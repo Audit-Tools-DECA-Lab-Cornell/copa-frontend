@@ -2,7 +2,6 @@
 
 import { FilterIcon } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -42,13 +41,13 @@ export function FilterPopover({ title, options, selectedValues, onChange }: Filt
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button variant="outline" size="sm" className="gap-2">
-					<FilterIcon className="size-3.5" />
+				<Button variant="secondary" size="sm" className="gap-2 px-3.5">
+					<FilterIcon className="size-3.5 shrink-0" />
 					{title}
 					{selectedValues.length > 0 && (
-						<Badge variant="secondary" className="ml-1 rounded-sm px-1.5 font-mono text-xs">
+						<span className="inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded border-0 bg-white/20 px-1 font-mono text-[11px] leading-none">
 							{selectedValues.length}
-						</Badge>
+						</span>
 					)}
 				</Button>
 			</PopoverTrigger>

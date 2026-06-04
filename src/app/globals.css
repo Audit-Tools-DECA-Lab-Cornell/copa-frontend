@@ -197,7 +197,7 @@ html[data-dyslexic-font="true"] {
 @layer components {
 	/** Step 5: Shared shells used across dashboard and field cards. */
 	.field-card {
-		@apply rounded-card border border-border bg-card text-card-foreground shadow-card;
+		@apply rounded-card border border-border/40 bg-card text-card-foreground shadow-card;
 	}
 	.field-card-body {
 		@apply space-y-4 p-5;

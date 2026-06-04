@@ -132,10 +132,10 @@ export const DESIGN_SYSTEM = {
 	palettes: {
 		light: {
 			standard: {
-				canvas: "#f7f1eb",
-				surface: "#fff9f4",
-				surfaceRaised: "#ffffff",
-				surfaceSunken: "#ede4db",
+				canvas: "#f5ede3",
+				surface: "#fdf6ee",
+				surfaceRaised: "#fffcf8",
+				surfaceSunken: "#e9ddd1",
 				textPrimary: "#2f2722",
 				textSecondary: "#5a4f45",
 				textMuted: "#7a6f64",
@@ -182,10 +182,10 @@ export const DESIGN_SYSTEM = {
 				solidOrphanText: "#f0d4b0"
 			},
 			high: {
-				canvas: "#ffffff",
-				surface: "#ffffff",
+				canvas: "#fffdf9",
+				surface: "#fffdf9",
 				surfaceRaised: "#ffffff",
-				surfaceSunken: "#f3f3f3",
+				surfaceSunken: "#f2ede8",
 				textPrimary: "#111111",
 				textSecondary: "#2f2822",
 				textMuted: "#50463f",
@@ -234,10 +234,10 @@ export const DESIGN_SYSTEM = {
 		},
 		dark: {
 			standard: {
-				canvas: "#1c1917",
-				surface: "#24201d",
-				surfaceRaised: "#2b2622",
-				surfaceSunken: "#211d1a",
+				canvas: "#18140f",
+				surface: "#211c17",
+				surfaceRaised: "#29231d",
+				surfaceSunken: "#130f0b",
 				textPrimary: "#ebe3d7",
 				textSecondary: "#d2c7b8",
 				textMuted: "#a89c8f",
