@@ -27,9 +27,9 @@ import {
 	buildConstructRankings,
 	toDomainTitle,
 	formatConstructDomainLine,
-	reportBarScoreTier,
 	roundedPercentOfMax
 } from "@/lib/audit/report-helpers";
+import { SCALE_ACCENT_COLORS } from "@/lib/export/audit/types";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -81,15 +81,6 @@ function formatDateTime(iso: string): string {
 		minute: "2-digit",
 		hour12: true
 	}).format(date);
-}
-
-/** Returns a Tailwind bg class based on the percentage tier. */
-function barColorClass(percentage: number | null): string {
-	const tier = reportBarScoreTier(percentage);
-	if (tier === "na") return "bg-muted";
-	if (tier === "high") return "bg-emerald-500";
-	if (tier === "mid") return "bg-amber-500";
-	return "bg-rose-500";
 }
 
 // ── Metric configuration ────────────────────────────────────────────────────
@@ -152,9 +143,29 @@ const CONSTRUCT_METRICS: readonly MetricDef[] = [
 	}
 ];
 
-// ── Aligned bar cell ─────────────────────────────────────────────────────────
+// ── Bar colors & thresholds ──────────────────────────────────────────────────
+// Each bar is colored by its metric identity (not its score). The four PVUA scale
+// bars use the shared design-system scale colors; the two headline constructs use a
+// balanced teal/gold pair — co-equal peers, distinct from the scales and the brand
+// clay. Score tiers are shown as two dotted threshold lines.
 
-function AlignedBarCell({
+const BAR_COLORS: Record<MetricKey, string> = {
+	provision: SCALE_ACCENT_COLORS.provision,
+	diversity: SCALE_ACCENT_COLORS.diversity,
+	challenge: SCALE_ACCENT_COLORS.challenge,
+	sociability: SCALE_ACCENT_COLORS.sociability,
+	play_value: "#2E7D78",
+	usability: "#C7972F"
+};
+
+// Percentage cutoffs where the legacy bar color used to change. Now rendered as
+// horizontal dotted lines across each bar, labeled at the start of each group.
+const BAR_THRESHOLDS = [40, 70] as const;
+
+// ── Bar group ────────────────────────────────────────────────────────────────
+
+/** One vertical bar track (no labels), centered within its data column. */
+function BarTrack({
 	metric,
 	scores,
 	colWidth
@@ -165,13 +176,10 @@ function AlignedBarCell({
 	const percentage = roundedPercentOfMax(value, max);
 	const fillRatio = isNa ? 0 : Math.min(1, value / max);
 	const fillHeight = Math.round(fillRatio * BAR_TRACK_HEIGHT);
-	const color = barColorClass(percentage);
+	const barColor = BAR_COLORS[metric.key];
 
 	return (
-		<div className="flex flex-col items-center gap-1.5 pb-1" style={{ width: colWidth }}>
-			<span className={cn("text-xs font-bold tabular-nums", isNa ? "text-muted-foreground" : "text-foreground")}>
-				{isNa ? "N/A" : `${percentage}%`}
-			</span>
+		<div className="flex justify-center" style={{ width: colWidth }}>
 			<div
 				className={cn(
 					"flex items-end overflow-hidden rounded border",
@@ -184,15 +192,95 @@ function AlignedBarCell({
 				aria-valuemax={max}
 				aria-label={`${metric.label}: ${isNa ? "not assessed" : `${percentage}%`}`}>
 				{!isNa && fillHeight > 0 ? (
-					<div className={cn("w-full rounded-b-sm opacity-90", color)} style={{ height: fillHeight }} />
+					<div
+						className="w-full rounded-b-sm opacity-90"
+						style={{ height: fillHeight, backgroundColor: barColor }}
+					/>
 				) : isNa ? (
 					<div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground/50">
 						—
 					</div>
 				) : null}
 			</div>
-			<span className="text-center text-xs leading-tight text-muted-foreground">{metric.shortLabel}</span>
 		</div>
+	);
+}
+
+/**
+ * A group of bars rendered as three aligned rows — percentage labels, a fixed-height
+ * track row, and metric labels — so each column lines up with the table below. The two
+ * threshold cutoffs are drawn as single dotted lines running continuously across the
+ * whole track row, with their values labeled once on the left axis.
+ */
+function BarGroup({
+	metrics,
+	scores,
+	colWidth
+}: Readonly<{ metrics: readonly MetricDef[]; scores: AuditScoreTotals | null; colWidth: number }>) {
+	return (
+		<>
+			{/* Percentage labels */}
+			<div className="flex">
+				<div style={{ width: LABEL_COL_W }} />
+				{metrics.map(m => {
+					const value = scores === null ? 0 : m.getValue(scores);
+					const max = scores === null ? 0 : m.getMax(scores);
+					const isNa = scores === null || max <= 0;
+					const percentage = roundedPercentOfMax(value, max);
+					return (
+						<div
+							key={m.key}
+							className={cn(
+								"text-center text-xs font-bold tabular-nums",
+								isNa ? "text-muted-foreground" : "text-foreground"
+							)}
+							style={{ width: colWidth }}>
+							{isNa ? "N/A" : `${percentage}%`}
+						</div>
+					);
+				})}
+			</div>
+
+			{/* Track row + continuous threshold lines */}
+			<div className="relative mt-1.5 flex" style={{ height: BAR_TRACK_HEIGHT }}>
+				{/* Left axis — threshold values labeled once */}
+				<div className="relative" style={{ width: LABEL_COL_W }}>
+					{BAR_THRESHOLDS.map(th => (
+						<span
+							key={th}
+							className="absolute right-2 -translate-y-1/2 text-[10px] font-medium tabular-nums text-muted-foreground"
+							style={{ bottom: (th / 100) * BAR_TRACK_HEIGHT }}>
+							{th}%
+						</span>
+					))}
+				</div>
+				{metrics.map(m => (
+					<BarTrack key={m.key} metric={m} scores={scores} colWidth={colWidth} />
+				))}
+				{/* Continuous dotted cutoff lines spanning the data columns */}
+				{BAR_THRESHOLDS.map(th => (
+					<div
+						key={th}
+						aria-hidden
+						className="pointer-events-none absolute border-t border-dashed border-foreground/45"
+						style={{ left: LABEL_COL_W, right: 0, bottom: (th / 100) * BAR_TRACK_HEIGHT }}
+					/>
+				))}
+			</div>
+
+			{/* Metric labels */}
+			<div className="mt-1.5 flex">
+				<div style={{ width: LABEL_COL_W }} />
+				{metrics.map(m => (
+					<div
+						key={m.key}
+						className="text-center text-xs leading-tight text-muted-foreground"
+						style={{ width: colWidth }}>
+						{m.shortLabel}
+					</div>
+				))}
+			</div>
+		</>
 	);
 }
 
@@ -215,12 +303,7 @@ function AlignedScoreDisplay({
 							Scale Scores
 						</p>
 					) : null}
-					<div className="flex items-end">
-						<div style={{ width: LABEL_COL_W }} />
-						{SCALE_METRICS.map(m => (
-							<AlignedBarCell key={m.key} metric={m} scores={scores} colWidth={SCALE_DATA_COL_W} />
-						))}
-					</div>
+					<BarGroup metrics={SCALE_METRICS} scores={scores} colWidth={SCALE_DATA_COL_W} />
 					<ScoreSubTable
 						metrics={SCALE_METRICS}
 						scores={scores}
@@ -236,12 +319,7 @@ function AlignedScoreDisplay({
 							Play Value & Usability
 						</p>
 					) : null}
-					<div className="flex items-end">
-						<div style={{ width: LABEL_COL_W }} />
-						{CONSTRUCT_METRICS.map(m => (
-							<AlignedBarCell key={m.key} metric={m} scores={scores} colWidth={CONSTRUCT_DATA_COL_W} />
-						))}
-					</div>
+					<BarGroup metrics={CONSTRUCT_METRICS} scores={scores} colWidth={CONSTRUCT_DATA_COL_W} />
 					<ScoreSubTable
 						metrics={CONSTRUCT_METRICS}
 						scores={scores}

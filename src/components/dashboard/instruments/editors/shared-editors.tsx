@@ -157,160 +157,144 @@ export function ScaleOptionsEditor({
 				</Button>
 			</div>
 
-			{/*
-			 * Column header row gives the table structure an explicit header, making it
-			 * easier to scan across multiple option rows without re-reading field labels
-			 * in each row.
-			 */}
 			{options.length > 0 && (
-				<div className="grid grid-cols-[28px_1fr_80px_80px_auto_32px] gap-x-2 items-center px-2 pb-1">
-					<span /> {/* drag handle column */}
-					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-						Key → Label
-					</span>
-					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
-						{t("additionValue")}
-					</span>
-					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
-						{t("boostValue")}
-					</span>
-					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-						{t("flags")}
-					</span>
-					<span /> {/* delete column */}
+				<div className="rounded-lg border border-border/50 overflow-hidden">
+					{/* Header — same grid template + padding as data rows so columns align exactly */}
+					<div className="grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-1.5 bg-muted/50 border-b border-border/40">
+						<span />
+						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+							Key → Label
+						</span>
+						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
+							{t("additionValue")}
+						</span>
+						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
+							{t("boostValue")}
+						</span>
+						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+							{t("flags")}
+						</span>
+						<span />
+					</div>
+
+					{options.map((opt, oIdx) => (
+						<div
+							key={oIdx}
+							className={`grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-2${oIdx < options.length - 1 ? " border-b border-border/30" : ""}`}>
+							{/* Reorder controls */}
+							<div className="flex flex-col items-center gap-0.5">
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
+									disabled={oIdx === 0}
+									onClick={() => moveOption(oIdx, "up")}
+									aria-label={t("moveOptionUp")}>
+									<ArrowUp className="h-3 w-3" />
+								</Button>
+								<GripVertical className="h-3.5 w-3.5 text-muted-foreground/30" aria-hidden />
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
+									disabled={oIdx === options.length - 1}
+									onClick={() => moveOption(oIdx, "down")}
+									aria-label={t("moveOptionDown")}>
+									<ArrowDown className="h-3 w-3" />
+								</Button>
+							</div>
+
+							{/* Key (readonly) + Label (editable) */}
+							<div className="min-w-0">
+								<p className="font-mono text-[10px] text-muted-foreground/70 mb-0.5 truncate">
+									{opt.key || "—"}
+								</p>
+								<Input
+									className="h-7 text-xs px-2"
+									value={opt.label}
+									placeholder={t("optionLabel")}
+									onChange={e =>
+										updateOption(oIdx, o => {
+											o.label = e.target.value;
+										})
+									}
+								/>
+							</div>
+
+							{/* Addition value */}
+							<Input
+								type="number"
+								className="h-7 text-xs font-mono px-2 text-center"
+								value={opt.addition_value}
+								onChange={e =>
+									updateOption(oIdx, o => {
+										o.addition_value = Number(e.target.value) || 0;
+									})
+								}
+							/>
+
+							{/* Boost value */}
+							<Input
+								type="number"
+								className="h-7 text-xs font-mono px-2 text-center"
+								value={opt.boost_value}
+								onChange={e =>
+									updateOption(oIdx, o => {
+										o.boost_value = Number(e.target.value) || 0;
+									})
+								}
+							/>
+
+							{/* Flag toggles */}
+							<div className="flex items-center gap-1.5 flex-wrap">
+								<button
+									type="button"
+									onClick={() =>
+										updateOption(oIdx, o => {
+											o.is_not_applicable = !o.is_not_applicable;
+										})
+									}
+									className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
+										opt.is_not_applicable
+											? "border-amber-400/60 bg-amber-100 text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-300"
+											: "border-border bg-transparent text-muted-foreground hover:border-border/80"
+									}`}
+									title={t("isNotApplicable")}>
+									{t("notApplicable")}
+								</button>
+								<button
+									type="button"
+									onClick={() =>
+										updateOption(oIdx, o => {
+											o.allows_follow_up_scales = !o.allows_follow_up_scales;
+										})
+									}
+									className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
+										opt.allows_follow_up_scales
+											? "border-violet-400/60 bg-violet-100 text-violet-800 dark:border-violet-500/40 dark:bg-violet-900/30 dark:text-violet-300"
+											: "border-border bg-transparent text-muted-foreground hover:border-border/80"
+									}`}
+									title={t("allowsFollowUp")}>
+									{t("followUpBadge")}
+								</button>
+							</div>
+
+							{/* Delete */}
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
+								onClick={() => removeOption(oIdx)}>
+								<Minus className="h-3.5 w-3.5" />
+							</Button>
+						</div>
+					))}
 				</div>
 			)}
 
-			{options.map((opt, oIdx) => (
-				/*
-				 * Each option is now a single compact row instead of a stacked block.
-				 * Key is shown as small monospace text above the label input (not a
-				 * separate full-width field) — reducing the row from 4 fields to 2 visible
-				 * inputs (label + two number inputs), which is much easier to scan.
-				 *
-				 * Flags (allows_follow_up_scales, is_not_applicable) are surfaced as
-				 * togglable pill badges instead of buried checkboxes at the bottom of each
-				 * block. Active state is visually distinct so the full option list can be
-				 * scanned at a glance.
-				 *
-				 * Move up/down are now icon-only buttons (no text label), saving significant
-				 * horizontal space and reducing visual noise.
-				 */
-				<div
-					key={oIdx}
-					className="grid grid-cols-[28px_1fr_80px_80px_auto_32px] gap-x-2 items-center rounded border border-border/40 bg-muted/20 px-2 py-2">
-					{/* Drag handle / reorder controls */}
-					<div className="flex flex-col items-center gap-0.5">
-						<Button
-							type="button"
-							variant="ghost"
-							size="icon"
-							className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
-							disabled={oIdx === 0}
-							onClick={() => moveOption(oIdx, "up")}
-							aria-label={t("moveOptionUp")}>
-							<ArrowUp className="h-3 w-3" />
-						</Button>
-						<GripVertical className="h-3.5 w-3.5 text-muted-foreground/30" aria-hidden />
-						<Button
-							type="button"
-							variant="ghost"
-							size="icon"
-							className="h-5 w-5 text-muted-foreground/60 hover:text-muted-foreground"
-							disabled={oIdx === options.length - 1}
-							onClick={() => moveOption(oIdx, "down")}
-							aria-label={t("moveOptionDown")}>
-							<ArrowDown className="h-3 w-3" />
-						</Button>
-					</div>
-
-					{/* Key (readonly display) + Label (editable) */}
-					<div className="min-w-0">
-						<p className="font-mono text-[10px] text-muted-foreground/70 mb-0.5 truncate">
-							{opt.key || "—"}
-						</p>
-						<Input
-							className="h-7 text-xs px-2"
-							value={opt.label}
-							placeholder={t("optionLabel")}
-							onChange={e =>
-								updateOption(oIdx, o => {
-									o.label = e.target.value;
-								})
-							}
-						/>
-					</div>
-
-					{/* Addition value */}
-					<Input
-						type="number"
-						className="h-7 text-xs font-mono px-2 text-center"
-						value={opt.addition_value}
-						onChange={e =>
-							updateOption(oIdx, o => {
-								o.addition_value = Number(e.target.value) || 0;
-							})
-						}
-					/>
-
-					{/* Boost value */}
-					<Input
-						type="number"
-						className="h-7 text-xs font-mono px-2 text-center"
-						value={opt.boost_value}
-						onChange={e =>
-							updateOption(oIdx, o => {
-								o.boost_value = Number(e.target.value) || 0;
-							})
-						}
-					/>
-
-					{/* Flag toggles as pills */}
-					<div className="flex items-center gap-1.5 flex-wrap">
-						<button
-							type="button"
-							onClick={() =>
-								updateOption(oIdx, o => {
-									o.is_not_applicable = !o.is_not_applicable;
-								})
-							}
-							className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
-								opt.is_not_applicable
-									? "border-amber-400/60 bg-amber-100 text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-300"
-									: "border-border bg-transparent text-muted-foreground hover:border-border/80"
-							}`}
-							title={t("isNotApplicable")}>
-							{t("notApplicable")}
-						</button>
-						<button
-							type="button"
-							onClick={() =>
-								updateOption(oIdx, o => {
-									o.allows_follow_up_scales = !o.allows_follow_up_scales;
-								})
-							}
-							className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap ${
-								opt.allows_follow_up_scales
-									? "border-violet-400/60 bg-violet-100 text-violet-800 dark:border-violet-500/40 dark:bg-violet-900/30 dark:text-violet-300"
-									: "border-border bg-transparent text-muted-foreground hover:border-border/80"
-							}`}
-							title={t("allowsFollowUp")}>
-							{t("followUpBadge")}
-						</button>
-					</div>
-
-					{/* Delete */}
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
-						onClick={() => removeOption(oIdx)}>
-						<Minus className="h-3.5 w-3.5" />
-					</Button>
-				</div>
-			))}
-
-			{/* Legend for flag pills */}
+			{/* Legend for active flag pills */}
 			{options.some(o => o.is_not_applicable || o.allows_follow_up_scales) && (
 				<div className="flex items-center gap-3 pt-1 pl-1">
 					<span className="text-[10px] text-muted-foreground/60">{t("flags")}:</span>
