@@ -37,9 +37,9 @@ export function ActivateDialog({
 					<DialogDescription>
 						{versionLabel && nextPublishedVersion
 							? t("versionHistory.confirmActivateWithVersion", {
-								version: versionLabel,
-								nextVersion: nextPublishedVersion
-							})
+									version: versionLabel,
+									nextVersion: nextPublishedVersion
+								})
 							: t("versionHistory.confirmActivate")}
 					</DialogDescription>
 				</DialogHeader>

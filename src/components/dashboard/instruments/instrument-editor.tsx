@@ -158,7 +158,7 @@ export function InstrumentEditor({
 				<div className="sticky top-0 z-10 -mx-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border px-1 pb-3 pt-2">
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<div className="flex items-center gap-2">
-							<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+							<span className="text-xs font-semibold tracking-wide text-muted-foreground">
 								{t("languages")}:
 							</span>
 							{languages.map(lang => {

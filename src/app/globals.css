@@ -101,6 +101,21 @@
 	--font-code-active: var(--font-code-stack);
 	--font-dyslexic: "OpenDyslexic";
 	color-scheme: light;
+
+	/** Warm Brutalism palette (earthy, dark-but-not-black) — drives the `.bru-*` classes below. */
+	--color-solid-primary: #2d5c3e;
+	--color-solid-primary-edge: #1a3825;
+	--color-solid-primary-text: #d4ede0;
+	--color-solid-neutral: #3c3a35;
+	--color-solid-neutral-edge: #28261f;
+	--color-solid-neutral-text: #d4d2cb;
+	--color-solid-danger: #7a2d2d;
+	--color-solid-danger-edge: #4a1818;
+	--color-solid-danger-text: #f5d4d4;
+	--color-solid-draft: #4a3f28;
+	--color-solid-draft-text: #d4c49a;
+	--color-solid-orphan: #5c3d1e;
+	--color-solid-orphan-text: #f0d4b0;
 }
 
 .dark {
@@ -196,5 +211,141 @@ html[data-dyslexic-font="true"] {
 	}
 	.field-card-section {
 		@apply space-y-2;
+	}
+
+	/**
+	 * Warm Brutalism controls & tags (Instrument dashboard). Solid, borderless,
+	 * with a hard bottom "edge" shadow so they read as blocks embedded in the
+	 * surface; pressing a button sinks it (translateY + inset shadow).
+	 */
+	.bru-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+		min-height: 32px;
+		padding: 7px 14px;
+		border: none;
+		border-radius: 7px;
+		font-size: 12px;
+		font-weight: 500;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			transform 80ms ease,
+			box-shadow 80ms ease;
+	}
+	.bru-btn > svg {
+		width: 14px;
+		height: 14px;
+		flex-shrink: 0;
+	}
+	.bru-btn:focus-visible {
+		outline: 2px solid var(--color-solid-primary);
+		outline-offset: 2px;
+	}
+	.bru-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+	.bru-btn-primary {
+		background: var(--color-solid-primary);
+		color: var(--color-solid-primary-text);
+		box-shadow:
+			0 2px 0 var(--color-solid-primary-edge),
+			inset 0 1px 0 rgba(255, 255, 255, 0.08);
+	}
+	.bru-btn-primary:active {
+		transform: translateY(2px);
+		box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+	}
+	.bru-btn-neutral {
+		background: var(--color-solid-neutral);
+		color: var(--color-solid-neutral-text);
+		box-shadow:
+			0 2px 0 var(--color-solid-neutral-edge),
+			inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	}
+	.bru-btn-neutral:active {
+		transform: translateY(2px);
+		box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+	}
+	.bru-btn-danger {
+		background: var(--color-solid-danger);
+		color: var(--color-solid-danger-text);
+		box-shadow:
+			0 2px 0 var(--color-solid-danger-edge),
+			inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	}
+	.bru-btn-danger:active {
+		transform: translateY(2px);
+		box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+	}
+	.bru-btn-ghost {
+		background: rgba(60, 58, 53, 0.07);
+		color: #4a4840;
+		box-shadow: none;
+	}
+	.bru-btn-ghost:hover {
+		background: rgba(60, 58, 53, 0.12);
+	}
+	.bru-btn-ghost:active {
+		transform: translateY(1px);
+	}
+	.dark .bru-btn-ghost {
+		background: rgba(255, 255, 255, 0.06);
+		color: var(--color-solid-neutral-text);
+	}
+	.dark .bru-btn-ghost:hover {
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	.bru-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		border: none;
+		border-radius: 5px;
+		padding: 2px 9px;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: 1.4;
+		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+	}
+	.bru-badge-active {
+		background: var(--color-solid-primary);
+		color: var(--color-solid-primary-text);
+	}
+	.bru-badge-inactive {
+		background: var(--color-solid-neutral);
+		color: var(--color-solid-neutral-text);
+	}
+	.bru-badge-draft {
+		background: var(--color-solid-draft);
+		color: var(--color-solid-draft-text);
+	}
+	.bru-badge-orphan {
+		background: var(--color-solid-orphan);
+		color: var(--color-solid-orphan-text);
+	}
+
+	/** Tree connector that ties a draft branch card to its expanded parent row. */
+	.bru-version-row--expanded {
+		border-left: 2px solid var(--color-solid-primary);
+	}
+	.bru-draft-branch-card {
+		position: relative;
+		margin-left: 36px;
+	}
+	.bru-draft-branch-card::before {
+		content: "";
+		position: absolute;
+		left: -18px;
+		top: 50%;
+		width: 14px;
+		height: 1.5px;
+		background: var(--color-solid-primary);
+		opacity: 0.4;
 	}
 }

@@ -55,3 +55,7 @@ docs/superpowers/
 
 test-results/
 .aider*
+
+.caliber/
+.caliber/.caliber-state.json
+.caliber/cache/fingerprint.json

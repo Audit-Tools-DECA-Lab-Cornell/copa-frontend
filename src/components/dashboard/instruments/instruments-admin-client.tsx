@@ -44,11 +44,9 @@ export function InstrumentsAdminClient() {
 	const [versionToDelete, setVersionToDelete] = useState<InstrumentVersionRow | null>(null);
 	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
-	// Single source of truth for the version list. Both "all versions" and the
-	// "active version" are derived from this one query, so a single fetch backs
-	// the whole page and there is no race between two queries hitting the same
-	// endpoint (which previously caused an empty-state flash and stale UI). The
-	// server component prefetches this exact key, so the list hydrates populated.
+	// Single source of truth: the full list and the active version both derive from
+	// this one query, avoiding a two-query race (empty-state flash, stale UI). The
+	// server component prefetches this key, so the list hydrates already populated.
 	const { data: versions, isPending } = useQuery({
 		queryKey: INSTRUMENTS_LIST_QUERY_KEY,
 		queryFn: () => playspaceApi.admin.instruments.list()
@@ -73,12 +71,16 @@ export function InstrumentsAdminClient() {
 
 	const activeVersion = useMemo(() => allVersions.find(v => v.is_active) ?? null, [allVersions]);
 
-	// Publications are the non-draft (root) rows: the active version plus any
-	// versions that were active before. The next publication number is derived
-	// from these, never from drafts.
+	// Publication numbers derive from the root (non-draft) rows only — never from drafts.
 	const publishedVersions = useMemo(
 		() => allVersions.filter(v => v.parent_instrument_id === null).map(v => v.version),
 		[allVersions]
+	);
+
+	// Draft branches orphaned if the version queued for deletion is removed (drives the warning copy).
+	const versionToDeleteChildren = useMemo(
+		() => (versionToDelete ? allVersions.filter(v => v.parent_instrument_id === versionToDelete.id) : []),
+		[versionToDelete, allVersions]
 	);
 
 	async function refreshVersionHistory() {
@@ -297,15 +299,27 @@ export function InstrumentsAdminClient() {
 						setVersionToDelete(null);
 					}
 				}}
-				title={t("versionHistory.confirmDeleteTitle")}
-				description={
+				title={
 					versionToDelete
-						? versionToDelete.parent_instrument_id
-							? t("versionHistory.confirmDeleteDraft", { version: versionToDelete.version })
-							: t("versionHistory.confirmDeleteInactive", { version: versionToDelete.version })
-						: t("versionHistory.confirmDeleteGeneric")
+						? t("versionHistory.confirmDeleteTitleNamed", { version: versionToDelete.version })
+						: t("versionHistory.confirmDeleteTitle")
 				}
-				confirmLabel={t("versionHistory.deleteConfirm")}
+				description={(() => {
+					if (!versionToDelete) {
+						return t("versionHistory.confirmDeleteGeneric");
+					}
+					const base = versionToDelete.parent_instrument_id
+						? t("versionHistory.confirmDeleteDraft", { version: versionToDelete.version })
+						: t("versionHistory.confirmDeleteInactive", { version: versionToDelete.version });
+					if (versionToDeleteChildren.length === 0) {
+						return base;
+					}
+					return `${base} ${t("versionHistory.confirmDeleteBranchWarning", {
+						count: versionToDeleteChildren.length,
+						versions: versionToDeleteChildren.map(child => `v${child.version}`).join(", ")
+					})}`;
+				})()}
+				confirmLabel={t("versionHistory.deletePermanently")}
 				isPending={deleteVersionMutation.isPending}
 				onConfirm={() => {
 					if (versionToDelete) {

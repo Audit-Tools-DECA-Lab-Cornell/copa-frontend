@@ -3,23 +3,23 @@ import { useTranslations } from "next-intl";
 import {
 	BadgeCheck,
 	CalendarDays,
+	Check,
 	ChevronDown,
 	ChevronRight,
 	ChevronUp,
 	GitBranch,
 	History,
-	Plus,
+	Pencil,
 	Trash2
 } from "lucide-react";
 import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { InstrumentContentViewer } from "./instrument-content-viewer";
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
-import { suggestNextPublishedVersion } from "./utils";
+import { isDraftBranchVersion, suggestNextPublishedVersion } from "./utils";
 
 interface VersionHistoryProps {
 	versions: InstrumentVersionRow[];
@@ -80,8 +80,7 @@ export function VersionHistory({
 	const displayBranches = expandedList ? branches : branches.slice(0, 3);
 	const hasMore = branches.length > 3;
 
-	// Publications are the non-draft (root) rows; the next publication number is
-	// derived from the highest of these, matching the server.
+	// Publications are the root (non-draft) rows; the preview's next number is the highest of these.
 	const publishedVersions = useMemo(
 		() => versions.filter(version => version.parent_instrument_id === null).map(version => version.version),
 		[versions]
@@ -106,48 +105,57 @@ export function VersionHistory({
 	}
 
 	function renderVersionActions(version: InstrumentVersionRow) {
+		const isExpanded = expandedVersionId === version.id;
+
+		const detailsButton = (
+			<button
+				type="button"
+				className="bru-btn bru-btn-ghost"
+				data-testid="toggle-detail-button"
+				aria-expanded={isExpanded}
+				onClick={() => toggleVersionDetails(version.id)}>
+				{isExpanded ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
+				{isExpanded ? t("versionHistory.hideDetails") : t("versionHistory.viewDetails")}
+			</button>
+		);
+
 		const deleteButton = (
-			<Button
-				variant="outline"
-				size="sm"
+			<button
+				type="button"
+				className="bru-btn bru-btn-danger"
 				disabled={!version.can_delete || isPending}
 				data-testid="delete-version-button"
+				aria-label={t("versionHistory.deleteAria", { version: version.version })}
 				onClick={() => onDeleteVersion(version)}>
-				<Trash2 className="mr-2 h-4 w-4" />
+				<Trash2 aria-hidden="true" />
 				{t("versionHistory.delete")}
-			</Button>
+			</button>
 		);
 
 		return (
 			<div className="flex flex-wrap items-center justify-end gap-2">
-				{version.is_active && (
-					<Button
-						variant="outline"
-						size="sm"
+				{detailsButton}
+				{version.is_active ? (
+					<button
+						type="button"
+						className="bru-btn bru-btn-primary"
 						data-testid="edit-duplicate-button"
 						onClick={() =>
 							onEditDraft(version.version, version.content as unknown as InstrumentContent, version.id)
 						}>
-						<Plus className="mr-2 h-4 w-4" />
+						<Pencil aria-hidden="true" />
 						{t("editThisVersion")}
-					</Button>
-				)}
-				<Button
-					variant={expandedVersionId === version.id ? "secondary" : "outline"}
-					size="sm"
-					data-testid="toggle-detail-button"
-					onClick={() => toggleVersionDetails(version.id)}>
-					{expandedVersionId === version.id ? (
-						<ChevronUp className="mr-2 h-4 w-4" />
-					) : (
-						<ChevronDown className="mr-2 h-4 w-4" />
-					)}
-					{expandedVersionId === version.id
-						? t("versionHistory.hideDetails")
-						: t("versionHistory.viewDetails")}
-				</Button>
-				{!version.is_active && (
+					</button>
+				) : (
 					<>
+						<button
+							type="button"
+							className="bru-btn bru-btn-primary"
+							disabled={isPending}
+							onClick={() => onActivateVersion(version)}>
+							<Check aria-hidden="true" />
+							{t("versionHistory.makeActive")}
+						</button>
 						{version.can_delete ? (
 							deleteButton
 						) : (
@@ -166,13 +174,6 @@ export function VersionHistory({
 								</Tooltip>
 							</TooltipProvider>
 						)}
-						<Button
-							variant="secondary"
-							size="sm"
-							disabled={isPending}
-							onClick={() => onActivateVersion(version)}>
-							{t("versionHistory.makeActive")}
-						</Button>
 					</>
 				)}
 			</div>
@@ -180,6 +181,9 @@ export function VersionHistory({
 	}
 
 	function renderVersionMeta(version: InstrumentVersionRow, variant: "root" | "draft") {
+		// Orphan: a root carrying a draft-shaped number — a draft branch whose parent was deleted.
+		const isOrphan = variant === "root" && !version.is_active && isDraftBranchVersion(version.version);
+
 		return (
 			<div className="min-w-0 space-y-1">
 				<div className="flex flex-wrap items-center gap-2">
@@ -190,32 +194,52 @@ export function VersionHistory({
 						v{version.version}
 					</span>
 					{version.is_active ? (
-						<Badge variant="outline" className="border-status-success text-[10px] text-status-success">
+						<span className="bru-badge bru-badge-active" role="img" aria-label={t("versionHistory.active")}>
 							{t("versionHistory.active")}
-						</Badge>
-					) : (
-						<Badge variant="secondary" className="text-[10px]">
-							{t(variant === "draft" ? "versionHistory.draft" : "versionHistory.inactive")}
-						</Badge>
-					)}
-					{variant === "draft" && (
-						<Badge variant="outline" className="text-[10px]">
+						</span>
+					) : variant === "draft" ? (
+						<span
+							className="bru-badge bru-badge-draft"
+							role="img"
+							aria-label={t("versionHistory.branchLabel")}>
 							{t("versionHistory.branchLabel")}
-						</Badge>
+						</span>
+					) : (
+						<span
+							className="bru-badge bru-badge-inactive"
+							role="img"
+							aria-label={t("versionHistory.inactive")}>
+							{t("versionHistory.inactive")}
+						</span>
+					)}
+					{isOrphan && (
+						<span
+							className="bru-badge bru-badge-orphan"
+							role="img"
+							aria-label={t("versionHistory.orphanedHelp")}
+							title={t("versionHistory.orphanedHelp")}>
+							{t("versionHistory.orphaned")}
+						</span>
 					)}
 					{!version.is_active && version.submission_count > 0 && version.parent_instrument_id === null && (
-						<Badge variant="outline" className="text-[10px]">
+						<span
+							className="bru-badge bru-badge-inactive"
+							role="img"
+							aria-label={t("versionHistory.auditUsage", { count: version.submission_count })}>
 							{t("versionHistory.auditUsage", { count: version.submission_count })}
-						</Badge>
+						</span>
 					)}
 				</div>
 				<div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
 					<span className="flex items-center gap-1">
-						<CalendarDays className="h-3 w-3" />
+						<CalendarDays className="h-3 w-3" aria-hidden="true" />
 						{format(new Date(version.created_at), "MMM d, yyyy HH:mm")}
 					</span>
 					{version.activated_at && (
-						<span className="flex items-center gap-1 text-status-success/80">
+						<span
+							className={`flex items-center gap-1 ${
+								version.is_active ? "text-status-success/80" : "text-muted-foreground"
+							}`}>
 							{t("versionHistory.activated", {
 								date: format(new Date(version.activated_at), "MMM d, yyyy")
 							})}
@@ -244,13 +268,12 @@ export function VersionHistory({
 		<div className="overflow-hidden rounded-lg border border-border/60 bg-card/40">
 			<div className="flex flex-col gap-2 border-b border-border/40 bg-muted/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-2">
-					<History className="h-4 w-4 text-muted-foreground" />
+					<History className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
 					<h3 className="text-sm font-semibold">{t("versionHistory.title")}</h3>
 					<Badge variant="secondary" className="ml-2 font-mono text-[10px]">
 						{t("versionHistory.versions", { count: versions.length })}
 					</Badge>
 				</div>
-				<p className="text-xs text-muted-foreground">{t("versionHistory.branchHelp")}</p>
 				{activeVersion ? (
 					<p className="text-xs text-muted-foreground">
 						{t("versionHistory.versioningHelp", {
@@ -271,33 +294,40 @@ export function VersionHistory({
 							<div
 								className={`flex flex-col gap-3 p-4 transition-colors hover:bg-muted/30 lg:flex-row lg:items-center lg:justify-between ${
 									root.is_active ? "bg-status-success-surface/10" : ""
-								}`}>
+								} ${branchExpanded ? "bru-version-row--expanded" : ""}`}>
 								<div className="flex min-w-0 items-start gap-3">
 									<button
 										type="button"
-										className="mt-0.5 rounded-md border border-border/70 p-1 text-muted-foreground transition-colors hover:bg-muted disabled:cursor-default disabled:opacity-40"
+										className="mt-0.5 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted disabled:cursor-default disabled:opacity-40"
 										disabled={!hasDrafts}
-										aria-label={t("versionHistory.toggleBranches")}
+										aria-expanded={branchExpanded}
+										aria-label={t("versionHistory.expandBranchesAria", { version: root.version })}
+										title={t("versionHistory.toggleBranchesHelp")}
 										onClick={() => toggleBranch(root.id)}>
 										{branchExpanded ? (
-											<ChevronDown className="size-4" />
+											<ChevronDown className="size-4" aria-hidden="true" />
 										) : (
-											<ChevronRight className="size-4" />
+											<ChevronRight className="size-4" aria-hidden="true" />
 										)}
 									</button>
 									<div className="mt-1">
 										{root.is_active ? (
-											<BadgeCheck className="h-5 w-5 text-status-success" />
+											<BadgeCheck className="h-5 w-5 text-status-success" aria-hidden="true" />
 										) : (
-											<div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
+											<div
+												className="h-5 w-5 rounded-full border-2 border-muted-foreground/30"
+												aria-hidden="true"
+											/>
 										)}
 									</div>
 									<div className="min-w-0 space-y-2">
 										{renderVersionMeta(root, "root")}
-										<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-											<GitBranch className="h-3.5 w-3.5" />
-											<span>{t("versionHistory.branchCount", { count: drafts.length })}</span>
-										</div>
+										{hasDrafts && (
+											<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+												<GitBranch className="h-3.5 w-3.5" aria-hidden="true" />
+												<span>{t("versionHistory.branchCount", { count: drafts.length })}</span>
+											</div>
+										)}
 									</div>
 								</div>
 								{renderVersionActions(root)}
@@ -306,14 +336,18 @@ export function VersionHistory({
 							{branchExpanded && (
 								<div className="border-t border-border/40 bg-muted/10 px-4 py-3">
 									{hasDrafts ? (
-										<div className="space-y-2 border-l border-border/70 pl-4">
+										<div className="space-y-3">
 											{drafts.map(draft => (
 												<div
 													key={draft.id}
-													className="overflow-hidden rounded-md border bg-background shadow-sm">
+													className="bru-draft-branch-card overflow-hidden rounded-md bg-background shadow-sm">
+													<span
+														className="sr-only"
+														role="img"
+														aria-label={t("versionHistory.childBranchAria")}
+													/>
 													<div className="flex flex-col gap-3 p-3 lg:flex-row lg:items-center lg:justify-between">
 														<div className="flex min-w-0 items-start gap-3">
-															<div className="mt-2 h-px w-4 bg-border" />
 															{renderVersionMeta(draft, "draft")}
 														</div>
 														{renderVersionActions(draft)}
@@ -334,15 +368,14 @@ export function VersionHistory({
 				})}
 				{hasMore && (
 					<div className="bg-muted/10 p-2 text-center">
-						<Button
-							variant="ghost"
-							size="sm"
-							className="h-8 text-xs text-muted-foreground"
+						<button
+							type="button"
+							className="bru-btn bru-btn-ghost"
 							onClick={() => setExpandedList(!expandedList)}>
 							{expandedList
 								? t("versionHistory.showLess")
 								: t("versionHistory.showMore", { count: branches.length - 3 })}
-						</Button>
+						</button>
 					</div>
 				)}
 			</div>

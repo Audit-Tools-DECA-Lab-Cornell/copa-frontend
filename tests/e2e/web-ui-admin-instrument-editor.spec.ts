@@ -90,7 +90,6 @@ test.describe("@web-ui Admin Instrument Editor", () => {
 		await page.getByRole("link", { name: /instruments/i }).click();
 		await expect(page).toHaveURL(/\/admin\/instruments/);
 		await expect(page.getByText("Version History").first()).toBeVisible({ timeout: 15_000 });
-		await expect(page.getByText("Toggle a version to view draft branches created from it.")).toBeVisible();
 
 		await page.getByTestId("edit-duplicate-button").first().click();
 		await expect(page.getByText("Instrument Editor").first()).toBeVisible({ timeout: 15_000 });
@@ -102,17 +101,17 @@ test.describe("@web-ui Admin Instrument Editor", () => {
 		await page.getByRole("button", { name: /save draft/i }).click();
 		await expect(page.getByText("Version History").first()).toBeVisible({ timeout: 15_000 });
 
-		const branchToggle = page.getByRole("button", { name: "Toggle draft branches from this version" }).first();
+		const branchToggle = page.getByRole("button", { name: /draft branches/i }).first();
 		await expect(branchToggle).toBeVisible();
 		await branchToggle.click();
 
 		const draftBranch = page.getByText(`v${draftVersion}`).first();
 		await expect(draftBranch).toBeVisible({ timeout: 15_000 });
-		await expect(page.getByText("draft branch").first()).toBeVisible();
+		await expect(page.getByText("Draft Branch").first()).toBeVisible();
 
 		await page.getByTestId("delete-version-button").first().click();
-		await expect(page.getByRole("heading", { name: "Delete this version?" })).toBeVisible();
-		await page.getByRole("button", { name: "Delete version" }).click();
+		await expect(page.getByRole("heading", { name: `Delete v${draftVersion}?` })).toBeVisible();
+		await page.getByRole("button", { name: "Delete permanently" }).click();
 		await expect(draftBranch).toBeHidden({ timeout: 15_000 });
 	});
 });
