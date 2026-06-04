@@ -198,7 +198,7 @@ export function SpreadsheetView({
 	}
 
 	const toolbar = (
-		<div className={isFullscreen ? "shrink-0 border-b border-border bg-background px-4 py-3" : ""}>
+		<div className={isFullscreen ? "shrink-0 border-b border-edge/40 bg-background px-4 py-3" : ""}>
 			<Card className={isFullscreen ? "border-0 shadow-none" : ""}>
 				<CardContent className="py-3">
 					<div className="flex flex-wrap items-center gap-3">
@@ -330,7 +330,7 @@ export function SpreadsheetView({
 												key={`section-header-${row.sectionKey}`}
 												className="bg-muted/30"
 												data-testid={`row-section-${row.sectionIndex}`}>
-												<TableCell className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-muted/30 border-r border-border/50">
+												<TableCell className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-muted/30 border-r border-edge/40">
 													<span
 														data-testid={`badge-section-${row.sectionIndex}`}
 														className="text-xs text-muted-foreground rounded-sm border border-b-black font-bold px-1.5 py-1 text-nowrap">
@@ -431,7 +431,7 @@ export function SpreadsheetView({
 											key={`${row.sectionKey}-${q.question_key}`}
 											data-testid={`row-question-${row.sectionIndex}-${row.questionIndex}`}>
 											<TableCell
-												className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-background border-r border-border/50"
+												className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-background border-r border-edge/40"
 												data-testid={`cell-question-key-${row.sectionIndex}-${row.questionIndex}`}>
 												{editableKeys
 													? renderEditableCell(
@@ -470,7 +470,7 @@ export function SpreadsheetView({
 														{q.options.map(opt => (
 															<span
 																key={opt.key}
-																className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 text-[10px]"
+																className="inline-flex items-center rounded-full border border-edge/40 bg-muted/40 px-1.5 py-0.5 text-[10px]"
 																data-testid={`question-option-${opt.key}`}>
 																<CheckCircle2 className="mr-0.5 h-2.5 w-2.5 text-muted-foreground" />
 																{opt.label}

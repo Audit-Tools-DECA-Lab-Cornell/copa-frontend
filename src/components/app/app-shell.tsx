@@ -110,9 +110,11 @@ function NavLinks({
 						onClick={onNavigate}
 						title={isCollapsed ? item.label : undefined}
 						className={cn(
-							"flex min-h-11 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground",
-							isCollapsed && "mx-auto size-11 min-h-0 justify-center rounded-lg p-0",
-							isActive && "bg-accent text-foreground shadow-field"
+							"flex min-h-11 items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-[background,box-shadow,color] duration-75",
+							isCollapsed && "mx-auto size-11 min-h-0 justify-center p-0",
+							isActive
+								? "bg-solid-neutral text-solid-neutral-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] hover:bg-(--solid-neutral-edge) hover:text-solid-neutral-text"
+								: "text-muted-foreground hover:bg-accent hover:text-foreground"
 						)}>
 						<Icon className="size-5" aria-hidden="true" />
 						<span className={cn("leading-5", isCollapsed && "sr-only")}>{item.label}</span>
@@ -146,9 +148,9 @@ function UserMenu({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="secondary" className="gap-2 border border-action-outline-border bg-secondary/75">
+				<Button variant="secondary" size="sm">
 					<span className="max-w-56 truncate">{label}</span>
-					<ChevronDown className="h-4 w-4 text-text-secondary" aria-hidden="true" />
+					<ChevronDown className="h-4 w-4 opacity-100" aria-hidden="true" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
@@ -200,7 +202,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 					"mx-auto grid w-full grid-cols-1",
 					isSidebarCollapsed ? "md:grid-cols-[84px_1fr]" : "md:grid-cols-[280px_1fr] xl:grid-cols-[296px_1fr]"
 				)}>
-				<aside className="hidden border-r border-sidebar-border bg-sidebar/90 transition-all md:block">
+				<aside className="hidden border-r-2 border-edge bg-sidebar/90 transition-all md:block">
 					<div className="flex h-dvh flex-col">
 						<div
 							className={cn(
@@ -247,7 +249,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 							</div>
 							<div
 								className={cn(
-									"inline-flex w-fit rounded-lg border border-primary/30 bg-primary/10 px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-primary uppercase",
+									"inline-flex w-fit rounded-md border-0 bg-solid-primary px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-solid-primary-text shadow-solid-primary uppercase",
 									isSidebarCollapsed && "sr-only"
 								)}>
 								{roleLabel}
@@ -288,7 +290,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 				</aside>
 
 				<div className="min-w-0">
-					<header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
+					<header className="sticky top-0 z-10 border-b-2 border-edge bg-background/90 shadow-[0_2px_8px_rgba(0,0,0,0.08)] backdrop-blur">
 						<div className="flex h-16 items-center gap-3 px-4 md:px-6">
 							<Sheet>
 								<SheetTrigger asChild>

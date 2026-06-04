@@ -327,7 +327,7 @@ export function DataTableToolbar<TData>({
 	}, [draftColumnVisibility, hasPendingColumnVisibilityChanges, table]);
 
 	return (
-		<div className="flex flex-col gap-4 border-b border-border/70 px-6 pb-5 lg:justify-between">
+		<div className="flex flex-col gap-4 px-6 pb-4 lg:justify-between lg:pt-4">
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 				{searchColumn ? (
 					<div className="min-w-0 flex-1 lg:max-w-sm">
@@ -411,7 +411,7 @@ export function DataTableToolbar<TData>({
 										</React.Fragment>
 									))}
 								</div>
-								<div className="flex items-center justify-between gap-2 border-t border-border/70 p-2.5">
+								<div className="flex items-center justify-between gap-2 border-t-2 border-edge/50 p-2.5">
 									<Button
 										type="button"
 										variant="ghost"
@@ -472,7 +472,7 @@ export function DataTableToolbar<TData>({
 										))}
 									</div>
 								</div>
-								<div className="flex justify-end border-t border-border/70 p-2.5">
+								<div className="flex justify-end border-t-2 border-edge/50 p-2.5">
 									<Button
 										type="button"
 										size="sm"

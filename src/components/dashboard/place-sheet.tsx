@@ -369,7 +369,7 @@ export function PlaceSheet({
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent side="right" className="w-full gap-0 sm:max-w-2xl">
-				<SheetHeader className="border-b border-border/70 px-6 py-5">
+				<SheetHeader className="border-b-2 border-edge/50 px-6 py-5">
 					<SheetTitle>{title}</SheetTitle>
 					<SheetDescription>{description}</SheetDescription>
 				</SheetHeader>
@@ -466,7 +466,7 @@ export function PlaceSheet({
 											<Loader2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground" />
 										) : null}
 										{isAddressDropdownOpen && addressSuggestions.length > 0 ? (
-											<div className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-lg">
+											<div className="absolute z-20 mt-2 max-h-72 w-full overflow-y-auto rounded-md border-0 bg-background p-1 shadow-[0_3px_0_rgba(0,0,0,0.16),0_6px_20px_rgba(0,0,0,0.12)]">
 												{addressSuggestions.map(suggestion => (
 													<button
 														type="button"
@@ -572,7 +572,7 @@ export function PlaceSheet({
 									{selectedLocationSummary.length > 0 ? selectedLocationSummary : "Address selected"}
 								</p>
 								{mapPreviewUrl ? (
-									<div className="overflow-hidden rounded-md border border-border bg-muted">
+									<div className="overflow-hidden rounded-md border border-edge/40 bg-muted">
 										<Image
 											src={mapPreviewUrl}
 											alt={`Map preview for ${selectedLocationSummary}`}
@@ -684,7 +684,7 @@ export function PlaceSheet({
 							)}
 						</form.Field>
 					</div>
-					<SheetFooter className="border-t border-border/70 px-6 py-4">
+					<SheetFooter className="border-t-2 border-edge/50 px-6 py-4">
 						{submitError ? (
 							<p aria-live="polite" className="mr-auto text-sm text-destructive">
 								{submitError}

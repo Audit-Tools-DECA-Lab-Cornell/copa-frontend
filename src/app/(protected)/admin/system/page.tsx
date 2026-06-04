@@ -43,7 +43,7 @@ export default function AdminSystemPage() {
 	}, [systemQuery.data, resolvedLanguage]);
 
 	if (systemQuery.isLoading) {
-		return <div className="h-40 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-40 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if (systemQuery.isError || !systemQuery.data || !instrument) {
@@ -161,7 +161,7 @@ export default function AdminSystemPage() {
 						</div>
 						<div className="space-y-3">
 							{instrument.execution_modes.map(mode => (
-								<div key={mode.key} className="rounded-card border border-border/70 bg-card/60 p-4">
+								<div key={mode.key} className="rounded-card border border-edge/40 bg-card/60 p-4">
 									<p className="font-medium text-foreground">{mode.label}</p>
 									{mode.description && (
 										<p className="mt-1 text-sm text-muted-foreground">{mode.description}</p>

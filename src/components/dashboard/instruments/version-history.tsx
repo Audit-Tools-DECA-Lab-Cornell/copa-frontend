@@ -254,7 +254,7 @@ export function VersionHistory({
 		if (expandedVersionId !== version.id) return null;
 
 		return (
-			<div className="border-t border-border/40 bg-muted/5 px-4 pb-6 pt-6">
+			<div className="border-t border-edge/30 bg-muted/5 px-4 pb-6 pt-6">
 				<InstrumentContentViewer
 					content={version.content as unknown as InstrumentContent}
 					version={version.version}
@@ -265,8 +265,8 @@ export function VersionHistory({
 	}
 
 	return (
-		<div className="overflow-hidden rounded-lg border border-border/60 bg-card/40">
-			<div className="flex flex-col gap-2 border-b border-border/40 bg-muted/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+		<div className="overflow-hidden rounded-lg border border-edge/50 bg-card/40">
+			<div className="flex flex-col gap-2 border-b border-edge/30 bg-muted/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-center gap-2">
 					<History className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
 					<h3 className="text-sm font-semibold">{t("versionHistory.title")}</h3>
@@ -334,13 +334,13 @@ export function VersionHistory({
 							</div>
 							{renderVersionDetails(root)}
 							{branchExpanded && (
-								<div className="border-t border-border/40 bg-muted/10 px-4 py-3">
+								<div className="border-t border-edge/30 bg-muted/10 px-4 py-3">
 									{hasDrafts ? (
 										<div className="space-y-3">
 											{drafts.map(draft => (
 												<div
 													key={draft.id}
-													className="bru-draft-branch-card overflow-hidden rounded-md bg-background shadow-sm">
+													className="bru-draft-branch-card overflow-hidden rounded-md bg-background shadow-card">
 													<span
 														className="sr-only"
 														role="img"

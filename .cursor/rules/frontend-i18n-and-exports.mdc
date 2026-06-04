@@ -21,6 +21,7 @@ alwaysApply: false
 - Every new user-facing string gets an entry in **both** `messages/en.json` and `messages/de.json`.
 - Reuse existing namespace keys (e.g. `reports.detail.auditType*`) before inventing parallel keys.
 - Run `pnpm lint` after editing locale files; keep key structure aligned across locales.
+- Instrument editor translation mode: when a non-primary locale is active the editor renders overlay translation fields. These fields are locale-only overlays — do not write translation values back to base instrument fields.
 
 ## Export module layout
 

@@ -41,20 +41,20 @@ export function SectionQuestionTable({
 		<div className="space-y-4">
 			<div className="overflow-x-auto">
 				<div
-					className="grid min-w-[980px] rounded-card border border-border bg-card"
+					className="grid min-w-[980px] rounded-card border border-edge/40 bg-card"
 					style={{
 						gridTemplateColumns: [
 							"minmax(320px, 1.8fr)",
 							...visibleScaleKeys.map(() => "minmax(170px, 1fr)")
 						].join(" ")
 					}}>
-					<div className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+					<div className="border-r border-edge/40 bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
 						{t("itemColumn")}
 					</div>
 					{visibleScaleKeys.map(scaleKey => (
 						<div
 							key={scaleKey}
-							className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary last:border-r-0">
+							className="border-r border-edge/40 bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary last:border-r-0">
 							{t(`scaleColumns.${scaleKey}`)}
 						</div>
 					))}
@@ -66,7 +66,7 @@ export function SectionQuestionTable({
 							<Fragment key={row.question.question_key}>
 								<div
 									className={cn(
-										"border-r border-t border-border px-4 py-4",
+										"border-r border-t border-edge/40 px-4 py-4",
 										rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
 									)}>
 									<QuestionPrompt
@@ -81,7 +81,7 @@ export function SectionQuestionTable({
 										currentScale => currentScale.key === scaleKey
 									);
 									const cellClassName = cn(
-										"border-r border-t border-border px-3 py-4 last:border-r-0",
+										"border-r border-t border-edge/40 px-3 py-4 last:border-r-0",
 										rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
 									);
 
@@ -142,7 +142,7 @@ export function SectionQuestionTable({
 																			"size-4 rounded-full border-2",
 																			isSelected
 																				? "border-primary bg-primary"
-																				: "border-border bg-background"
+																				: "border-edge/40 bg-background"
 																		)}
 																	/>
 																	<span>{option.label}</span>
@@ -194,7 +194,7 @@ function QuestionPrompt({ question, selectedAnswers, disabled, onChangeQuestionN
 				))}
 			</p>
 			{question.notes_prompt ? (
-				<div className="space-y-2 rounded-field border border-border/70 bg-secondary/30 p-3">
+				<div className="space-y-2 rounded-field border border-edge/50 bg-secondary/30 p-3">
 					<p className="text-xs font-medium leading-5 text-foreground">{question.notes_prompt}</p>
 					<Textarea
 						rows={4}

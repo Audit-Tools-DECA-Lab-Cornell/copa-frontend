@@ -71,7 +71,7 @@ function WorkspaceContextPanel({
 	if (!hasOrg && !hasInviter) return null;
 
 	return (
-		<div className="mb-5 rounded-md border border-border bg-secondary/50 px-4 py-3">
+		<div className="mb-5 rounded-md border border-edge/40 bg-secondary/50 px-4 py-3">
 			<p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
 				{t("workspaceContext.label")}
 			</p>
@@ -286,7 +286,7 @@ export function AcceptInviteForm({ token }: Readonly<AcceptInviteFormProps>) {
 						<p className="mb-5 text-center text-sm text-muted-foreground">{t("description")}</p>
 
 						{previewLoading ? (
-							<div className="mb-5 space-y-2 rounded-md border border-border bg-secondary/50 px-4 py-3">
+							<div className="mb-5 space-y-2 rounded-md border border-edge/40 bg-secondary/50 px-4 py-3">
 								<Skeleton className="h-3 w-20" />
 								<Skeleton className="h-4 w-40" />
 								<Skeleton className="h-4 w-32" />

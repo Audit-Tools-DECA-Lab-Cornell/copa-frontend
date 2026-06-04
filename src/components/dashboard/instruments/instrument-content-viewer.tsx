@@ -65,7 +65,7 @@ export function InstrumentContentViewer({
 	}
 
 	return (
-		<div className={`space-y-5 ${hideBorder ? "" : "mt-4 border-t border-border pt-4"}`}>
+		<div className={`space-y-5 ${hideBorder ? "" : "mt-4 border-t border-edge/40 pt-4"}`}>
 			{/* Language switcher & Export */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export function InstrumentContentViewer({
 								{preamble.map((text, idx) => (
 									<div
 										key={idx}
-										className="rounded-md border border-border/40 bg-muted/30 p-3 text-sm leading-relaxed whitespace-pre-line">
+										className="rounded-md border border-edge/30 bg-muted/30 p-3 text-sm leading-relaxed whitespace-pre-line">
 										{renderInlineMarkdown(text)}
 									</div>
 								))}
@@ -169,7 +169,7 @@ export function InstrumentContentViewer({
 									{executionModes.map(mode => (
 										<div
 											key={mode.key}
-											className="rounded-lg border border-border/60 p-3 flex flex-col justify-between gap-2">
+											className="rounded-lg border border-edge/50 p-3 flex flex-col justify-between gap-2">
 											<div className="mb-1 flex items-center gap-2">
 												<Badge variant="outline" className="font-mono text-xs">
 													{mode.key}
@@ -306,7 +306,7 @@ function PreAuditQuestionsViewer({ questions }: Readonly<{ questions: PreAuditQu
 					</CardHeader>
 					<CardContent className="space-y-2">
 						{groupQuestions.map(q => (
-							<div key={q.key} className="rounded-md border border-border/50 bg-card/40 p-3">
+							<div key={q.key} className="rounded-md border border-edge/40 bg-card/40 p-3">
 								<div className="flex flex-wrap items-start justify-between gap-2">
 									<div className="space-y-1">
 										<p className="text-sm font-medium">{q.label}</p>
@@ -342,7 +342,7 @@ function PreAuditQuestionsViewer({ questions }: Readonly<{ questions: PreAuditQu
 											{q.options.map(opt => (
 												<span
 													key={opt.key}
-													className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-xs">
+													className="inline-flex items-center rounded-full border border-edge/40 bg-muted/40 px-2 py-0.5 text-xs">
 													{opt.label}
 													{opt.description && (
 														<span className="ml-1 text-muted-foreground">
@@ -392,7 +392,7 @@ function ScaleGuidanceViewer({ scales }: Readonly<{ scales: ScaleDefinition[] }>
 function ScaleOptionRow({ option }: Readonly<{ option: ScaleOption }>) {
 	const t = useTranslations("admin.instruments.content");
 	return (
-		<div className="flex items-center justify-between gap-2 rounded border border-border/40 bg-muted/20 px-3 py-1.5 text-xs">
+		<div className="flex items-center justify-between gap-2 rounded border border-edge/30 bg-muted/20 px-3 py-1.5 text-xs">
 			<div className="flex items-center gap-2">
 				<span className="font-medium">{option.label}</span>
 				{option.is_not_applicable && (
@@ -466,7 +466,7 @@ function ViewerSectionAccordion({
 									</div>
 								)}
 								{section.notes_prompt && (
-									<div className="rounded-md border border-border/40 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+									<div className="rounded-md border border-edge/30 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
 										<strong>{t("sectionNotesPrompt")}:</strong>{" "}
 										{renderInlineMarkdown(section.notes_prompt)}
 									</div>
@@ -508,7 +508,7 @@ function ViewerQuestionCard({
 	const isChecklist = questionType === "checklist";
 
 	return (
-		<div className="rounded-lg border border-border/50 bg-card/40 p-3 transition-colors hover:bg-card/60">
+		<div className="rounded-lg border border-edge/40 bg-card/40 p-3 transition-colors hover:bg-card/60">
 			<div className="flex flex-wrap items-start gap-2">
 				<Badge variant="outline" className="mt-0.5 shrink-0 font-mono text-xs tabular-nums">
 					{questionLabel}
@@ -575,7 +575,7 @@ function ViewerQuestionCard({
 								{question.options.map(opt => (
 									<span
 										key={opt.key}
-										className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-xs">
+										className="inline-flex items-center rounded-full border border-edge/40 bg-muted/40 px-2 py-0.5 text-xs">
 										<CheckCircle2 className="mr-1 h-3 w-3 text-muted-foreground" />
 										{opt.label}
 									</span>
@@ -601,7 +601,7 @@ function ViewerScaleRow({
 	const t = useTranslations("admin.instruments.content");
 
 	return (
-		<div className="rounded-md border border-border/30 bg-muted/20 p-2 flex flex-col gap-4 justify-between">
+		<div className="rounded-md border border-edge/25 bg-muted/20 p-2 flex flex-col gap-4 justify-between">
 			<div className="mb-1 flex items-center gap-1.5">
 				<ScaleKeyBadge scaleKey={scale.key} />
 				{isCustomized && (
@@ -629,7 +629,7 @@ function ViewerScaleRow({
 								? "border-dashed border-muted-foreground/40 text-muted-foreground"
 								: opt.allows_follow_up_scales
 									? "border-status-success-border bg-status-success-surface text-foreground font-medium"
-									: "border-border/60 bg-muted/40"
+									: "border-edge/50 bg-muted/40"
 						}`}>
 						{opt.label}
 						{opt.addition_value > 0 && (

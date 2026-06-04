@@ -130,7 +130,7 @@ export default function AdminReportsPage() {
 	);
 
 	if (reportsQuery.isLoading && !reportsQuery.data) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if (reportsQuery.isError && !reportsQuery.data) {

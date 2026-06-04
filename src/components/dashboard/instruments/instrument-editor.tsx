@@ -154,8 +154,8 @@ export function InstrumentEditor({
 
 	return (
 		<InstrumentEditProvider activeLang={activeLang} baseLang={baseLang}>
-			<div className="mt-4 space-y-4 border-t border-border pt-4">
-				<div className="sticky top-0 z-10 -mx-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border px-1 pb-3 pt-2">
+			<div className="mt-4 space-y-4 border-t border-edge/40 pt-4">
+				<div className="sticky top-0 z-10 -mx-1 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 border-b border-edge/40 px-1 pb-3 pt-2">
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<div className="flex items-center gap-2">
 							<span className="text-xs font-semibold tracking-wide text-muted-foreground">
@@ -252,7 +252,7 @@ export function InstrumentEditor({
 						</div>
 
 						<div className="flex items-center gap-2">
-							<div className="flex items-center gap-2 rounded-md border border-border/50 bg-muted/20 px-3 py-1.5">
+							<div className="flex items-center gap-2 rounded-md border border-edge/40 bg-muted/20 px-3 py-1.5">
 								<Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal shrink-0">
 									<span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
 										{t("draft")}

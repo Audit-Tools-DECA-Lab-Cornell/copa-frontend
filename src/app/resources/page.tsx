@@ -34,7 +34,7 @@ export default function PublicResourcesIndexPage() {
 
 			<div className="grid gap-4 md:grid-cols-2">
 				{resources.map(resource => (
-					<Card key={resource.slug} className="flex h-full flex-col border-border/70 bg-card/90">
+					<Card key={resource.slug} className="flex h-full flex-col border-edge/50 bg-card/90">
 						<CardHeader className="gap-3">
 							<div className="flex items-center justify-between gap-3">
 								<Badge variant="outline">{getPublicResourceKindLabel(resource.kind)}</Badge>

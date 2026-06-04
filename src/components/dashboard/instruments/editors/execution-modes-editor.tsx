@@ -46,7 +46,7 @@ export function ExecutionModesEditor({
 			</CardHeader>
 			<CardContent className="space-y-3">
 				{modes.map((mode, idx) => (
-					<div key={idx} className="flex items-start gap-2 rounded-lg border border-border/50 bg-card/40 p-3">
+					<div key={idx} className="flex items-start gap-2 rounded-lg border border-edge/40 bg-card/40 p-3">
 						{/*
 						 * Previously `md:grid-cols-3` gave equal width to all three fields.
 						 * Key is a short token (e.g. "both"), label is a sentence fragment,

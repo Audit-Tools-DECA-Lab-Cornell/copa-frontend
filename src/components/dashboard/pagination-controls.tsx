@@ -35,7 +35,7 @@ export function PaginationControls({
 	const rangeEnd = Math.min(currentPage * pageSize, totalItems);
 
 	return (
-		<div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:items-center sm:justify-between">
+		<div className="flex flex-col gap-3 border-t-2 border-edge/50 pt-4 sm:flex-row sm:items-center sm:justify-between">
 			<p className="text-sm text-muted-foreground">
 				{t("showing", { start: rangeStart, end: rangeEnd, total: totalItems, itemLabel })}
 			</p>

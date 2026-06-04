@@ -80,7 +80,7 @@ function ReportSourceCard({ label, session, href, actionLabel }: Readonly<Report
 						</p>
 					</div>
 					<div className="flex flex-col gap-3 w-full">
-						<div className="w-full rounded-lg border border-border/70 bg-muted/25 px-3 py-2.5">
+						<div className="w-full rounded-lg border border-edge/40 bg-muted/25 px-3 py-2.5">
 							<p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
 								Audit code
 							</p>
@@ -90,7 +90,7 @@ function ReportSourceCard({ label, session, href, actionLabel }: Readonly<Report
 								</code>
 							</div>
 						</div>
-						<div className="w-full rounded-lg border border-border/70 bg-muted/25 px-3 py-2.5">
+						<div className="w-full rounded-lg border border-edge/40 bg-muted/25 px-3 py-2.5">
 							<p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
 								Auditor code
 							</p>
@@ -223,7 +223,7 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 					actions={<BackButton href={reportsBasePath} label="Back to Reports" />}
 				/>
 				{Array.from({ length: 3 }).map((_, i) => (
-					<div key={i} className="h-32 animate-pulse rounded-card border border-border bg-card" />
+					<div key={i} className="h-32 animate-pulse rounded-card border border-edge/40 bg-card" />
 				))}
 			</div>
 		);
@@ -302,7 +302,7 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 			/>
 
 			<Card className="overflow-hidden">
-				<CardHeader className="border-b border-border/70">
+				<CardHeader className="border-b-2 border-edge/50">
 					<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 						<div className="space-y-2">
 							<CardTitle className="flex flex-wrap items-center gap-2 text-lg">
@@ -366,7 +366,7 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 			</Card>
 
 			<Card className="overflow-hidden">
-				<CardHeader className="border-b border-border/70">
+				<CardHeader className="border-b-2 border-edge/50">
 					<div className="space-y-2">
 						<CardTitle className="flex flex-wrap items-center gap-2 text-base">
 							<LayersIcon className="size-4 text-primary" />

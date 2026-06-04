@@ -47,7 +47,7 @@ export function ReviewChangesDialog({
 						<AlertCircle className="h-4 w-4 text-status-warning" />
 						{t("detectedChanges", { count: changes.length })}
 					</h4>
-					<ScrollArea className="h-[300px] rounded-md border border-border/60 bg-muted/20 p-4">
+					<ScrollArea className="h-[300px] rounded-md border border-edge/40 bg-muted/20 p-4">
 						{changes.length === 0 ? (
 							<div className="flex flex-col items-center justify-center h-full py-8 text-center">
 								<CheckCircle2 className="h-8 w-8 text-status-success mb-2 opacity-50" />

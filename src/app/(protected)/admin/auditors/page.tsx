@@ -201,7 +201,7 @@ export default function AdminAuditorsPage() {
 	);
 
 	if (isInitialLoading) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if ((auditorsQuery.isError && !auditorsQuery.data) || !auditorsQuery.data) {

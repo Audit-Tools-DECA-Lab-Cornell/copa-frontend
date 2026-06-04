@@ -52,7 +52,7 @@ export function ScaleGuidanceEditor({
 			 */}
 			<div className="space-y-4">
 				{scales.map((scale, sIdx) => (
-					<Card key={sIdx} className="border-border/60">
+					<Card key={sIdx} className="border-edge/50">
 						<CardHeader className="pb-3 px-4 pt-4">
 							<div className="flex items-start justify-between gap-2">
 								<div className="min-w-0 flex-1 grid gap-3 sm:grid-cols-2">

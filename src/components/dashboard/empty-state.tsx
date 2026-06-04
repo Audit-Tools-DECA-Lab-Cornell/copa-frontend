@@ -13,7 +13,7 @@ export interface EmptyStateProps {
  */
 export function EmptyState({ title, description, action }: Readonly<EmptyStateProps>) {
 	return (
-		<Card className="border-dashed bg-card/70">
+		<Card className="border border-edge/50 bg-surface-sunken shadow-none">
 			<CardHeader className="gap-1.5">
 				<CardTitle className="text-xl md:text-2xl">{title}</CardTitle>
 				<CardDescription className="max-w-2xl">{description}</CardDescription>

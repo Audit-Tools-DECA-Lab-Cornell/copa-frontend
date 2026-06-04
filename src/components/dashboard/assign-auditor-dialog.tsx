@@ -140,7 +140,7 @@ function AuditorPicker({ auditors, selectedIds, disabled, onToggle, onToggleAll 
 					</div>
 				) : null}
 			</div>
-			<div className="max-h-48 overflow-y-auto rounded-field border border-border bg-card">
+			<div className="max-h-48 overflow-y-auto rounded-field border border-edge/40 bg-card">
 				{filtered.length === 0 ? (
 					<p className="px-4 py-3 text-sm text-muted-foreground">No matching auditors.</p>
 				) : (
@@ -224,7 +224,7 @@ function PlacePicker({ places, selectedPlaceIds, disabled, projectSelected, onTo
 			</div>
 			<div
 				className={cn(
-					"max-h-48 overflow-y-auto rounded-field border border-border bg-card",
+					"max-h-48 overflow-y-auto rounded-field border border-edge/40 bg-card",
 					!projectSelected && "pointer-events-none opacity-50 grayscale"
 				)}>
 				{!projectSelected ? (
@@ -662,8 +662,8 @@ export function AssignAuditorDialog({ open, onOpenChange, prefill, onAssigned }:
 
 				{isLoading ? (
 					<div className="space-y-3 py-4">
-						<div className="h-10 animate-pulse rounded-field border border-border bg-card" />
-						<div className="h-32 animate-pulse rounded-field border border-border bg-card" />
+						<div className="h-10 animate-pulse rounded-field border border-edge/40 bg-card" />
+						<div className="h-32 animate-pulse rounded-field border border-edge/40 bg-card" />
 					</div>
 				) : hasPrefilledAuditors ? (
 					/* ─── Auditor-scoped mode: no tabs, just scope picker ─── */

@@ -245,7 +245,7 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 	}, [sectionRows, showEmptySections, questionNotesBySectionKey]);
 
 	if (auditQuery.isLoading || !auditId) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if (auditQuery.isError || !audit) {
@@ -428,7 +428,7 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 								</div>
 							</div>
 							{orderedSectionRows.length === 0 ? (
-								<div className="rounded-card border border-dashed border-border p-4">
+								<div className="rounded-card border border-dashed border-edge/50 p-4">
 									<p className="font-medium text-foreground">
 										{t("sectionNotes.noCapturedNotesTitle")}
 									</p>
@@ -447,7 +447,7 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 										return (
 											<div
 												key={section.section_key}
-												className="rounded-card border border-border/70 bg-card/60 p-4">
+												className="rounded-card border border-edge/40 bg-card/60 p-4">
 												<div className="flex flex-wrap items-start justify-between gap-3">
 													<div className="space-y-1">
 														<p className="font-medium text-foreground">

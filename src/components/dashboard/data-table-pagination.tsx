@@ -29,7 +29,7 @@ export function DataTablePagination<TData>({
 	const endRow = totalFilteredRows === 0 ? 0 : Math.min((pageIndex + 1) * pageSize, totalFilteredRows);
 
 	return (
-		<div className="flex flex-col border-t border-border/70 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+		<div className="flex flex-col border-t-2 border-edge/60 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
 			<div className="text-sm text-muted-foreground flex-1">
 				{t("showing", { start: startRow, end: endRow, total: totalFilteredRows })}
 			</div>

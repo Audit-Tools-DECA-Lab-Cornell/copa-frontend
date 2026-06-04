@@ -433,7 +433,7 @@ function SectionResponses({ audit, instrument }: SectionResponsesProps) {
 											);
 										})}
 										{sectionState?.note ? (
-											<div className="mt-4 rounded-lg border border-border/60 bg-muted/30 p-4">
+											<div className="mt-4 rounded-lg border border-edge/40 bg-muted/30 p-4">
 												<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
 													Section Note
 												</p>
@@ -479,11 +479,11 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 
 	if (question.question_type === "checklist") {
 		return (
-			<div className="rounded-lg border border-border/40 bg-card p-4">
+			<div className="rounded-lg border border-edge/30 bg-card p-4">
 				{promptNode}
 				<p className="mt-1.5 text-sm text-muted-foreground">{formatChecklistAnswerText(question, answers)}</p>
 				{questionComment.length > 0 ? (
-					<div className="mt-3 rounded-md border border-border/60 bg-muted/30 p-3">
+					<div className="mt-3 rounded-md border border-edge/40 bg-muted/30 p-3">
 						<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
 							Auditor Comment
 						</p>
@@ -506,7 +506,7 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 		.filter((entry): entry is { scaleTitle: string; answer: string } => entry !== null);
 
 	return (
-		<div className="rounded-lg border border-border/40 bg-card p-4">
+		<div className="rounded-lg border border-edge/30 bg-card p-4">
 			{promptNode}
 			{answerEntries.length > 0 ? (
 				<div className="mt-2 flex flex-wrap gap-2">
@@ -520,7 +520,7 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 				<p className="mt-1.5 text-sm text-muted-foreground">No response recorded</p>
 			)}
 			{questionComment.length > 0 ? (
-				<div className="mt-3 rounded-md border border-border/60 bg-muted/30 p-3">
+				<div className="mt-3 rounded-md border border-edge/40 bg-muted/30 p-3">
 					<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
 						Auditor Comment
 					</p>
@@ -631,7 +631,7 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow, basePath }: Audit
 						))}
 					</nav>
 				)}
-				<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card/70 p-6 shadow-card md:p-7">
+				<div className="flex flex-col gap-4 rounded-card border border-edge/40 bg-card/70 p-6 shadow-card md:p-7">
 					<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 						<div className="space-y-2">
 							<p className="text-(length:--eyebrow-size) font-semibold tracking-(--eyebrow-tracking) text-text-secondary uppercase">
@@ -654,7 +654,7 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow, basePath }: Audit
 								</p>
 							</div>
 						</div>
-						<div className="flex items-center gap-3">
+						<div className="flex flex-col items-start gap-2 lg:items-end">
 							{isSubmitted && basePath !== undefined && (
 								<a href={`${basePath}/reports/${audit.audit_id}`}>
 									<Button variant="outline" size="sm" className="gap-1.5">
@@ -718,7 +718,7 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow, basePath }: Audit
 											return (
 												<div
 													key={label}
-													className="space-y-2 rounded-lg border border-border/50 p-4">
+													className="space-y-2 rounded-lg border border-edge/40 p-4">
 													<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
 														{label}
 													</p>

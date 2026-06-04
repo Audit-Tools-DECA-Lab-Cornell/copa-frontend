@@ -120,18 +120,18 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	if (projectQuery.isLoading || projectStatsQuery.isLoading || projectPlacesQuery.isLoading) {
 		return (
 			<div className="space-y-6">
-				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-20 animate-pulse rounded-card border border-edge/40 bg-card" />
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{PROJECT_DETAIL_SKELETON_IDS.map(skeletonId => {
 						return (
 							<div
 								key={skeletonId}
-								className="h-36 animate-pulse rounded-card border border-border bg-card"
+								className="h-36 animate-pulse rounded-card border border-edge/40 bg-card"
 							/>
 						);
 					})}
 				</div>
-				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />
 			</div>
 		);
 	}
@@ -151,18 +151,18 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	if (!projectQuery.data || !projectStatsQuery.data || !projectPlacesQuery.data) {
 		return (
 			<div className="space-y-6">
-				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-20 animate-pulse rounded-card border border-edge/40 bg-card" />
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{PROJECT_DETAIL_SKELETON_IDS.map(skeletonId => {
 						return (
 							<div
 								key={skeletonId}
-								className="h-36 animate-pulse rounded-card border border-border bg-card"
+								className="h-36 animate-pulse rounded-card border border-edge/40 bg-card"
 							/>
 						);
 					})}
 				</div>
-				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />
 			</div>
 		);
 	}
@@ -286,7 +286,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 								<CardTitle>{t("deliverySignals.title")}</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-4">
-								<div className="rounded-field border border-border/70 bg-muted/40 p-4">
+								<div className="rounded-field border border-edge/40 bg-muted/40 p-4">
 									<p className="text-sm font-medium text-foreground">
 										{t("deliverySignals.currentSubmittedMeanScore")}
 									</p>

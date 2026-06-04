@@ -54,7 +54,7 @@ export function AdminReportDetailClient({ auditId }: Readonly<AdminReportDetailC
 					{ label: audit?.audit_code ?? "Report" }
 				]}
 				actions={
-					<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+					<div className="flex flex-col items-end gap-2">
 						{audit !== undefined && instrumentQuery.data !== undefined && (
 							<AuditExportActions audit={audit} instrument={instrumentQuery.data} />
 						)}
@@ -68,7 +68,7 @@ export function AdminReportDetailClient({ auditId }: Readonly<AdminReportDetailC
 					{Array.from({ length: 3 }).map((_, idx) => (
 						<div
 							key={`skeleton-${idx}`}
-							className="h-40 animate-pulse rounded-card border border-border bg-card"
+							className="h-40 animate-pulse rounded-card border border-edge/40 bg-card"
 						/>
 					))}
 				</div>

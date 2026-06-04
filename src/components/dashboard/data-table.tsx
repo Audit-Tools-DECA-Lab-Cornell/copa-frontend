@@ -178,7 +178,7 @@ export function DataTable<TData, TValue>({
 	return (
 		<Card className="overflow-hidden">
 			{title || description ? (
-				<CardHeader className="gap-1 border-b border-border/70">
+				<CardHeader className="gap-1 border-b-2 pb-5 border-edge/50">
 					{title ? <CardTitle>{title}</CardTitle> : null}
 					{description ? <CardDescription>{description}</CardDescription> : null}
 				</CardHeader>

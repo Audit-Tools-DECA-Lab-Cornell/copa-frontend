@@ -75,7 +75,7 @@ function OverviewPanels({
 						{managerProfiles.map(profile => (
 							<div
 								key={profile.id}
-								className="flex items-start justify-between gap-4 rounded-card border border-border/70 bg-card/60 p-4">
+								className="flex items-start justify-between gap-4 rounded-card border border-edge/40 bg-card/60 p-4">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{profile.full_name}</p>
 									<p className="text-sm text-muted-foreground">
@@ -204,7 +204,7 @@ export function ManagerDashboardClient({
 							<Link
 								key={activity.audit_id}
 								href={`/manager/audits/${encodeURIComponent(activity.audit_id)}`}
-								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5">
+								className="flex flex-col gap-3 rounded-card border border-edge/40 bg-card/60 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{activity.place_name}</p>
 									<p className="text-sm text-muted-foreground">{activity.project_name}</p>

@@ -151,7 +151,7 @@ function CollectionNamespaceBar({
 	onClearSelection
 }: CollectionNamespaceBarProps) {
 	return (
-		<div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-border/70 bg-muted/20 px-3.5 py-2">
+		<div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-edge/40 bg-muted/20 px-3.5 py-2">
 			{/* Namespace path — monospace database path like Atlas */}
 			<div className="flex min-w-0 items-center gap-1 font-mono text-[13px]">
 				<DatabaseIcon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />

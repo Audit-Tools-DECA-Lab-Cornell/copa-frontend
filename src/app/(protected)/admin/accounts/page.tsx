@@ -150,7 +150,7 @@ export default function AdminAccountsPage() {
 	);
 
 	if (isInitialLoading) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if ((accountsQuery.isError && !accountsQuery.data) || !accountsQuery.data) {

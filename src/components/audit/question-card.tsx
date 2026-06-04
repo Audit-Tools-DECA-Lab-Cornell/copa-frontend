@@ -89,7 +89,7 @@ export function AuditQuestionCard({
 				) : null}
 
 				{question.notes_prompt ? (
-					<div className="space-y-2 rounded-field border border-border/70 bg-secondary/30 p-4">
+					<div className="space-y-2 rounded-field border border-edge/50 bg-secondary/30 p-4">
 						<p className="text-sm font-medium text-foreground">{question.notes_prompt}</p>
 						<Textarea
 							rows={4}
@@ -135,7 +135,7 @@ function ScaleSelector({
 	disabled
 }: Readonly<ScaleSelectorProps>) {
 	return (
-		<div className="space-y-3 rounded-field border border-border/70 bg-secondary/40 p-4 md:p-5">
+		<div className="space-y-3 rounded-field border border-edge/50 bg-secondary/40 p-4 md:p-5">
 			<div className="space-y-1">
 				<p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">{scale.title}</p>
 				<p className="text-sm leading-5 text-muted-foreground">{scale.prompt}</p>
@@ -190,7 +190,7 @@ function ChecklistSelector({
 	disabled
 }: Readonly<ChecklistSelectorProps>) {
 	return (
-		<div className="space-y-3 rounded-field border border-border/70 bg-secondary/40 p-4 md:p-5">
+		<div className="space-y-3 rounded-field border border-edge/50 bg-secondary/40 p-4 md:p-5">
 			<div className="grid gap-2.5 sm:grid-cols-2">
 				{question.options.map(option => {
 					const isSelected = selectedOptionKeys.includes(option.key);

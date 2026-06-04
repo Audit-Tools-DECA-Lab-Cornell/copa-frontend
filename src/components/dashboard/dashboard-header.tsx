@@ -62,7 +62,7 @@ export function DashboardHeader({
 			) : (
 				<div className="h-5" />
 			)}
-			<div className="flex flex-col gap-4 rounded-card border border-foreground/10 bg-foreground p-6 text-foreground shadow-md md:p-7">
+			<div className="flex flex-col gap-4 rounded-card border-0 bg-foreground p-6 text-foreground shadow-[0_6px_0_rgba(0,0,0,0.22),0_12px_28px_rgba(0,0,0,0.18)] md:p-7">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="space-y-2">
 						{eyebrow ? (

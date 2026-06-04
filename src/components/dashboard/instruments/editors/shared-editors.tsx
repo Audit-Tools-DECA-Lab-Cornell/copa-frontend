@@ -99,14 +99,14 @@ export function ChoiceOptionsEditor({
 				{options.map((opt, i) => (
 					<div
 						key={i}
-						className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center rounded-lg bg-muted/30 border border-border/40 px-2 py-1.5">
+						className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center rounded-lg bg-muted/30 border border-edge/30 px-2 py-1.5">
 						<Input
 							value={opt.key}
 							onChange={e => updateOption(i, "key", e.target.value)}
 							placeholder="option_key"
 							readOnly={translationMode}
 							aria-disabled={translationMode}
-							className={`h-7 text-xs font-mono bg-background border-border/60 ${
+							className={`h-7 text-xs font-mono bg-background border-edge/50 ${
 								translationMode ? "cursor-not-allowed text-muted-foreground" : ""
 							}`}
 						/>
@@ -114,7 +114,7 @@ export function ChoiceOptionsEditor({
 							value={opt.label}
 							onChange={e => updateOption(i, "label", e.target.value)}
 							placeholder="Display label"
-							className="h-7 text-xs bg-background border-border/60"
+							className="h-7 text-xs bg-background border-edge/50"
 						/>
 						{translationMode ? (
 							<AiTranslateFieldButton className="h-7 w-7" />
@@ -178,9 +178,9 @@ export function ScaleOptionsEditor({
 			</div>
 
 			{options.length > 0 && (
-				<div className="rounded-lg border border-border/50 overflow-hidden">
+				<div className="rounded-lg border border-edge/40 overflow-hidden">
 					{/* Header — same grid template + padding as data rows so columns align exactly */}
-					<div className="grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-1.5 bg-muted/50 border-b border-border/40">
+					<div className="grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-1.5 bg-muted/50 border-b border-edge/30">
 						<span />
 						<div className="leading-tight">
 							<span className="block text-[9px] font-mono uppercase text-muted-foreground/50">
@@ -205,7 +205,7 @@ export function ScaleOptionsEditor({
 					{options.map((opt, oIdx) => (
 						<div
 							key={oIdx}
-							className={`grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 relative items-center-safe px-2 py-2 ${oIdx < options.length - 1 ? " border-b border-border/30" : ""}`}>
+							className={`grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 relative items-center-safe px-2 py-2 ${oIdx < options.length - 1 ? " border-b border-edge/25" : ""}`}>
 							{/* Reorder controls — self-center keeps the grip aligned to the row's midline while the input cells share a bottom baseline */}
 							{translationMode ? (
 								<span />
@@ -291,7 +291,7 @@ export function ScaleOptionsEditor({
 									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.is_not_applicable
 											? "border-amber-400/60 bg-amber-100 text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-300"
-											: "border-border bg-transparent text-muted-foreground hover:border-border/80"
+											: "border-edge/40 bg-transparent text-muted-foreground hover:border-edge/40/80"
 									}`}
 									title={t("isNotApplicable")}>
 									{opt.is_not_applicable && <Check className="h-2.5 w-2.5 shrink-0" />}
@@ -308,7 +308,7 @@ export function ScaleOptionsEditor({
 									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.allows_follow_up_scales
 											? "border-violet-400/60 bg-violet-100 text-violet-800 dark:border-violet-500/40 dark:bg-violet-900/30 dark:text-violet-300"
-											: "border-border bg-transparent text-muted-foreground hover:border-border/80"
+											: "border-edge/40 bg-transparent text-muted-foreground hover:border-edge/40/80"
 									}`}
 									title={t("allowsFollowUp")}>
 									{opt.allows_follow_up_scales && <Check className="h-2.5 w-2.5 shrink-0" />}
@@ -482,7 +482,7 @@ export function QuestionScalesEditor({
 						className={`rounded-lg border p-3 space-y-3 ${
 							customized
 								? "border-accent-terracotta/30 bg-accent-terracotta/5"
-								: "border-border/50 bg-card/30"
+								: "border-edge/40 bg-card/30"
 						}`}>
 						<div className="flex items-start justify-between gap-2">
 							<div className="min-w-0 flex-1 grid gap-3 md:grid-cols-3">
@@ -583,7 +583,7 @@ export function QuestionEditor({
 	const isChecklist = questionType === "checklist";
 
 	return (
-		<div className="rounded-lg border border-border/50 bg-card p-3 shadow-sm">
+		<div className="rounded-lg border border-edge/40 bg-card p-3 shadow-sm">
 			{/* Collapsed header */}
 			<div className="flex items-start gap-2">
 				<Button
@@ -654,7 +654,7 @@ export function QuestionEditor({
 
 			{/* Expanded editor */}
 			{expanded && (
-				<div className="mt-4 space-y-4 border-t border-border/30 pt-4 pl-8">
+				<div className="mt-4 space-y-4 border-t border-edge/25 pt-4 pl-8">
 					<div className="grid gap-3 md:grid-cols-[1fr_160px_160px]">
 						<EditableField
 							label={t("questionKey")}
@@ -756,7 +756,7 @@ export function QuestionEditor({
 										className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
 											checked
 												? "border-primary bg-primary text-primary-foreground"
-												: "border-border bg-muted/40 text-muted-foreground hover:border-primary/50"
+												: "border-edge/40 bg-muted/40 text-muted-foreground hover:border-primary/50"
 										}`}>
 										{checked ? (
 											<Check className="h-3 w-3 shrink-0" />
@@ -783,7 +783,7 @@ export function QuestionEditor({
 										q.required = e.target.checked;
 									})
 								}
-								className="rounded border-border"
+								className="rounded border-edge/40"
 							/>
 							{t("required")}
 						</label>

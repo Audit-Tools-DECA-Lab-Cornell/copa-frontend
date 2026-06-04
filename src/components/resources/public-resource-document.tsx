@@ -70,7 +70,7 @@ export function PublicResourceDocument({ resource }: Readonly<{ resource: Public
 							<Link
 								key={relatedResource.slug}
 								href={`/resources/${relatedResource.slug}`}
-								className="group flex items-start justify-between gap-4 rounded-card border border-border/70 bg-card/80 p-4 transition-colors hover:border-primary/35 hover:bg-accent/50">
+								className="group flex items-start justify-between gap-4 rounded-card border border-edge/40 bg-card/80 p-4 transition-colors hover:border-primary/35 hover:bg-accent/50">
 								<div className="space-y-1">
 									<p className="text-sm font-semibold text-foreground">{relatedResource.title}</p>
 									<p className="text-sm leading-6 text-muted-foreground">

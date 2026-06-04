@@ -408,11 +408,11 @@ export default function ManagerPlacesPage() {
 					{MANAGER_PLACES_SKELETON_IDS.map(skeletonId => (
 						<div
 							key={skeletonId}
-							className="h-32 animate-pulse rounded-card border border-border bg-card"
+							className="h-32 animate-pulse rounded-card border border-edge/40 bg-card"
 						/>
 					))}
 				</div>
-				<div className="h-[420px] animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-[420px] animate-pulse rounded-card border border-edge/40 bg-card" />
 			</div>
 		);
 	}

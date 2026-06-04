@@ -239,11 +239,11 @@ export default function ManagerAuditsPage() {
 					{Array.from({ length: 4 }).map((_, index) => (
 						<div
 							key={`audit-stat-skeleton-${index}`}
-							className="h-32 animate-pulse rounded-card border border-border bg-card"
+							className="h-32 animate-pulse rounded-card border border-edge/40 bg-card"
 						/>
 					))}
 				</div>
-				<div className="h-[420px] animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-[420px] animate-pulse rounded-card border border-edge/40 bg-card" />
 			</div>
 		);
 	}

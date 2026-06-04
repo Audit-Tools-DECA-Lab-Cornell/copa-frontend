@@ -348,7 +348,7 @@ function PlaceSubmissionTable({
 	const someSelected = selectedCount > 0 && selectedCount < group.reportCount;
 
 	return (
-		<div className="space-y-3 rounded-md border bg-background p-4 shadow-sm">
+		<div className="space-y-3 rounded-md border border-edge/40 bg-background p-4 shadow-[0_3px_0_rgba(0,0,0,0.12),0_6px_16px_rgba(0,0,0,0.08)]">
 			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<p className="text-sm font-semibold text-foreground">Submitted reports</p>
@@ -570,7 +570,7 @@ export function GroupedReportsView({
 							type="button"
 							className="flex w-full items-start gap-3 text-left"
 							onClick={row.getToggleExpandedHandler()}>
-							<span className="mt-0.5 rounded-md border border-border/70 p-1 text-muted-foreground">
+							<span className="mt-0.5 rounded-md border border-edge/40 p-1 text-muted-foreground">
 								{row.getIsExpanded() ? (
 									<ChevronDownIcon className="size-4" />
 								) : (
@@ -725,7 +725,7 @@ export function GroupedReportsView({
 		<TooltipProvider>
 			<div className="space-y-4">
 				<Card className="overflow-hidden">
-					<CardHeader className="gap-4 border-b border-border/70">
+					<CardHeader className="gap-4 border-b-2 border-edge/50">
 						<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
 							<div>
 								<CardTitle>Place reports</CardTitle>
@@ -744,7 +744,7 @@ export function GroupedReportsView({
 
 					<CardContent className="p-0">
 						<div ref={tableCardContentRef} className="relative">
-							<div className="flex flex-col gap-4 border-b border-border/70 px-6 py-5">
+							<div className="flex flex-col gap-4 border-b-2 border-edge/50 px-6 py-5">
 								<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 									<div className="min-w-0 flex-1 lg:max-w-sm">
 										<div className="relative">

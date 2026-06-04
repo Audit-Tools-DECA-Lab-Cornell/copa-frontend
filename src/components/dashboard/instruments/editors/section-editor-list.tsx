@@ -57,7 +57,7 @@ export function SectionEditorList({
 			<Accordion type="single" collapsible className="w-full">
 				{sections.map((section, sIdx) => (
 					<AccordionItem key={section.section_key} value={section.section_key}>
-						<AccordionTrigger className="text-sm hover:no-underline border border-border/60 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
+						<AccordionTrigger className="text-sm hover:no-underline border border-edge/50 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
 							<span className="flex items-center gap-3">
 								<span className="font-mono text-xs tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
 									{sIdx + 1}
@@ -68,7 +68,7 @@ export function SectionEditorList({
 								</span>
 							</span>
 						</AccordionTrigger>
-						<AccordionContent className="border-x border-b border-border/60 rounded-b-lg bg-card/30 p-4">
+						<AccordionContent className="border-x border-b border-edge/50 rounded-b-lg bg-card/30 p-4">
 							<div className="space-y-6">
 								{!translationMode && (
 									<div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export function SectionEditorList({
 									</div>
 
 									{section.questions.length === 0 && (
-										<div className="rounded-lg border border-dashed border-border/60 p-8 text-center">
+										<div className="rounded-lg border border-dashed border-edge/50 p-8 text-center">
 											<p className="text-sm text-muted-foreground">{t("noQuestions")}</p>
 										</div>
 									)}

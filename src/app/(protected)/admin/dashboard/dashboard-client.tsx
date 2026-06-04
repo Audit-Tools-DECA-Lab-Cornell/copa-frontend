@@ -101,7 +101,7 @@ export function AdminDashboardClient({ overview, latestAudits, errorMessage }: R
 							<Link
 								key={audit.audit_id}
 								href={`/admin/audits/${encodeURIComponent(audit.audit_id)}`}
-								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5 lg:flex-row lg:items-center lg:justify-between">
+								className="flex flex-col gap-3 rounded-card border border-edge/40 bg-card/60 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5 lg:flex-row lg:items-center lg:justify-between">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{audit.place_name}</p>
 									<p className="text-sm text-muted-foreground">

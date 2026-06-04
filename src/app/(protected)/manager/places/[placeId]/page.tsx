@@ -66,7 +66,7 @@ export default function ManagerPlaceDetailPage() {
 	const history = historyQuery.data;
 
 	if (historyQuery.isLoading) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if (historyQuery.isError || !history) {

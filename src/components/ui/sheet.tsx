@@ -54,15 +54,15 @@ function SheetContent({
 			<SheetPrimitive.Content
 				data-slot="sheet-content"
 				className={cn(
-					"fixed z-50 flex max-h-dvh flex-col gap-4 overflow-hidden bg-background shadow-lift transition ease-in-out overscroll-contain data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
+					"fixed z-50 flex max-h-dvh flex-col gap-4 overflow-hidden bg-background shadow-[0_6px_0_rgba(0,0,0,0.22),0_12px_28px_rgba(0,0,0,0.18)] transition ease-in-out overscroll-contain data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
 					side === "right" &&
-						"inset-y-0 right-0 h-dvh w-full max-w-[28rem] border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+						"inset-y-0 right-0 h-dvh w-full max-w-[28rem] border-l-2 border-edge data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
 					side === "left" &&
-						"inset-y-0 left-0 h-dvh w-full max-w-[28rem] border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+						"inset-y-0 left-0 h-dvh w-full max-w-[28rem] border-r-2 border-edge data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
 					side === "top" &&
-						"inset-x-0 top-0 h-auto max-h-[75dvh] border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top md:max-h-[32rem]",
+						"inset-x-0 top-0 h-auto max-h-[75dvh] border-b-2 border-edge data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top md:max-h-[32rem]",
 					side === "bottom" &&
-						"inset-x-0 bottom-0 h-auto max-h-[75dvh] border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:max-h-[32rem]",
+						"inset-x-0 bottom-0 h-auto max-h-[75dvh] border-t-2 border-edge data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:max-h-[32rem]",
 					className
 				)}
 				{...props}>
@@ -79,11 +79,23 @@ function SheetContent({
 }
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
-	return <div data-slot="sheet-header" className={cn("flex flex-col gap-1.5 p-4", className)} {...props} />;
+	return (
+		<div
+			data-slot="sheet-header"
+			className={cn("flex flex-col gap-1.5 border-b-2 border-edge/50 p-4 pb-4", className)}
+			{...props}
+		/>
+	);
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
-	return <div data-slot="sheet-footer" className={cn("mt-auto flex flex-col gap-2 p-4", className)} {...props} />;
+	return (
+		<div
+			data-slot="sheet-footer"
+			className={cn("mt-auto flex flex-col gap-2 border-t-2 border-edge/50 p-4 pt-4", className)}
+			{...props}
+		/>
+	);
 }
 
 function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {

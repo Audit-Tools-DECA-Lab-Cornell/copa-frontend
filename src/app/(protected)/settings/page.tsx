@@ -410,7 +410,7 @@ function ChoiceCardGroup<TValue extends string>({
 								"inline-flex min-h-10 items-center gap-2 rounded-lg border px-4 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
 								isSelected
 									? "border-primary bg-primary/10 shadow-field"
-									: "border-border bg-card text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+									: "border-edge/40 bg-card text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
 							)}>
 							<Icon
 								className={cn(
@@ -452,7 +452,7 @@ function PreferenceToggleRow({
 	const t = useTranslations("settings.common");
 
 	return (
-		<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+		<div className="flex flex-col gap-4 rounded-card border border-edge/40 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div className="flex items-start gap-3">
 				<div className="rounded-lg bg-secondary p-2">
 					<Icon className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -585,7 +585,7 @@ function SecurityCard({
 					<DetailItem label={t("fields.device")} value={t("values.currentBrowserSession")} />
 				</div>
 
-				<div className="rounded-card border border-border bg-secondary/40 p-4">
+				<div className="rounded-card border border-edge/40 bg-secondary/40 p-4">
 					<p className="text-sm font-medium text-foreground">{t("sharedDeviceTitle")}</p>
 					<p className="mt-2 text-sm text-muted-foreground">{t("sharedDeviceDescription")}</p>
 				</div>
@@ -677,7 +677,7 @@ function AccessibilityPreferencesCard() {
 					onToggle={preferences.setDyslexicFont}
 				/>
 
-				<div className="rounded-card border border-border bg-card p-4">
+				<div className="rounded-card border border-edge/40 bg-card p-4">
 					<div className="flex items-center justify-between gap-3">
 						<div className="space-y-1">
 							<p className="font-medium text-foreground">{t("fontSize.title")}</p>
@@ -931,7 +931,7 @@ function ManagerOrganizationCard({
 							<DetailItemSkeleton label={t("fields.primaryContact")} />
 							<DetailItemSkeleton label={t("fields.memberSince")} />
 						</div>
-						<div className="rounded-card border border-border bg-secondary/40 p-4">
+						<div className="rounded-card border border-edge/40 bg-secondary/40 p-4">
 							<SettingsInlineSkeleton className="h-4 w-28" />
 							<SettingsInlineSkeleton className="mt-3 h-4 w-40" />
 							<SettingsInlineSkeleton className="mt-2 h-4 w-52" />
@@ -955,7 +955,7 @@ function ManagerOrganizationCard({
 						</div>
 
 						{isEditingOrganization ? (
-							<div className="space-y-4 rounded-card border border-border bg-secondary/40 p-4">
+							<div className="space-y-4 rounded-card border border-edge/40 bg-secondary/40 p-4">
 								<p className="text-xs text-muted-foreground">
 									Fields marked with{" "}
 									<span className="text-destructive" aria-hidden="true">
@@ -1024,7 +1024,7 @@ function ManagerOrganizationCard({
 								</div>
 							</div>
 						) : (
-							<div className="rounded-card border border-border bg-secondary/40 p-4">
+							<div className="rounded-card border border-edge/40 bg-secondary/40 p-4">
 								<p className="text-sm font-medium text-foreground">{t("primaryContact.title")}</p>
 								{primaryManagerProfile ? (
 									<div className="mt-3 space-y-1">
@@ -1130,7 +1130,7 @@ function ManagerContactsCard({
 							{MANAGER_CONTACT_SKELETON_IDS.map(skeletonId => (
 								<div
 									key={`manager-profile-skeleton-${skeletonId}`}
-									className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+									className="flex items-start gap-3 rounded-card border border-edge/40 bg-card p-4">
 									<SettingsInlineSkeleton className="size-6 rounded-full" />
 									<div className="min-w-0 flex-1 space-y-2">
 										<SettingsInlineSkeleton className="h-4 w-32" />
@@ -1150,7 +1150,7 @@ function ManagerContactsCard({
 						: managerProfiles.map(profile => (
 								<div
 									key={profile.id}
-									className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+									className="flex items-start gap-3 rounded-card border border-edge/40 bg-card p-4">
 									<Avatar size="sm">
 										<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
 									</Avatar>
@@ -1189,7 +1189,7 @@ function ManagerContactsCard({
 										{visibleInvites.map(invite => (
 											<div
 												key={invite.id}
-												className="flex items-center gap-3 rounded-card border border-border bg-card/60 px-3 py-2.5">
+												className="flex items-center gap-3 rounded-card border border-edge/40 bg-card/60 px-3 py-2.5">
 												<div className="min-w-0 flex-1 space-y-1">
 													<p className="truncate text-sm font-medium text-foreground">
 														{invite.email}

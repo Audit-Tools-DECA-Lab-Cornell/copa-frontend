@@ -78,7 +78,7 @@ function updateStoredAuditorSession(profile: MyAuditorProfile, nextStep: "COMPLE
 
 function RequirementList({ password }: Readonly<{ password: string }>) {
 	return (
-		<div className="flex flex-col gap-2 rounded-card border border-border bg-secondary/40 p-4">
+		<div className="flex flex-col gap-2 rounded-card border border-edge/40 bg-secondary/40 p-4">
 			<p className="text-sm font-semibold text-foreground">Password requirements</p>
 			<div className="grid gap-2 sm:grid-cols-2">
 				{PASSWORD_REQUIREMENTS.map(requirement => {
@@ -416,7 +416,7 @@ function TermsStep({ onComplete }: Readonly<{ onComplete: (profile: MyAuditorPro
 					return (
 						<div
 							key={document.key}
-							className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
+							className="flex flex-col gap-4 rounded-card border border-edge/40 bg-card p-4">
 							<div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
 								<div className="flex flex-col gap-1">
 									<Badge variant="secondary" className="w-fit">
@@ -440,7 +440,7 @@ function TermsStep({ onComplete }: Readonly<{ onComplete: (profile: MyAuditorPro
 								aria-label={`${document.short_title} summary`}
 								className="min-h-20"
 							/>
-							<div className="max-h-72 overflow-y-auto rounded-card border border-border bg-secondary/30 p-4">
+							<div className="max-h-72 overflow-y-auto rounded-card border border-edge/40 bg-secondary/30 p-4">
 								<div className="flex flex-col gap-5">
 									{document.sections.map(section => (
 										<section key={section.key} className="flex flex-col gap-2">
@@ -551,7 +551,7 @@ export default function AuditorOnboardingPage() {
 						className={
 							item === step
 								? "rounded-card border border-primary bg-primary/10 p-3 text-sm font-medium text-foreground"
-								: "rounded-card border border-border bg-card p-3 text-sm text-muted-foreground"
+								: "rounded-card border border-edge/40 bg-card p-3 text-sm text-muted-foreground"
 						}>
 						{index + 1}. {item}
 					</div>

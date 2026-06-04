@@ -29,7 +29,7 @@ export default async function OnboardingLayout({ children }: Readonly<{ children
 
 	return (
 		<div className="min-h-dvh bg-background">
-			<header className="border-b border-border/60 bg-background/95 backdrop-blur">
+			<header className="border-b border-edge/50 bg-background/95 backdrop-blur">
 				<div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
 					<Image src="/icon.png" alt="COPA Tool" width={28} height={28} className="rounded-md" />
 					<span className="text-sm font-semibold text-foreground">COPA Tool</span>

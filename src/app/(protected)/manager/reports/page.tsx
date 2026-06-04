@@ -169,11 +169,11 @@ export default function ManagerReportsPage() {
 					{Array.from({ length: 4 }).map((_, idx) => (
 						<div
 							key={`stat-skeleton-${idx}`}
-							className="h-32 animate-pulse rounded-card border border-border bg-card"
+							className="h-32 animate-pulse rounded-card border border-edge/40 bg-card"
 						/>
 					))}
 				</div>
-				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />
 			</div>
 		);
 	}

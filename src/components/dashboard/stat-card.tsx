@@ -4,12 +4,21 @@ import { cn } from "@/lib/utils";
 type StatTone = "neutral" | "primary" | "success" | "warning" | "info" | "violet";
 
 const toneClassesByTone: Record<StatTone, string> = {
-	neutral: "bg-status-danger",
-	primary: "bg-accent-terracotta",
+	neutral: "bg-solid-neutral",
+	primary: "bg-solid-primary",
 	success: "bg-status-success",
 	warning: "bg-status-warning",
 	info: "bg-stat-accent-info",
 	violet: "bg-accent-violet"
+};
+
+const toneBorderByTone: Record<StatTone, string> = {
+	neutral: "border-l-solid-neutral",
+	primary: "border-l-solid-primary",
+	success: "border-l-status-success",
+	warning: "border-l-status-warning",
+	info: "border-l-stat-accent-info",
+	violet: "border-l-accent-violet"
 };
 
 export interface StatCardProps {
@@ -25,9 +34,13 @@ export interface StatCardProps {
  */
 export function StatCard({ title, value, helper, tone = "neutral", valueClassName }: Readonly<StatCardProps>) {
 	return (
-		<Card className="relative flex flex-col justify-between gap-6 overflow-hidden border-border bg-card/95">
-			<div className={cn("absolute inset-x-0 top-0 h-1", toneClassesByTone[tone])} aria-hidden="true" />
-			<CardHeader className="gap-2 border-border/70">
+		<Card
+			className={cn(
+				"relative flex flex-col justify-between gap-6 overflow-hidden border-l-2 bg-card/95",
+				toneBorderByTone[tone]
+			)}>
+			<div className={cn("absolute inset-x-0 top-0 h-[3px]", toneClassesByTone[tone])} aria-hidden="true" />
+			<CardHeader className="gap-2 border-edge/50">
 				<CardTitle className="text-[13px] font-semibold tracking-[0.08em] text-text-secondary">
 					{title}
 				</CardTitle>

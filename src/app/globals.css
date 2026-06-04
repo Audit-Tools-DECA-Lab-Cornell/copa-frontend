@@ -55,6 +55,16 @@
 	--color-sidebar-primary: var(--sidebar-primary);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar: var(--sidebar);
+	--color-solid-primary: var(--solid-primary);
+	--color-solid-primary-text: var(--solid-primary-text);
+	--color-solid-neutral: var(--solid-neutral);
+	--color-solid-neutral-text: var(--solid-neutral-text);
+	--color-solid-danger: var(--solid-danger);
+	--color-solid-danger-text: var(--solid-danger-text);
+	--color-solid-draft: var(--solid-draft);
+	--color-solid-draft-text: var(--solid-draft-text);
+	--color-solid-orphan: var(--solid-orphan);
+	--color-solid-orphan-text: var(--solid-orphan-text);
 	--color-chart-5: var(--chart-5);
 	--color-chart-4: var(--chart-4);
 	--color-chart-3: var(--chart-3);
@@ -102,20 +112,10 @@
 	--font-dyslexic: "OpenDyslexic";
 	color-scheme: light;
 
-	/** Warm Brutalism palette (earthy, dark-but-not-black) — drives the `.bru-*` classes below. */
-	--color-solid-primary: #2d5c3e;
-	--color-solid-primary-edge: #1a3825;
-	--color-solid-primary-text: #d4ede0;
-	--color-solid-neutral: #3c3a35;
-	--color-solid-neutral-edge: #28261f;
-	--color-solid-neutral-text: #d4d2cb;
-	--color-solid-danger: #7a2d2d;
-	--color-solid-danger-edge: #4a1818;
-	--color-solid-danger-text: #f5d4d4;
-	--color-solid-draft: #4a3f28;
-	--color-solid-draft-text: #d4c49a;
-	--color-solid-orphan: #5c3d1e;
-	--color-solid-orphan-text: #f0d4b0;
+	/** Warm Brutalism edge vars — used only in box-shadow declarations; not Tailwind utilities. */
+	--color-solid-primary-edge: var(--solid-primary-edge);
+	--color-solid-neutral-edge: var(--solid-neutral-edge);
+	--color-solid-danger-edge: var(--solid-danger-edge);
 }
 
 .dark {

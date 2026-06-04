@@ -129,16 +129,16 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 	if (auditorsQuery.isLoading) {
 		return (
 			<div className="space-y-6">
-				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-20 animate-pulse rounded-card border border-edge/40 bg-card" />
 				<div className="grid gap-4 md:grid-cols-3">
 					{[1, 2, 3].map(i => (
 						<div
 							key={`skel-${i.toString()}`}
-							className="h-32 animate-pulse rounded-card border border-border bg-card"
+							className="h-32 animate-pulse rounded-card border border-edge/40 bg-card"
 						/>
 					))}
 				</div>
-				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
+				<div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />
 			</div>
 		);
 	}
@@ -263,7 +263,7 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 							{getErrorMessage(assignmentsQuery.error, t("assignmentsCard.loadErrorFallback"))}
 						</p>
 					) : assignments.length === 0 ? (
-						<div className="rounded-field border border-dashed border-border p-6 text-center">
+						<div className="rounded-field border border-dashed border-edge/50 p-6 text-center">
 							<p className="font-medium text-foreground">{t("assignmentsCard.emptyTitle")}</p>
 							<p className="mt-1 text-sm text-muted-foreground">
 								{t("assignmentsCard.emptyDescription")}
@@ -273,7 +273,7 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 						assignments.map(assignment => (
 							<div
 								key={assignment.id}
-								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
+								className="flex flex-col gap-3 rounded-card border border-edge/40 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{assignment.scope_name}</p>
 									<p className="text-xs text-muted-foreground">

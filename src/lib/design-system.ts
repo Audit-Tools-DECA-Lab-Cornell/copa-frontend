@@ -44,6 +44,20 @@ interface DesignSystemPalette {
 	readonly actionOutlineBorder: string;
 	readonly tableRowHover: string;
 	readonly statAccentNeutral: string;
+	// Warm Brutalism solid-block tokens — drive bru-* classes and button/badge components
+	readonly solidPrimary: string;
+	readonly solidPrimaryEdge: string;
+	readonly solidPrimaryText: string;
+	readonly solidNeutral: string;
+	readonly solidNeutralEdge: string;
+	readonly solidNeutralText: string;
+	readonly solidDanger: string;
+	readonly solidDangerEdge: string;
+	readonly solidDangerText: string;
+	readonly solidDraft: string;
+	readonly solidDraftText: string;
+	readonly solidOrphan: string;
+	readonly solidOrphanText: string;
 }
 
 interface DesignSystemVariableInput {
@@ -152,7 +166,20 @@ export const DESIGN_SYSTEM = {
 				inputBorder: "#c4b8ad",
 				actionOutlineBorder: "rgba(47, 39, 34, 0.22)",
 				tableRowHover: "rgba(47, 39, 34, 0.04)",
-				statAccentNeutral: "rgba(47, 39, 34, 0.12)"
+				statAccentNeutral: "rgba(47, 39, 34, 0.12)",
+				solidPrimary: "#2d5c3e",
+				solidPrimaryEdge: "#1a3825",
+				solidPrimaryText: "#d4ede0",
+				solidNeutral: "#3c3a35",
+				solidNeutralEdge: "#28261f",
+				solidNeutralText: "#d4d2cb",
+				solidDanger: "#7a2d2d",
+				solidDangerEdge: "#4a1818",
+				solidDangerText: "#f5d4d4",
+				solidDraft: "#4a3f28",
+				solidDraftText: "#d4c49a",
+				solidOrphan: "#5c3d1e",
+				solidOrphanText: "#f0d4b0"
 			},
 			high: {
 				canvas: "#ffffff",
@@ -189,7 +216,20 @@ export const DESIGN_SYSTEM = {
 				inputBorder: "#8a8078",
 				actionOutlineBorder: "rgba(17, 17, 17, 0.36)",
 				tableRowHover: "rgba(17, 17, 17, 0.08)",
-				statAccentNeutral: "rgba(17, 17, 17, 0.2)"
+				statAccentNeutral: "rgba(17, 17, 17, 0.2)",
+				solidPrimary: "#1e4228",
+				solidPrimaryEdge: "#0e2414",
+				solidPrimaryText: "#e0f5e8",
+				solidNeutral: "#2a2820",
+				solidNeutralEdge: "#181610",
+				solidNeutralText: "#e2dfd8",
+				solidDanger: "#6a1e1e",
+				solidDangerEdge: "#3d0f0f",
+				solidDangerText: "#ffe0e0",
+				solidDraft: "#3a3018",
+				solidDraftText: "#e8d8a4",
+				solidOrphan: "#4e2c10",
+				solidOrphanText: "#f8e0c0"
 			}
 		},
 		dark: {
@@ -228,7 +268,20 @@ export const DESIGN_SYSTEM = {
 				inputBorder: "#5a524c",
 				actionOutlineBorder: "rgba(235, 227, 215, 0.30)",
 				tableRowHover: "rgba(255, 255, 255, 0.06)",
-				statAccentNeutral: "rgba(235, 227, 215, 0.16)"
+				statAccentNeutral: "rgba(235, 227, 215, 0.16)",
+				solidPrimary: "#2d5c3e",
+				solidPrimaryEdge: "#1a3825",
+				solidPrimaryText: "#d4ede0",
+				solidNeutral: "#3c3a35",
+				solidNeutralEdge: "#28261f",
+				solidNeutralText: "#d4d2cb",
+				solidDanger: "#7a2d2d",
+				solidDangerEdge: "#4a1818",
+				solidDangerText: "#f5d4d4",
+				solidDraft: "#4a3f28",
+				solidDraftText: "#d4c49a",
+				solidOrphan: "#5c3d1e",
+				solidOrphanText: "#f0d4b0"
 			},
 			high: {
 				canvas: "#000000",
@@ -265,7 +318,20 @@ export const DESIGN_SYSTEM = {
 				inputBorder: "#a0a0a0",
 				actionOutlineBorder: "rgba(255, 255, 255, 0.42)",
 				tableRowHover: "rgba(255, 255, 255, 0.1)",
-				statAccentNeutral: "rgba(255, 255, 255, 0.22)"
+				statAccentNeutral: "rgba(255, 255, 255, 0.22)",
+				solidPrimary: "#1e4228",
+				solidPrimaryEdge: "#0e2414",
+				solidPrimaryText: "#e0f5e8",
+				solidNeutral: "#2a2820",
+				solidNeutralEdge: "#181610",
+				solidNeutralText: "#e2dfd8",
+				solidDanger: "#6a1e1e",
+				solidDangerEdge: "#3d0f0f",
+				solidDangerText: "#ffe0e0",
+				solidDraft: "#3a3018",
+				solidDraftText: "#e8d8a4",
+				solidOrphan: "#4e2c10",
+				solidOrphanText: "#f8e0c0"
 			}
 		}
 	} satisfies Record<DesignSystemThemeMode, Record<DesignSystemContrastMode, DesignSystemPalette>>
@@ -378,7 +444,20 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--eyebrow-weight": DESIGN_SYSTEM.typography.eyebrow.weight,
 		"--workspace-label-size": DESIGN_SYSTEM.typography.workspaceLabel.size,
 		"--workspace-label-tracking": DESIGN_SYSTEM.typography.workspaceLabel.tracking,
-		"--workspace-label-weight": DESIGN_SYSTEM.typography.workspaceLabel.weight
+		"--workspace-label-weight": DESIGN_SYSTEM.typography.workspaceLabel.weight,
+		"--solid-primary": palette.solidPrimary,
+		"--solid-primary-edge": palette.solidPrimaryEdge,
+		"--solid-primary-text": palette.solidPrimaryText,
+		"--solid-neutral": palette.solidNeutral,
+		"--solid-neutral-edge": palette.solidNeutralEdge,
+		"--solid-neutral-text": palette.solidNeutralText,
+		"--solid-danger": palette.solidDanger,
+		"--solid-danger-edge": palette.solidDangerEdge,
+		"--solid-danger-text": palette.solidDangerText,
+		"--solid-draft": palette.solidDraft,
+		"--solid-draft-text": palette.solidDraftText,
+		"--solid-orphan": palette.solidOrphan,
+		"--solid-orphan-text": palette.solidOrphanText
 	};
 }
 

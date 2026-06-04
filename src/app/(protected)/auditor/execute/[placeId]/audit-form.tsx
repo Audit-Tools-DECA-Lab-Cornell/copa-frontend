@@ -647,7 +647,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	}
 
 	if (createOrResumeQuery.isLoading) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if (createOrResumeQuery.isError) {
@@ -665,16 +665,16 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	}
 
 	if (createOrResumeQuery.data && !instrument) {
-		return <div className="h-40 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-40 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if (!session) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	return (
 		<div className="space-y-6">
-			<div className="sticky top-16 z-20 -mx-4 border-b border-border/70 bg-background/95 px-4 py-4 backdrop-blur md:-mx-6 md:px-6">
+			<div className="sticky top-16 z-20 -mx-4 border-b border-edge/60 bg-background/95 px-4 py-4 backdrop-blur md:-mx-6 md:px-6">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 					<div className="space-y-2">
 						<h1 className="text-2xl font-semibold tracking-tight">{t("header.title")}</h1>
@@ -1194,7 +1194,7 @@ function PreambleBlockCard({ block }: Readonly<PreambleBlockCardProps>) {
 		<div
 			className={cn(
 				"rounded-card border p-4",
-				isScaleBlock ? "border-primary/25 bg-primary/5" : "border-border bg-card"
+				isScaleBlock ? "border-primary/25 bg-primary/5" : "border-edge/40 bg-card"
 			)}>
 			<div className="space-y-3">
 				<h3 className={cn("font-semibold", isScaleBlock ? "text-primary" : "text-foreground")}>
@@ -1345,20 +1345,20 @@ function MatrixPreAuditCard({ questions, values, disabled, onSelectOption }: Rea
 		<FieldCard title={t("matrixTitle")} description={t("matrixDescription")}>
 			<div className="overflow-x-auto">
 				<div
-					className="grid min-w-[720px] rounded-card border border-border"
+					className="grid min-w-[720px] rounded-card border border-edge/40"
 					style={{
 						gridTemplateColumns: [
 							"minmax(180px, 1.3fr)",
 							...matrixOptions.map(() => "minmax(120px, 1fr)")
 						].join(" ")
 					}}>
-					<div className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+					<div className="border-r border-edge/40 bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
 						{t("matrixAgeColumn")}
 					</div>
 					{matrixOptions.map(option => (
 						<div
 							key={option.key}
-							className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary last:border-r-0">
+							className="border-r border-edge/40 bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary last:border-r-0">
 							{option.label}
 						</div>
 					))}
@@ -1366,7 +1366,7 @@ function MatrixPreAuditCard({ questions, values, disabled, onSelectOption }: Rea
 						<React.Fragment key={question.key}>
 							<div
 								className={cn(
-									"border-r border-t border-border px-4 py-4",
+									"border-r border-t border-edge/40 px-4 py-4",
 									rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
 								)}>
 								<p className="text-sm font-medium text-foreground">{question.label}</p>
@@ -1378,7 +1378,7 @@ function MatrixPreAuditCard({ questions, values, disabled, onSelectOption }: Rea
 									<div
 										key={`${question.key}.${option.key}`}
 										className={cn(
-											"border-r border-t border-border px-3 py-3 last:border-r-0",
+											"border-r border-t border-edge/40 px-3 py-3 last:border-r-0",
 											rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
 										)}>
 										<Button

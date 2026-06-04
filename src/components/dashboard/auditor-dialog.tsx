@@ -462,7 +462,7 @@ function AuditorCreatedConfirmation({
 			</div>
 
 			{/* Detail rows */}
-			<div className="rounded-lg border border-border bg-muted/40 divide-y divide-border">
+			<div className="rounded-lg border border-edge/40 bg-muted/40 divide-y divide-border">
 				{/* Email row */}
 				<div className="flex items-start gap-3 px-4 py-3">
 					<MailIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />

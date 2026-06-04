@@ -64,7 +64,7 @@ export function PlaceReportsCard({ placeId, projectId, savedReports, rolePrefix 
 
 	return (
 		<Card className="overflow-hidden">
-			<CardHeader className="border-b border-border/70 bg-muted/25">
+			<CardHeader className="border-b-2 border-edge/50 bg-muted/25">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div>
 						<CardTitle className="flex items-center gap-2 text-base">

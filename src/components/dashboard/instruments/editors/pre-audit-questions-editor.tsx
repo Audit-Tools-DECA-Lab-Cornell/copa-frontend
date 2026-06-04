@@ -31,9 +31,9 @@ function QuestionCard({
 	const [showGroup, setShowGroup] = useState(false);
 
 	return (
-		<div className="rounded-xl border border-border bg-card shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.04] flex flex-col">
+		<div className="rounded-xl border border-edge/40 bg-card shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.04] flex flex-col">
 			{/* Card top bar */}
-			<div className="flex items-center justify-between px-4 py-2.5 border-b border-border/60 bg-muted/30 rounded-t-xl">
+			<div className="flex items-center justify-between px-4 py-2.5 border-b border-edge/50 bg-muted/30 rounded-t-xl">
 				<div className="flex items-center gap-2">
 					<GripVertical className="h-3.5 w-3.5 text-muted-foreground/40" />
 					<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
@@ -189,7 +189,7 @@ function QuestionCard({
 									className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed ${
 										checked
 											? "border-primary bg-primary text-primary-foreground shadow-sm"
-											: "border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground"
+											: "border-edge/40 bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground"
 									}`}>
 									{t.has(`modes.${m}`) ? t(`modes.${m}`) : m}
 								</button>
@@ -200,7 +200,7 @@ function QuestionCard({
 
 				{/* Required */}
 				<div
-					className={`flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5 transition-colors ${
+					className={`flex items-center justify-between rounded-lg border border-edge/40 bg-muted/20 px-3 py-2.5 transition-colors ${
 						translationMode ? "cursor-not-allowed opacity-70" : "cursor-pointer hover:bg-muted/40"
 					}`}
 					onClick={() => {
@@ -223,14 +223,14 @@ function QuestionCard({
 							})
 						}
 						onClick={e => e.stopPropagation()}
-						className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+						className="h-4 w-4 rounded border-edge/40 accent-primary cursor-pointer"
 					/>
 				</div>
 			</div>
 
 			{/* Options */}
 			{(question.options?.length > 0 || ["select", "radio", "checkbox"].includes(question.input_type)) && (
-				<div className="border-t border-border/60 px-4 py-3 bg-muted/10 rounded-b-xl">
+				<div className="border-t-2 border-edge/50 px-4 py-3 bg-muted/10 rounded-b-xl">
 					<ChoiceOptionsEditor
 						options={question.options}
 						onChange={opts =>
@@ -289,7 +289,7 @@ export function PreAuditQuestionsEditor({
 
 			{/* Empty state */}
 			{questions.length === 0 && (
-				<div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/60 bg-muted/20 py-12 text-center">
+				<div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-edge/50 bg-muted/20 py-12 text-center">
 					<p className="text-sm font-medium text-muted-foreground">No questions yet</p>
 					<p className="text-xs text-muted-foreground/70 mt-1">
 						Click &ldquo;Add question&ldquo; to get started

@@ -201,7 +201,7 @@ export default function AdminAuditsPage() {
 	const isInitialLoading = auditsQuery.isLoading && !auditsQuery.data;
 
 	if (isInitialLoading) {
-		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
+		return <div className="h-64 animate-pulse rounded-card border border-edge/40 bg-card" />;
 	}
 
 	if ((auditsQuery.isError && !auditsQuery.data) || !auditsQuery.data) {

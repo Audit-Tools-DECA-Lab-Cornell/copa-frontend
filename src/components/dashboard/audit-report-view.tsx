@@ -183,7 +183,7 @@ function BarTrack({
 			<div
 				className={cn(
 					"flex items-end overflow-hidden rounded border",
-					isNa ? "border-dashed border-border/50 bg-muted/30" : "border-border bg-muted/60"
+					isNa ? "border-dashed border-edge/30 bg-muted/30" : "border-edge/40 bg-muted/60"
 				)}
 				style={{ width: BAR_WIDTH, height: BAR_TRACK_HEIGHT }}
 				role="meter"
@@ -355,7 +355,7 @@ function ScoreSubTable({
 	];
 
 	return (
-		<div className="overflow-hidden rounded-sm border border-border" style={{ width: tableW }}>
+		<div className="overflow-hidden rounded-sm border border-edge/40" style={{ width: tableW }}>
 			{/* Header */}
 			<div className="flex bg-primary">
 				<div className="border-r border-primary-foreground/20 px-3 py-2" style={{ width: LABEL_COL_W }} />
@@ -373,9 +373,11 @@ function ScoreSubTable({
 			</div>
 			{/* Data rows */}
 			{rows.map(row => (
-				<div key={row.label} className={cn("flex border-t border-border", row.alt ? "bg-muted/40" : "bg-card")}>
+				<div
+					key={row.label}
+					className={cn("flex border-t border-edge/40", row.alt ? "bg-muted/40" : "bg-card")}>
 					<div
-						className="border-r border-border px-3 py-2 text-xs font-bold text-muted-foreground"
+						className="border-r border-edge/40 px-3 py-2 text-xs font-bold text-muted-foreground"
 						style={{ width: LABEL_COL_W }}>
 						{row.label}
 					</div>
@@ -384,7 +386,7 @@ function ScoreSubTable({
 							key={`${row.label}-${i}`}
 							className={cn(
 								"px-3 py-2 text-center font-mono text-xs tabular-nums",
-								i < row.cells.length - 1 && "border-r border-border"
+								i < row.cells.length - 1 && "border-r border-edge/40"
 							)}
 							style={{ width: dataColW }}>
 							{cell}
@@ -425,7 +427,7 @@ function ReportStatCard({
 	accent = "bg-primary"
 }: Readonly<{ label: string; value: string; helper?: string; accent?: string }>) {
 	return (
-		<Card className="relative flex flex-col justify-between gap-3 overflow-hidden border-border bg-card/95">
+		<Card className="relative flex flex-col justify-between gap-3 overflow-hidden border-edge/40 bg-card/95">
 			<div className={cn("absolute inset-x-0 top-0 h-1", accent)} aria-hidden="true" />
 			<CardHeader className="gap-1 pb-0 pt-5">
 				<CardTitle className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
@@ -450,32 +452,32 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 	}
 
 	return (
-		<div className="overflow-x-auto rounded-md border border-border">
+		<div className="overflow-x-auto rounded-md border border-edge/40">
 			<table className="w-full min-w-[800px] border-collapse text-xs">
 				<thead>
 					<tr className="bg-muted/60">
-						<th className="w-16 border-b border-r border-border px-3 py-2 text-left font-bold text-muted-foreground">
+						<th className="w-16 border-b border-r border-edge/40 px-3 py-2 text-left font-bold text-muted-foreground">
 							ID
 						</th>
-						<th className="border-b border-r border-border px-3 py-2 text-left font-bold text-muted-foreground">
+						<th className="border-b border-r border-edge/40 px-3 py-2 text-left font-bold text-muted-foreground">
 							Item
 						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
 							Provision
 						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
 							Diversity
 						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
 							Challenge
 						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-muted-foreground">
+						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
 							Sociability
 						</th>
-						<th className="w-20 border-b border-r border-border px-3 py-2 text-center font-bold text-primary">
+						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-primary">
 							PV
 						</th>
-						<th className="w-20 border-b border-border px-3 py-2 text-center font-bold text-primary">U</th>
+						<th className="w-20 border-b border-edge/40 px-3 py-2 text-center font-bold text-primary">U</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -485,11 +487,11 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 
 						return (
 							<tr key={q.rowKey} className={idx % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-								<td className="border-r border-border px-3 py-2 font-mono tabular-nums text-muted-foreground">
+								<td className="border-r border-edge/40 px-3 py-2 font-mono tabular-nums text-muted-foreground">
 									{formattedId}
 								</td>
 								<td
-									className="border-r border-border px-3 py-2 text-foreground"
+									className="border-r border-edge/40 px-3 py-2 text-foreground"
 									style={{ maxWidth: 360 }}>
 									{q.sourceLabel !== null ? (
 										<div className="mb-1.5">
@@ -508,20 +510,20 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										))}
 									</span>
 									{q.checklistAnswerLabel !== null ? (
-										<p className="mt-1.5 rounded-sm border border-border/60 bg-muted/40 px-2 py-1 text-[11px] leading-4 text-muted-foreground">
+										<p className="mt-1.5 rounded-sm border border-edge/40 bg-muted/40 px-2 py-1 text-[11px] leading-4 text-muted-foreground">
 											<span className="font-semibold text-foreground">Selected: </span>
 											{q.checklistAnswerLabel}
 										</p>
 									) : null}
 								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
 									{renderScaleCellState({
 										label: q.provisionLabel,
 										applicable: q.provisionApplicable,
 										isNotApplicable: q.provisionIsNotApplicable
 									})}
 								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
 									{renderScaleCellState({
 										label: q.diversityLabel,
 										applicable: q.diversityApplicable,
@@ -529,7 +531,7 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										followUpScalesAsked: q.followUpScalesAsked
 									})}
 								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
 									{renderScaleCellState({
 										label: q.challengeLabel,
 										applicable: q.challengeApplicable,
@@ -537,7 +539,7 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										followUpScalesAsked: q.followUpScalesAsked
 									})}
 								</td>
-								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
+								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
 									{renderScaleCellState({
 										label: q.sociabilityLabel,
 										applicable: q.sociabilityApplicable,
@@ -545,7 +547,7 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										followUpScalesAsked: q.followUpScalesAsked
 									})}
 								</td>
-								<td className="border-r border-border px-3 py-2 text-center font-mono tabular-nums">
+								<td className="border-r border-edge/40 px-3 py-2 text-center font-mono tabular-nums">
 									{q.playValueScore !== null && q.playValueMax !== null
 										? `${q.playValueScore}/${q.playValueMax}`
 										: "—"}
@@ -600,13 +602,13 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 								{row.map(key => {
 									const ranking = rankingByKey.get(key);
 									return (
-										<div key={key} className="overflow-hidden rounded-lg border border-border">
+										<div key={key} className="overflow-hidden rounded-lg border border-edge/40">
 											<div className="bg-primary px-3 py-2">
 												<p className="text-center text-xs font-bold text-primary-foreground">
 													{CONSTRUCT_LABELS[key]}
 												</p>
 											</div>
-											<div className="border-b border-border bg-emerald-50 px-3 py-2.5 dark:bg-emerald-950/20">
+											<div className="border-b border-edge/40 bg-emerald-50 px-3 py-2.5 dark:bg-emerald-950/20">
 												<div className="mb-1 flex items-center gap-1.5">
 													<div className="size-2 rounded-full bg-emerald-500" />
 													<span className="text-xs font-bold text-muted-foreground">

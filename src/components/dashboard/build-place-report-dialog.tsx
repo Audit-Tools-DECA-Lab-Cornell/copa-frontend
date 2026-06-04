@@ -102,10 +102,10 @@ function ModeCard({ label, countLabel, available, selected, onSelect }: Readonly
 			className={cn(
 				"flex flex-col gap-2 rounded-xl border px-4 py-3.5 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 				selected
-					? "border-primary bg-primary/5 shadow-sm"
+					? "border-primary bg-primary/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.12)]"
 					: available
 						? "border-border bg-card hover:border-foreground/20 hover:bg-accent/25"
-						: "cursor-not-allowed border-border/50 bg-muted/30 opacity-70"
+						: "cursor-not-allowed border-edge/30 bg-muted/30 opacity-70"
 			)}>
 			{/* Row 1: full-width title */}
 			<p className="w-full text-sm font-semibold text-foreground">{label}</p>
@@ -138,7 +138,9 @@ function SubmissionOption({ row, selected, onSelect, inputName }: Readonly<Submi
 			className={cn(
 				"group relative flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-all duration-150",
 				"hover:border-foreground/20 hover:bg-accent/25 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1",
-				selected ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-card"
+				selected
+					? "border-primary bg-primary/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.12)]"
+					: "border-edge/40 bg-card"
 			)}>
 			<input type="radio" name={inputName} className="sr-only" checked={selected} onChange={onSelect} />
 
@@ -146,7 +148,7 @@ function SubmissionOption({ row, selected, onSelect, inputName }: Readonly<Submi
 			<div
 				className={cn(
 					"absolute right-3 top-3 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors",
-					selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"
+					selected ? "border-primary bg-primary text-primary-foreground" : "border-edge/40 bg-background"
 				)}>
 				{selected ? <CheckIcon className="size-3.5" /> : null}
 			</div>
@@ -183,7 +185,7 @@ function SubmissionOption({ row, selected, onSelect, inputName }: Readonly<Submi
 
 function EmptySelectionState({ message }: Readonly<{ message: string }>) {
 	return (
-		<div className="rounded-xl border border-dashed border-border bg-muted/30 px-4 py-5 text-center">
+		<div className="rounded-xl border border-dashed border-edge/50 bg-muted/30 px-4 py-5 text-center">
 			<p className="text-sm text-muted-foreground">{message}</p>
 		</div>
 	);

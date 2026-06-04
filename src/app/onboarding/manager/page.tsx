@@ -248,7 +248,7 @@ function TermsStep({ onComplete }: Readonly<{ onComplete: () => void }>) {
 					return (
 						<div
 							key={document.key}
-							className="flex flex-col gap-4 rounded-card border border-border bg-card p-4">
+							className="flex flex-col gap-4 rounded-card border border-edge/40 bg-card p-4">
 							<div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
 								<div className="flex flex-col gap-1">
 									<Badge variant="secondary" className="w-fit">
@@ -272,7 +272,7 @@ function TermsStep({ onComplete }: Readonly<{ onComplete: () => void }>) {
 								aria-label={`${document.short_title} summary`}
 								className="min-h-20"
 							/>
-							<div className="max-h-72 overflow-y-auto rounded-card border border-border bg-secondary/30 p-4">
+							<div className="max-h-72 overflow-y-auto rounded-card border border-edge/40 bg-secondary/30 p-4">
 								<div className="flex flex-col gap-5">
 									{document.sections.map(section => (
 										<section key={section.key} className="flex flex-col gap-2">
@@ -341,7 +341,7 @@ function WelcomeStep({ profileSnapshot }: Readonly<{ profileSnapshot: MyManagerP
 			</CardHeader>
 			<CardContent className="flex flex-col gap-6">
 				{organisation ? (
-					<div className="flex items-start gap-3 rounded-card border border-border bg-secondary/40 p-4">
+					<div className="flex items-start gap-3 rounded-card border border-edge/40 bg-secondary/40 p-4">
 						<Building2 className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
 						<div className="space-y-1">
 							<p className="text-sm font-semibold text-foreground">{organisation}</p>
@@ -358,7 +358,7 @@ function WelcomeStep({ profileSnapshot }: Readonly<{ profileSnapshot: MyManagerP
 							{ icon: "👤", label: "Invite auditors", description: "Grow your team and assign work" }
 						] as const
 					).map(item => (
-						<div key={item.label} className="rounded-card border border-border bg-card p-4 text-center">
+						<div key={item.label} className="rounded-card border border-edge/40 bg-card p-4 text-center">
 							<p className="mb-2 text-2xl" aria-hidden="true">
 								{item.icon}
 							</p>
@@ -412,7 +412,7 @@ export default function ManagerOnboardingPage() {
 						className={
 							item === step
 								? "rounded-card border border-primary bg-primary/10 p-3 text-sm font-medium text-foreground"
-								: "rounded-card border border-border bg-card p-3 text-sm text-muted-foreground"
+								: "rounded-card border border-edge/40 bg-card p-3 text-sm text-muted-foreground"
 						}>
 						{index + 1}. {STEP_DISPLAY_NAMES[item]}
 					</div>

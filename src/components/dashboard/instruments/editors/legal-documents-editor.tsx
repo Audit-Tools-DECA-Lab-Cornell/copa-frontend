@@ -103,7 +103,7 @@ export function LegalDocumentsEditor({
 			<Accordion type="single" collapsible className="w-full">
 				{documents.map((doc, docIndex) => (
 					<AccordionItem key={docIndex} value={`doc-${docIndex}`}>
-						<AccordionTrigger className="text-sm hover:no-underline border border-border/60 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
+						<AccordionTrigger className="text-sm hover:no-underline border border-edge/50 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
 							<span className="flex items-center gap-2">
 								<span className="font-medium text-left">{doc.title || t("untitledDocument")}</span>
 								<span className="text-xs text-muted-foreground font-mono bg-muted/50 px-1.5 py-0.5 rounded">
@@ -111,7 +111,7 @@ export function LegalDocumentsEditor({
 								</span>
 							</span>
 						</AccordionTrigger>
-						<AccordionContent className="border-x border-b border-border/60 rounded-b-lg bg-card/30 p-4">
+						<AccordionContent className="border-x border-b border-edge/50 rounded-b-lg bg-card/30 p-4">
 							<div className="space-y-6">
 								{!translationMode && (
 									<div className="flex justify-end">
@@ -208,7 +208,7 @@ export function LegalDocumentsEditor({
 									</div>
 
 									{doc.sections.map((section, sectionIndex) => (
-										<Card key={sectionIndex} className="border-border/60">
+										<Card key={sectionIndex} className="border-edge/50">
 											<CardHeader className="pb-2 pt-3 px-4">
 												<div className="flex items-start justify-between gap-2">
 													<div className="grid grid-cols-2 gap-2 flex-1 min-w-0">

@@ -86,7 +86,7 @@ function LockedKeyField({ label, value, hint }: Readonly<{ label: string; value:
 				</TooltipProvider>
 			</div>
 			<div
-				className="flex h-9 items-center rounded-md border border-dashed border-border/70 bg-muted/40 px-3 font-mono text-sm text-muted-foreground"
+				className="flex h-9 items-center rounded-md border border-dashed border-edge/50 bg-muted/40 px-3 font-mono text-sm text-muted-foreground"
 				title={hint}>
 				<span className="truncate">{value || "—"}</span>
 			</div>
@@ -96,7 +96,7 @@ function LockedKeyField({ label, value, hint }: Readonly<{ label: string; value:
 
 export function StatBox({ label, value, textValue }: Readonly<{ label: string; value?: number; textValue?: string }>) {
 	return (
-		<div className="rounded-lg border border-border/70 bg-background p-3 flex flex-col justify-between gap-2">
+		<div className="rounded-lg border border-edge/50 bg-background p-3 flex flex-col justify-between gap-2">
 			<p className="text-xs font-semibold text-muted-foreground">{label}</p>
 			{textValue !== undefined ? (
 				<p
@@ -120,7 +120,7 @@ const SCALE_COLORS: Record<string, string> = {
 
 export function ScaleKeyBadge({ scaleKey }: Readonly<{ scaleKey: string }>) {
 	const t = useTranslations("admin.instruments.content");
-	const colorClasses = SCALE_COLORS[scaleKey] ?? "border-border bg-muted/40";
+	const colorClasses = SCALE_COLORS[scaleKey] ?? "border-edge/40 bg-muted/40";
 	const label = t.has(`scaleLabels.${scaleKey}`) ? t(`scaleLabels.${scaleKey}`) : scaleKey;
 
 	return (

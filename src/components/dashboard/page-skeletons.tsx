@@ -11,7 +11,7 @@ export function StatCardsSkeleton({ count = 4 }: Readonly<{ count?: number }>) {
 	return (
 		<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 			{items.map(index => (
-				<Skeleton key={`stat-card-${index}`} className="h-32 rounded-card border border-border bg-card" />
+				<Skeleton key={`stat-card-${index}`} className="h-32 rounded-card border border-edge/40 bg-card" />
 			))}
 		</div>
 	);
@@ -21,7 +21,7 @@ export function StatCardsSkeleton({ count = 4 }: Readonly<{ count?: number }>) {
  * Generic table skeleton used by list pages while the data loads server-side.
  */
 export function TableSkeleton() {
-	return <Skeleton className="h-[420px] rounded-card border border-border bg-card" />;
+	return <Skeleton className="h-[420px] rounded-card border border-edge/40 bg-card" />;
 }
 
 /**
@@ -32,13 +32,16 @@ export function AuditDetailSkeleton() {
 	return (
 		<div className="space-y-6">
 			<Skeleton className="h-10 w-48 rounded-md" />
-			<Skeleton className="h-40 rounded-card border border-border bg-card" />
+			<Skeleton className="h-40 rounded-card border border-edge/40 bg-card" />
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				{items.map(index => (
-					<Skeleton key={`detail-stat-${index}`} className="h-32 rounded-card border border-border bg-card" />
+					<Skeleton
+						key={`detail-stat-${index}`}
+						className="h-32 rounded-card border border-edge/40 bg-card"
+					/>
 				))}
 			</div>
-			<Skeleton className="h-64 rounded-card border border-border bg-card" />
+			<Skeleton className="h-64 rounded-card border border-edge/40 bg-card" />
 		</div>
 	);
 }
@@ -50,9 +53,9 @@ export function AuditReportSkeleton() {
 	return (
 		<div className="space-y-6">
 			<Skeleton className="h-10 w-48 rounded-md" />
-			<Skeleton className="h-40 rounded-card border border-border bg-card" />
-			<Skeleton className="h-[280px] rounded-card border border-border bg-card" />
-			<Skeleton className="h-[420px] rounded-card border border-border bg-card" />
+			<Skeleton className="h-40 rounded-card border border-edge/40 bg-card" />
+			<Skeleton className="h-[280px] rounded-card border border-edge/40 bg-card" />
+			<Skeleton className="h-[420px] rounded-card border border-edge/40 bg-card" />
 		</div>
 	);
 }
@@ -71,7 +74,7 @@ export function ProtectedShellSkeleton() {
 			</div>
 			<div className="space-y-3">
 				{SKELETON_LINE_KEYS.map(key => (
-					<Skeleton key={`shell-line-${key}`} className="h-20 rounded-card border border-border bg-card" />
+					<Skeleton key={`shell-line-${key}`} className="h-20 rounded-card border border-edge/40 bg-card" />
 				))}
 			</div>
 		</div>
