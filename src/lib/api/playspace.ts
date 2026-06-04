@@ -668,7 +668,11 @@ export const playspaceApi = {
 						body: JSON.stringify(parsedPayload)
 					}
 				);
-			}
+			},
+			delete: async (instrumentId: string): Promise<void> =>
+				fetchNoContent(`/playspace/admin/instruments/${encodeURIComponent(instrumentId)}`, {
+					method: "DELETE"
+				})
 		},
 		accounts: async (query: AdminAccountsQuery = {}): Promise<PaginatedResponse<AdminAccountRow>> =>
 			fetchValidatedJson(

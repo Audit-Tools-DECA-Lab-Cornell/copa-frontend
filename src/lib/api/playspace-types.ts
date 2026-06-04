@@ -931,6 +931,11 @@ export const instrumentResponseSchema = z.object({
 	id: z.string().uuid(),
 	instrument_key: z.string(),
 	instrument_version: z.string(),
+	parent_instrument_id: z
+		.string()
+		.uuid()
+		.nullish()
+		.transform(value => value ?? null),
 	is_active: z.boolean(),
 	content: instrumentContentSchema,
 	created_at: z.string().datetime(),
@@ -942,6 +947,7 @@ export type InstrumentResponse = z.infer<typeof instrumentResponseSchema>;
 export const instrumentCreateRequestSchema = z.object({
 	instrument_key: z.string().min(1),
 	instrument_version: z.string().min(1),
+	parent_instrument_id: z.string().uuid().nullable().optional(),
 	content: instrumentContentSchema
 });
 
