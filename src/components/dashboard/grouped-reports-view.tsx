@@ -41,9 +41,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * Display variant. "reports" groups only SUBMITTED submissions and offers the
- * build-place-report action (the dashboard Reports surface). "audits" groups
- * every submission status and drops the build action (the raw-data Audits
- * preview), so in-progress work stays visible.
+ * build-place-report action (the dashboard Reports surface). "audits" keeps the
+ * audit-oriented labels and drops the build action.
  */
 type GroupedReportsVariant = "reports" | "audits";
 
@@ -58,7 +57,7 @@ interface PlaceGroup {
 	projectName: string;
 	accountNames: string[];
 	rows: AuditActivityRow[];
-	/** Rows shown in the expanded sub-table (submitted-only for reports, all statuses for audits). */
+	/** Rows shown in the expanded sub-table. */
 	displayRows: AuditActivityRow[];
 	/** Submitted-only rows, used to resolve place-report build availability. */
 	submittedRows: AuditActivityRow[];
@@ -80,6 +79,7 @@ export interface GroupedReportsViewProps {
 	onSearchValueChange?: (value: string) => void;
 	isSearching?: boolean;
 	toolbarFilters?: React.ReactNode;
+	description?: React.ReactNode;
 	variant?: GroupedReportsVariant;
 }
 
@@ -516,6 +516,7 @@ export function GroupedReportsView({
 	onSearchValueChange,
 	isSearching = false,
 	toolbarFilters,
+	description,
 	variant = "reports"
 }: Readonly<GroupedReportsViewProps>) {
 	const includeAllStatuses = variant === "audits";
@@ -795,9 +796,10 @@ export function GroupedReportsView({
 							<div>
 								<CardTitle>{includeAllStatuses ? "Place audits" : "Place reports"}</CardTitle>
 								<CardDescription>
-									{includeAllStatuses
-										? "Open a place to review every submission - submitted, paused, and in progress."
-										: "Open a place to review submitted reports and build a place report once the right submissions are available."}
+									{description ??
+										(includeAllStatuses
+											? "Open a place to review every audit submission."
+											: "Open a place to review submitted reports and build a place report once the right submissions are available.")}
 								</CardDescription>
 							</div>
 							<div className="flex flex-wrap gap-2">

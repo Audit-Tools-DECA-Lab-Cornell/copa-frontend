@@ -6,14 +6,6 @@ import { CheckIcon, DownloadIcon, FilterIcon, Loader2Icon, Rows3Icon, XIcon } fr
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
@@ -218,27 +210,19 @@ export function CollectionNamespaceBar({
 export interface SelectionBarLabels {
 	selectedText: string;
 	exportSelected: string;
-	countLabel: string;
 	deselectAll: string;
-	xlsx: string;
-	json: string;
-	csvParentOnly: string;
 }
 
 const DEFAULT_SELECTION_LABELS: SelectionBarLabels = {
 	selectedText: "selected",
 	exportSelected: "Export selected",
-	countLabel: "selected",
-	deselectAll: "Deselect all",
-	xlsx: "Excel workbook (.xlsx)",
-	json: "JSON bundle (.json)",
-	csvParentOnly: "CSV - this level only"
+	deselectAll: "Deselect all"
 };
 
 interface SelectionBarProps {
 	selectedCount: number;
 	isExporting: boolean;
-	onExportSelected: (format: ExportFormat) => void;
+	onExportSelected: () => void;
 	onClearSelection: () => void;
 	labels?: Partial<SelectionBarLabels>;
 }
@@ -271,37 +255,22 @@ export function SelectionBar({
 				</span>
 			</div>
 			<div className="flex items-center gap-2">
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							type="button"
-							size="sm"
-							disabled={isExporting}
-							className="h-8 gap-1.5 text-white"
-							style={{ background: "#00a85a" }}
-							onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = "#008f4c")}
-							onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = "#00a85a")}>
-							{isExporting ? (
-								<Loader2Icon className="size-3.5 animate-spin" aria-hidden="true" />
-							) : (
-								<DownloadIcon className="size-3.5" aria-hidden="true" />
-							)}
-							{labels.exportSelected}
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="min-w-44">
-						<DropdownMenuLabel className="font-mono text-xs text-muted-foreground">
-							{`${selectedCount} ${labels.countLabel}`}
-						</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => onExportSelected("xlsx")}>{labels.xlsx}</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => onExportSelected("json")}>{labels.json}</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => onExportSelected("csv")}>
-							{labels.csvParentOnly}
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<Button
+					type="button"
+					size="sm"
+					disabled={isExporting}
+					className="h-8 gap-1.5 text-white"
+					style={{ background: "#00a85a" }}
+					onClick={onExportSelected}
+					onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = "#008f4c")}
+					onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = "#00a85a")}>
+					{isExporting ? (
+						<Loader2Icon className="size-3.5 animate-spin" aria-hidden="true" />
+					) : (
+						<DownloadIcon className="size-3.5" aria-hidden="true" />
+					)}
+					{labels.exportSelected}
+				</Button>
 				<Button
 					type="button"
 					variant="ghost"

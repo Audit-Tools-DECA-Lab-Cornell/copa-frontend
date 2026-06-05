@@ -66,15 +66,6 @@ export function AuditExportActions({ audit, instrument }: AuditExportActionsProp
 				<DownloadIcon className="size-3.5" />
 				Excel
 			</Button>
-			<Button
-				variant="outline"
-				size="sm"
-				disabled={isExporting}
-				onClick={() => void handleExport("csv")}
-				className="gap-1.5">
-				<DownloadIcon className="size-3.5" />
-				CSV
-			</Button>
 		</div>
 	);
 }
