@@ -41,7 +41,7 @@ export default function AdminReportsPage() {
 	const auditorsQuery = useQuery({
 		queryKey: ["playspace", "admin", "reports", "auditors-for-filter"],
 		queryFn: async (): Promise<PaginatedResponse<AdminAuditorRow>> =>
-			playspaceApi.admin.auditors({ page: 1, pageSize: 200 })
+			playspaceApi.admin.auditors({ page: 1, pageSize: 100 })
 	});
 
 	const accountsQuery = useQuery({
@@ -66,7 +66,7 @@ export default function AdminReportsPage() {
 		queryFn: () =>
 			playspaceApi.admin.audits({
 				page: 1,
-				pageSize: 200,
+				pageSize: 100,
 				search: reportSearch,
 				projectIds: selectedProjectIds,
 				placeIds: selectedPlaceIds,

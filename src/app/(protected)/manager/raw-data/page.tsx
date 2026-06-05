@@ -333,7 +333,7 @@ export default function ManagerRawDataPage() {
 			if (activeEntity === "audits" || activeEntity === "reports") {
 				return playspaceApi.accounts.audits(accountId, {
 					page: 1,
-					pageSize: 200,
+					pageSize: 100,
 					search: groupedSearch || undefined,
 					projectIds: projectIds.length > 0 ? projectIds : undefined,
 					statuses:

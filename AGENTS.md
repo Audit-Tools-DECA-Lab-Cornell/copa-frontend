@@ -32,6 +32,8 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 ## Hot paths
 
 - `src/lib/api/playspace.ts` - API client
+- `src/lib/api/playspace-types.ts` - shared API type definitions
+- `src/lib/api/playspace-server.ts` - server-side API client
 - `middleware.ts` - role-based route guards
 - `messages/en.json`, `messages/de.json` - i18n (update both)
 - `src/lib/export/` - PDF/Excel exports

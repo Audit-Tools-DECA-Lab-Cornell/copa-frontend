@@ -82,7 +82,7 @@ export default function AdminAuditorsPage() {
 	const placesQuery = useQuery({
 		queryKey: ["playspace", "admin", "auditors", "places-for-filter"],
 		queryFn: async (): Promise<PaginatedResponse<AdminPlaceRow>> =>
-			playspaceApi.admin.places({ page: 1, pageSize: 200 })
+			playspaceApi.admin.places({ page: 1, pageSize: 100 })
 	});
 
 	const auditorsQuery = useQuery({

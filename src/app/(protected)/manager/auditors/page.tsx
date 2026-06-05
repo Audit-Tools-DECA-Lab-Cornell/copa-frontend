@@ -66,7 +66,7 @@ export default function ManagerAuditorsPage() {
 			if (!accountId) {
 				throw new Error("Manager account context is unavailable.");
 			}
-			return playspaceApi.accounts.places(accountId, { page: 1, pageSize: 200 });
+			return playspaceApi.accounts.places(accountId, { page: 1, pageSize: 100 });
 		},
 		enabled: accountId !== null
 	});
@@ -96,7 +96,7 @@ export default function ManagerAuditorsPage() {
 				projectIds: selectedProjectIds.length > 0 ? selectedProjectIds : undefined,
 				placeIds: selectedPlaceIds.length > 0 ? selectedPlaceIds : undefined,
 				page: 1,
-				pageSize: 200
+				pageSize: 100
 			});
 			return new Set(result.items.map(a => a.auditor_code));
 		},
@@ -365,14 +365,14 @@ export default function ManagerAuditorsPage() {
 				initialValues={
 					editingAuditor
 						? {
-								email: editingAuditor.email,
-								fullName: editingAuditor.full_name,
-								auditorCode: editingAuditor.auditor_code,
-								role: editingAuditor.role,
-								ageRange: editingAuditor.age_range,
-								gender: editingAuditor.gender,
-								country: editingAuditor.country
-							}
+							email: editingAuditor.email,
+							fullName: editingAuditor.full_name,
+							auditorCode: editingAuditor.auditor_code,
+							role: editingAuditor.role,
+							ageRange: editingAuditor.age_range,
+							gender: editingAuditor.gender,
+							country: editingAuditor.country
+						}
 						: undefined
 				}
 				isPending={updateAuditor.isPending}

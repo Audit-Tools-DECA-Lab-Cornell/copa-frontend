@@ -340,7 +340,7 @@ export default function AdminRawDataPage() {
 			if (activeEntity === "audits" || activeEntity === "reports") {
 				return playspaceApi.admin.audits({
 					page: 1,
-					pageSize: 200,
+					pageSize: 100,
 					search: groupedSearch || undefined,
 					accountIds: accountIds.length > 0 ? accountIds : undefined,
 					projectIds: projectIds.length > 0 ? projectIds : undefined,
