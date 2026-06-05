@@ -3,6 +3,240 @@
 		"title": "COPA Tool",
 		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) - strukturierte Audits zu Spielwert und Nutzbarkeit."
 	},
+	"landing": {
+		"nav": {
+			"features": "Funktionen",
+			"how": "So funktioniert's",
+			"pricing": "Preise",
+			"faq": "FAQ",
+			"resources": "Ressourcen",
+			"signIn": "Anmelden",
+			"getStarted": "Loslegen",
+			"openMenu": "Menü öffnen",
+			"closeMenu": "Menü schließen"
+		},
+		"hero": {
+			"badge": "Der Standard für Outdoor-Playspace-Audits",
+			"titleLead": "Prüfen Sie jeden Playspace nach",
+			"titleAccent": "einem strengen Standard",
+			"subtitle": "COPA verwandelt subjektive Begehungen in strukturierte, belastbare Bewertungen. Planen Sie Projekte, beauftragen Sie Prüfer vor Ort und veröffentlichen Sie gremienreife Berichte zu Spielwert und Nutzbarkeit — alles in einem Workspace.",
+			"ctaPrimary": "Loslegen",
+			"ctaSecondary": "So funktioniert's",
+			"trust": "Keine Kreditkarte nötig · Rollenbasierter Zugriff · Auf dem COPA-Framework aufgebaut"
+		},
+		"stats": {
+			"items": [
+				{ "value": "4", "label": "Bewertete Dimensionen pro Frage" },
+				{ "value": "3", "label": "Rollen, ein gemeinsamer Workspace" },
+				{ "value": "100%", "label": "Prüfbare, exportierbare Datensätze" },
+				{ "value": "2", "label": "Sprachen von Haus aus" }
+			]
+		},
+		"logos": {
+			"title": "Gebaut für die Teams, die öffentliche Spielräume pflegen"
+		},
+		"mock": {
+			"workspace": "Manager-Workspace",
+			"project": "Riverside Parks · Programm 2026",
+			"places": "Geprüfte Orte",
+			"score": "Mittlerer Spielwert",
+			"completion": "Fortschritt",
+			"pv": "PV",
+			"u": "U",
+			"domains": "Domänen-Werte",
+			"domainProvision": "Ausstattung",
+			"domainDiversity": "Vielfalt",
+			"domainChallenge": "Herausforderung",
+			"domainSociability": "Geselligkeit",
+			"statusComplete": "Eingereicht",
+			"statusInProgress": "In Bearbeitung"
+		},
+		"features": {
+			"eyebrow": "Warum COPA",
+			"title": "Alles, was ein Audit-Programm braucht — und nichts, was es nicht braucht",
+			"subtitle": "Ein fokussiertes Toolkit für Planung, Feldarbeit, Bewertung und Berichte — ausgerichtet an der tatsächlichen Arbeitsweise echter Audit-Teams.",
+			"items": [
+				{
+					"icon": "clipboard",
+					"title": "Strukturierte Instrumente",
+					"body": "Versionierte Audit-Instrumente halten alle Prüfer bei denselben Fragen, Skalen und Definitionen — kein Tabellen-Wildwuchs mehr."
+				},
+				{
+					"icon": "users",
+					"title": "Rollenbasierter Workflow",
+					"body": "Administratoren, Manager und Prüfer vor Ort erhalten jeweils einen Workspace, der genau auf ihre Aufgaben zugeschnitten ist."
+				},
+				{
+					"icon": "gauge",
+					"title": "Bewertung von Spielwert & Nutzbarkeit",
+					"body": "Jeder Ort liefert explizite PV- und U-Werte über Ausstattung, Vielfalt, Herausforderung und Geselligkeit — belastbar und vergleichbar."
+				},
+				{
+					"icon": "map",
+					"title": "Konto → Projekt → Ort → Audit",
+					"body": "Eine klare Hierarchie bildet ab, wie Programme tatsächlich laufen — so bleiben Portfolios auch bei Hunderten Standorten geordnet."
+				},
+				{
+					"icon": "save",
+					"title": "Feldarbeit auch offline",
+					"body": "Mehrstufige Formulare mit automatischem Speichern erfassen den Fortschritt vor Ort und synchronisieren ihn ohne Datenverlust."
+				},
+				{
+					"icon": "file",
+					"title": "Gremienreife Exporte",
+					"body": "Erzeugen Sie ansprechende PDF-Berichte und strukturierte Excel-Arbeitsmappen für Stakeholder, Förderanträge und die öffentliche Akte."
+				}
+			]
+		},
+		"how": {
+			"eyebrow": "So funktioniert's",
+			"title": "Vom Kickoff zum veröffentlichten Bericht in vier Schritten",
+			"steps": [
+				{
+					"title": "Programm einrichten",
+					"body": "Legen Sie Projekte an und fügen Sie die von Ihnen betreuten Orte hinzu. Laden Sie Manager und Prüfer rollenbasiert ein."
+				},
+				{
+					"title": "Feldarbeit zuweisen",
+					"body": "Beauftragen Sie Prüfer mit dem passenden Instrument für jeden Ort. Der Fortschritt wird automatisch gespeichert."
+				},
+				{
+					"title": "Einheitlich bewerten",
+					"body": "Strukturierte Skalen erzeugen vergleichbare Werte für Spielwert und Nutzbarkeit — über alle Standorte und Prüfer hinweg."
+				},
+				{
+					"title": "Veröffentlichen & entscheiden",
+					"body": "Exportieren Sie gremienreife PDF- und Excel-Berichte, vergleichen Sie Standorte und priorisieren Sie Investitionen sicher."
+				}
+			]
+		},
+		"showcase": {
+			"eyebrow": "Das Bewertungsmodell",
+			"title": "Aus subjektiven Begehungen werden belastbare Daten",
+			"body": "COPA erfasst für jeden Standort zwei unabhängige Dimensionen — Spielwert (PV) und Nutzbarkeit (U) — über vier Domänen. Das Ergebnis ist ein einheitlicher, prüfbarer Wert, den Sie über ein ganzes Portfolio vergleichen und vor jedem Gremium vertreten können.",
+			"points": [
+				"Explizite PV-|-U-Paare statt einer einzelnen Mischzahl",
+				"Domänen-Ranking zeigt die am höchsten und am niedrigsten bewerteten Bereiche",
+				"Lückenloser Prüfpfad von der Rohbeobachtung bis zum Abschlussbericht"
+			]
+		},
+		"pricing": {
+			"eyebrow": "Preise",
+			"title": "Klare Tarife, die mit Ihrem Programm wachsen",
+			"subtitle": "Starten Sie kostenlos mit einem Pilotprojekt. Upgraden Sie, wenn Ihr Programm wächst. Keine Überraschungen pro Platz.",
+			"monthly": "Monatlich",
+			"annual": "Jährlich",
+			"annualNote": "20% sparen",
+			"perMonth": "/Mon.",
+			"billedAnnually": "jährlich abgerechnet",
+			"mostPopular": "Am beliebtesten",
+			"tiers": [
+				{
+					"id": "starter",
+					"name": "Starter",
+					"priceMonthly": "Kostenlos",
+					"priceAnnual": "Kostenlos",
+					"description": "Für Pilotprojekte und Einzelstandort-Bewertungen am Anfang.",
+					"cta": "Kostenlos starten",
+					"highlight": false,
+					"features": [
+						"1 Projekt",
+						"Bis zu 5 Orte",
+						"2 Prüfer vor Ort",
+						"PDF-Berichtsexport",
+						"Community-Ressourcen"
+					]
+				},
+				{
+					"id": "professional",
+					"name": "Professional",
+					"priceMonthly": "149 $",
+					"priceAnnual": "119 $",
+					"description": "Für aktive Audit-Programme über viele Standorte hinweg.",
+					"cta": "Loslegen",
+					"highlight": true,
+					"features": [
+						"Unbegrenzte Projekte",
+						"Bis zu 50 Orte",
+						"15 Prüfer vor Ort",
+						"PDF- + Excel-Exporte",
+						"Komplette Berichts- & Bewertungssuite",
+						"Zweisprachige Oberfläche (EN / DE)",
+						"Bevorzugter E-Mail-Support"
+					]
+				},
+				{
+					"id": "enterprise",
+					"name": "Enterprise",
+					"priceMonthly": "Individuell",
+					"priceAnnual": "Individuell",
+					"description": "Für Behörden und Netzwerke, die Audits im großen Maßstab standardisieren.",
+					"cta": "Vertrieb kontaktieren",
+					"highlight": false,
+					"features": [
+						"Alles aus Professional",
+						"Unbegrenzte Orte & Prüfer",
+						"Single Sign-on (SSO)",
+						"Eigene Instrumente & Branding",
+						"Datenstandort & SLA",
+						"Persönlicher Success Manager"
+					]
+				}
+			],
+			"note": "Alle Tarife enthalten rollenbasierten Zugriff, automatisch speichernde Feldarbeit und einen lückenlosen Prüfpfad."
+		},
+		"faq": {
+			"eyebrow": "FAQ",
+			"title": "Fragen, beantwortet",
+			"items": [
+				{
+					"q": "Was ist das COPA-Framework?",
+					"a": "Der Comprehensive Outdoor Playspace Audit ist eine strukturierte Methode zur Bewertung von Outdoor-Spielumgebungen nach Spielwert und Nutzbarkeit. Das Produkt COPA setzt dieses Framework in Planung, Feldarbeit, Bewertung und Berichte um."
+				},
+				{
+					"q": "Für wen ist COPA gedacht?",
+					"a": "Für Parkverwaltungen, Kommunen, Schulträger, Universitäten und Forschende, die einheitliche, belastbare Bewertungen von Outdoor-Playspaces benötigen."
+				},
+				{
+					"q": "Können Prüfer vor Ort arbeiten?",
+					"a": "Ja. Prüfer nutzen ein schlankes, automatisch speicherndes mehrstufiges Formular, das den Fortschritt vor Ort erfasst und mit dem Workspace synchronisiert — keine Beobachtung geht verloren."
+				},
+				{
+					"q": "Was kann ich exportieren?",
+					"a": "Die Tarife Professional und Enterprise erzeugen ansprechende PDF-Berichte und strukturierte Excel-Arbeitsmappen — bereit für Gremien, Förderanträge und die öffentliche Akte."
+				},
+				{
+					"q": "Ist die Oberfläche in anderen Sprachen verfügbar?",
+					"a": "COPA wird mit Englisch und Deutsch ausgeliefert; Enterprise-Kunden können weitere Sprachen anfragen."
+				},
+				{
+					"q": "Wie lege ich los?",
+					"a": "Erstellen Sie ein kostenloses Starter-Konto, richten Sie Ihr erstes Projekt ein und laden Sie Ihr Team ein. Sie können jederzeit upgraden, wenn Ihr Programm wächst."
+				}
+			]
+		},
+		"cta": {
+			"title": "Bringen Sie einen strengen Standard zu jedem Playspace",
+			"subtitle": "Richten Sie Ihr erstes Projekt in Minuten ein. Keine Kreditkarte nötig.",
+			"primary": "Kostenlos loslegen",
+			"secondary": "Anmelden"
+		},
+		"footer": {
+			"tagline": "Strukturierte, belastbare Audits für Outdoor-Playspaces.",
+			"product": "Produkt",
+			"company": "Unternehmen",
+			"legal": "Rechtliches",
+			"links": {
+				"features": "Funktionen",
+				"pricing": "Preise",
+				"how": "So funktioniert's",
+				"signIn": "Anmelden",
+				"resources": "Ressourcen",
+				"faq": "FAQ"
+			},
+			"copyright": "COPA Tool. Alle Rechte vorbehalten."
+		}
+	},
 	"common": {
 		"roles": {
 			"administrator": "Administrator",

@@ -3,6 +3,240 @@
 		"title": "COPA Tool",
 		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool - structured outdoor playspace audits covering play value and usability."
 	},
+	"landing": {
+		"nav": {
+			"features": "Features",
+			"how": "How it works",
+			"pricing": "Pricing",
+			"faq": "FAQ",
+			"resources": "Resources",
+			"signIn": "Sign in",
+			"getStarted": "Get started",
+			"openMenu": "Open menu",
+			"closeMenu": "Close menu"
+		},
+		"hero": {
+			"badge": "The standard for outdoor playspace audits",
+			"titleLead": "Audit every playspace with",
+			"titleAccent": "one rigorous standard",
+			"subtitle": "COPA turns subjective walkthroughs into structured, defensible assessments. Plan projects, dispatch field auditors, and publish board-ready reports on play value and usability — all from a single workspace.",
+			"ctaPrimary": "Get started",
+			"ctaSecondary": "See how it works",
+			"trust": "No credit card required · Role-based access · Built on the COPA framework"
+		},
+		"stats": {
+			"items": [
+				{ "value": "4", "label": "Scored dimensions per question" },
+				{ "value": "3", "label": "Roles, one shared workspace" },
+				{ "value": "100%", "label": "Auditable, exportable records" },
+				{ "value": "2", "label": "Languages out of the box" }
+			]
+		},
+		"logos": {
+			"title": "Built for the teams that maintain public play"
+		},
+		"mock": {
+			"workspace": "Manager workspace",
+			"project": "Riverside Parks · 2026 Program",
+			"places": "Places audited",
+			"score": "Mean play value",
+			"completion": "Completion",
+			"pv": "PV",
+			"u": "U",
+			"domains": "Domain scores",
+			"domainProvision": "Provision",
+			"domainDiversity": "Diversity",
+			"domainChallenge": "Challenge",
+			"domainSociability": "Sociability",
+			"statusComplete": "Submitted",
+			"statusInProgress": "In progress"
+		},
+		"features": {
+			"eyebrow": "Why COPA",
+			"title": "Everything an audit program needs, nothing it doesn't",
+			"subtitle": "A focused toolkit for planning, fieldwork, scoring, and reporting — designed around the way real audit teams actually work.",
+			"items": [
+				{
+					"icon": "clipboard",
+					"title": "Structured instruments",
+					"body": "Version-controlled audit instruments keep every auditor on the same questions, scales, and definitions — no more spreadsheet drift."
+				},
+				{
+					"icon": "users",
+					"title": "Role-based workflow",
+					"body": "Administrators, managers, and field auditors each get a workspace scoped to exactly what they need to see and do."
+				},
+				{
+					"icon": "gauge",
+					"title": "Play value & usability scoring",
+					"body": "Every place rolls up explicit PV and U scores across Provision, Diversity, Challenge, and Sociability — defensible and comparable."
+				},
+				{
+					"icon": "map",
+					"title": "Account → Project → Place → Audit",
+					"body": "A clean hierarchy mirrors how programs are actually run, so portfolios stay organized as they scale to hundreds of sites."
+				},
+				{
+					"icon": "save",
+					"title": "Offline-friendly fieldwork",
+					"body": "Auto-saving multi-step forms capture progress in the field and sync back without losing a single observation."
+				},
+				{
+					"icon": "file",
+					"title": "Board-ready exports",
+					"body": "Generate polished PDF reports and structured Excel workbooks for stakeholders, grant applications, and the public record."
+				}
+			]
+		},
+		"how": {
+			"eyebrow": "How it works",
+			"title": "From kickoff to published report in four steps",
+			"steps": [
+				{
+					"title": "Set up your program",
+					"body": "Create projects and add the places you steward. Invite managers and field auditors with role-based access."
+				},
+				{
+					"title": "Assign the fieldwork",
+					"body": "Dispatch auditors to places with the right instrument. Progress auto-saves as they work through each site."
+				},
+				{
+					"title": "Score consistently",
+					"body": "Structured scales produce comparable play-value and usability scores across every site and every auditor."
+				},
+				{
+					"title": "Publish & decide",
+					"body": "Export board-ready PDF and Excel reports, compare sites, and prioritize investment with confidence."
+				}
+			]
+		},
+		"showcase": {
+			"eyebrow": "The scoring model",
+			"title": "Subjective walkthroughs become defensible data",
+			"body": "COPA captures two independent dimensions for every site — Play Value (PV) and Usability (U) — across four domains. The result is a consistent, auditable score you can compare across a whole portfolio and stand behind in front of any board.",
+			"points": [
+				"Explicit PV | U pairs instead of a single blended number",
+				"Domain ranking surfaces the highest and lowest scored areas",
+				"Full audit trail from raw observation to final report"
+			]
+		},
+		"pricing": {
+			"eyebrow": "Pricing",
+			"title": "Straightforward plans that scale with your program",
+			"subtitle": "Start free on a pilot. Upgrade when your program grows. No per-seat surprises.",
+			"monthly": "Monthly",
+			"annual": "Annual",
+			"annualNote": "Save 20%",
+			"perMonth": "/mo",
+			"billedAnnually": "billed annually",
+			"mostPopular": "Most popular",
+			"tiers": [
+				{
+					"id": "starter",
+					"name": "Starter",
+					"priceMonthly": "Free",
+					"priceAnnual": "Free",
+					"description": "For pilots and single-site assessments getting off the ground.",
+					"cta": "Start for free",
+					"highlight": false,
+					"features": [
+						"1 project",
+						"Up to 5 places",
+						"2 field auditors",
+						"PDF report export",
+						"Community resources"
+					]
+				},
+				{
+					"id": "professional",
+					"name": "Professional",
+					"priceMonthly": "$149",
+					"priceAnnual": "$119",
+					"description": "For active audit programs running across many sites.",
+					"cta": "Get started",
+					"highlight": true,
+					"features": [
+						"Unlimited projects",
+						"Up to 50 places",
+						"15 field auditors",
+						"PDF + Excel exports",
+						"Full report & scoring suite",
+						"Bilingual (EN / DE) interface",
+						"Priority email support"
+					]
+				},
+				{
+					"id": "enterprise",
+					"name": "Enterprise",
+					"priceMonthly": "Custom",
+					"priceAnnual": "Custom",
+					"description": "For agencies and networks standardizing audits at scale.",
+					"cta": "Contact sales",
+					"highlight": false,
+					"features": [
+						"Everything in Professional",
+						"Unlimited places & auditors",
+						"Single sign-on (SSO)",
+						"Custom instruments & branding",
+						"Data residency & SLA",
+						"Dedicated success manager"
+					]
+				}
+			],
+			"note": "All plans include role-based access, auto-saving fieldwork, and a complete audit trail."
+		},
+		"faq": {
+			"eyebrow": "FAQ",
+			"title": "Questions, answered",
+			"items": [
+				{
+					"q": "What is the COPA framework?",
+					"a": "The Comprehensive Outdoor Playspace Audit is a structured method for assessing outdoor play environments across play value and usability. COPA the product operationalizes that framework into planning, fieldwork, scoring, and reporting."
+				},
+				{
+					"q": "Who is COPA for?",
+					"a": "Parks and recreation departments, municipalities, school districts, universities, and researchers who need consistent, defensible assessments of outdoor playspaces."
+				},
+				{
+					"q": "Can auditors work in the field?",
+					"a": "Yes. Field auditors use a streamlined, auto-saving multi-step form that captures progress on site and syncs back to the workspace, so no observation is lost."
+				},
+				{
+					"q": "What can I export?",
+					"a": "Professional and Enterprise plans produce polished PDF reports and structured Excel workbooks — ready for boards, grant applications, and the public record."
+				},
+				{
+					"q": "Is the interface available in other languages?",
+					"a": "COPA ships with English and German out of the box, and Enterprise customers can request additional locales."
+				},
+				{
+					"q": "How do I get started?",
+					"a": "Create a free Starter account, set up your first project, and invite your team. You can upgrade at any time as your program grows."
+				}
+			]
+		},
+		"cta": {
+			"title": "Bring one rigorous standard to every playspace",
+			"subtitle": "Set up your first project in minutes. No credit card required.",
+			"primary": "Get started free",
+			"secondary": "Sign in"
+		},
+		"footer": {
+			"tagline": "Structured, defensible audits for outdoor playspaces.",
+			"product": "Product",
+			"company": "Company",
+			"legal": "Legal",
+			"links": {
+				"features": "Features",
+				"pricing": "Pricing",
+				"how": "How it works",
+				"signIn": "Sign in",
+				"resources": "Resources",
+				"faq": "FAQ"
+			},
+			"copyright": "COPA Tool. All rights reserved."
+		}
+	},
 	"common": {
 		"roles": {
 			"administrator": "Administrator",
