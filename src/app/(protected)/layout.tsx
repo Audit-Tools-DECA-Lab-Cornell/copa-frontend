@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/app/app-shell";
 import { AuthSessionProvider } from "@/components/app/auth-session-provider";
+import { ExportJobsProvider } from "@/components/dashboard/export-jobs-provider";
 import { getServerAuthSession } from "@/lib/auth/server-session";
 
 export default async function ProtectedLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -20,7 +21,7 @@ export default async function ProtectedLayout({ children }: Readonly<{ children:
 				auditorCode={session.auditorCode}
 				userName={session.userName}
 				userEmail={session.userEmail}>
-				{children}
+				<ExportJobsProvider>{children}</ExportJobsProvider>
 			</AppShell>
 		</AuthSessionProvider>
 	);
