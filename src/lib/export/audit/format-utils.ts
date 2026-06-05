@@ -2,7 +2,7 @@
  * Pure text and number formatting helpers used across all audit export formats.
  *
  * All functions here are side-effect-free. They do not import from any sibling
- * module — only from `types.ts` and the shared domain types.
+ * module - only from `types.ts` and the shared domain types.
  */
 
 import type {

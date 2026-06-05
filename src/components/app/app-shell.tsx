@@ -81,6 +81,7 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("auditors"), href: "/manager/auditors", icon: Users },
 			{ label: t("audits"), href: "/manager/audits", icon: Form },
 			{ label: t("reports"), href: "/manager/reports", icon: ClipboardList },
+			{ label: t("rawData"), href: "/manager/raw-data", icon: DatabaseIcon },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
 	}

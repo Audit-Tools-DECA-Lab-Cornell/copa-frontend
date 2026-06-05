@@ -18,7 +18,7 @@ test.describe("@manager-invites primary manager can manage invites", () => {
 		// Use a timestamp-derived email so parallel runs never collide.
 		const uniqueEmail = `e2e-invite-${Date.now()}@example.org`;
 
-		// Create an invite — POST /playspace/manager-invites
+		// Create an invite - POST /playspace/manager-invites
 		const createResponse = await request.post(`${base}/playspace/manager-invites`, {
 			data: { email: uniqueEmail },
 			headers
@@ -34,7 +34,7 @@ test.describe("@manager-invites primary manager can manage invites", () => {
 		expect(created.status).toBe("PENDING");
 		const inviteId = created.id;
 
-		// List invites — GET /playspace/manager-invites — new invite must be present
+		// List invites - GET /playspace/manager-invites - new invite must be present
 		const listResponse = await request.get(`${base}/playspace/manager-invites`, { headers });
 		await expectOk(listResponse);
 		const invites = (await listResponse.json()) as Array<{ id: string; email: string; status: string }>;
@@ -42,7 +42,7 @@ test.describe("@manager-invites primary manager can manage invites", () => {
 		expect(match).toBeDefined();
 		expect(match?.status).toBe("PENDING");
 
-		// Resend — POST /playspace/manager-invites/{id}/resend — refreshes token, keeps PENDING
+		// Resend - POST /playspace/manager-invites/{id}/resend - refreshes token, keeps PENDING
 		const resendResponse = await request.post(`${base}/playspace/manager-invites/${inviteId}/resend`, { headers });
 		await expectOk(resendResponse);
 		const resent = (await resendResponse.json()) as { id: string; status: string; expires_at: string };
@@ -51,11 +51,11 @@ test.describe("@manager-invites primary manager can manage invites", () => {
 		// Resend must have extended the expiry
 		expect(new Date(resent.expires_at).getTime()).toBeGreaterThan(new Date(created.expires_at).getTime());
 
-		// Revoke — DELETE /playspace/manager-invites/{id} — 204, no body
+		// Revoke - DELETE /playspace/manager-invites/{id} - 204, no body
 		const revokeResponse = await request.delete(`${base}/playspace/manager-invites/${inviteId}`, { headers });
 		expect(revokeResponse.status()).toBe(204);
 
-		// List after revoke — invite must be absent
+		// List after revoke - invite must be absent
 		const listAfterResponse = await request.get(`${base}/playspace/manager-invites`, { headers });
 		await expectOk(listAfterResponse);
 		const invitesAfter = (await listAfterResponse.json()) as Array<{ id: string }>;
@@ -97,13 +97,13 @@ test.describe("@manager-invites primary manager can manage invites", () => {
 		const inviteUrl = ((await createResponse.json()) as { invite_url: string }).invite_url;
 		const inviteToken = inviteUrl.split("/").at(-1) ?? "";
 
-		// Accept invite — creates a secondary manager
+		// Accept invite - creates a secondary manager
 		const acceptResponse = await request.post(`${base}/playspace/auth/manager-invites/${inviteToken}/accept`, {
 			data: { name: "E2E Secondary Manager", password: "DemoPass123!" }
 		});
 		await expectOk(acceptResponse);
 
-		// List — accepted invite has ACCEPTED status
+		// List - accepted invite has ACCEPTED status
 		const listResponse = await request.get(`${base}/playspace/manager-invites`, { headers });
 		await expectOk(listResponse);
 		const invites = (await listResponse.json()) as Array<{
@@ -118,13 +118,13 @@ test.describe("@manager-invites primary manager can manage invites", () => {
 		expect(acceptedInvite?.accepted_at).not.toBeNull();
 		const acceptedInviteId = acceptedInvite?.id ?? "";
 
-		// Revoke accepted invite — 400
+		// Revoke accepted invite - 400
 		const revokeAccepted = await request.delete(`${base}/playspace/manager-invites/${acceptedInviteId}`, {
 			headers
 		});
 		expect(revokeAccepted.status()).toBe(400);
 
-		// Resend accepted invite — 400
+		// Resend accepted invite - 400
 		const resendAccepted = await request.post(`${base}/playspace/manager-invites/${acceptedInviteId}/resend`, {
 			headers
 		});

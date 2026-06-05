@@ -15,10 +15,15 @@ import {
 	adminAuditsExportResponseSchema,
 	adminOverviewSchema,
 	adminPlaceRowSchema,
+	adminPlacesExportBundleSchema,
 	adminPlacesExportResponseSchema,
 	adminProjectRowSchema,
+	adminProjectsExportBundleSchema,
 	adminProjectsExportResponseSchema,
 	adminSystemSchema,
+	managerAuditsExportResponseSchema,
+	managerPlacesExportBundleSchema,
+	managerProjectsExportBundleSchema,
 	assignmentSchema,
 	assignmentWriteSchema,
 	auditDraftPatchSchema,
@@ -70,9 +75,11 @@ import {
 	type AdminExportQuery,
 	type AdminOverview,
 	type AdminPlaceRow,
+	type AdminPlacesExportBundle,
 	type AdminPlacesExportResponse,
 	type AdminPlacesQuery,
 	type AdminProjectRow,
+	type AdminProjectsExportBundle,
 	type AdminProjectsExportResponse,
 	type AdminProjectsQuery,
 	type AdminSystem,
@@ -90,7 +97,11 @@ import {
 	type AuditorProfileDetail,
 	type AuditorSummary,
 	type BulkAssignmentWrite,
+	type ManagerAuditsExportResponse,
 	type ManagerAuditsList,
+	type ManagerExportQuery,
+	type ManagerPlacesExportBundle,
+	type ManagerProjectsExportBundle,
 	type MyAuditorProfile,
 	type MyAuditorProfileUpdate,
 	type MyManagerProfile,
@@ -322,7 +333,54 @@ export const playspaceApi = {
 				managerAuditsListSchema
 			),
 		auditDetail: async (auditId: string): Promise<AuditSession> =>
-			fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}`, auditSessionSchema)
+			fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}`, auditSessionSchema),
+		exportProjectsBundle: async (
+			accountId: string,
+			query: ManagerExportQuery = {}
+		): Promise<ManagerProjectsExportBundle> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/export/projects/bundle${buildQueryString({
+					search: query.search,
+					project_id: query.projectIds
+				})}`,
+				managerProjectsExportBundleSchema
+			),
+		exportPlacesBundle: async (
+			accountId: string,
+			query: ManagerExportQuery = {}
+		): Promise<ManagerPlacesExportBundle> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/export/places/bundle${buildQueryString({
+					search: query.search,
+					project_id: query.projectIds,
+					place_id: query.placeIds,
+					audit_status: query.auditStatuses,
+					survey_status: query.surveyStatuses
+				})}`,
+				managerPlacesExportBundleSchema
+			),
+		exportAudits: async (accountId: string, query: ManagerExportQuery = {}): Promise<ManagerAuditsExportResponse> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/export/audits${buildQueryString({
+					search: query.search,
+					project_id: query.projectIds,
+					auditor_id: query.auditorIds,
+					place_id: query.placeIds,
+					status: query.statuses
+				})}`,
+				managerAuditsExportResponseSchema
+			),
+		exportReports: async (
+			accountId: string,
+			query: ManagerExportQuery = {}
+		): Promise<ManagerAuditsExportResponse> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/export/reports${buildQueryString({
+					search: query.search,
+					project_id: query.projectIds
+				})}`,
+				managerAuditsExportResponseSchema
+			)
 	},
 	projects: {
 		get: async (projectId: string): Promise<ProjectDetail> =>
@@ -778,6 +836,27 @@ export const playspaceApi = {
 					project_id: query.projectIds
 				})}`,
 				adminAuditsExportResponseSchema
+			),
+		exportProjectsBundle: async (query: AdminExportQuery = {}): Promise<AdminProjectsExportBundle> =>
+			fetchValidatedJson(
+				`/playspace/admin/export/projects/bundle${buildQueryString({
+					search: query.search,
+					account_id: query.accountIds,
+					project_id: query.projectIds
+				})}`,
+				adminProjectsExportBundleSchema
+			),
+		exportPlacesBundle: async (query: AdminExportQuery = {}): Promise<AdminPlacesExportBundle> =>
+			fetchValidatedJson(
+				`/playspace/admin/export/places/bundle${buildQueryString({
+					search: query.search,
+					account_id: query.accountIds,
+					project_id: query.projectIds,
+					place_id: query.placeIds,
+					audit_status: query.auditStatuses,
+					survey_status: query.surveyStatuses
+				})}`,
+				adminPlacesExportBundleSchema
 			)
 	}
 };

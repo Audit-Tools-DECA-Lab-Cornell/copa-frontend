@@ -1,7 +1,7 @@
 /**
  * Shared types, constants, and palette helpers for the audit export pipeline.
  *
- * All other modules in this directory import from here — nothing here imports
+ * All other modules in this directory import from here - nothing here imports
  * from any sibling module, keeping the dependency graph acyclic.
  */
 

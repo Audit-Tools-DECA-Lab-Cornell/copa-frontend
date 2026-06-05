@@ -174,7 +174,7 @@ export function AuditorDashboardClient() {
 		return `/auditor/execute/${encodeURIComponent(place.place_id)}?projectId=${encodeURIComponent(place.project_id)}`;
 	}, []);
 
-	/** Build the primary link href for a place row — report if submitted, execute otherwise. */
+	/** Build the primary link href for a place row - report if submitted, execute otherwise. */
 	const getPrimaryHref = React.useCallback(
 		(place: AuditorPlace): string => {
 			const status = deriveSessionStatus(place);

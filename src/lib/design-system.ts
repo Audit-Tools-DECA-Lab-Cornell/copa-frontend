@@ -44,7 +44,7 @@ interface DesignSystemPalette {
 	readonly actionOutlineBorder: string;
 	readonly tableRowHover: string;
 	readonly statAccentNeutral: string;
-	// Warm Brutalism solid-block tokens — drive bru-* classes and button/badge components
+	// Warm Brutalism solid-block tokens - drive bru-* classes and button/badge components
 	readonly solidPrimary: string;
 	readonly solidPrimaryEdge: string;
 	readonly solidPrimaryText: string;

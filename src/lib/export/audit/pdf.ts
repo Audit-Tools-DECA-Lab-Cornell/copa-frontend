@@ -4,7 +4,7 @@
  * Styled to match the instrument PDF: dark header, section banner rows, score
  * summary banners. Section headers span the full table width and show the
  * section title, description, instruction, and notes prompt as consecutive
- * banner rows — not as data columns.
+ * banner rows - not as data columns.
  *
  * ### Column layout (response matrix)
  * | # | Header        | Notes                                        |
@@ -21,8 +21,8 @@
  * | 9 | U Score       | Usability construct score                    |
  *
  * ### Page structure
- * - **Page 1 (portrait A4)** — metadata + aggregate score summary table
- * - **Page 2+ (landscape A4)** — response matrix with section banners
+ * - **Page 1 (portrait A4)** - metadata + aggregate score summary table
+ * - **Page 2+ (landscape A4)** - response matrix with section banners
  */
 
 import type { Cell, CellHookData } from "jspdf-autotable";
@@ -78,14 +78,14 @@ const AUDIT_PDF_PALETTE = {
 
 	border: [226, 232, 240] as [number, number, number],
 
-	// Per-scale soft fill RGB — mirrors SCALE_SOFT_COLORS hex values.
+	// Per-scale soft fill RGB - mirrors SCALE_SOFT_COLORS hex values.
 	scaleFill: {
 		provision: [174, 197, 150] as [number, number, number],
 		diversity: [235, 172, 153] as [number, number, number],
 		sociability: [197, 150, 192] as [number, number, number],
 		challenge: [177, 212, 224] as [number, number, number]
 	},
-	// Per-scale accent (dark text) RGB — mirrors SCALE_ACCENT_COLORS hex values.
+	// Per-scale accent (dark text) RGB - mirrors SCALE_ACCENT_COLORS hex values.
 	scaleAccent: {
 		provision: [51, 65, 85] as [number, number, number],
 		diversity: [51, 65, 85] as [number, number, number],
@@ -361,10 +361,10 @@ export async function generatePdfBlob(
 		const auditorBody: [string, string][] = auditorProfile
 			? [
 					["Auditor Code", auditorProfile.auditorCode],
-					["Age Range", auditorProfile.ageRange ?? "—"],
-					["Gender", auditorProfile.gender ?? "—"],
-					["Country", auditorProfile.country ?? "—"],
-					["Role", auditorProfile.role ?? "—"]
+					["Age Range", auditorProfile.ageRange ?? "-"],
+					["Gender", auditorProfile.gender ?? "-"],
+					["Country", auditorProfile.country ?? "-"],
+					["Role", auditorProfile.role ?? "-"]
 				]
 			: [["Auditor", "Not available"]];
 
@@ -565,16 +565,16 @@ export async function generatePdfBlob(
 
 	/**
 	 * Column width proportions.
-	 * 0  Question Key — 8%
-	 * 1  Mode         — 5.5%
-	 * 2  Constructs   — 6.5%
-	 * 3  Prompt       — 28%
-	 * 4  Provision    — 10%
-	 * 5  Diversity    — 10%
-	 * 6  Sociability  — 10%
-	 * 7  Challenge    — 10%
-	 * 8  PV Score     — 6%
-	 * 9  U Score      — 6%
+	 * 0  Question Key - 8%
+	 * 1  Mode         - 5.5%
+	 * 2  Constructs   - 6.5%
+	 * 3  Prompt       - 28%
+	 * 4  Provision    - 10%
+	 * 5  Diversity    - 10%
+	 * 6  Sociability  - 10%
+	 * 7  Challenge    - 10%
+	 * 8  PV Score     - 6%
+	 * 9  U Score      - 6%
 	 *                   ≈ 100%
 	 */
 	const colWidths: Record<number, number> = {
@@ -592,7 +592,7 @@ export async function generatePdfBlob(
 
 	doc.setFontSize(13);
 	doc.setTextColor(...AUDIT_PDF_PALETTE.headerFill);
-	doc.text(`${auditSession.audit_code} — ${auditSession.place_name} — PVUA Response Matrix`, pdfMargin.left, 14);
+	doc.text(`${auditSession.audit_code} - ${auditSession.place_name} - PVUA Response Matrix`, pdfMargin.left, 14);
 
 	if (combinedSources !== null) {
 		const legendTop = 16.5;
@@ -717,7 +717,7 @@ export async function generatePdfBlob(
 	/**
 	 * Pushes a full-width banner row (colSpan = COL_COUNT).
 	 * Used for section headers, descriptions, instructions, notes, and score
-	 * summary lines — all follow the instrument-PDF style.
+	 * summary lines - all follow the instrument-PDF style.
 	 */
 	function pushBanner(
 		content: string,
@@ -986,7 +986,7 @@ export async function generatePdfBlob(
 		}
 
 		// ── Auditor note row ────────────────────────────────────────────────
-		// Always rendered — blank when the auditor left no note, so there is
+		// Always rendered - blank when the auditor left no note, so there is
 		// always a visual gap between the last question and the score rows.
 
 		if (combinedSources === null) {
@@ -1020,7 +1020,7 @@ export async function generatePdfBlob(
 		}
 
 		// ── Section score summary rows ───────────────────────────────────────
-		// Three structured rows — Total / Max / % — each value aligned under
+		// Three structured rows - Total / Max / % - each value aligned under
 		// its scale column header with the canonical scale soft fill.
 
 		pushScoreRow(`Section ${sectionIndex + 1}  Total`, sectionTotals, "total");
@@ -1048,7 +1048,7 @@ export async function generatePdfBlob(
 		// Thin separator before overall rows
 		pushBanner("", "normal", AUDIT_PDF_PALETTE.sectionTitleColor, AUDIT_PDF_PALETTE.sectionFill, 4, 2, 2);
 
-		// Three structured overall rows — Total / Max / %
+		// Three structured overall rows - Total / Max / %
 		pushScoreRow("Overall  Total", overallTotals, "total");
 		pushScoreRow("Overall  Max", overallTotals, "max");
 		pushScoreRow("Overall  Percent", overallTotals, "pct");

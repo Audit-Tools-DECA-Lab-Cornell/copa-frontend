@@ -69,7 +69,7 @@ function resolveExecutionModeLabel(audit: AuditSession): string {
  */
 function formatTimestamp(value: string | null): string {
 	if (typeof value !== "string" || value.trim().length === 0) {
-		return "—";
+		return "-";
 	}
 	const parsed = new Date(value);
 	if (Number.isNaN(parsed.getTime())) {
@@ -100,7 +100,7 @@ function deriveSummaryScore(audit: AuditSession): number | null {
  */
 function formatPercent(value: number, max: number): string {
 	if (max <= 0) {
-		return "—";
+		return "-";
 	}
 	const pct = (value / max) * 100;
 	const rounded = Math.round(pct * 10) / 10;
@@ -112,7 +112,7 @@ function formatPercent(value: number, max: number): string {
  */
 function formatScaledAnswer(question: InstrumentQuestion, scaleKey: string, answerKey: string | undefined): string {
 	if (typeof answerKey !== "string" || answerKey.trim().length === 0) {
-		return "—";
+		return "-";
 	}
 	const scale = question.scales.find(s => s.key === scaleKey);
 	if (scale === undefined) {
@@ -131,7 +131,7 @@ function formatScaledAnswer(question: InstrumentQuestion, scaleKey: string, answ
 function formatChecklistAnswerText(question: InstrumentQuestion, answers: QuestionResponsePayload): string {
 	const selectedKeys = answers["selected_option_keys"];
 	if (!Array.isArray(selectedKeys) || selectedKeys.length === 0) {
-		return "—";
+		return "-";
 	}
 	const labels: string[] = selectedKeys
 		.filter((key): key is string => typeof key === "string")
@@ -169,7 +169,7 @@ function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
 			/>
 			<StatCard
 				title="Play Value"
-				value={overall ? formatPercent(overall.play_value_total, overall.play_value_total_max) : "—"}
+				value={overall ? formatPercent(overall.play_value_total, overall.play_value_total_max) : "-"}
 				helper={
 					overall
 						? `${Math.round(overall.play_value_total * 10) / 10} / ${Math.round(overall.play_value_total_max * 10) / 10}`
@@ -179,7 +179,7 @@ function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
 			/>
 			<StatCard
 				title="Usability"
-				value={overall ? formatPercent(overall.usability_total, overall.usability_total_max) : "—"}
+				value={overall ? formatPercent(overall.usability_total, overall.usability_total_max) : "-"}
 				helper={
 					overall
 						? `${Math.round(overall.usability_total * 10) / 10} / ${Math.round(overall.usability_total_max * 10) / 10}`
@@ -189,7 +189,7 @@ function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
 			/>
 			<StatCard
 				title="Duration"
-				value={audit.total_minutes !== null ? `${audit.total_minutes} min` : "—"}
+				value={audit.total_minutes !== null ? `${audit.total_minutes} min` : "-"}
 				helper="Total audit session duration."
 				tone="warning"
 			/>
@@ -221,7 +221,7 @@ function MetaInfoCard({ audit }: MetaInfoCardProps) {
 		{
 			icon: <ClockIcon className="size-4" />,
 			label: "Duration",
-			value: audit.total_minutes !== null ? `${audit.total_minutes} min` : "—"
+			value: audit.total_minutes !== null ? `${audit.total_minutes} min` : "-"
 		},
 		{ icon: <FileTextIcon className="size-4" />, label: "Execution Mode", value: resolveExecutionModeLabel(audit) },
 		{
@@ -287,7 +287,7 @@ function PreAuditCard({ audit, instrument }: PreAuditCardProps) {
 				const opt = question.options.find(o => o.key === key);
 				return opt?.label ?? key;
 			});
-			displayValue = labels.length > 0 ? labels.join(", ") : "—";
+			displayValue = labels.length > 0 ? labels.join(", ") : "-";
 		} else if (typeof rawValue === "string" && rawValue.trim().length > 0) {
 			const opt = question.options.find(o => o.key === rawValue);
 			displayValue = opt?.label ?? rawValue;
@@ -501,7 +501,7 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 			const answerKey = typeof rawAnswer === "string" ? rawAnswer : undefined;
 			const label = formatScaledAnswer(question, key, answerKey);
 			const scale = question.scales.find(s => s.key === key);
-			return label !== "—" && scale ? { scaleTitle: scale.title, answer: label } : null;
+			return label !== "-" && scale ? { scaleTitle: scale.title, answer: label } : null;
 		})
 		.filter((entry): entry is { scaleTitle: string; answer: string } => entry !== null);
 

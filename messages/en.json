@@ -1,7 +1,7 @@
 {
 	"metadata": {
 		"title": "COPA Tool",
-		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool — structured outdoor playspace audits covering play value and usability."
+		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool - structured outdoor playspace audits covering play value and usability."
 	},
 	"common": {
 		"roles": {
@@ -248,6 +248,50 @@
 		}
 	},
 	"admin": {
+		"rawData": {
+			"eyebrow": "Admin",
+			"title": "Raw Data Export",
+			"breadcrumb": "Raw Data",
+			"description": "Filter and download Playspace data across projects, places, audits, and reports. Auditors are identified by code only.",
+			"tabs": {
+				"projects": "Projects",
+				"places": "Places",
+				"audits": "Audits",
+				"reports": "Reports"
+			},
+			"filters": {
+				"account": "Account",
+				"project": "Project",
+				"auditStatus": "Audit Status",
+				"surveyStatus": "Survey Status",
+				"status": "Status",
+				"clear": "Clear"
+			},
+			"export": {
+				"button": "Export",
+				"exporting": "Exporting…",
+				"allDocuments": "All documents",
+				"xlsx": "Excel workbook (.xlsx)",
+				"json": "JSON bundle (.json)",
+				"csvParentOnly": "CSV - this level only",
+				"selected": "{count} selected",
+				"selectedXlsx": "Selected as Excel",
+				"selectedJson": "Selected as JSON",
+				"selectedCsvParentOnly": "Selected as CSV - this level only"
+			},
+			"table": {
+				"searchProjects": "Search by name or account…",
+				"searchPlaces": "Search by name, address, or project…",
+				"emptyProjects": "No projects match the current filters.",
+				"emptyPlaces": "No places match the current filters.",
+				"descriptionLoading": "Filter and download {entity}.",
+				"description": "{count} records match filters. Use Export for the full dataset.",
+				"descriptionCapped": "{count} records match filters - downloads include up to 10,000 matching rows. Use Export for the full dataset."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard"
+			}
+		},
 		"dashboard": {
 			"error": {
 				"title": "Administrator dashboard unavailable",
@@ -589,13 +633,13 @@
 				"languageExists": "This language already exists.",
 				"confirmRemoveLanguage": "Are you sure you want to remove the {lang} translation? This cannot be undone.",
 				"copyFrom": "Copy from {lang}",
-				"keyLockedHint": "Locked while translating — edit this key in {lang}.",
-				"baseLanguageHint": "Base language — keys and structure are edited here.",
+				"keyLockedHint": "Locked while translating - edit this key in {lang}.",
+				"baseLanguageHint": "Base language - keys and structure are edited here.",
 				"baseLanguageTag": "Base",
 				"translatingBadge": "Translating {lang}",
 				"coverageBadge": "{percent}% translated",
 				"coverageTooltip": "{translated} of {total} translatable fields differ from the base language.",
-				"translationBannerTitle": "Translating into {lang} — structure locked to {base}",
+				"translationBannerTitle": "Translating into {lang} - structure locked to {base}",
 				"translationBannerBody": "Keys, scoring, and structure are managed in the base language. Only display text is editable here; untranslated fields automatically fall back to the base language.",
 				"addLanguageTitle": "Add a translation",
 				"addLanguageDesc": "Pick a language and the source to copy its structure from. Keys and structure stay in sync with the base language; you then translate the display text.",
@@ -610,10 +654,10 @@
 				"premiumBadge": "Premium",
 				"aiTranslateTitle": "Translate with AI",
 				"aiTranslateDesc": "Automatically draft {target} from {base} for every untranslated field, keeping keys and structure untouched.",
-				"aiTranslateComingSoon": "This is a preview of an upcoming premium feature. AI auto-translation isn't enabled yet — translations are still entered manually.",
+				"aiTranslateComingSoon": "This is a preview of an upcoming premium feature. AI auto-translation isn't enabled yet - translations are still entered manually.",
 				"aiTranslateCta": "Auto-translate (coming soon)",
 				"aiTranslateField": "Translate this field with AI",
-				"aiTranslateFieldTooltip": "Premium · coming soon — translate just this text block with AI, leaving keys and structure untouched.",
+				"aiTranslateFieldTooltip": "Premium · coming soon - translate just this text block with AI, leaving keys and structure untouched.",
 				"sectionTitle": "Section Title",
 				"sectionDescription": "Description",
 				"sectionInstruction": "Instruction",
@@ -929,6 +973,50 @@
 		"signInLink": "Sign in instead"
 	},
 	"manager": {
+		"rawData": {
+			"eyebrow": "Manager",
+			"title": "Raw Data Export",
+			"breadcrumb": "Raw Data",
+			"description": "Filter and download your account's data across projects, places, audits, and reports. Auditor exports include each auditor's full profile.",
+			"accountUnavailable": "Manager account context is unavailable. Sign in again to view your raw data.",
+			"tabs": {
+				"projects": "Projects",
+				"places": "Places",
+				"audits": "Audits",
+				"reports": "Reports"
+			},
+			"filters": {
+				"project": "Project",
+				"auditStatus": "Audit Status",
+				"surveyStatus": "Survey Status",
+				"status": "Status",
+				"clear": "Clear"
+			},
+			"export": {
+				"button": "Export",
+				"exporting": "Exporting…",
+				"allDocuments": "All documents",
+				"xlsx": "Excel workbook (.xlsx)",
+				"json": "JSON bundle (.json)",
+				"csvParentOnly": "CSV - this level only",
+				"selected": "{count} selected",
+				"selectedXlsx": "Selected as Excel",
+				"selectedJson": "Selected as JSON",
+				"selectedCsvParentOnly": "Selected as CSV - this level only"
+			},
+			"table": {
+				"searchProjects": "Search by name…",
+				"searchPlaces": "Search by name, address, or project…",
+				"emptyProjects": "No projects in this account yet.",
+				"emptyPlaces": "No places match the current filters.",
+				"descriptionLoading": "Filter and download {entity}.",
+				"description": "{count} records match filters. Use Export for the full dataset.",
+				"descriptionCapped": "{count} records match filters - downloads include up to 10,000 matching rows. Use Export for the full dataset."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard"
+			}
+		},
 		"dashboard": {
 			"errors": {
 				"accountContextUnavailable": "Manager account context is unavailable.",

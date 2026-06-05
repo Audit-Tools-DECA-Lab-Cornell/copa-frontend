@@ -1,6 +1,6 @@
 export const QUERY_KEY = ["playspace", "admin", "instruments"] as const;
 
-/** Version list key — shared by server prefetch and client `useQuery`; nested under `QUERY_KEY` for invalidation. */
+/** Version list key - shared by server prefetch and client `useQuery`; nested under `QUERY_KEY` for invalidation. */
 export const INSTRUMENTS_LIST_QUERY_KEY = [...QUERY_KEY, "list"] as const;
 
 export const SCALE_KEY_OPTIONS = ["provision", "diversity", "challenge", "sociability"] as const;

@@ -483,7 +483,7 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 																key={questionKey}
 																className="rounded-md bg-muted/40 px-3 py-2 text-sm">
 																<p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-																	{questionKey} — {t("sectionNotes.comment")}
+																	{questionKey} - {t("sectionNotes.comment")}
 																</p>
 																<p className="text-foreground">{note}</p>
 															</div>

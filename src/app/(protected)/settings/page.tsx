@@ -145,8 +145,8 @@ function getWorkspaceLabel(role: AuthSession["role"], workspaceT: SettingsRoleTr
 /**
  * Resolve a user-facing display name from the current session.
  *
- * Uses session.userName — the logged-in user's own name from their personal
- * ManagerProfile or AuditorProfile record — not the account's primary contact.
+ * Uses session.userName - the logged-in user's own name from their personal
+ * ManagerProfile or AuditorProfile record - not the account's primary contact.
  */
 function getSessionDisplayName(
 	session: AuthSession,
@@ -183,7 +183,7 @@ function getProfileSubtitle(session: AuthSession, managerAccount: AccountDetail 
 /**
  * Resolve the profile email for the signed-in user.
  *
- * Uses session.userEmail — the logged-in user's personal email — rather than
+ * Uses session.userEmail - the logged-in user's personal email - rather than
  * the organisational account email.
  */
 function getProfileEmail(session: AuthSession, t: SettingsTranslator): string {
@@ -1171,7 +1171,7 @@ function ManagerContactsCard({
 								</div>
 							))}
 
-					{/* Pending invitations section — primary manager only */}
+					{/* Pending invitations section - primary manager only */}
 					{isPrimary ? (
 						<>
 							<Separator className="my-1" />

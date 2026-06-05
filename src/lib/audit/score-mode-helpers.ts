@@ -33,7 +33,7 @@ const EXECUTION_MODE_LABELS: Record<ExecutionMode, string> = {
  */
 export function getExecutionModeLabel(mode: ExecutionMode | null | undefined): string {
 	if (mode === null || mode === undefined) {
-		return "—";
+		return "-";
 	}
-	return EXECUTION_MODE_LABELS[mode] ?? "—";
+	return EXECUTION_MODE_LABELS[mode] ?? "-";
 }

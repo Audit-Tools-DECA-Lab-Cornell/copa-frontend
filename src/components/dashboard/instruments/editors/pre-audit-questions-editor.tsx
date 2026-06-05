@@ -142,7 +142,7 @@ function QuestionCard({
 					</div>
 				</div>
 
-				{/* Group key — hidden until needed */}
+				{/* Group key - hidden until needed */}
 				{question.group_key || (showGroup && !translationMode) ? (
 					<EditableField
 						label={t("groupKey")}

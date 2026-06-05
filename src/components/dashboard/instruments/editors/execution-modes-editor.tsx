@@ -50,7 +50,7 @@ export function ExecutionModesEditor({
 						{/*
 						 * Previously `md:grid-cols-3` gave equal width to all three fields.
 						 * Key is a short token (e.g. "both"), label is a sentence fragment,
-						 * description is a full sentence — so we use proportional columns:
+						 * description is a full sentence - so we use proportional columns:
 						 * key 1fr · label 2fr · description 3fr.
 						 */}
 						<div className="min-w-0 flex-1 grid gap-3 md:grid-cols-[1fr_2fr_3fr]">

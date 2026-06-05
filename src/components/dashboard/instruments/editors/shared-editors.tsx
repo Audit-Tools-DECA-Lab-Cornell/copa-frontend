@@ -87,7 +87,7 @@ export function ChoiceOptionsEditor({
 				)}
 			</div>
 
-			{/* Column headers — shown ONCE, not per row */}
+			{/* Column headers - shown ONCE, not per row */}
 			<div className="grid grid-cols-[1fr_1fr_auto] gap-2 px-1">
 				<span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide">Key</span>
 				<span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide">Label</span>
@@ -179,7 +179,7 @@ export function ScaleOptionsEditor({
 
 			{options.length > 0 && (
 				<div className="rounded-lg border border-edge/40 overflow-hidden">
-					{/* Header — same grid template + padding as data rows so columns align exactly */}
+					{/* Header - same grid template + padding as data rows so columns align exactly */}
 					<div className="grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 items-center px-2 py-1.5 bg-muted/50 border-b border-edge/30">
 						<span />
 						<div className="leading-tight">
@@ -206,7 +206,7 @@ export function ScaleOptionsEditor({
 						<div
 							key={oIdx}
 							className={`grid grid-cols-[28px_1fr_80px_80px_130px_32px] gap-x-2 relative items-center-safe px-2 py-2 ${oIdx < options.length - 1 ? " border-b border-edge/25" : ""}`}>
-							{/* Reorder controls — self-center keeps the grip aligned to the row's midline while the input cells share a bottom baseline */}
+							{/* Reorder controls - self-center keeps the grip aligned to the row's midline while the input cells share a bottom baseline */}
 							{translationMode ? (
 								<span />
 							) : (
@@ -238,7 +238,7 @@ export function ScaleOptionsEditor({
 							{/* Key (readonly) + Label (editable) */}
 							<div className="min-w-0">
 								<span className="font-mono text-[10px] text-muted-foreground/70 top-2 truncate absolute">
-									{opt.key || "—"}
+									{opt.key || "-"}
 								</span>
 								<Input
 									className="h-7 text-xs px-2"
@@ -252,7 +252,7 @@ export function ScaleOptionsEditor({
 								/>
 							</div>
 
-							{/* Addition value (scoring — owned by the base language) */}
+							{/* Addition value (scoring - owned by the base language) */}
 							<Input
 								type="number"
 								className="h-7 text-xs font-mono px-2 text-center"
@@ -265,7 +265,7 @@ export function ScaleOptionsEditor({
 								}
 							/>
 
-							{/* Boost value (scoring — owned by the base language) */}
+							{/* Boost value (scoring - owned by the base language) */}
 							<Input
 								type="number"
 								className="h-7 text-xs font-mono px-2 text-center"
@@ -638,7 +638,7 @@ export function QuestionEditor({
 				{/*
 				 * Delete button toned down from always-red to muted with hover transition.
 				 * Prevents it from being the dominant colour in a list of questions.
-				 * Hidden while translating — removing a question is a structural change
+				 * Hidden while translating - removing a question is a structural change
 				 * owned by the base language.
 				 */}
 				{!translationMode && (

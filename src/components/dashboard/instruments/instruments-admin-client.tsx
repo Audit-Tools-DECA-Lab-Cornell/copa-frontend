@@ -71,7 +71,7 @@ export function InstrumentsAdminClient() {
 
 	const activeVersion = useMemo(() => allVersions.find(v => v.is_active) ?? null, [allVersions]);
 
-	// Publication numbers derive from the root (non-draft) rows only — never from drafts.
+	// Publication numbers derive from the root (non-draft) rows only - never from drafts.
 	const publishedVersions = useMemo(
 		() => allVersions.filter(v => v.parent_instrument_id === null).map(v => v.version),
 		[allVersions]

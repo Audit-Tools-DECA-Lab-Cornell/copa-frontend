@@ -1,4 +1,4 @@
-# AGENTS.md — Playspace web dashboard
+# AGENTS.md - Playspace web dashboard
 
 Next.js 15 App Router dashboard (admin, manager, auditor). Sibling repos in the workspace: `audit-tools-backend/`, `audit-tools-playspace-mobile/`.
 
@@ -19,7 +19,7 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 |------|-------|
 | `CLAUDE.md` | Quick reference for Claude Code |
 | `.claude/rules/*.mdc` | Scoped rules (source of truth) |
-| `.cursor/rules/*.mdc` | Cursor mirror — keep filenames in sync with `.claude/rules/` |
+| `.cursor/rules/*.mdc` | Cursor mirror - keep filenames in sync with `.claude/rules/` |
 
 ## Workspace laws and memory
 
@@ -31,14 +31,15 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 
 ## Hot paths
 
-- `src/lib/api/playspace.ts` — API client
-- `middleware.ts` — role-based route guards
-- `messages/en.json`, `messages/de.json` — i18n (update both)
-- `src/lib/export/` — PDF/Excel exports
-- `src/components/dashboard/` — tables, reports, filters, instrument editor
-- `src/components/dashboard/instruments/` — instrument editor submodule (editors, version history, spreadsheet view)
-- `src/lib/design-system.ts` — design tokens and CSS custom properties
-- `tests/e2e/` — Playwright specs
+- `src/lib/api/playspace.ts` - API client
+- `middleware.ts` - role-based route guards
+- `messages/en.json`, `messages/de.json` - i18n (update both)
+- `src/lib/export/` - PDF/Excel exports
+- `src/components/dashboard/` - tables, reports, filters, instrument editor
+- `src/components/dashboard/instruments/` - instrument editor submodule (editors, version history, spreadsheet view)
+- `src/components/dashboard/raw-data-export.tsx` - raw data export component (admin + manager)
+- `src/lib/design-system.ts` - design tokens and CSS custom properties
+- `tests/e2e/` - Playwright specs
 
 ## Conventions
 
@@ -59,7 +60,7 @@ grep -q "caliber" .git/hooks/pre-commit 2>/dev/null && echo "hook-active" || ech
 - If **hook-active**: the hook handles sync automatically — just commit normally. Tell the user: "Caliber will sync your agent configs automatically via the pre-commit hook."
 - If **no-hook**: run Caliber manually before committing:
   1. Tell the user: "Caliber: Syncing agent configs with your latest changes..."
-  2. Run: `caliber refresh && git add CALIBER_LEARNINGS.md CLAUDE.md .claude/ .cursor/ .cursorrules AGENTS.md .agents/ 2>/dev/null`
+  2. Run: `caliber refresh && git add CALIBER_LEARNINGS.md CLAUDE.md .claude/ AGENTS.md .agents/ 2>/dev/null`
   3. After it completes, briefly tell the user what Caliber updated. Then proceed with the commit.
 
 **Valid `caliber refresh` options:** `--quiet` (suppress output) and `--dry-run` (preview without writing). Do not pass any other flags — options like `--auto-approve`, `--debug`, or `--force` do not exist and will cause errors.

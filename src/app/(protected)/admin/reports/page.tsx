@@ -50,7 +50,7 @@ export default function AdminReportsPage() {
 			playspaceApi.admin.accounts({ page: 1, pageSize: 100, accountTypes: ["MANAGER"] })
 	});
 
-	// Fetch all submitted reports (no pagination — grouped view handles display)
+	// Fetch all submitted reports (no pagination - grouped view handles display)
 	const reportsQuery = useQuery({
 		queryKey: [
 			"playspace",

@@ -1,5 +1,5 @@
 ---
-description: Web i18n parity, report views, and PDF/Excel export pipeline. Mirror in .claude/rules/ — edit both when changing.
+description: Web i18n parity, report views, and PDF/Excel export pipeline. Mirror in .claude/rules/ - edit both when changing.
 globs:
     [
         "messages/**/*.json",
@@ -22,13 +22,13 @@ alwaysApply: false
 - Every new user-facing string gets an entry in **both** `messages/en.json` and `messages/de.json`.
 - Reuse existing namespace keys (e.g. `reports.detail.auditType*`) before inventing parallel keys.
 - Run `pnpm lint` after editing locale files; keep key structure aligned across locales.
-- Instrument editor translation mode: when a non-primary locale is active the editor renders overlay translation fields. These fields are locale-only overlays — do not write translation values back to base instrument fields.
+- Instrument editor translation mode: when a non-primary locale is active the editor renders overlay translation fields. These fields are locale-only overlays - do not write translation values back to base instrument fields.
 
 ## Export module layout
 
 - Public surfaces: `src/lib/export/instrument/index.ts` and `src/lib/export/audit/index.ts`.
 - Split implementation across `instrument-shared` / `-pdf` / `-excel` and `audit/` (`types`, `format-utils`, `score-utils`, `row-builders`, `excel`, `pdf`).
-- Dynamically import jsPDF, jspdf-autotable, and xlsx — do not add static top-level imports for heavy export libs.
+- Dynamically import jsPDF, jspdf-autotable, and xlsx - do not add static top-level imports for heavy export libs.
 
 ## Row builders and shapes
 
@@ -39,13 +39,13 @@ alwaysApply: false
 
 - Domain rows: `buildDomainReportRows()` filters by execution mode via `questionMatchesMode()`; pass a question lookup so checklist follow-ups inherit parent domains (`getQuestionDomainKeys()`).
 - Combined mode: use `getCombinedReportSources()`, `buildVisibleQuestionEntries()`, and `getCombinedReportLegend()` from `report-source-sessions.ts` for source-aware place reports.
-- Scale display: `resolveScaleOptionInfo()` drives labels and N/A flags. Faint `—` = scale not asked; unblurred "Not applicable" = auditor-selected N/A.
+- Scale display: `resolveScaleOptionInfo()` drives labels and N/A flags. Faint `-` = scale not asked; unblurred "Not applicable" = auditor-selected N/A.
 - Report tables use full scale names (Provision, Diversity, Challenge, Sociability), not abbreviations. Domain ranking summary uses "Highest Scored" / "Lowest Scored".
-- Bold prompt markers (`**text**`) render via `parsePromptSegments` — do not hand-roll parsing except on plain-string badge paths that strip markers with `replaceAll("**", "")`.
+- Bold prompt markers (`**text**`) render via `parsePromptSegments` - do not hand-roll parsing except on plain-string badge paths that strip markers with `replaceAll("**", "")`.
 
 ## PDF / Excel specifics
 
-- Audit PDF exports (`src/lib/export/audit/pdf.ts`): 12 landscape columns; instrument-style full-width colSpan banner rows per section. Column headers: `"Question Key"`, `"Mode"`, `"Constructs"` (plural), four individual scale columns plus combined `"Scales"` — no section-number column.
+- Audit PDF exports (`src/lib/export/audit/pdf.ts`): 12 landscape columns; instrument-style full-width colSpan banner rows per section. Column headers: `"Question Key"`, `"Mode"`, `"Constructs"` (plural), four individual scale columns plus combined `"Scales"` - no section-number column.
 - jsPDF bold-in-autotable: use `didDrawCell` to refill background then redraw with per-segment `setFont` weights. Line height = `fontSize * pdf.getLineHeightFactor() * (25.4/72)`; reuse `cell.text` for wrapped lines.
 - Tablet report layout: domain score tables join into one 6-column table (`useReportScoreTableLayout`); phones size sub-tables via `getContentTrackInnerWidth()` (`responsive-layout.ts`).
 

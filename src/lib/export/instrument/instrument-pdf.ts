@@ -3,7 +3,7 @@
  *
  * Uses jsPDF + jspdf-autotable (loaded dynamically to keep the initial bundle
  * small). Rich-text rendering (bold inline segments) is achieved by suppressing
- * AutoTable's default text draw and re-drawing character runs in didDrawCell —
+ * AutoTable's default text draw and re-drawing character runs in didDrawCell -
  * the only approach that keeps row heights and line positions aligned with what
  * AutoTable has already laid out.
  */
@@ -29,7 +29,7 @@ type PdfRichCell = {
 /** jsPDF uses millimetres; 1 pt = 25.4/72 mm. */
 const JSPDF_MM_PER_PT = 25.4 / 72;
 
-/** Column header labels — order must match the column-width and body-cell order. */
+/** Column header labels - order must match the column-width and body-cell order. */
 const QUESTION_HEADERS = [
 	"Question Key",
 	"Section #",
@@ -77,7 +77,7 @@ function setPdfFillFromAutotable(pdf: CellHookData["doc"], fillColor: Cell["styl
  *    correct font weight, using `cell.getTextPos()` for vertical alignment.
  *
  * This guarantees that row heights, line counts, and vertical positions exactly
- * match what AutoTable allocated — no character-per-line or misalignment bugs.
+ * match what AutoTable allocated - no character-per-line or misalignment bugs.
  */
 function drawRichCellFromAutotableLines(
 	pdf: CellHookData["doc"],
@@ -116,7 +116,7 @@ function drawRichCellFromAutotableLines(
 
 	let startY: number;
 	if (valign === "top") {
-		// pos.y is already top-padding baseline — just offset by one lineHeight
+		// pos.y is already top-padding baseline - just offset by one lineHeight
 		// to match jsPDF baseline drawing (text baseline sits one line below y)
 		startY = pos.y + lineHeight * (2 - pdf.getLineHeightFactor());
 	} else if (valign === "bottom") {

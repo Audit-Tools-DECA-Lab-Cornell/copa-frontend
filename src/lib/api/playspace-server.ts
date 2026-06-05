@@ -68,7 +68,7 @@ function getServerErrorMessage(payload: unknown, fallback: string): string {
 
 /**
  * Options accepted by `fetchServerJson`. `next` is the standard Next.js fetch
- * cache directive — we expose it so callers can opt into ISR-style caching with
+ * cache directive - we expose it so callers can opt into ISR-style caching with
  * tags. Phase C3 uses this to cache the static instrument fetch.
  */
 export interface ServerFetchOptions {
@@ -144,7 +144,7 @@ export async function fetchServerJson<TValue>(
 /**
  * Fetch one audit session by id on the server.
  * Same endpoint as `playspaceApi.auditor.getAudit` / `admin.auditDetail` /
- * `accounts.auditDetail` — the route is role-aware on the backend.
+ * `accounts.auditDetail` - the route is role-aware on the backend.
  */
 export async function getServerAudit(auditId: string): Promise<AuditSession> {
 	return fetchServerJson(`/playspace/audits/${encodeURIComponent(auditId)}`, auditSessionSchema);

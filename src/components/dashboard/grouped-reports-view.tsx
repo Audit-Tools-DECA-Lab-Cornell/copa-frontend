@@ -40,6 +40,14 @@ import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import { cn } from "@/lib/utils";
 
 /**
+ * Display variant. "reports" groups only SUBMITTED submissions and offers the
+ * build-place-report action (the dashboard Reports surface). "audits" groups
+ * every submission status and drops the build action (the raw-data Audits
+ * preview), so in-progress work stays visible.
+ */
+type GroupedReportsVariant = "reports" | "audits";
+
+/**
  * Parent row data shown in the main expandable table.
  */
 interface PlaceGroup {
@@ -50,13 +58,16 @@ interface PlaceGroup {
 	projectName: string;
 	accountNames: string[];
 	rows: AuditActivityRow[];
+	/** Rows shown in the expanded sub-table (submitted-only for reports, all statuses for audits). */
+	displayRows: AuditActivityRow[];
+	/** Submitted-only rows, used to resolve place-report build availability. */
 	submittedRows: AuditActivityRow[];
-	reportCount: number;
+	displayCount: number;
 	auditCount: number;
 	surveyCount: number;
 	fullCount: number;
-	latestSubmittedAt: string | null;
-	latestSubmittedRow: AuditActivityRow | null;
+	latestActivityAt: string | null;
+	latestActivityRow: AuditActivityRow | null;
 	searchText: string;
 }
 
@@ -69,11 +80,12 @@ export interface GroupedReportsViewProps {
 	onSearchValueChange?: (value: string) => void;
 	isSearching?: boolean;
 	toolbarFilters?: React.ReactNode;
+	variant?: GroupedReportsVariant;
 }
 
 const fallbackText = (key: string) => {
 	const values: Record<string, string> = {
-		noRecentActivity: "—",
+		noRecentActivity: "-",
 		pending: "Pending"
 	};
 	return values[key] ?? key;
@@ -99,12 +111,19 @@ function getPlaceId(row: AuditActivityRow): string {
 }
 
 /**
- * Keep report rows ordered by most recent submission first within each place.
+ * Resolve the most recent activity timestamp for a row (submission, else start).
  */
-function getSubmittedRows(rows: AuditActivityRow[]): AuditActivityRow[] {
-	return rows
-		.filter(row => row.status === "SUBMITTED")
-		.sort((left, right) => new Date(right.submittedAt ?? 0).getTime() - new Date(left.submittedAt ?? 0).getTime());
+function getRecencyTime(row: AuditActivityRow): number {
+	return new Date(row.submittedAt ?? row.startedAt ?? 0).getTime();
+}
+
+/**
+ * Resolve the rows shown for a place. Reports show submitted-only; audits show
+ * every status. Both are ordered by most recent activity first.
+ */
+function getDisplayRows(rows: AuditActivityRow[], includeAllStatuses: boolean): AuditActivityRow[] {
+	const scoped = includeAllStatuses ? rows : rows.filter(row => row.status === "SUBMITTED");
+	return [...scoped].sort((left, right) => getRecencyTime(right) - getRecencyTime(left));
 }
 
 /**
@@ -119,7 +138,7 @@ function formatSubmissionScore(row: AuditActivityRow): string {
 /**
  * Group submissions by project-place pair so expansion stays correct even when a place appears in multiple projects.
  */
-function buildPlaceGroups(rows: AuditActivityRow[]): PlaceGroup[] {
+function buildPlaceGroups(rows: AuditActivityRow[], includeAllStatuses: boolean): PlaceGroup[] {
 	const groupedRows = new Map<string, AuditActivityRow[]>();
 	for (const row of rows) {
 		const groupKey = `${getProjectId(row)}:::${getPlaceId(row)}`;
@@ -128,27 +147,31 @@ function buildPlaceGroups(rows: AuditActivityRow[]): PlaceGroup[] {
 	}
 
 	return Array.from(groupedRows.entries()).map(([groupKey, groupRows]) => {
-		const submittedRows = getSubmittedRows(groupRows);
-		const latestSubmittedRow = submittedRows[0] ?? null;
+		const submittedRows = groupRows
+			.filter(row => row.status === "SUBMITTED")
+			.sort((left, right) => getRecencyTime(right) - getRecencyTime(left));
+		const displayRows = getDisplayRows(groupRows, includeAllStatuses);
+		const latestActivityRow = displayRows[0] ?? null;
 		const accountNames = Array.from(
 			new Set(groupRows.map(row => row.accountName?.trim()).filter((value): value is string => Boolean(value)))
 		);
 
 		return {
 			id: groupKey,
-			placeId: getPlaceId(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
-			projectId: getProjectId(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
-			placeName: getPlaceName(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
-			projectName: getProjectName(groupRows[0] ?? latestSubmittedRow ?? rows[0]),
+			placeId: getPlaceId(groupRows[0] ?? latestActivityRow ?? rows[0]),
+			projectId: getProjectId(groupRows[0] ?? latestActivityRow ?? rows[0]),
+			placeName: getPlaceName(groupRows[0] ?? latestActivityRow ?? rows[0]),
+			projectName: getProjectName(groupRows[0] ?? latestActivityRow ?? rows[0]),
 			accountNames,
 			rows: groupRows,
+			displayRows,
 			submittedRows,
-			reportCount: submittedRows.length,
-			auditCount: submittedRows.filter(row => row.executionMode === "audit").length,
-			surveyCount: submittedRows.filter(row => row.executionMode === "survey").length,
-			fullCount: submittedRows.filter(row => row.executionMode === "both").length,
-			latestSubmittedAt: latestSubmittedRow?.submittedAt ?? null,
-			latestSubmittedRow,
+			displayCount: displayRows.length,
+			auditCount: displayRows.filter(row => row.executionMode === "audit").length,
+			surveyCount: displayRows.filter(row => row.executionMode === "survey").length,
+			fullCount: displayRows.filter(row => row.executionMode === "both").length,
+			latestActivityAt: latestActivityRow?.submittedAt ?? latestActivityRow?.startedAt ?? null,
+			latestActivityRow,
 			searchText: groupRows
 				.flatMap(row => [
 					row.auditCode,
@@ -181,25 +204,29 @@ function formatPlaceContext(group: PlaceGroup): string {
  * Resolve whether the place has enough submitted data to build a place report.
  */
 function getBuildAvailability(group: PlaceGroup): { canBuild: boolean; reason: string | null } {
-	if (group.fullCount > 0 || (group.auditCount > 0 && group.surveyCount > 0)) {
+	const submittedAuditCount = group.submittedRows.filter(row => row.executionMode === "audit").length;
+	const submittedSurveyCount = group.submittedRows.filter(row => row.executionMode === "survey").length;
+	const submittedFullCount = group.submittedRows.filter(row => row.executionMode === "both").length;
+
+	if (submittedFullCount > 0 || (submittedAuditCount > 0 && submittedSurveyCount > 0)) {
 		return { canBuild: true, reason: null };
 	}
 
-	if (group.auditCount === 0 && group.surveyCount === 0) {
+	if (submittedAuditCount === 0 && submittedSurveyCount === 0) {
 		return {
 			canBuild: false,
 			reason: "No submitted place audits or surveys are available for this place yet."
 		};
 	}
 
-	if (group.auditCount === 0) {
+	if (submittedAuditCount === 0) {
 		return {
 			canBuild: false,
 			reason: "Need at least one submitted place audit before building a place report."
 		};
 	}
 
-	if (group.surveyCount === 0) {
+	if (submittedSurveyCount === 0) {
 		return {
 			canBuild: false,
 			reason: "Need at least one submitted place survey before building a place report."
@@ -246,6 +273,25 @@ function CopyCodeButton({ value }: Readonly<{ value: string }>) {
 		<Button type="button" variant="ghost" size="icon-xs" onClick={handleCopy} aria-label={`Copy ${value}`}>
 			{isCopied ? <CheckIcon className="size-3.5 text-status-success" /> : <CopyIcon className="size-3.5" />}
 		</Button>
+	);
+}
+
+/**
+ * Status badge shown alongside submissions in the audits variant so in-progress
+ * and paused work reads clearly.
+ */
+function AuditStatusBadge({ status }: Readonly<{ status: AuditActivityRow["status"] }>) {
+	const label = status === "SUBMITTED" ? "Submitted" : status === "PAUSED" ? "Paused" : "In progress";
+	const tone =
+		status === "SUBMITTED"
+			? "border-status-success/40 text-status-success"
+			: status === "PAUSED"
+				? "border-amber-500/40 text-amber-600"
+				: "border-edge/50 text-muted-foreground";
+	return (
+		<Badge variant="outline" className={cn("whitespace-nowrap text-xs font-medium", tone)}>
+			{label}
+		</Badge>
 	);
 }
 
@@ -331,6 +377,7 @@ function BuildPlaceReportButton({
 function PlaceSubmissionTable({
 	group,
 	basePath,
+	includeAllStatuses,
 	showSelection,
 	selectedReportIds,
 	onReportSelectionChange,
@@ -338,27 +385,26 @@ function PlaceSubmissionTable({
 }: Readonly<{
 	group: PlaceGroup;
 	basePath: string;
+	includeAllStatuses: boolean;
 	showSelection: boolean;
 	selectedReportIds: Record<string, boolean>;
 	onReportSelectionChange: (reportId: string, checked: boolean) => void;
 	onPlaceSelectionChange: (group: PlaceGroup, checked: boolean) => void;
 }>) {
-	const selectedCount = group.submittedRows.filter(row => selectedReportIds[row.id]).length;
-	const allSelected = group.reportCount > 0 && selectedCount === group.reportCount;
-	const someSelected = selectedCount > 0 && selectedCount < group.reportCount;
+	const noun = includeAllStatuses ? "submission" : "report";
+	const selectedCount = group.displayRows.filter(row => selectedReportIds[row.id]).length;
+	const allSelected = group.displayCount > 0 && selectedCount === group.displayCount;
+	const someSelected = selectedCount > 0 && selectedCount < group.displayCount;
 
 	return (
 		<div className="space-y-3 rounded-md border border-edge/40 bg-background p-4 shadow-[0_3px_0_rgba(0,0,0,0.12),0_6px_16px_rgba(0,0,0,0.08)]">
+			{" "}
 			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<p className="text-sm font-semibold text-foreground">Submitted reports</p>
-					<p className="text-xs text-muted-foreground">
-						Expand a place to review individual submissions without leaving the table.
-					</p>
-				</div>
-				<Badge variant="secondary">{group.reportCount} reports</Badge>
+				<Badge variant="secondary">
+					{group.displayCount} {noun}
+					{group.displayCount === 1 ? "" : "s"}
+				</Badge>
 			</div>
-
 			<Table>
 				<TableHeader>
 					<TableRow className="hover:bg-transparent">
@@ -367,20 +413,21 @@ function PlaceSubmissionTable({
 								<Checkbox
 									checked={allSelected ? true : someSelected ? "indeterminate" : false}
 									onCheckedChange={checked => onPlaceSelectionChange(group, checked === true)}
-									aria-label={`Select reports for ${group.placeName}`}
+									aria-label={`Select ${noun}s for ${group.placeName}`}
 								/>
 							</TableHead>
 						) : null}
-						<TableHead>Report</TableHead>
+						<TableHead>{includeAllStatuses ? "Submission" : "Report"}</TableHead>
 						<TableHead>Type</TableHead>
+						{includeAllStatuses ? <TableHead>Status</TableHead> : null}
 						<TableHead>Auditor</TableHead>
-						<TableHead>Submitted</TableHead>
+						<TableHead>{includeAllStatuses ? "Last activity" : "Submitted"}</TableHead>
 						<TableHead>Score</TableHead>
 						<TableHead className="text-right">Action</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{group.submittedRows.map(row => {
+					{group.displayRows.map(row => {
 						const mode = row.executionMode as "audit" | "survey" | "both" | null;
 
 						return (
@@ -415,9 +462,14 @@ function PlaceSubmissionTable({
 											{getExecutionModeLabel(mode)}
 										</Badge>
 									) : (
-										<span className="text-sm text-muted-foreground">—</span>
+										<span className="text-sm text-muted-foreground">-</span>
 									)}
 								</TableCell>
+								{includeAllStatuses ? (
+									<TableCell className="py-3">
+										<AuditStatusBadge status={row.status} />
+									</TableCell>
+								) : null}
 								<TableCell className="py-3 text-sm">
 									{row.auditorDisplayName ? (
 										<div className="space-y-0.5">
@@ -433,7 +485,7 @@ function PlaceSubmissionTable({
 									)}
 								</TableCell>
 								<TableCell className="py-3 text-sm text-muted-foreground">
-									{formatDateTimeLabel(row.submittedAt, fallbackText)}
+									{formatDateTimeLabel(row.submittedAt ?? row.startedAt, fallbackText)}
 								</TableCell>
 								<TableCell className="py-3 font-mono text-sm tabular-nums">
 									{formatSubmissionScore(row)}
@@ -463,17 +515,20 @@ export function GroupedReportsView({
 	searchValue,
 	onSearchValueChange,
 	isSearching = false,
-	toolbarFilters
+	toolbarFilters,
+	variant = "reports"
 }: Readonly<GroupedReportsViewProps>) {
+	const includeAllStatuses = variant === "audits";
+	const noun = includeAllStatuses ? "submission" : "report";
 	const tableCardContentRef = React.useRef<HTMLDivElement | null>(null);
 	const [buildPlaceGroup, setBuildPlaceGroup] = React.useState<PlaceGroup | null>(null);
 	const [expanded, setExpanded] = React.useState<ExpandedState>({});
-	const [sorting, setSorting] = React.useState<SortingState>([{ id: "latestSubmittedAt", desc: true }]);
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "latestActivityAt", desc: true }]);
 	const [globalFilter, setGlobalFilter] = React.useState(searchValue ?? "");
 	const [selectedReportIds, setSelectedReportIds] = React.useState<Record<string, boolean>>({});
 	const skipNextSearchChangeRef = React.useRef(false);
 
-	const placeGroups = React.useMemo(() => buildPlaceGroups(rows), [rows]);
+	const placeGroups = React.useMemo(() => buildPlaceGroups(rows, includeAllStatuses), [rows, includeAllStatuses]);
 
 	const [prevSearchValue, setPrevSearchValue] = React.useState(searchValue);
 
@@ -537,7 +592,7 @@ export function GroupedReportsView({
 	function handlePlaceSelectionChange(group: PlaceGroup, checked: boolean) {
 		setSelectedReportIds(currentSelection => {
 			const nextSelection = { ...currentSelection };
-			for (const row of group.submittedRows) {
+			for (const row of group.displayRows) {
 				if (checked) {
 					nextSelection[row.id] = true;
 				} else {
@@ -552,8 +607,8 @@ export function GroupedReportsView({
 		setSelectedReportIds({});
 	}
 
-	const columns = React.useMemo<ColumnDef<PlaceGroup>[]>(
-		() => [
+	const columns = React.useMemo<ColumnDef<PlaceGroup>[]>(() => {
+		const baseColumns: ColumnDef<PlaceGroup>[] = [
 			{
 				id: "place",
 				accessorFn: row => row.placeName,
@@ -588,18 +643,20 @@ export function GroupedReportsView({
 				)
 			},
 			{
-				id: "reportCount",
-				accessorFn: row => row.reportCount,
+				id: "displayCount",
+				accessorFn: row => row.displayCount,
 				header: ({ column }) => (
 					<SortableHeader
-						title="Submitted reports"
+						title={includeAllStatuses ? "Submissions" : "Submitted reports"}
 						sorted={column.getIsSorted()}
 						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 					/>
 				),
 				cell: ({ row }) => (
 					<div className="min-w-[220px] space-y-2 py-1">
-						<p className="font-medium text-foreground">{row.original.reportCount} submitted</p>
+						<p className="font-medium text-foreground">
+							{row.original.displayCount} {includeAllStatuses ? "total" : "submitted"}
+						</p>
 						<div className="flex flex-wrap gap-2">
 							{row.original.auditCount > 0 ? (
 								<Badge variant="outline" className="text-xs">
@@ -621,11 +678,11 @@ export function GroupedReportsView({
 				)
 			},
 			{
-				id: "latestSubmittedAt",
-				accessorFn: row => row.latestSubmittedAt ?? "",
+				id: "latestActivityAt",
+				accessorFn: row => row.latestActivityAt ?? "",
 				header: ({ column }) => (
 					<SortableHeader
-						title="Latest submission"
+						title={includeAllStatuses ? "Latest activity" : "Latest submission"}
 						sorted={column.getIsSorted()}
 						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 					/>
@@ -633,30 +690,35 @@ export function GroupedReportsView({
 				cell: ({ row }) => (
 					<div className="min-w-[190px] space-y-1 py-1">
 						<p className="text-sm font-medium text-foreground">
-							{formatDateTimeLabel(row.original.latestSubmittedAt, fallbackText)}
+							{formatDateTimeLabel(row.original.latestActivityAt, fallbackText)}
 						</p>
 						<p className="text-xs text-muted-foreground">
-							{row.original.latestSubmittedRow
+							{row.original.latestActivityRow
 								? (() => {
 										const auditorLabel = getAuditorTableLabel(
-											row.original.latestSubmittedRow.auditorCode,
-											row.original.latestSubmittedRow.auditorDisplayName
+											row.original.latestActivityRow.auditorCode,
+											row.original.latestActivityRow.auditorDisplayName
 										);
 										const auditorCodeSubtitle = getAuditorCodeSubtitle(
-											row.original.latestSubmittedRow.auditorCode,
-											row.original.latestSubmittedRow.auditorDisplayName
+											row.original.latestActivityRow.auditorCode,
+											row.original.latestActivityRow.auditorDisplayName
 										);
 
 										return `Latest auditor ${auditorLabel}${
 											auditorCodeSubtitle ? ` (${auditorCodeSubtitle})` : ""
 										}`;
 									})()
-								: "No submitted reports yet"}
+								: includeAllStatuses
+									? "No submissions yet"
+									: "No submitted reports yet"}
 						</p>
 					</div>
 				)
-			},
-			{
+			}
+		];
+
+		if (!includeAllStatuses) {
+			baseColumns.push({
 				id: "actions",
 				enableSorting: false,
 				header: () => <span className="block text-right">Actions</span>,
@@ -669,10 +731,11 @@ export function GroupedReportsView({
 						/>
 					</div>
 				)
-			}
-		],
-		[]
-	);
+			});
+		}
+
+		return baseColumns;
+	}, [includeAllStatuses]);
 
 	const table = useReactTable({
 		data: placeGroups,
@@ -690,7 +753,7 @@ export function GroupedReportsView({
 				String(typeof updater === "function" ? updater(previousValue) : (updater ?? ""))
 			);
 		},
-		getRowCanExpand: row => row.original.reportCount > 0,
+		getRowCanExpand: row => row.original.displayCount > 0,
 		globalFilterFn: (row, _columnId, filterValue) => {
 			const query = String(filterValue).trim().toLowerCase();
 			return query.length === 0 || row.original.searchText.includes(query);
@@ -708,14 +771,16 @@ export function GroupedReportsView({
 	const selectedCount = selectedIds.length;
 	const filteredPlaceCount = table.getRowModel().rows.length;
 	const totalPlaceCount = placeGroups.length;
-	const totalReportCount = rows.length;
+	const totalRowCount = rows.length;
 
 	if (rows.length === 0) {
 		return (
 			<Card>
 				<CardContent className="py-12 text-center">
 					<FileTextIcon className="mx-auto size-10 text-muted-foreground/50" />
-					<p className="mt-3 text-sm text-muted-foreground">No submitted reports yet.</p>
+					<p className="mt-3 text-sm text-muted-foreground">
+						{includeAllStatuses ? "No audits yet." : "No submitted reports yet."}
+					</p>
 				</CardContent>
 			</Card>
 		);
@@ -728,15 +793,19 @@ export function GroupedReportsView({
 					<CardHeader className="gap-4 border-b-2 border-edge/50">
 						<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
 							<div>
-								<CardTitle>Place reports</CardTitle>
+								<CardTitle>{includeAllStatuses ? "Place audits" : "Place reports"}</CardTitle>
 								<CardDescription>
-									Open a place to review submitted reports and build a place report once the right
-									submissions are available.
+									{includeAllStatuses
+										? "Open a place to review every submission - submitted, paused, and in progress."
+										: "Open a place to review submitted reports and build a place report once the right submissions are available."}
 								</CardDescription>
 							</div>
 							<div className="flex flex-wrap gap-2">
 								<Badge variant="secondary">{totalPlaceCount} places</Badge>
-								<Badge variant="secondary">{totalReportCount} reports</Badge>
+								<Badge variant="secondary">
+									{totalRowCount} {noun}
+									{totalRowCount === 1 ? "" : "s"}
+								</Badge>
 								{isSearching ? <Badge variant="outline">Searching…</Badge> : null}
 							</div>
 						</div>
@@ -843,6 +912,7 @@ export function GroupedReportsView({
 															<PlaceSubmissionTable
 																group={row.original}
 																basePath={basePath}
+																includeAllStatuses={includeAllStatuses}
 																showSelection={Boolean(onExportSelected)}
 																selectedReportIds={selectedReportIds}
 																onReportSelectionChange={handleReportSelectionChange}
@@ -870,13 +940,13 @@ export function GroupedReportsView({
 
 				<div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">
 					<span>
-						Showing {filteredPlaceCount} of {totalPlaceCount} places with {totalReportCount} submitted
-						reports.
+						Showing {filteredPlaceCount} of {totalPlaceCount} places with {totalRowCount} {noun}
+						{totalRowCount === 1 ? "" : "s"}.
 					</span>
 					<span>
 						Open a place to review its submissions
 						{selectedCount > 0
-							? ` or export ${selectedCount} selected report${selectedCount === 1 ? "" : "s"}`
+							? ` or export ${selectedCount} selected ${noun}${selectedCount === 1 ? "" : "s"}`
 							: ""}
 						.
 					</span>

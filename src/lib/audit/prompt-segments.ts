@@ -23,9 +23,9 @@ export interface PromptSegment {
 	readonly bold: boolean;
 	/**
 	 * Granular type for the segment.
-	 * - `"text"` — plain prose
-	 * - `"bold"` — `**…**` inline emphasis
-	 * - `"h1"`…`"h5"` — Markdown ATX header (`#`…`#####`)
+	 * - `"text"` - plain prose
+	 * - `"bold"` - `**…**` inline emphasis
+	 * - `"h1"`…`"h5"` - Markdown ATX header (`#`…`#####`)
 	 */
 	readonly type: PromptSegmentType;
 }
@@ -93,7 +93,7 @@ function parseBoldSegments(line: string): PromptSegment[] {
  *
  * Returns a single-element array with the header segment when the line
  * matches, or `null` when it does not. Bold markers inside header text are
- * intentionally not parsed — headers are already a structural element and
+ * intentionally not parsed - headers are already a structural element and
  * nested bold-within-header is not needed for instrument prompts.
  *
  * @param line - A single, already-trimmed line of the raw prompt.
@@ -124,7 +124,7 @@ function tryParseHeaderLine(line: string): PromptSegment[] | null {
  * - Inline bold: `**…**` markers within non-header lines
  *
  * Empty segments (consecutive markers, blank lines, leading/trailing
- * delimiters) are dropped. Lines are preserved as logical units — a newline
+ * delimiters) are dropped. Lines are preserved as logical units - a newline
  * between a header and the following prose does not produce an extra segment.
  *
  * @param raw - Raw prompt string from the instrument definition.
@@ -153,7 +153,7 @@ export function parsePromptSegments(raw: string): PromptSegment[] {
 	for (const line of raw.split("\n")) {
 		const trimmed = line.trim();
 
-		// Skip blank lines — they carry no content for instrument prompts.
+		// Skip blank lines - they carry no content for instrument prompts.
 		if (trimmed.length === 0) continue;
 
 		const headerSegments = tryParseHeaderLine(trimmed);

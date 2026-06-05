@@ -88,7 +88,7 @@ function LockedKeyField({ label, value, hint }: Readonly<{ label: string; value:
 			<div
 				className="flex h-9 items-center rounded-md border border-dashed border-edge/50 bg-muted/40 px-3 font-mono text-sm text-muted-foreground"
 				title={hint}>
-				<span className="truncate">{value || "—"}</span>
+				<span className="truncate">{value || "-"}</span>
 			</div>
 		</div>
 	);

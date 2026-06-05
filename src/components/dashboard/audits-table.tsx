@@ -246,7 +246,7 @@ export function AuditsTable({
 				cell: ({ row }) => {
 					const mode = row.original.executionMode;
 					if (mode === null || mode === undefined) {
-						return <span className="text-sm text-muted-foreground">—</span>;
+						return <span className="text-sm text-muted-foreground">-</span>;
 					}
 					return (
 						<Badge variant="outline" className="text-xs font-medium whitespace-nowrap">

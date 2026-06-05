@@ -112,7 +112,7 @@
 	--font-dyslexic: "OpenDyslexic";
 	color-scheme: light;
 
-	/** Warm Brutalism edge vars — used only in box-shadow declarations; not Tailwind utilities. */
+	/** Warm Brutalism edge vars - used only in box-shadow declarations; not Tailwind utilities. */
 	--color-solid-primary-edge: var(--solid-primary-edge);
 	--color-solid-neutral-edge: var(--solid-neutral-edge);
 	--color-solid-danger-edge: var(--solid-danger-edge);

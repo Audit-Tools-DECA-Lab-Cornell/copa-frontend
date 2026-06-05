@@ -855,7 +855,11 @@ export const adminProjectExportRecordSchema = z.object({
 	auditors_count: z.number().int().nonnegative(),
 	audits_completed: z.number().int().nonnegative(),
 	average_pv_score: z.number().nullable(),
-	average_u_score: z.number().nullable()
+	average_u_score: z.number().nullable(),
+	audit_mean_pv: z.number().nullable().optional(),
+	audit_mean_u: z.number().nullable().optional(),
+	survey_mean_pv: z.number().nullable().optional(),
+	survey_mean_u: z.number().nullable().optional()
 });
 
 export const adminProjectsExportResponseSchema = z.object({
@@ -869,6 +873,9 @@ export const adminPlaceExportRecordSchema = z.object({
 	place_id: z.string().uuid(),
 	project_id: z.string().uuid(),
 	project_name: z.string(),
+	project_overview: z.string().nullable().optional(),
+	project_start_date: z.string().date().nullable().optional(),
+	project_end_date: z.string().date().nullable().optional(),
 	account_id: z.string().uuid(),
 	account_name: z.string(),
 	name: z.string(),
@@ -925,6 +932,146 @@ export const adminAuditsExportResponseSchema = z.object({
 	generated_at: z.string().datetime(),
 	record_count: z.number().int().nonnegative(),
 	records: z.array(adminAuditExportRecordSchema)
+});
+
+// ── Admin relational export bundles (parent level + all descendants) ────────────
+
+export const adminAuditorExportRecordSchema = z.object({
+	auditor_profile_id: z.string().uuid(),
+	account_id: z.string().uuid().nullable(),
+	account_name: z.string().nullable(),
+	auditor_code: z.string(),
+	assignments_count: z.number().int().nonnegative(),
+	completed_audits: z.number().int().nonnegative(),
+	last_active_at: z.string().datetime().nullable()
+});
+
+export const adminProjectsExportBundleSchema = z.object({
+	generated_at: z.string().datetime(),
+	scope: z.string(),
+	projects: z.array(adminProjectExportRecordSchema),
+	places: z.array(adminPlaceExportRecordSchema),
+	auditors: z.array(adminAuditorExportRecordSchema),
+	audits: z.array(adminAuditExportRecordSchema)
+});
+
+export const adminPlacesExportBundleSchema = z.object({
+	generated_at: z.string().datetime(),
+	scope: z.string(),
+	places: z.array(adminPlaceExportRecordSchema),
+	auditors: z.array(adminAuditorExportRecordSchema),
+	audits: z.array(adminAuditExportRecordSchema)
+});
+
+// ── Manager relational export records & bundles (full auditor identity) ─────────
+
+export const managerProjectExportRecordSchema = z.object({
+	project_id: z.string().uuid(),
+	name: z.string(),
+	overview: z.string().nullable(),
+	start_date: z.string().date().nullable(),
+	end_date: z.string().date().nullable(),
+	place_types: z.array(z.string()),
+	places_count: z.number().int().nonnegative(),
+	auditors_count: z.number().int().nonnegative(),
+	audits_completed: z.number().int().nonnegative(),
+	average_pv_score: z.number().nullable(),
+	average_u_score: z.number().nullable(),
+	audit_mean_pv: z.number().nullable().optional(),
+	audit_mean_u: z.number().nullable().optional(),
+	survey_mean_pv: z.number().nullable().optional(),
+	survey_mean_u: z.number().nullable().optional()
+});
+
+export const managerPlaceExportRecordSchema = z.object({
+	place_id: z.string().uuid(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
+	project_overview: z.string().nullable(),
+	project_start_date: z.string().date().nullable(),
+	project_end_date: z.string().date().nullable(),
+	name: z.string(),
+	address: z.string().nullable(),
+	city: z.string().nullable(),
+	province: z.string().nullable(),
+	country: z.string().nullable(),
+	postal_code: z.string().nullable(),
+	place_type: z.string().nullable(),
+	lat: z.number().nullable(),
+	lng: z.number().nullable(),
+	place_audit_status: z.string(),
+	place_survey_status: z.string(),
+	place_audit_count: z.number().int().nonnegative(),
+	place_survey_count: z.number().int().nonnegative(),
+	audits_completed: z.number().int().nonnegative(),
+	audit_mean_pv: z.number().nullable(),
+	audit_mean_u: z.number().nullable(),
+	survey_mean_pv: z.number().nullable(),
+	survey_mean_u: z.number().nullable(),
+	last_audited_at: z.string().datetime().nullable()
+});
+
+export const managerAuditorExportRecordSchema = z.object({
+	auditor_profile_id: z.string().uuid(),
+	auditor_code: z.string(),
+	full_name: z.string(),
+	email: z.string().nullable(),
+	age_range: z.string().nullable(),
+	gender: z.string().nullable(),
+	country: z.string().nullable(),
+	role: z.string().nullable(),
+	assignments_count: z.number().int().nonnegative(),
+	completed_audits: z.number().int().nonnegative(),
+	last_active_at: z.string().datetime().nullable()
+});
+
+export const managerAuditExportRecordSchema = z.object({
+	audit_id: z.string().uuid(),
+	audit_code: z.string(),
+	status: z.string(),
+	execution_mode: executionModeSchema.nullable().optional(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
+	place_id: z.string().uuid(),
+	place_name: z.string(),
+	auditor_code: z.string(),
+	auditor_full_name: z.string(),
+	auditor_email: z.string().nullable(),
+	auditor_age_range: z.string().nullable(),
+	auditor_gender: z.string().nullable(),
+	auditor_country: z.string().nullable(),
+	auditor_role: z.string().nullable(),
+	started_at: z.string().datetime(),
+	submitted_at: z.string().datetime().nullable(),
+	summary_score: z.number().nullable(),
+	audit_pv_score: z.number().nullable(),
+	audit_u_score: z.number().nullable(),
+	survey_pv_score: z.number().nullable(),
+	survey_u_score: z.number().nullable()
+});
+
+export const managerProjectsExportBundleSchema = z.object({
+	generated_at: z.string().datetime(),
+	scope: z.string(),
+	projects: z.array(managerProjectExportRecordSchema),
+	places: z.array(managerPlaceExportRecordSchema),
+	auditors: z.array(managerAuditorExportRecordSchema),
+	audits: z.array(managerAuditExportRecordSchema)
+});
+
+export const managerPlacesExportBundleSchema = z.object({
+	generated_at: z.string().datetime(),
+	scope: z.string(),
+	places: z.array(managerPlaceExportRecordSchema),
+	auditors: z.array(managerAuditorExportRecordSchema),
+	audits: z.array(managerAuditExportRecordSchema)
+});
+
+export const managerAuditsExportResponseSchema = z.object({
+	entity: z.string(),
+	generated_at: z.string().datetime(),
+	record_count: z.number().int().nonnegative(),
+	records: z.array(managerAuditExportRecordSchema)
 });
 
 export const instrumentResponseSchema = z.object({
@@ -1021,6 +1168,16 @@ export type AdminPlaceExportRecord = z.infer<typeof adminPlaceExportRecordSchema
 export type AdminPlacesExportResponse = z.infer<typeof adminPlacesExportResponseSchema>;
 export type AdminAuditExportRecord = z.infer<typeof adminAuditExportRecordSchema>;
 export type AdminAuditsExportResponse = z.infer<typeof adminAuditsExportResponseSchema>;
+export type AdminAuditorExportRecord = z.infer<typeof adminAuditorExportRecordSchema>;
+export type AdminProjectsExportBundle = z.infer<typeof adminProjectsExportBundleSchema>;
+export type AdminPlacesExportBundle = z.infer<typeof adminPlacesExportBundleSchema>;
+export type ManagerProjectExportRecord = z.infer<typeof managerProjectExportRecordSchema>;
+export type ManagerPlaceExportRecord = z.infer<typeof managerPlaceExportRecordSchema>;
+export type ManagerAuditorExportRecord = z.infer<typeof managerAuditorExportRecordSchema>;
+export type ManagerAuditExportRecord = z.infer<typeof managerAuditExportRecordSchema>;
+export type ManagerProjectsExportBundle = z.infer<typeof managerProjectsExportBundleSchema>;
+export type ManagerPlacesExportBundle = z.infer<typeof managerPlacesExportBundleSchema>;
+export type ManagerAuditsExportResponse = z.infer<typeof managerAuditsExportResponseSchema>;
 export type PaginatedResponse<TItem> = {
 	items: TItem[];
 	total_count: number;
@@ -1099,6 +1256,22 @@ export interface AdminExportQuery {
 	search?: string;
 	accountIds?: readonly string[];
 	projectIds?: readonly string[];
+	placeIds?: readonly string[];
+	auditorIds?: readonly string[];
+	auditStatuses?: readonly string[];
+	surveyStatuses?: readonly string[];
+	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
+}
+
+/**
+ * Manager export query - identical to AdminExportQuery minus accountIds
+ * (manager exports are always scoped to the manager's own account).
+ */
+export interface ManagerExportQuery {
+	search?: string;
+	projectIds?: readonly string[];
+	placeIds?: readonly string[];
+	auditorIds?: readonly string[];
 	auditStatuses?: readonly string[];
 	surveyStatuses?: readonly string[];
 	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;

@@ -604,7 +604,7 @@ export function AssignAuditorDialog({ open, onOpenChange, prefill, onAssigned }:
 
 	/**
 	 * When auditor IDs are pre-filled (opened from auditor detail page),
-	 * skip the auditor picker and tabs — just show the scope form.
+	 * skip the auditor picker and tabs - just show the scope form.
 	 */
 	const hasPrefilledAuditors = prefill?.auditorIds !== undefined && prefill.auditorIds.length > 0;
 

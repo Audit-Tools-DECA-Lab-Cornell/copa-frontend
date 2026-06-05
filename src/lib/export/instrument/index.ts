@@ -1,10 +1,10 @@
 /**
- * Instrument export — public surface.
+ * Instrument export - public surface.
  *
  * All format-specific logic lives in dedicated modules:
- *   - instrument-shared.ts  — types, palettes, flatten, helpers
- *   - instrument-pdf.ts     — jsPDF / jspdf-autotable PDF generation
- *   - instrument-excel.ts   — xlsx XLSX / CSV generation
+ *   - instrument-shared.ts  - types, palettes, flatten, helpers
+ *   - instrument-pdf.ts     - jsPDF / jspdf-autotable PDF generation
+ *   - instrument-excel.ts   - xlsx XLSX / CSV generation
  *
  * Consumers should import from this file; the split is an internal concern.
  */

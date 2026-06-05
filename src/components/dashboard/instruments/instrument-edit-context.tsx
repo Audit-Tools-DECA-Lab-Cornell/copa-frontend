@@ -23,17 +23,17 @@ export const BASE_INSTRUMENT_LANG = "en";
  */
 export const COMMON_LANGUAGES: ReadonlyArray<{ code: string; label: string }> = [
 	{ code: "en", label: "English" },
-	{ code: "de", label: "German — Deutsch" },
-	{ code: "fr", label: "French — Français" },
-	{ code: "es", label: "Spanish — Español" },
-	{ code: "it", label: "Italian — Italiano" },
-	{ code: "nl", label: "Dutch — Nederlands" },
-	{ code: "pt", label: "Portuguese — Português" },
-	{ code: "pl", label: "Polish — Polski" },
-	{ code: "sv", label: "Swedish — Svenska" },
-	{ code: "da", label: "Danish — Dansk" },
-	{ code: "no", label: "Norwegian — Norsk" },
-	{ code: "fi", label: "Finnish — Suomi" }
+	{ code: "de", label: "German - Deutsch" },
+	{ code: "fr", label: "French - Français" },
+	{ code: "es", label: "Spanish - Español" },
+	{ code: "it", label: "Italian - Italiano" },
+	{ code: "nl", label: "Dutch - Nederlands" },
+	{ code: "pt", label: "Portuguese - Português" },
+	{ code: "pl", label: "Polish - Polski" },
+	{ code: "sv", label: "Swedish - Svenska" },
+	{ code: "da", label: "Danish - Dansk" },
+	{ code: "no", label: "Norwegian - Norsk" },
+	{ code: "fi", label: "Finnish - Suomi" }
 ];
 
 /**

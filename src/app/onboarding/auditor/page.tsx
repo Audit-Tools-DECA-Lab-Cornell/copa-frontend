@@ -487,7 +487,7 @@ function CodeStep({ profile }: Readonly<{ profile: MyAuditorProfile | null }>) {
 		queryFn: () => playspaceApi.auditor.myProfile(),
 		initialData: profile ?? undefined
 	});
-	const auditorCode = profileQuery.data?.auditor_code ?? "—";
+	const auditorCode = profileQuery.data?.auditor_code ?? "-";
 
 	return (
 		<Card>

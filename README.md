@@ -189,15 +189,15 @@ Auto-save behavior:
 
 Scoped conventions for this repo (keep `.cursor/rules/` and `.claude/rules/` in sync):
 
-- `frontend-dashboard-core.mdc` — role guards, shared dashboard components, API contract, UI copy
-- `frontend-i18n-and-exports.mdc` — `messages/en.json` + `de.json`, report views, PDF/Excel exports
+- `frontend-dashboard-core.mdc` - role guards, shared dashboard components, API contract, UI copy
+- `frontend-i18n-and-exports.mdc` - `messages/en.json` + `de.json`, report views, PDF/Excel exports
 
 See `CLAUDE.md` and `.claude/README.md`. Workspace routing: `../.claude/AGENT_ROUTING.md` → `web-dashboard-ui`.
 
 ### Project structure
 
-- `src/app/(public)` — unauthenticated pages
-- `src/app/(protected)` — authenticated shell + role-specific routes
-- `src/lib/auth` — role/session cookie helpers (server + browser)
-- `src/lib/api` — Axios client + interceptors
-- `src/components/app` — application shell components
+- `src/app/(public)` - unauthenticated pages
+- `src/app/(protected)` - authenticated shell + role-specific routes
+- `src/lib/auth` - role/session cookie helpers (server + browser)
+- `src/lib/api` - Axios client + interceptors
+- `src/components/app` - application shell components

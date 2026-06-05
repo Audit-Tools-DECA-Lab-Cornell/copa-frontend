@@ -62,12 +62,12 @@ function renderScaleCellState(options: {
 }): React.ReactNode {
 	const { label, applicable, isNotApplicable, followUpScalesAsked = true } = options;
 	if (!applicable || !followUpScalesAsked) {
-		return <span className="text-muted-foreground/50">—</span>;
+		return <span className="text-muted-foreground/50">-</span>;
 	}
 	if (isNotApplicable) {
 		return <span className="text-foreground">Not applicable</span>;
 	}
-	return label ?? <span className="text-muted-foreground/50">—</span>;
+	return label ?? <span className="text-muted-foreground/50">-</span>;
 }
 
 function formatDateTime(iso: string): string {
@@ -146,7 +146,7 @@ const CONSTRUCT_METRICS: readonly MetricDef[] = [
 // ── Bar colors & thresholds ──────────────────────────────────────────────────
 // Each bar is colored by its metric identity (not its score). The four PVUA scale
 // bars use the shared design-system scale colors; the two headline constructs use a
-// balanced teal/gold pair — co-equal peers, distinct from the scales and the brand
+// balanced teal/gold pair - co-equal peers, distinct from the scales and the brand
 // clay. Score tiers are shown as two dotted threshold lines.
 
 const BAR_COLORS: Record<MetricKey, string> = {
@@ -198,7 +198,7 @@ function BarTrack({
 					/>
 				) : isNa ? (
 					<div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground/50">
-						—
+						-
 					</div>
 				) : null}
 			</div>
@@ -207,8 +207,8 @@ function BarTrack({
 }
 
 /**
- * A group of bars rendered as three aligned rows — percentage labels, a fixed-height
- * track row, and metric labels — so each column lines up with the table below. The two
+ * A group of bars rendered as three aligned rows - percentage labels, a fixed-height
+ * track row, and metric labels - so each column lines up with the table below. The two
  * threshold cutoffs are drawn as single dotted lines running continuously across the
  * whole track row, with their values labeled once on the left axis.
  */
@@ -243,7 +243,7 @@ function BarGroup({
 
 			{/* Track row + continuous threshold lines */}
 			<div className="relative mt-1.5 flex" style={{ height: BAR_TRACK_HEIGHT }}>
-				{/* Left axis — threshold values labeled once */}
+				{/* Left axis - threshold values labeled once */}
 				<div className="relative" style={{ width: LABEL_COL_W }}>
 					{BAR_THRESHOLDS.map(th => (
 						<span
@@ -341,14 +341,14 @@ function ScoreSubTable({
 	const rows: Array<{ label: string; cells: string[]; alt: boolean }> = [
 		{
 			label: "Score Achieved",
-			cells: metrics.map(m => (scores === null ? "—" : String(m.getValue(scores)))),
+			cells: metrics.map(m => (scores === null ? "-" : String(m.getValue(scores)))),
 			alt: false
 		},
 		{
 			label: "Max Score",
 			cells: metrics.map(m => {
 				const max = scores === null ? 0 : m.getMax(scores);
-				return max <= 0 ? "—" : String(max);
+				return max <= 0 ? "-" : String(max);
 			}),
 			alt: true
 		}
@@ -550,12 +550,12 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 								<td className="border-r border-edge/40 px-3 py-2 text-center font-mono tabular-nums">
 									{q.playValueScore !== null && q.playValueMax !== null
 										? `${q.playValueScore}/${q.playValueMax}`
-										: "—"}
+										: "-"}
 								</td>
 								<td className="px-3 py-2 text-center font-mono tabular-nums">
 									{q.usabilityScore !== null && q.usabilityMax !== null
 										? `${q.usabilityScore}/${q.usabilityMax}`
-										: "—"}
+										: "-"}
 								</td>
 							</tr>
 						);
@@ -630,7 +630,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 														</p>
 													</>
 												) : (
-													<p className="text-sm text-muted-foreground">—</p>
+													<p className="text-sm text-muted-foreground">-</p>
 												)}
 											</div>
 											<div className="bg-rose-50 px-3 py-2.5 dark:bg-rose-950/20">
@@ -655,7 +655,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 														</p>
 													</>
 												) : (
-													<p className="text-sm text-muted-foreground">—</p>
+													<p className="text-sm text-muted-foreground">-</p>
 												)}
 											</div>
 										</div>
@@ -685,9 +685,9 @@ export interface AuditReportViewProps {
  */
 export function AuditReportView({ audit, instrument = null, basePath }: Readonly<AuditReportViewProps>) {
 	const overall = getEffectiveScoreTotals(audit.scores);
-	const overallPvPct = overall !== null ? pct(overall.play_value_total, overall.play_value_total_max) : "—";
-	const overallUPct = overall !== null ? pct(overall.usability_total, overall.usability_total_max) : "—";
-	const overallSocPct = overall !== null ? pct(overall.sociability_total, overall.sociability_total_max) : "—";
+	const overallPvPct = overall !== null ? pct(overall.play_value_total, overall.play_value_total_max) : "-";
+	const overallUPct = overall !== null ? pct(overall.usability_total, overall.usability_total_max) : "-";
+	const overallSocPct = overall !== null ? pct(overall.sociability_total, overall.sociability_total_max) : "-";
 	const overallCombined = overall !== null ? `PV ${overallPvPct} · U ${overallUPct}` : "Pending";
 
 	const domainRows = React.useMemo(() => {
@@ -813,19 +813,19 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 					/>
 					<ReportStatCard
 						label="Play Value"
-						value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "—"}
+						value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "-"}
 						helper={overall !== null ? `Max score = ${overall.play_value_total_max}` : undefined}
 						accent="bg-amber-500"
 					/>
 					<ReportStatCard
 						label="Usability"
-						value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "—"}
+						value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "-"}
 						helper={overall !== null ? `Max score = ${overall.usability_total_max}` : undefined}
 						accent="bg-primary"
 					/>
 					<ReportStatCard
 						label="Sociability"
-						value={overall !== null ? `${overall.sociability_total} (${overallSocPct})` : "—"}
+						value={overall !== null ? `${overall.sociability_total} (${overallSocPct})` : "-"}
 						helper={overall !== null ? `Max score = ${overall.sociability_total_max}` : undefined}
 						accent="bg-emerald-500"
 					/>

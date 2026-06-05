@@ -1,7 +1,7 @@
 {
 	"metadata": {
 		"title": "COPA Tool",
-		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) — strukturierte Audits zu Spielwert und Nutzbarkeit."
+		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) - strukturierte Audits zu Spielwert und Nutzbarkeit."
 	},
 	"common": {
 		"roles": {
@@ -248,6 +248,50 @@
 		}
 	},
 	"admin": {
+		"rawData": {
+			"eyebrow": "Admin",
+			"title": "Rohdatenexport",
+			"breadcrumb": "Rohdaten",
+			"description": "Filtern und laden Sie Playspace-Daten über Projekte, Orte, Audits und Berichte herunter. Prüfer werden nur anhand ihres Codes identifiziert.",
+			"tabs": {
+				"projects": "Projekte",
+				"places": "Orte",
+				"audits": "Audits",
+				"reports": "Berichte"
+			},
+			"filters": {
+				"account": "Konto",
+				"project": "Projekt",
+				"auditStatus": "Auditstatus",
+				"surveyStatus": "Umfragestatus",
+				"status": "Status",
+				"clear": "Zurücksetzen"
+			},
+			"export": {
+				"button": "Exportieren",
+				"exporting": "Wird exportiert…",
+				"allDocuments": "Alle Dokumente",
+				"xlsx": "Excel-Arbeitsmappe (.xlsx)",
+				"json": "JSON-Paket (.json)",
+				"csvParentOnly": "CSV - nur diese Ebene",
+				"selected": "{count} ausgewählt",
+				"selectedXlsx": "Auswahl als Excel",
+				"selectedJson": "Auswahl als JSON",
+				"selectedCsvParentOnly": "Auswahl als CSV - nur diese Ebene"
+			},
+			"table": {
+				"searchProjects": "Nach Name oder Konto suchen…",
+				"searchPlaces": "Nach Name, Adresse oder Projekt suchen…",
+				"emptyProjects": "Keine Projekte entsprechen den aktuellen Filtern.",
+				"emptyPlaces": "Keine Orte entsprechen den aktuellen Filtern.",
+				"descriptionLoading": "{entity} filtern und herunterladen.",
+				"description": "{count} Datensätze entsprechen den Filtern. Verwenden Sie Exportieren für den vollständigen Datensatz.",
+				"descriptionCapped": "{count} Datensätze entsprechen den Filtern - Downloads enthalten bis zu 10.000 übereinstimmende Zeilen. Verwenden Sie Exportieren für den vollständigen Datensatz."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard"
+			}
+		},
 		"dashboard": {
 			"error": {
 				"title": "Administrator-Dashboard nicht verfügbar",
@@ -496,7 +540,7 @@
 				"noVersions": "Keine Instrumentversionen gefunden.",
 				"confirmActivateTitle": "Diese Version aktivieren?",
 				"confirmActivate": "Dies ersetzt sofort das aktuelle aktive Instrument für alle Prüfer. Laufende Audits werden mit ihrer gestarteten Version fortgesetzt.",
-				"confirmActivateWithVersion": "{version} wird als Version {nextVersion} aktiviert — die nächste Nummer in Ihrer Veröffentlichungsreihe. Laufende Audits behalten die Version, mit der sie gestartet wurden.",
+				"confirmActivateWithVersion": "{version} wird als Version {nextVersion} aktiviert - die nächste Nummer in Ihrer Veröffentlichungsreihe. Laufende Audits behalten die Version, mit der sie gestartet wurden.",
 				"activate": "Version aktivieren",
 				"cancel": "Abbrechen",
 				"delete": "Löschen",
@@ -571,13 +615,13 @@
 				"languageExists": "Diese Sprache existiert bereits.",
 				"confirmRemoveLanguage": "Sind Sie sicher, dass Sie die Übersetzung {lang} entfernen möchten? Dies kann nicht rückgängig gemacht werden.",
 				"copyFrom": "Von {lang} kopieren",
-				"keyLockedHint": "Während der Übersetzung gesperrt — diesen Schlüssel in {lang} bearbeiten.",
-				"baseLanguageHint": "Basissprache — Schlüssel und Struktur werden hier bearbeitet.",
+				"keyLockedHint": "Während der Übersetzung gesperrt - diesen Schlüssel in {lang} bearbeiten.",
+				"baseLanguageHint": "Basissprache - Schlüssel und Struktur werden hier bearbeitet.",
 				"baseLanguageTag": "Basis",
 				"translatingBadge": "Übersetzung {lang}",
 				"coverageBadge": "{percent}% übersetzt",
 				"coverageTooltip": "{translated} von {total} übersetzbaren Feldern weichen von der Basissprache ab.",
-				"translationBannerTitle": "Übersetzung nach {lang} — Struktur an {base} gebunden",
+				"translationBannerTitle": "Übersetzung nach {lang} - Struktur an {base} gebunden",
 				"translationBannerBody": "Schlüssel, Bewertung und Struktur werden in der Basissprache verwaltet. Hier ist nur der Anzeigetext bearbeitbar; nicht übersetzte Felder greifen automatisch auf die Basissprache zurück.",
 				"addLanguageTitle": "Übersetzung hinzufügen",
 				"addLanguageDesc": "Wählen Sie eine Sprache und die Quelle, aus der die Struktur kopiert wird. Schlüssel und Struktur bleiben mit der Basissprache synchron; anschließend übersetzen Sie den Anzeigetext.",
@@ -592,10 +636,10 @@
 				"premiumBadge": "Premium",
 				"aiTranslateTitle": "Mit KI übersetzen",
 				"aiTranslateDesc": "Erstellt automatisch {target} aus {base} für jedes nicht übersetzte Feld, ohne Schlüssel und Struktur zu verändern.",
-				"aiTranslateComingSoon": "Dies ist eine Vorschau einer kommenden Premium-Funktion. Die KI-Übersetzung ist noch nicht aktiviert — Übersetzungen werden weiterhin manuell eingegeben.",
+				"aiTranslateComingSoon": "Dies ist eine Vorschau einer kommenden Premium-Funktion. Die KI-Übersetzung ist noch nicht aktiviert - Übersetzungen werden weiterhin manuell eingegeben.",
 				"aiTranslateCta": "Automatisch übersetzen (in Kürze)",
 				"aiTranslateField": "Dieses Feld mit KI übersetzen",
-				"aiTranslateFieldTooltip": "Premium · in Kürze — nur diesen Textblock mit KI übersetzen, Schlüssel und Struktur bleiben unberührt.",
+				"aiTranslateFieldTooltip": "Premium · in Kürze - nur diesen Textblock mit KI übersetzen, Schlüssel und Struktur bleiben unberührt.",
 				"sectionTitle": "Abschnittstitel",
 				"sectionDescription": "Beschreibung",
 				"sectionInstruction": "Anweisung",
@@ -903,6 +947,50 @@
 		"signInLink": "Stattdessen anmelden"
 	},
 	"manager": {
+		"rawData": {
+			"eyebrow": "Manager",
+			"title": "Rohdatenexport",
+			"breadcrumb": "Rohdaten",
+			"description": "Filtern und laden Sie die Daten Ihres Kontos über Projekte, Orte, Audits und Berichte herunter. Prüfer-Exporte enthalten das vollständige Profil jedes Prüfers.",
+			"accountUnavailable": "Der Kontokontext des Managers ist nicht verfügbar. Melden Sie sich erneut an, um Ihre Rohdaten anzuzeigen.",
+			"tabs": {
+				"projects": "Projekte",
+				"places": "Orte",
+				"audits": "Audits",
+				"reports": "Berichte"
+			},
+			"filters": {
+				"project": "Projekt",
+				"auditStatus": "Auditstatus",
+				"surveyStatus": "Umfragestatus",
+				"status": "Status",
+				"clear": "Zurücksetzen"
+			},
+			"export": {
+				"button": "Exportieren",
+				"exporting": "Wird exportiert…",
+				"allDocuments": "Alle Dokumente",
+				"xlsx": "Excel-Arbeitsmappe (.xlsx)",
+				"json": "JSON-Paket (.json)",
+				"csvParentOnly": "CSV - nur diese Ebene",
+				"selected": "{count} ausgewählt",
+				"selectedXlsx": "Auswahl als Excel",
+				"selectedJson": "Auswahl als JSON",
+				"selectedCsvParentOnly": "Auswahl als CSV - nur diese Ebene"
+			},
+			"table": {
+				"searchProjects": "Nach Name suchen…",
+				"searchPlaces": "Nach Name, Adresse oder Projekt suchen…",
+				"emptyProjects": "Noch keine Projekte in diesem Konto.",
+				"emptyPlaces": "Keine Orte entsprechen den aktuellen Filtern.",
+				"descriptionLoading": "{entity} filtern und herunterladen.",
+				"description": "{count} Datensätze entsprechen den Filtern. Verwenden Sie Exportieren für den vollständigen Datensatz.",
+				"descriptionCapped": "{count} Datensätze entsprechen den Filtern - Downloads enthalten bis zu 10.000 übereinstimmende Zeilen. Verwenden Sie Exportieren für den vollständigen Datensatz."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard"
+			}
+		},
 		"dashboard": {
 			"errors": {
 				"accountContextUnavailable": "Der Kontokontext des Managers ist nicht verfügbar.",

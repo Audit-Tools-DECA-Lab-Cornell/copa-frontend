@@ -11,7 +11,7 @@ interface GlobalErrorProps {
  * Absolute-fallback error boundary.
  * Replaces the root layout when an error escapes every nested boundary,
  * so it renders its own html/body. Cannot rely on next-intl or other
- * providers — text is hardcoded English.
+ * providers - text is hardcoded English.
  */
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
 	useEffect(() => {

@@ -125,7 +125,7 @@ export function buildOverviewRows(
  * preceded by a header row and followed by per-section summary rows. An
  * overall summary block is appended after the last section.
  *
- * The header row (`SINGLE_RESPONSE_HEADERS`) is NOT prepended here — callers
+ * The header row (`SINGLE_RESPONSE_HEADERS`) is NOT prepended here - callers
  * add it as needed to support both XLSX (sheet prepend) and CSV (array prepend).
  */
 function buildSingleAuditResponseTable(
@@ -157,7 +157,7 @@ function buildSingleAuditResponseTable(
 			rows.push(buildQuestionResponseRow(sectionIndex, questionIndex, question, answers, questionScores));
 			rowMetadata.push(sourceComponent === null ? null : { sourceComponent });
 
-			// Per-question auditor comment row — emitted directly after the
+			// Per-question auditor comment row - emitted directly after the
 			// question item row, before score rows, matching the PDF layout.
 			const questionComment = typeof answers.question_note === "string" ? answers.question_note.trim() : "";
 			if (questionComment.length > 0) {

@@ -21,7 +21,7 @@ export function formatQuestionKeyForDisplay(questionKey: string): string {
 
 /**
  * Convert a snake_case key like "section_1_playspace_character_community"
- * into a human-readable label "Section 1 — Playspace Character Community".
+ * into a human-readable label "Section 1 - Playspace Character Community".
  */
 export function formatSectionKey(key: string): string {
 	const match = key.match(/^section_(\\d+)_(.+)$/);
@@ -208,7 +208,7 @@ export function buildScaleGuidanceMap(scaleGuidance: ScaleDefinition[]): Map<str
 /**
  * True when a version number has the draft-branch shape (three or more numeric
  * segments, e.g. 5.23.1). Publications are flat two-segment numbers, so a row
- * carrying a draft-shaped number with no parent is an orphan — a draft branch
+ * carrying a draft-shaped number with no parent is an orphan - a draft branch
  * whose parent version was deleted.
  */
 export function isDraftBranchVersion(version: string): boolean {
@@ -282,7 +282,7 @@ export function suggestNextPublishedVersion(publishedVersions: readonly string[]
 /**
  * Collect the translatable display strings of an instrument in a stable order.
  *
- * Keys, scoring values, and structural flags are deliberately excluded — only
+ * Keys, scoring values, and structural flags are deliberately excluded - only
  * human-facing copy that a translator would localize is gathered. Because every
  * language shares the same key-aligned structure, two languages produce arrays
  * of the same length and ordering, which lets {@link getTranslationCoverage}

@@ -201,7 +201,7 @@ export function formatLabel(raw: string): string {
 // ─── Instrument flattening ────────────────────────────────────────────────────
 
 /**
- * Converts a parsed instrument into an ordered list of flat rows — one
+ * Converts a parsed instrument into an ordered list of flat rows - one
  * `section_header` row per section followed by one `question` row per question.
  * All text fields are normalised to plain strings; prompt segments are retained
  * alongside so rich PDF rendering can use them directly.

@@ -21,7 +21,7 @@ import {
  *
  * Like {@link AiTranslateButton} this is intentionally presentation-only: it
  * advertises an upcoming paid capability to translate a single text block on
- * demand. It performs no translation and has no click handler — the tooltip
+ * demand. It performs no translation and has no click handler - the tooltip
  * explains it ships with a future premium plan. Shown next to individual
  * translatable fields while editing a non-base language.
  */
@@ -55,7 +55,7 @@ export function AiTranslateFieldButton({ className }: Readonly<{ className?: str
  *
  * This is intentionally a presentation-only feature: it advertises an upcoming
  * paid capability to auto-translate the active language from the base language.
- * It performs no translation and makes no network calls — the popover explains
+ * It performs no translation and makes no network calls - the popover explains
  * that it ships with a future premium plan. Wiring it to a real provider is the
  * only change needed to make it functional.
  *

@@ -163,7 +163,7 @@ export default function AdminAuditsPage() {
 		}));
 	}, [placesQuery.data]);
 
-	/** Admin auditors filter shows auditor code only — no personal details. */
+	/** Admin auditors filter shows auditor code only - no personal details. */
 	const auditorOptions = React.useMemo(() => {
 		return (auditorsQuery.data?.items ?? []).map((a: AdminAuditorRow) => ({
 			label: a.auditor_code,

@@ -2,9 +2,9 @@
  * XLSX and CSV export for the audit pipeline.
  *
  * Provides:
- *   - `generateXlsxBlob`  — styled multi-sheet workbook
- *   - `generateCsvBlob`   — plain comma-separated response matrix
- *   - `buildCsvText`      — (exported for testing) converts rows to CSV text
+ *   - `generateXlsxBlob`  - styled multi-sheet workbook
+ *   - `generateCsvBlob`   - plain comma-separated response matrix
+ *   - `buildCsvText`      - (exported for testing) converts rows to CSV text
  *
  * The `xlsx-js-style` import is a static top-level import (not dynamic) because
  * the `audit` export path is already inside a user-triggered async flow and the
@@ -122,7 +122,7 @@ const SCALE_COLUMN_MAP: Record<number, "provision" | "diversity" | "sociability"
 	10: "challenge"
 };
 
-/** Hex strings for each scale's soft fill — source of truth is SCALE_SOFT_COLORS in types.ts. */
+/** Hex strings for each scale's soft fill - source of truth is SCALE_SOFT_COLORS in types.ts. */
 const SCALE_SOFT_HEX: Record<"provision" | "diversity" | "sociability" | "challenge", string> = {
 	provision: "AEC596",
 	diversity: "EBAC99",
@@ -168,7 +168,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 	const altRowFill = { patternType: "solid", fgColor: { rgb: "F8FAFC" } } as const;
 	const noFill = { patternType: "none" } as const;
 
-	// Score row fills — matches PDF AUDIT_PDF_PALETTE
+	// Score row fills - matches PDF AUDIT_PDF_PALETTE
 	const scoreLabelFill = { patternType: "solid", fgColor: { rgb: "333F55" } } as const;
 	const scorePvUFill = { patternType: "solid", fgColor: { rgb: "F1F5F9" } } as const;
 
@@ -255,7 +255,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 					border: { top: heavyBorder, bottom: heavyBorder, right: noBorder }
 				};
 			} else if (isCommentRow) {
-				// Per-question comment — subtle section-grey, italic, full-width feel.
+				// Per-question comment - subtle section-grey, italic, full-width feel.
 				cell.s = {
 					...baseStyle,
 					fill: sectionFill,
@@ -263,7 +263,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 					border: { bottom: lightBorder, right: noBorder }
 				};
 			} else if (isSectionNoteRow) {
-				// Notes Prompt — bold banner, no column dividers.
+				// Notes Prompt - bold banner, no column dividers.
 				cell.s = {
 					...baseStyle,
 					fill: sectionFill,
@@ -272,7 +272,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 					border: { top: lightBorder, bottom: noBorder, right: noBorder }
 				};
 			} else if (isSectionNoteResponseRow) {
-				// Auditor Note response — normal weight, same banner background.
+				// Auditor Note response - normal weight, same banner background.
 				cell.s = {
 					...baseStyle,
 					fill: sectionFill,
@@ -336,7 +336,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 					};
 				}
 			} else {
-				// Normal body row — scale cols get their soft fill, PV/U cols get
+				// Normal body row - scale cols get their soft fill, PV/U cols get
 				// the slate score fill (matching PDF summaryFill), everything else
 				// uses the alternating row fill.
 				const bodyFill = isEvenRow ? altRowFill : noFill;
@@ -436,8 +436,8 @@ export function buildCsvText(rows: readonly SpreadsheetRow[]): string {
 
 /**
  * Generates a styled XLSX workbook blob with two sheets:
- * - **Overview** — key/value metadata and aggregate scores
- * - **Responses** — the full PVUA response matrix
+ * - **Overview** - key/value metadata and aggregate scores
+ * - **Responses** - the full PVUA response matrix
  */
 export function generateXlsxBlob(
 	exportableAudit: ExportableAudit,

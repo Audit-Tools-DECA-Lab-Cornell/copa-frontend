@@ -1,13 +1,13 @@
 /**
- * Audit export — public surface.
+ * Audit export - public surface.
  *
  * All format-specific and domain logic lives in dedicated modules:
- *   - types.ts        — interfaces, constants, palette helpers
- *   - format-utils.ts — pure text / number formatters
- *   - score-utils.ts  — score calculation and AuditScoreTotals helpers
- *   - row-builders.ts — spreadsheet row factories
- *   - excel.ts        — XLSX / CSV blob generation
- *   - pdf.ts          — jsPDF / autotable PDF blob generation
+ *   - types.ts        - interfaces, constants, palette helpers
+ *   - format-utils.ts - pure text / number formatters
+ *   - score-utils.ts  - score calculation and AuditScoreTotals helpers
+ *   - row-builders.ts - spreadsheet row factories
+ *   - excel.ts        - XLSX / CSV blob generation
+ *   - pdf.ts          - jsPDF / autotable PDF blob generation
  *
  * Consumers should import from this file only. The module split is an internal
  * concern; this file is the stable contract.

@@ -15,24 +15,23 @@ import {
 import { useTranslations } from "next-intl";
 
 import type {
-	AdminAuditExportRecord,
-	AdminAuditorExportRecord,
-	AdminAuditRow,
-	AdminAuditsQuery,
-	AdminExportQuery,
-	AdminPlaceExportRecord,
-	AdminPlaceRow,
-	AdminPlacesQuery,
-	AdminProjectExportRecord,
-	AdminProjectRow,
-	AdminProjectsQuery,
-	PaginatedResponse
+	ManagerAuditExportRecord,
+	ManagerAuditorExportRecord,
+	ManagerAuditRow,
+	ManagerAuditsQuery,
+	ManagerExportQuery,
+	ManagerPlaceExportRecord,
+	ManagerPlaceRow,
+	ManagerPlacesQuery,
+	ManagerProjectExportRecord,
+	ProjectSummary
 } from "@/lib/api/playspace";
 import { playspaceApi } from "@/lib/api/playspace";
+import { useAuthSession } from "@/components/app/auth-session-provider";
 import { type AuditActivityRow } from "@/components/dashboard/audits-table";
+import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DataTable } from "@/components/dashboard/data-table";
-import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import {
 	CollectionNamespaceBar,
@@ -58,6 +57,7 @@ import {
 } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -71,14 +71,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 // ── Workbook sheet mappers ──────────────────────────────────────────────────────
-// Each mapper flattens one entity into a labelled column shape for a workbook sheet.
-// The id/foreign-key columns are kept so the linked sheets re-join cleanly.
+// Manager exports include the auditor's full identity (name, email, demographics) -
+// consistent with the manager auditors view. Account columns are omitted because the
+// export is always scoped to the manager's own account.
 
-function projectSheetRecord(r: AdminProjectExportRecord): Record<string, unknown> {
+function projectSheetRecord(r: ManagerProjectExportRecord): Record<string, unknown> {
 	return {
 		project_id: r.project_id,
-		account_id: r.account_id,
-		account_name: r.account_name,
 		name: r.name,
 		overview: r.overview ?? "",
 		start_date: r.start_date ?? "",
@@ -96,7 +95,7 @@ function projectSheetRecord(r: AdminProjectExportRecord): Record<string, unknown
 	};
 }
 
-function placeSheetRecord(r: AdminPlaceExportRecord): Record<string, unknown> {
+function placeSheetRecord(r: ManagerPlaceExportRecord): Record<string, unknown> {
 	return {
 		place_id: r.place_id,
 		project_id: r.project_id,
@@ -104,8 +103,6 @@ function placeSheetRecord(r: AdminPlaceExportRecord): Record<string, unknown> {
 		project_overview: r.project_overview ?? "",
 		project_start_date: r.project_start_date ?? "",
 		project_end_date: r.project_end_date ?? "",
-		account_id: r.account_id,
-		account_name: r.account_name,
 		name: r.name,
 		address: r.address ?? "",
 		city: r.city ?? "",
@@ -128,31 +125,39 @@ function placeSheetRecord(r: AdminPlaceExportRecord): Record<string, unknown> {
 	};
 }
 
-function auditorSheetRecord(r: AdminAuditorExportRecord): Record<string, unknown> {
+function auditorSheetRecord(r: ManagerAuditorExportRecord): Record<string, unknown> {
 	return {
 		auditor_profile_id: r.auditor_profile_id,
-		account_id: r.account_id ?? "",
-		account_name: r.account_name ?? "",
 		auditor_code: r.auditor_code,
+		full_name: r.full_name,
+		email: r.email ?? "",
+		age_range: r.age_range ?? "",
+		gender: r.gender ?? "",
+		country: r.country ?? "",
+		role: r.role ?? "",
 		assignments_count: r.assignments_count,
 		completed_audits: r.completed_audits,
 		last_active_at: r.last_active_at ?? ""
 	};
 }
 
-function auditSheetRecord(r: AdminAuditExportRecord): Record<string, unknown> {
+function auditSheetRecord(r: ManagerAuditExportRecord): Record<string, unknown> {
 	return {
 		audit_id: r.audit_id,
 		audit_code: r.audit_code,
 		status: r.status,
 		execution_mode: r.execution_mode ?? "",
-		account_id: r.account_id,
-		account_name: r.account_name,
 		project_id: r.project_id,
 		project_name: r.project_name,
 		place_id: r.place_id,
 		place_name: r.place_name,
 		auditor_code: r.auditor_code,
+		auditor_full_name: r.auditor_full_name,
+		auditor_email: r.auditor_email ?? "",
+		auditor_age_range: r.auditor_age_range ?? "",
+		auditor_gender: r.auditor_gender ?? "",
+		auditor_country: r.auditor_country ?? "",
+		auditor_role: r.auditor_role ?? "",
 		started_at: r.started_at,
 		submitted_at: r.submitted_at ?? "",
 		summary_score: r.summary_score ?? "",
@@ -165,9 +170,12 @@ function auditSheetRecord(r: AdminAuditExportRecord): Record<string, unknown> {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function AdminRawDataPage() {
+export default function ManagerRawDataPage() {
 	const formatT = useTranslations("common.format");
-	const t = useTranslations("admin.rawData");
+	const t = useTranslations("manager.rawData");
+	const session = useAuthSession();
+	const accountId = session?.role === "manager" ? session.accountId : null;
+
 	const [activeEntity, setActiveEntity] = React.useState<ExportEntity>("projects");
 	const [isExporting, setIsExporting] = React.useState(false);
 
@@ -201,10 +209,8 @@ export default function AdminRawDataPage() {
 
 	const clearSelection = React.useCallback(() => setSelectedRowIds(new Set()), []);
 
-	// ── Shared dropdown filter state (reset on tab change) ───────────────────
-	const [accountIds, setAccountIds] = React.useState<string[]>([]);
+	// ── Scoped dropdown filter state (reset on tab change) ───────────────────
 	const [projectIds, setProjectIds] = React.useState<string[]>([]);
-	// Places-only axis filters
 	const [auditStatuses, setAuditStatuses] = React.useState<string[]>([]);
 	const [surveyStatuses, setSurveyStatuses] = React.useState<string[]>([]);
 	// Audits-tab submission status filter (IN_PROGRESS / PAUSED / SUBMITTED)
@@ -220,7 +226,6 @@ export default function AdminRawDataPage() {
 	const handleEntityChange = React.useCallback((entity: string) => {
 		setActiveEntity(entity as ExportEntity);
 		setSelectedRowIds(new Set());
-		setAccountIds([]);
 		setProjectIds([]);
 		setAuditStatuses([]);
 		setSurveyStatuses([]);
@@ -233,12 +238,10 @@ export default function AdminRawDataPage() {
 
 	// Reset pagination when filters/sort change
 	const sortParam = toBackendSortParam(sorting);
-	const accountIdsKey = accountIds.join("|");
 	const projectIdsKey = projectIds.join("|");
 	const auditStatusesKey = auditStatuses.join("|");
 	const surveyStatusesKey = surveyStatuses.join("|");
 
-	// Search comes from the table's built-in search box
 	const searchColumnId = activeEntity === "audits" || activeEntity === "reports" ? "audit_code" : "name";
 	const searchValue = getTextColumnFilterValue(columnFilters, searchColumnId);
 
@@ -250,7 +253,6 @@ export default function AdminRawDataPage() {
 	const [prevDeps, setPrevDeps] = React.useState({
 		searchValue,
 		sortParam,
-		accountIdsKey,
 		projectIdsKey,
 		auditStatusesKey,
 		surveyStatusesKey
@@ -258,37 +260,30 @@ export default function AdminRawDataPage() {
 	if (
 		searchValue !== prevDeps.searchValue ||
 		sortParam !== prevDeps.sortParam ||
-		accountIdsKey !== prevDeps.accountIdsKey ||
 		projectIdsKey !== prevDeps.projectIdsKey ||
 		auditStatusesKey !== prevDeps.auditStatusesKey ||
 		surveyStatusesKey !== prevDeps.surveyStatusesKey
 	) {
-		setPrevDeps({ searchValue, sortParam, accountIdsKey, projectIdsKey, auditStatusesKey, surveyStatusesKey });
+		setPrevDeps({ searchValue, sortParam, projectIdsKey, auditStatusesKey, surveyStatusesKey });
 		setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
 	}
 
-	// ── Filter option queries ─────────────────────────────────────────────────
-	const accountsQuery = useQuery({
-		queryKey: ["playspace", "admin", "raw-data", "accounts-for-filter"],
-		queryFn: () => playspaceApi.admin.accounts({ pageSize: 100, accountTypes: ["MANAGER"] }),
-		staleTime: 5 * 60_000
-	});
-	const accountOptions = React.useMemo(
-		() => (accountsQuery.data?.items ?? []).map(a => ({ label: a.name, value: a.account_id })),
-		[accountsQuery.data]
-	);
-
+	// ── Filter option queries (account-scoped) ────────────────────────────────
+	// The full project list doubles as the Projects-tab preview data (client-paginated)
+	// and as the project filter options for the Places/Reports tabs.
 	const projectsListQuery = useQuery({
-		queryKey: ["playspace", "admin", "raw-data", "projects-for-filter"],
-		queryFn: () => playspaceApi.admin.projects({ pageSize: 100 }),
+		queryKey: ["playspace", "manager", "raw-data", "projects", accountId],
+		queryFn: async (): Promise<ProjectSummary[]> => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			return playspaceApi.accounts.projects(accountId);
+		},
+		enabled: accountId !== null,
 		staleTime: 5 * 60_000
 	});
 	const projectOptions = React.useMemo(
-		() =>
-			(projectsListQuery.data?.items ?? []).map(p => ({
-				label: `${p.account_name} · ${p.name}`,
-				value: p.project_id
-			})),
+		() => (projectsListQuery.data ?? []).map(p => ({ label: p.name, value: p.id })),
 		[projectsListQuery.data]
 	);
 
@@ -311,38 +306,35 @@ export default function AdminRawDataPage() {
 		[]
 	);
 
-	// ── Preview queries (each enabled only for its active tab) ────────────────
-	type PreviewResult =
-		| PaginatedResponse<AdminProjectRow>
-		| PaginatedResponse<AdminPlaceRow>
-		| PaginatedResponse<AdminAuditRow>;
-
-	const previewQuery = useQuery<PreviewResult>({
+	// ── Server-paginated preview (places / audits / reports) ──────────────────
+	const serverPreviewQuery = useQuery({
 		queryKey: [
 			"playspace",
-			"admin",
+			"manager",
 			"raw-data-preview",
+			accountId,
 			activeEntity,
 			pagination.pageIndex,
 			pagination.pageSize,
 			searchValue,
 			groupedSearch,
 			sortParam,
-			accountIds,
 			projectIds,
 			auditStatuses,
 			surveyStatuses,
 			auditStatusList
 		],
-		queryFn: async (): Promise<PreviewResult> => {
-			// Projects/Places preview as a server-paginated table; Audits/Reports load
-			// the full scoped set (up to 200) for the place-grouped, expandable view.
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			// Audits/Reports load the full scoped set (up to 200) for the place-grouped,
+			// expandable view; Places stays a server-paginated table.
 			if (activeEntity === "audits" || activeEntity === "reports") {
-				return playspaceApi.admin.audits({
+				return playspaceApi.accounts.audits(accountId, {
 					page: 1,
 					pageSize: 200,
 					search: groupedSearch || undefined,
-					accountIds: accountIds.length > 0 ? accountIds : undefined,
 					projectIds: projectIds.length > 0 ? projectIds : undefined,
 					statuses:
 						activeEntity === "reports"
@@ -350,37 +342,37 @@ export default function AdminRawDataPage() {
 							: auditStatusFilter.length > 0
 								? auditStatusFilter
 								: undefined
-				} satisfies AdminAuditsQuery);
+				} satisfies ManagerAuditsQuery);
 			}
 			const base = {
 				page: pagination.pageIndex + 1,
 				pageSize: pagination.pageSize,
 				search: searchValue || undefined,
 				sort: sortParam,
-				accountIds: accountIds.length > 0 ? accountIds : undefined
+				projectIds: projectIds.length > 0 ? projectIds : undefined
 			};
 			if (activeEntity === "places") {
-				return playspaceApi.admin.places({
+				return playspaceApi.accounts.places(accountId, {
 					...base,
-					projectIds: projectIds.length > 0 ? projectIds : undefined,
 					auditStatuses: auditStatuses.length > 0 ? auditStatuses : undefined,
 					surveyStatuses: surveyStatuses.length > 0 ? surveyStatuses : undefined
-				} satisfies AdminPlacesQuery);
+				} satisfies ManagerPlacesQuery);
 			}
-			return playspaceApi.admin.projects(base satisfies AdminProjectsQuery);
+			// Projects are client-paginated from projectsListQuery; this branch is unused.
+			return playspaceApi.accounts.places(accountId, base satisfies ManagerPlacesQuery);
 		},
+		enabled: accountId !== null && activeEntity !== "projects",
 		placeholderData: preservePreviousData
 	});
 
-	// Map AdminAuditRow → AuditActivityRow for the audits/reports tabs
+	// Map ManagerAuditRow → AuditActivityRow for the audits/reports tabs
 	const auditRows = React.useMemo((): AuditActivityRow[] => {
 		if (activeEntity !== "audits" && activeEntity !== "reports") return [];
-		return ((previewQuery.data?.items as AdminAuditRow[] | undefined) ?? []).map(audit => ({
+		return ((serverPreviewQuery.data?.items as ManagerAuditRow[] | undefined) ?? []).map(audit => ({
 			id: audit.audit_id,
 			auditCode: audit.audit_code,
 			status: audit.status,
 			auditorCode: audit.auditor_code,
-			accountName: audit.account_name,
 			projectName: audit.project_name,
 			projectId: audit.project_id,
 			placeName: audit.place_name,
@@ -391,39 +383,37 @@ export default function AdminRawDataPage() {
 			score: audit.summary_score,
 			scorePair: audit.score_pair
 		}));
-	}, [activeEntity, previewQuery.data]);
+	}, [activeEntity, serverPreviewQuery.data]);
 
 	// ── Export ────────────────────────────────────────────────────────────────
-	// Audits/Reports search from the grouped view's box; Projects/Places from the table.
+	// Audits/Reports search from the grouped view's box; Places from the table.
 	const effectiveSearch = activeEntity === "audits" || activeEntity === "reports" ? groupedSearch : searchValue;
-	const exportQuery = React.useMemo<AdminExportQuery>(
+	const exportQuery = React.useMemo<ManagerExportQuery>(
 		() => ({
 			search: effectiveSearch.trim() || undefined,
-			accountIds: accountIds.length > 0 ? accountIds : undefined,
 			projectIds: projectIds.length > 0 ? projectIds : undefined,
 			statuses: auditStatusFilter.length > 0 ? auditStatusFilter : undefined,
 			auditStatuses: auditStatuses.length > 0 ? auditStatuses : undefined,
 			surveyStatuses: surveyStatuses.length > 0 ? surveyStatuses : undefined
 		}),
-		[effectiveSearch, accountIds, projectIds, auditStatusFilter, auditStatuses, surveyStatuses]
+		[effectiveSearch, projectIds, auditStatusFilter, auditStatuses, surveyStatuses]
 	);
 
 	/**
-	 * Export the scoped relational bundle for the active tab.
-	 *
-	 * Projects/Places emit a multi-sheet workbook (parent level + every descendant
-	 * level as linked sheets). Audits/Reports are leaf levels and emit a single sheet.
-	 * `query` carries the scope: explicit ids for "Export selected", active filters
-	 * for "Export all".
+	 * Export the scoped relational bundle for the active tab, scoped to the
+	 * manager's own account. Projects/Places emit a multi-sheet workbook (parent
+	 * level + every descendant level). Audits/Reports are leaf single sheets. Every
+	 * auditor/audit sheet carries the full auditor identity.
 	 */
 	const runExport = React.useCallback(
-		async (format: ExportFormat, query: AdminExportQuery, suffix: string) => {
+		async (format: ExportFormat, query: ManagerExportQuery, suffix: string) => {
+			if (!accountId) return;
 			setIsExporting(true);
 			try {
 				const timestamp = new Date().toISOString().slice(0, 10);
 				switch (activeEntity) {
 					case "projects": {
-						const bundle = await playspaceApi.admin.exportProjectsBundle(query);
+						const bundle = await playspaceApi.accounts.exportProjectsBundle(accountId, query);
 						const sheets: WorkbookSheet[] = [
 							{ sheetName: "Projects", records: bundle.projects.map(projectSheetRecord) },
 							{ sheetName: "Places", records: bundle.places.map(placeSheetRecord) },
@@ -437,7 +427,7 @@ export default function AdminRawDataPage() {
 						break;
 					}
 					case "places": {
-						const bundle = await playspaceApi.admin.exportPlacesBundle(query);
+						const bundle = await playspaceApi.accounts.exportPlacesBundle(accountId, query);
 						const sheets: WorkbookSheet[] = [
 							{ sheetName: "Places", records: bundle.places.map(placeSheetRecord) },
 							{ sheetName: "Auditors", records: bundle.auditors.map(auditorSheetRecord) },
@@ -450,7 +440,7 @@ export default function AdminRawDataPage() {
 						break;
 					}
 					case "audits": {
-						const result = await playspaceApi.admin.exportAudits(query);
+						const result = await playspaceApi.accounts.exportAudits(accountId, query);
 						await downloadSingleSheet(
 							result.records.map(auditSheetRecord),
 							format,
@@ -460,7 +450,7 @@ export default function AdminRawDataPage() {
 						break;
 					}
 					case "reports": {
-						const result = await playspaceApi.admin.exportReports(query);
+						const result = await playspaceApi.accounts.exportReports(accountId, query);
 						await downloadSingleSheet(
 							result.records.map(auditSheetRecord),
 							format,
@@ -474,7 +464,7 @@ export default function AdminRawDataPage() {
 				setIsExporting(false);
 			}
 		},
-		[activeEntity]
+		[accountId, activeEntity]
 	);
 
 	/** Export all matching documents (full dataset, server-fetched). */
@@ -483,15 +473,11 @@ export default function AdminRawDataPage() {
 		[runExport, exportQuery]
 	);
 
-	/**
-	 * Export only the currently-selected rows. The selected ids define the export
-	 * scope; the bundle endpoint returns the full descendant hierarchy for them,
-	 * so selected-export is as deep and authoritative as export-all.
-	 */
+	/** Export only the currently-selected rows (selected ids define the scope). */
 	const handleExportSelected = React.useCallback(
 		(format: ExportFormat) => {
 			const ids = Array.from(selectedRowIds);
-			const scopedQuery: AdminExportQuery =
+			const scopedQuery: ManagerExportQuery =
 				activeEntity === "projects"
 					? { projectIds: ids }
 					: activeEntity === "places"
@@ -504,20 +490,20 @@ export default function AdminRawDataPage() {
 
 	/**
 	 * Export the audits/reports selected inside the place-grouped view. The leaf
-	 * export endpoint returns the full rich rows for the active filters; we keep
-	 * only the selected audit ids and write a single sheet.
+	 * export endpoint returns the full rich rows (with full auditor identity) for
+	 * the active filters; we keep only the selected audit ids and write one sheet.
 	 */
 	const handleExportGroupedSelected = React.useCallback(
 		async (selectedAuditIds: string[]) => {
-			if (selectedAuditIds.length === 0) return;
+			if (!accountId || selectedAuditIds.length === 0) return;
 			setIsExporting(true);
 			try {
 				const timestamp = new Date().toISOString().slice(0, 10);
 				const idSet = new Set(selectedAuditIds);
 				const result =
 					activeEntity === "reports"
-						? await playspaceApi.admin.exportReports(exportQuery)
-						: await playspaceApi.admin.exportAudits(exportQuery);
+						? await playspaceApi.accounts.exportReports(accountId, exportQuery)
+						: await playspaceApi.accounts.exportAudits(accountId, exportQuery);
 				const records = result.records.filter(r => idSet.has(r.audit_id)).map(auditSheetRecord);
 				await downloadSingleSheet(
 					records,
@@ -529,23 +515,21 @@ export default function AdminRawDataPage() {
 				setIsExporting(false);
 			}
 		},
-		[activeEntity, exportQuery]
+		[accountId, activeEntity, exportQuery]
 	);
 
 	// ── Column definitions ────────────────────────────────────────────────────
 
-	// Current-page items for select-all header logic
-	const projectColumns = React.useMemo<ColumnDef<AdminProjectRow>[]>(() => {
-		const projectPageItems = (previewQuery.data?.items as AdminProjectRow[] | undefined) ?? [];
+	const projectColumns = React.useMemo<ColumnDef<ProjectSummary>[]>(() => {
+		const pageItems = projectsListQuery.data ?? [];
 		return [
-			// ── Selection column ──────────────────────────────────────────────
 			{
 				id: "select",
 				size: 40,
 				enableSorting: false,
 				enableHiding: false,
 				header: () => {
-					const ids = projectPageItems.map(r => r.project_id);
+					const ids = pageItems.map(r => r.id);
 					const allSelected = ids.length > 0 && ids.every(id => selectedRowIds.has(id));
 					const someSelected = ids.some(id => selectedRowIds.has(id));
 					return (
@@ -553,13 +537,13 @@ export default function AdminRawDataPage() {
 							checked={allSelected}
 							data-state={someSelected && !allSelected ? "indeterminate" : undefined}
 							onCheckedChange={() => togglePageSelection(ids)}
-							aria-label="Select all on this page"
+							aria-label="Select all projects"
 							className="translate-y-px"
 						/>
 					);
 				},
 				cell: ({ row }) => {
-					const id = row.original.project_id;
+					const id = row.original.id;
 					return (
 						<Checkbox
 							checked={selectedRowIds.has(id)}
@@ -570,15 +554,16 @@ export default function AdminRawDataPage() {
 					);
 				}
 			},
-			// ── Data columns ──────────────────────────────────────────────────
 			{
 				id: "name",
-				accessorFn: row => `${row.name} ${row.account_name}`,
+				accessorFn: row => row.name,
 				header: ({ column }) => <DataTableColumnHeader column={column} title="Project" />,
 				cell: ({ row }) => (
 					<div className="min-w-[240px] space-y-1">
 						<p className="font-medium text-foreground">{row.original.name}</p>
-						<p className="text-sm text-muted-foreground">{row.original.account_name}</p>
+						{row.original.overview ? (
+							<p className="line-clamp-1 text-sm text-muted-foreground">{row.original.overview}</p>
+						) : null}
 					</div>
 				),
 				enableHiding: false
@@ -622,19 +607,18 @@ export default function AdminRawDataPage() {
 				)
 			}
 		];
-	}, [formatT, selectedRowIds, previewQuery.data, toggleRowSelection, togglePageSelection]);
+	}, [formatT, selectedRowIds, projectsListQuery.data, toggleRowSelection, togglePageSelection]);
 
-	const placeColumns = React.useMemo<ColumnDef<AdminPlaceRow>[]>(() => {
-		const placePageItems = (previewQuery.data?.items as AdminPlaceRow[] | undefined) ?? [];
+	const placeColumns = React.useMemo<ColumnDef<ManagerPlaceRow>[]>(() => {
+		const pageItems = (serverPreviewQuery.data?.items as ManagerPlaceRow[] | undefined) ?? [];
 		return [
-			// ── Selection column ──────────────────────────────────────────────
 			{
 				id: "select",
 				size: 40,
 				enableSorting: false,
 				enableHiding: false,
 				header: () => {
-					const ids = placePageItems.map(r => r.place_id);
+					const ids = pageItems.map(r => r.id);
 					const allSelected = ids.length > 0 && ids.every(id => selectedRowIds.has(id));
 					const someSelected = ids.some(id => selectedRowIds.has(id));
 					return (
@@ -648,7 +632,7 @@ export default function AdminRawDataPage() {
 					);
 				},
 				cell: ({ row }) => {
-					const id = row.original.place_id;
+					const id = row.original.id;
 					return (
 						<Checkbox
 							checked={selectedRowIds.has(id)}
@@ -659,11 +643,10 @@ export default function AdminRawDataPage() {
 					);
 				}
 			},
-			// ── Data columns ──────────────────────────────────────────────────
 			{
 				id: "name",
 				accessorFn: row =>
-					`${row.name} ${row.address ?? ""} ${row.project_name} ${row.account_name} ${[row.city, row.province, row.country].filter(Boolean).join(" ")}`,
+					`${row.name} ${row.address ?? ""} ${row.project_name} ${[row.city, row.province, row.country].filter(Boolean).join(" ")}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title="Place" />,
 				cell: ({ row }) => (
 					<div className="min-w-[260px] space-y-1">
@@ -671,9 +654,7 @@ export default function AdminRawDataPage() {
 						{row.original.address ? (
 							<p className="text-sm text-muted-foreground">{row.original.address}</p>
 						) : null}
-						<p className="text-sm text-muted-foreground">
-							{row.original.account_name} · {row.original.project_name}
-						</p>
+						<p className="text-sm text-muted-foreground">{row.original.project_name}</p>
 						<p className="text-sm text-muted-foreground">
 							{[row.original.city, row.original.province, row.original.country]
 								.filter((p): p is string => Boolean(p))
@@ -734,14 +715,15 @@ export default function AdminRawDataPage() {
 				)
 			}
 		];
-	}, [formatT, selectedRowIds, previewQuery.data, toggleRowSelection, togglePageSelection]);
+	}, [formatT, selectedRowIds, serverPreviewQuery.data, toggleRowSelection, togglePageSelection]);
 
-	// ── Shared table props ────────────────────────────────────────────────────
+	// ── Table props (projects = client, others = server) ──────────────────────
+	const isProjects = activeEntity === "projects";
+	const totalCount = isProjects ? projectsListQuery.data?.length : serverPreviewQuery.data?.total_count;
+	const isFetching = isProjects ? projectsListQuery.isFetching : serverPreviewQuery.isFetching;
 
-	const totalCount = previewQuery.data?.total_count;
-
-	const sharedTableProps = {
-		isFetching: previewQuery.isFetching,
+	const serverTableProps = {
+		isFetching: serverPreviewQuery.isFetching,
 		pageSize: pagination.pageSize,
 		sortingState: sorting,
 		onSortingStateChange: setSorting,
@@ -752,11 +734,10 @@ export default function AdminRawDataPage() {
 		manualPagination: true,
 		manualSorting: true,
 		manualFiltering: true,
-		rowCount: totalCount,
-		pageCount: previewQuery.data?.total_pages
+		rowCount: serverPreviewQuery.data?.total_count,
+		pageCount: serverPreviewQuery.data?.total_pages
 	} as const;
 
-	// Description with record count
 	function makeDescription(entity: string): string {
 		if (totalCount === undefined) return t("table.descriptionLoading", { entity });
 		if (totalCount > 10_000) return t("table.descriptionCapped", { count: totalCount.toLocaleString() });
@@ -764,19 +745,8 @@ export default function AdminRawDataPage() {
 	}
 
 	// ── Toolbar extras ────────────────────────────────────────────────────────
-
 	const hasDropdownFilters =
-		accountIds.length + projectIds.length + auditStatuses.length + surveyStatuses.length + auditStatusList.length >
-		0;
-
-	const accountFilter = (
-		<FilterPopover
-			title={t("filters.account")}
-			options={accountOptions}
-			selectedValues={accountIds}
-			onChange={setAccountIds}
-		/>
-	);
+		projectIds.length + auditStatuses.length + surveyStatuses.length + auditStatusList.length > 0;
 	const projectFilter = (
 		<FilterPopover
 			title={t("filters.project")}
@@ -800,7 +770,6 @@ export default function AdminRawDataPage() {
 			size="sm"
 			className="gap-1.5"
 			onClick={() => {
-				setAccountIds([]);
 				setProjectIds([]);
 				setAuditStatuses([]);
 				setSurveyStatuses([]);
@@ -813,6 +782,27 @@ export default function AdminRawDataPage() {
 
 	const selectedCount = selectedRowIds.size;
 
+	if (accountId === null) {
+		return (
+			<div className="space-y-6">
+				<DashboardHeader
+					eyebrow={t("eyebrow")}
+					title={t("title")}
+					description={t("description")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumb") }
+					]}
+				/>
+				<Card>
+					<CardContent className="py-10 text-center text-sm text-muted-foreground">
+						{t("accountUnavailable")}
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
+
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
@@ -820,7 +810,7 @@ export default function AdminRawDataPage() {
 				title={t("title")}
 				description={t("description")}
 				breadcrumbs={[
-					{ label: t("breadcrumbs.dashboard"), href: "/admin/dashboard" },
+					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
 					{ label: t("breadcrumb") }
 				]}
 				actions={
@@ -836,7 +826,6 @@ export default function AdminRawDataPage() {
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="min-w-56">
-							{/* Export all (filtered) */}
 							<DropdownMenuLabel className="font-normal text-muted-foreground">
 								<span className="font-mono text-xs">
 									{totalCount !== undefined
@@ -855,7 +844,6 @@ export default function AdminRawDataPage() {
 								{t("export.csvParentOnly")}
 							</DropdownMenuItem>
 
-							{/* Export selected - only shown when rows are checked */}
 							{selectedCount > 0 && (
 								<>
 									<DropdownMenuSeparator />
@@ -901,13 +889,13 @@ export default function AdminRawDataPage() {
 					</TabsTrigger>
 				</TabsList>
 
-				{/* Projects */}
+				{/* Projects (client-paginated) */}
 				<TabsContent value="projects" className="mt-4 space-y-3">
 					<CollectionNamespaceBar
 						entityLabel={t("tabs.projects").toLowerCase()}
 						totalCount={totalCount}
 						selectedCount={selectedCount}
-						isFetching={previewQuery.isFetching}
+						isFetching={isFetching}
 						onClearSelection={clearSelection}
 					/>
 					<SelectionBar
@@ -920,17 +908,11 @@ export default function AdminRawDataPage() {
 						title={t("tabs.projects")}
 						description={makeDescription(t("tabs.projects").toLowerCase())}
 						columns={projectColumns}
-						data={(previewQuery.data?.items as AdminProjectRow[] | undefined) ?? []}
+						data={projectsListQuery.data ?? []}
 						searchColumnId="name"
 						searchPlaceholder={t("table.searchProjects")}
-						toolbarExtra={
-							<>
-								{accountFilter}
-								{clearButton}
-							</>
-						}
+						isFetching={projectsListQuery.isFetching}
 						emptyMessage={t("table.emptyProjects")}
-						{...sharedTableProps}
 					/>
 				</TabsContent>
 
@@ -940,7 +922,7 @@ export default function AdminRawDataPage() {
 						entityLabel={t("tabs.places").toLowerCase()}
 						totalCount={totalCount}
 						selectedCount={selectedCount}
-						isFetching={previewQuery.isFetching}
+						isFetching={isFetching}
 						onClearSelection={clearSelection}
 					/>
 					<SelectionBar
@@ -953,12 +935,11 @@ export default function AdminRawDataPage() {
 						title={t("tabs.places")}
 						description={makeDescription(t("tabs.places").toLowerCase())}
 						columns={placeColumns}
-						data={(previewQuery.data?.items as AdminPlaceRow[] | undefined) ?? []}
+						data={(serverPreviewQuery.data?.items as ManagerPlaceRow[] | undefined) ?? []}
 						searchColumnId="name"
 						searchPlaceholder={t("table.searchPlaces")}
 						toolbarExtra={
 							<>
-								{accountFilter}
 								{projectFilter}
 								<FilterPopover
 									title={t("filters.auditStatus")}
@@ -976,7 +957,7 @@ export default function AdminRawDataPage() {
 							</>
 						}
 						emptyMessage={t("table.emptyPlaces")}
-						{...sharedTableProps}
+						{...serverTableProps}
 					/>
 				</TabsContent>
 
@@ -984,16 +965,15 @@ export default function AdminRawDataPage() {
 				<TabsContent value="audits" className="mt-4 space-y-3">
 					<GroupedReportsView
 						rows={auditRows}
-						basePath="/admin/audits"
-						rolePrefix="admin"
+						basePath="/manager/audits"
+						rolePrefix="manager"
 						variant="audits"
 						searchValue={groupedSearch}
 						onSearchValueChange={setGroupedSearch}
-						isSearching={previewQuery.isFetching}
+						isSearching={serverPreviewQuery.isFetching}
 						onExportSelected={ids => void handleExportGroupedSelected(ids)}
 						toolbarFilters={
 							<>
-								{accountFilter}
 								{projectFilter}
 								{auditStatusFilterPopover}
 								{clearButton}
@@ -1006,16 +986,15 @@ export default function AdminRawDataPage() {
 				<TabsContent value="reports" className="mt-4 space-y-3">
 					<GroupedReportsView
 						rows={auditRows}
-						basePath="/admin/reports"
-						rolePrefix="admin"
+						basePath="/manager/reports"
+						rolePrefix="manager"
 						variant="reports"
 						searchValue={groupedSearch}
 						onSearchValueChange={setGroupedSearch}
-						isSearching={previewQuery.isFetching}
+						isSearching={serverPreviewQuery.isFetching}
 						onExportSelected={ids => void handleExportGroupedSelected(ids)}
 						toolbarFilters={
 							<>
-								{accountFilter}
 								{projectFilter}
 								{clearButton}
 							</>

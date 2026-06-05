@@ -12,7 +12,7 @@ import {
  * instrument's Unicode punctuation into ASCII-safe equivalents before drawing.
  */
 test("normalizePromptTypographyForPdf replaces unsupported punctuation with ASCII", () => {
-	const value = "well‑being improves stimulation—such as “quotes”, dashes – and minus − signs";
+	const value = "well‑being improves stimulation-such as “quotes”, dashes – and minus − signs";
 
 	assert.equal(
 		normalizePromptTypographyForPdf(value),
@@ -26,7 +26,7 @@ test("normalizePromptTypographyForPdf replaces unsupported punctuation with ASCI
  */
 test("normalizePromptSegmentsForPdf preserves bold segments while normalizing text", () => {
 	const raw =
-		"**Sensory Qualities & Regulation:** evaluates how well a space supports comfort, well‑being, and stimulation—such as “visual” cues.";
+		"**Sensory Qualities & Regulation:** evaluates how well a space supports comfort, well‑being, and stimulation-such as “visual” cues.";
 
 	const normalizedSegments = normalizePromptSegmentsForPdf(parsePromptSegments(raw));
 
