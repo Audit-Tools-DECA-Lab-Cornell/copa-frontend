@@ -73,6 +73,7 @@ import {
 	type AdminAuditsExportResponse,
 	type AdminAuditsQuery,
 	type AdminExportQuery,
+	type ExportReadyNotifyPayload,
 	type AdminOverview,
 	type AdminPlaceRow,
 	type AdminPlacesExportBundle,
@@ -286,6 +287,18 @@ function buildQueryString(params: Readonly<Record<string, QueryValue>>): string 
  * Playspace dashboard API surface used by the web app.
  */
 export const playspaceApi = {
+	exports: {
+		/**
+		 * Notify the requesting manager/admin by email that their raw-data export
+		 * finished building. Best-effort: the backend always returns 204, so a
+		 * delivery failure never surfaces as an export error.
+		 */
+		notifyReady: async (payload: ExportReadyNotifyPayload): Promise<void> =>
+			fetchNoContent("/playspace/exports/notify-ready", {
+				method: "POST",
+				body: JSON.stringify(payload)
+			})
+	},
 	accounts: {
 		get: async (accountId: string): Promise<AccountDetail> =>
 			fetchValidatedJson(`/playspace/accounts/${encodeURIComponent(accountId)}`, accountDetailSchema),

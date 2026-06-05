@@ -1264,6 +1264,19 @@ export interface AdminExportQuery {
 }
 
 /**
+ * Summary of a completed raw-data export, sent to the backend so it can email
+ * the requester a completion notice. The ZIP is generated in the browser, so
+ * this carries counts only - never the file itself.
+ */
+export interface ExportReadyNotifyPayload {
+	entity: "audits" | "reports" | "places" | "projects";
+	format: "xlsx" | "json";
+	audit_count: number;
+	combined_report_count?: number;
+	had_failures?: boolean;
+}
+
+/**
  * Manager export query - identical to AdminExportQuery minus accountIds
  * (manager exports are always scoped to the manager's own account).
  */
