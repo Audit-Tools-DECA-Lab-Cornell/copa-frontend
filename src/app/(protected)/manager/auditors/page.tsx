@@ -365,14 +365,14 @@ export default function ManagerAuditorsPage() {
 				initialValues={
 					editingAuditor
 						? {
-							email: editingAuditor.email,
-							fullName: editingAuditor.full_name,
-							auditorCode: editingAuditor.auditor_code,
-							role: editingAuditor.role,
-							ageRange: editingAuditor.age_range,
-							gender: editingAuditor.gender,
-							country: editingAuditor.country
-						}
+								email: editingAuditor.email,
+								fullName: editingAuditor.full_name,
+								auditorCode: editingAuditor.auditor_code,
+								role: editingAuditor.role,
+								ageRange: editingAuditor.age_range,
+								gender: editingAuditor.gender,
+								country: editingAuditor.country
+							}
 						: undefined
 				}
 				isPending={updateAuditor.isPending}

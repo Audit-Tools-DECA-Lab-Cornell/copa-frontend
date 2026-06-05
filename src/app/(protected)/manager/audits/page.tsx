@@ -380,20 +380,20 @@ export default function ManagerAuditsPage() {
 						{(selectedProjectIds.length > 0 ||
 							selectedPlaceIds.length > 0 ||
 							selectedAuditorIds.length > 0) && (
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									className="gap-1.5"
-									onClick={() => {
-										setSelectedProjectIds([]);
-										setSelectedPlaceIds([]);
-										setSelectedAuditorIds([]);
-									}}>
-									<XIcon className="size-3.5" />
-									Clear filters
-								</Button>
-							)}
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={() => {
+									setSelectedProjectIds([]);
+									setSelectedPlaceIds([]);
+									setSelectedAuditorIds([]);
+								}}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						)}
 					</>
 				}
 			/>
