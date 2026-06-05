@@ -25,7 +25,10 @@ export type {
 // ── Public API types ─────────────────────────────────────────────────────────
 
 /** The set of file formats a single audit can be exported as. */
-export type AuditExportFormat = "pdf" | "csv" | "xlsx";
+export type AuditExportFormat = "pdf" | "csv" | "xlsx" | "json";
+
+/** Structured-data formats the audit generators can produce. */
+export type AuditExportDataFormat = "xlsx" | "json";
 
 /** Geographic context attached to an audit export. */
 export interface AuditExportContext {
