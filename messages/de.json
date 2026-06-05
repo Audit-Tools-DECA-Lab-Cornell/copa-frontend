@@ -4,6 +4,16 @@
 		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) - strukturierte Audits zu Spielwert und Nutzbarkeit."
 	},
 	"common": {
+		"exportJobs": {
+			"eyebrow": "Export",
+			"preparing": "Export wird vorbereitet…",
+			"generating": "Dateien werden erstellt",
+			"compressing": "Archiv wird komprimiert…",
+			"downloaded": "Heruntergeladen",
+			"failed": "Export fehlgeschlagen",
+			"interrupted": "Export unterbrochen - bitte erneut versuchen",
+			"dismiss": "Schließen"
+		},
 		"roles": {
 			"administrator": "Administrator",
 			"manager": "Manager",
@@ -268,16 +278,12 @@
 				"clear": "Zurücksetzen"
 			},
 			"export": {
-				"button": "Exportieren",
+				"button": "PDF + Excel exportieren",
 				"exporting": "Wird exportiert…",
 				"allDocuments": "Alle Dokumente",
 				"xlsx": "Excel-Arbeitsmappe (.xlsx)",
-				"json": "JSON-Paket (.json)",
-				"csvParentOnly": "CSV - nur diese Ebene",
 				"selected": "{count} ausgewählt",
-				"selectedXlsx": "Auswahl als Excel",
-				"selectedJson": "Auswahl als JSON",
-				"selectedCsvParentOnly": "Auswahl als CSV - nur diese Ebene"
+				"selectedXlsx": "Auswahl als Excel"
 			},
 			"table": {
 				"searchProjects": "Nach Name oder Konto suchen…",
@@ -286,7 +292,9 @@
 				"emptyPlaces": "Keine Orte entsprechen den aktuellen Filtern.",
 				"descriptionLoading": "{entity} filtern und herunterladen.",
 				"description": "{count} Datensätze entsprechen den Filtern. Verwenden Sie Exportieren für den vollständigen Datensatz.",
-				"descriptionCapped": "{count} Datensätze entsprechen den Filtern - Downloads enthalten bis zu 10.000 übereinstimmende Zeilen. Verwenden Sie Exportieren für den vollständigen Datensatz."
+				"descriptionCapped": "{count} Datensätze entsprechen den Filtern - Downloads enthalten bis zu 10.000 übereinstimmende Zeilen. Verwenden Sie Exportieren für den vollständigen Datensatz.",
+				"auditExportDescription": "Wählen Sie eingereichte Audits aus, um sie als PDF- und Excel-Dateien zu exportieren. Laufende und pausierte Audits werden ausgeschlossen, da sie noch nicht exportiert werden können.",
+				"reportExportDescription": "Wählen Sie eingereichte Berichte aus, um sie als PDF- und Excel-Dateien zu exportieren. Ortsberichte werden im Berichtsbereich erstellt."
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard"
@@ -967,16 +975,12 @@
 				"clear": "Zurücksetzen"
 			},
 			"export": {
-				"button": "Exportieren",
+				"button": "PDF + Excel exportieren",
 				"exporting": "Wird exportiert…",
 				"allDocuments": "Alle Dokumente",
 				"xlsx": "Excel-Arbeitsmappe (.xlsx)",
-				"json": "JSON-Paket (.json)",
-				"csvParentOnly": "CSV - nur diese Ebene",
 				"selected": "{count} ausgewählt",
-				"selectedXlsx": "Auswahl als Excel",
-				"selectedJson": "Auswahl als JSON",
-				"selectedCsvParentOnly": "Auswahl als CSV - nur diese Ebene"
+				"selectedXlsx": "Auswahl als Excel"
 			},
 			"table": {
 				"searchProjects": "Nach Name suchen…",
@@ -985,7 +989,9 @@
 				"emptyPlaces": "Keine Orte entsprechen den aktuellen Filtern.",
 				"descriptionLoading": "{entity} filtern und herunterladen.",
 				"description": "{count} Datensätze entsprechen den Filtern. Verwenden Sie Exportieren für den vollständigen Datensatz.",
-				"descriptionCapped": "{count} Datensätze entsprechen den Filtern - Downloads enthalten bis zu 10.000 übereinstimmende Zeilen. Verwenden Sie Exportieren für den vollständigen Datensatz."
+				"descriptionCapped": "{count} Datensätze entsprechen den Filtern - Downloads enthalten bis zu 10.000 übereinstimmende Zeilen. Verwenden Sie Exportieren für den vollständigen Datensatz.",
+				"auditExportDescription": "Wählen Sie eingereichte Audits aus, um sie als PDF- und Excel-Dateien zu exportieren. Laufende und pausierte Audits werden ausgeschlossen, da sie noch nicht exportiert werden können.",
+				"reportExportDescription": "Wählen Sie eingereichte Berichte aus, um sie als PDF- und Excel-Dateien zu exportieren. Ortsberichte werden im Berichtsbereich erstellt."
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard"

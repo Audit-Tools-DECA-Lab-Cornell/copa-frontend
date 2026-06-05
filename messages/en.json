@@ -4,6 +4,16 @@
 		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool - structured outdoor playspace audits covering play value and usability."
 	},
 	"common": {
+		"exportJobs": {
+			"eyebrow": "Export",
+			"preparing": "Preparing export…",
+			"generating": "Generating files",
+			"compressing": "Compressing archive…",
+			"downloaded": "Downloaded",
+			"failed": "Export failed",
+			"interrupted": "Export interrupted - please retry",
+			"dismiss": "Dismiss"
+		},
 		"roles": {
 			"administrator": "Administrator",
 			"manager": "Manager",
@@ -268,16 +278,12 @@
 				"clear": "Clear"
 			},
 			"export": {
-				"button": "Export",
+				"button": "Export PDF + Excel",
 				"exporting": "Exporting…",
 				"allDocuments": "All documents",
 				"xlsx": "Excel workbook (.xlsx)",
-				"json": "JSON bundle (.json)",
-				"csvParentOnly": "CSV - this level only",
 				"selected": "{count} selected",
-				"selectedXlsx": "Selected as Excel",
-				"selectedJson": "Selected as JSON",
-				"selectedCsvParentOnly": "Selected as CSV - this level only"
+				"selectedXlsx": "Selected as Excel"
 			},
 			"table": {
 				"searchProjects": "Search by name or account…",
@@ -286,7 +292,9 @@
 				"emptyPlaces": "No places match the current filters.",
 				"descriptionLoading": "Filter and download {entity}.",
 				"description": "{count} records match filters. Use Export for the full dataset.",
-				"descriptionCapped": "{count} records match filters - downloads include up to 10,000 matching rows. Use Export for the full dataset."
+				"descriptionCapped": "{count} records match filters - downloads include up to 10,000 matching rows. Use Export for the full dataset.",
+				"auditExportDescription": "Select submitted audits to export as PDF and Excel files. In-progress and paused audits are excluded because they cannot be exported yet.",
+				"reportExportDescription": "Select submitted reports to export as PDF and Excel files. Place-report building is handled from the reports workspace."
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard"
@@ -993,16 +1001,12 @@
 				"clear": "Clear"
 			},
 			"export": {
-				"button": "Export",
+				"button": "Export PDF + Excel",
 				"exporting": "Exporting…",
 				"allDocuments": "All documents",
 				"xlsx": "Excel workbook (.xlsx)",
-				"json": "JSON bundle (.json)",
-				"csvParentOnly": "CSV - this level only",
 				"selected": "{count} selected",
-				"selectedXlsx": "Selected as Excel",
-				"selectedJson": "Selected as JSON",
-				"selectedCsvParentOnly": "Selected as CSV - this level only"
+				"selectedXlsx": "Selected as Excel"
 			},
 			"table": {
 				"searchProjects": "Search by name…",
@@ -1011,7 +1015,9 @@
 				"emptyPlaces": "No places match the current filters.",
 				"descriptionLoading": "Filter and download {entity}.",
 				"description": "{count} records match filters. Use Export for the full dataset.",
-				"descriptionCapped": "{count} records match filters - downloads include up to 10,000 matching rows. Use Export for the full dataset."
+				"descriptionCapped": "{count} records match filters - downloads include up to 10,000 matching rows. Use Export for the full dataset.",
+				"auditExportDescription": "Select submitted audits to export as PDF and Excel files. In-progress and paused audits are excluded because they cannot be exported yet.",
+				"reportExportDescription": "Select submitted reports to export as PDF and Excel files. Place-report building is handled from the reports workspace."
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard"

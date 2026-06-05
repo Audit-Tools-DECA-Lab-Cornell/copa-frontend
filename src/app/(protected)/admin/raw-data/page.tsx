@@ -36,14 +36,25 @@ import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view"
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import {
 	CollectionNamespaceBar,
-	downloadSingleSheet,
-	downloadWorkbook,
 	FilterPopover,
 	SelectionBar,
-	type ExportEntity,
-	type ExportFormat,
-	type WorkbookSheet
+	type ExportEntity
 } from "@/components/dashboard/raw-data-export";
+import { useExportJobs } from "@/components/dashboard/export-jobs-provider";
+import type { AuditExportDataFormat } from "@/lib/export/audit";
+import { createRichAuditSource } from "@/lib/export/rich-audit-source";
+import {
+	exportAuditsZip,
+	exportPlacesZip,
+	exportProjectsZip,
+	fetchSavedPlaceReportsViaHistory,
+	type AuditExportRow,
+	type ExportProgress,
+	type IndexSheet,
+	type PlaceExportRow,
+	type ProjectExportRow,
+	type RawDataZipContext
+} from "@/lib/export/raw-data-zip";
 import {
 	getTextColumnFilterValue,
 	preservePreviousData,
@@ -59,14 +70,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -163,13 +166,42 @@ function auditSheetRecord(r: AdminAuditExportRecord): Record<string, unknown> {
 	};
 }
 
+// ── ZIP orchestrator row mappers ────────────────────────────────────────────────
+// Project the export records down to the identity fields the ZIP folder tree needs.
+
+function toAuditRow(r: AdminAuditExportRecord): AuditExportRow {
+	return {
+		audit_id: r.audit_id,
+		audit_code: r.audit_code,
+		status: r.status,
+		place_id: r.place_id,
+		place_name: r.place_name,
+		project_id: r.project_id,
+		project_name: r.project_name
+	};
+}
+
+function toPlaceRow(r: AdminPlaceExportRecord): PlaceExportRow {
+	return {
+		place_id: r.place_id,
+		place_name: r.name,
+		project_id: r.project_id,
+		project_name: r.project_name
+	};
+}
+
+function toProjectRow(r: AdminProjectExportRecord): ProjectExportRow {
+	return { project_id: r.project_id, project_name: r.name };
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function AdminRawDataPage() {
 	const formatT = useTranslations("common.format");
 	const t = useTranslations("admin.rawData");
+	const exportJobs = useExportJobs();
+	const isExporting = exportJobs.activeCount > 0;
 	const [activeEntity, setActiveEntity] = React.useState<ExportEntity>("projects");
-	const [isExporting, setIsExporting] = React.useState(false);
 
 	// ── Row selection state ───────────────────────────────────────────────────
 	const [selectedRowIds, setSelectedRowIds] = React.useState<Set<string>>(new Set());
@@ -207,8 +239,6 @@ export default function AdminRawDataPage() {
 	// Places-only axis filters
 	const [auditStatuses, setAuditStatuses] = React.useState<string[]>([]);
 	const [surveyStatuses, setSurveyStatuses] = React.useState<string[]>([]);
-	// Audits-tab submission status filter (IN_PROGRESS / PAUSED / SUBMITTED)
-	const [auditStatusList, setAuditStatusList] = React.useState<string[]>([]);
 	// Search box for the grouped audits/reports view (drives the server query)
 	const [groupedSearch, setGroupedSearch] = React.useState("");
 
@@ -224,7 +254,6 @@ export default function AdminRawDataPage() {
 		setProjectIds([]);
 		setAuditStatuses([]);
 		setSurveyStatuses([]);
-		setAuditStatusList([]);
 		setGroupedSearch("");
 		setSorting([]);
 		setColumnFilters([]);
@@ -241,11 +270,6 @@ export default function AdminRawDataPage() {
 	// Search comes from the table's built-in search box
 	const searchColumnId = activeEntity === "audits" || activeEntity === "reports" ? "audit_code" : "name";
 	const searchValue = getTextColumnFilterValue(columnFilters, searchColumnId);
-
-	// Audits-tab status filter (validated to the known audit statuses).
-	const auditStatusFilter = auditStatusList.filter(
-		(v): v is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" => v === "IN_PROGRESS" || v === "PAUSED" || v === "SUBMITTED"
-	);
 
 	const [prevDeps, setPrevDeps] = React.useState({
 		searchValue,
@@ -301,16 +325,6 @@ export default function AdminRawDataPage() {
 		[formatT]
 	);
 
-	// Submission status options for the Audits tab.
-	const auditStatusOptions = React.useMemo(
-		() => [
-			{ label: "In progress", value: "IN_PROGRESS" },
-			{ label: "Paused", value: "PAUSED" },
-			{ label: "Submitted", value: "SUBMITTED" }
-		],
-		[]
-	);
-
 	// ── Preview queries (each enabled only for its active tab) ────────────────
 	type PreviewResult =
 		| PaginatedResponse<AdminProjectRow>
@@ -331,8 +345,7 @@ export default function AdminRawDataPage() {
 			accountIds,
 			projectIds,
 			auditStatuses,
-			surveyStatuses,
-			auditStatusList
+			surveyStatuses
 		],
 		queryFn: async (): Promise<PreviewResult> => {
 			// Projects/Places preview as a server-paginated table; Audits/Reports load
@@ -344,12 +357,7 @@ export default function AdminRawDataPage() {
 					search: groupedSearch || undefined,
 					accountIds: accountIds.length > 0 ? accountIds : undefined,
 					projectIds: projectIds.length > 0 ? projectIds : undefined,
-					statuses:
-						activeEntity === "reports"
-							? ["SUBMITTED"]
-							: auditStatusFilter.length > 0
-								? auditStatusFilter
-								: undefined
+					statuses: ["SUBMITTED"]
 				} satisfies AdminAuditsQuery);
 			}
 			const base = {
@@ -401,135 +409,162 @@ export default function AdminRawDataPage() {
 			search: effectiveSearch.trim() || undefined,
 			accountIds: accountIds.length > 0 ? accountIds : undefined,
 			projectIds: projectIds.length > 0 ? projectIds : undefined,
-			statuses: auditStatusFilter.length > 0 ? auditStatusFilter : undefined,
+			statuses: ["SUBMITTED"],
 			auditStatuses: auditStatuses.length > 0 ? auditStatuses : undefined,
 			surveyStatuses: surveyStatuses.length > 0 ? surveyStatuses : undefined
 		}),
-		[effectiveSearch, accountIds, projectIds, auditStatusFilter, auditStatuses, surveyStatuses]
+		[effectiveSearch, accountIds, projectIds, auditStatuses, surveyStatuses]
+	);
+
+	/** Builds the shared ZIP context, wiring scope-enforced data sources to the job's progress callback. */
+	const buildZipContext = React.useCallback(
+		(
+			format: AuditExportDataFormat,
+			fileBaseName: string,
+			onProgress: (progress: ExportProgress) => void
+		): RawDataZipContext => ({
+			role: "admin",
+			userId: null,
+			format,
+			filters: { ...exportQuery },
+			source: createRichAuditSource(),
+			fetchSavedPlaceReports: fetchSavedPlaceReportsViaHistory,
+			fileBaseName,
+			onProgress
+		}),
+		[exportQuery]
 	);
 
 	/**
-	 * Export the scoped relational bundle for the active tab.
-	 *
-	 * Projects/Places emit a multi-sheet workbook (parent level + every descendant
-	 * level as linked sheets). Audits/Reports are leaf levels and emit a single sheet.
-	 * `query` carries the scope: explicit ids for "Export selected", active filters
-	 * for "Export all".
+	 * Export the scoped selection for the active tab as a ZIP via the durable
+	 * export-jobs provider. Generation runs above the router, so it survives
+	 * client-side navigation; a floating indicator tracks progress and large
+	 * exports also send a completion email. Each submitted audit and combined
+	 * report contributes a PDF plus an Excel data file, placed
+	 * into a folder tree, alongside a relational `index` file and `manifest.json`.
+	 * `query` carries the scope: explicit ids for "Export selected", active
+	 * filters for "Export all".
 	 */
 	const runExport = React.useCallback(
-		async (format: ExportFormat, query: AdminExportQuery, suffix: string) => {
-			setIsExporting(true);
-			try {
-				const timestamp = new Date().toISOString().slice(0, 10);
-				switch (activeEntity) {
-					case "projects": {
+		(query: AdminExportQuery, suffix: string) => {
+			const dataFormat: AuditExportDataFormat = "xlsx";
+			const entity = activeEntity;
+			void exportJobs.startExport({
+				label: t(`tabs.${entity}`),
+				entity,
+				format: dataFormat,
+				run: async onProgress => {
+					const timestamp = new Date().toISOString().slice(0, 10);
+					const baseName = `playspace-${entity}${suffix}-${timestamp}`;
+					const ctx = buildZipContext(dataFormat, baseName, onProgress);
+					if (entity === "projects") {
 						const bundle = await playspaceApi.admin.exportProjectsBundle(query);
-						const sheets: WorkbookSheet[] = [
+						const indexSheets: IndexSheet[] = [
 							{ sheetName: "Projects", records: bundle.projects.map(projectSheetRecord) },
 							{ sheetName: "Places", records: bundle.places.map(placeSheetRecord) },
 							{ sheetName: "Auditors", records: bundle.auditors.map(auditorSheetRecord) },
 							{ sheetName: "Audits", records: bundle.audits.map(auditSheetRecord) }
 						];
-						await downloadWorkbook(sheets, format, `playspace-projects${suffix}-${timestamp}`, {
-							generated_at: bundle.generated_at,
-							scope: bundle.scope
+						const result = await exportProjectsZip({
+							projects: bundle.projects.map(toProjectRow),
+							places: bundle.places.map(toPlaceRow),
+							audits: bundle.audits.map(toAuditRow),
+							indexSheets,
+							ctx
 						});
-						break;
+						return { result, fileName: `${baseName}.zip` };
 					}
-					case "places": {
+					if (entity === "places") {
 						const bundle = await playspaceApi.admin.exportPlacesBundle(query);
-						const sheets: WorkbookSheet[] = [
+						const indexSheets: IndexSheet[] = [
 							{ sheetName: "Places", records: bundle.places.map(placeSheetRecord) },
 							{ sheetName: "Auditors", records: bundle.auditors.map(auditorSheetRecord) },
 							{ sheetName: "Audits", records: bundle.audits.map(auditSheetRecord) }
 						];
-						await downloadWorkbook(sheets, format, `playspace-places${suffix}-${timestamp}`, {
-							generated_at: bundle.generated_at,
-							scope: bundle.scope
+						const result = await exportPlacesZip({
+							places: bundle.places.map(toPlaceRow),
+							audits: bundle.audits.map(toAuditRow),
+							indexSheets,
+							ctx
 						});
-						break;
+						return { result, fileName: `${baseName}.zip` };
 					}
-					case "audits": {
-						const result = await playspaceApi.admin.exportAudits(query);
-						await downloadSingleSheet(
-							result.records.map(auditSheetRecord),
-							format,
-							`playspace-audits${suffix}-${timestamp}`,
-							"Audits"
-						);
-						break;
-					}
-					case "reports": {
-						const result = await playspaceApi.admin.exportReports(query);
-						await downloadSingleSheet(
-							result.records.map(auditSheetRecord),
-							format,
-							`playspace-reports${suffix}-${timestamp}`,
-							"Reports"
-						);
-						break;
-					}
+					const isReports = entity === "reports";
+					const exportData = isReports
+						? await playspaceApi.admin.exportReports(query)
+						: await playspaceApi.admin.exportAudits(query);
+					const result = await exportAuditsZip({
+						rows: exportData.records.map(toAuditRow),
+						indexSheets: [
+							{
+								sheetName: isReports ? "Reports" : "Audits",
+								records: exportData.records.map(auditSheetRecord)
+							}
+						],
+						entityLabel: isReports ? "reports" : "audits",
+						ctx
+					});
+					return { result, fileName: `${baseName}.zip` };
 				}
-			} finally {
-				setIsExporting(false);
-			}
+			});
 		},
-		[activeEntity]
+		[activeEntity, buildZipContext, exportJobs, t]
 	);
 
 	/** Export all matching documents (full dataset, server-fetched). */
-	const handleExportAll = React.useCallback(
-		(format: ExportFormat) => runExport(format, exportQuery, ""),
-		[runExport, exportQuery]
-	);
+	const handleExportAll = React.useCallback(() => runExport(exportQuery, ""), [runExport, exportQuery]);
 
 	/**
 	 * Export only the currently-selected rows. The selected ids define the export
-	 * scope; the bundle endpoint returns the full descendant hierarchy for them,
-	 * so selected-export is as deep and authoritative as export-all.
+	 * scope; the server resolves the full accessible hierarchy for them.
 	 */
-	const handleExportSelected = React.useCallback(
-		(format: ExportFormat) => {
-			const ids = Array.from(selectedRowIds);
-			const scopedQuery: AdminExportQuery =
-				activeEntity === "projects"
-					? { projectIds: ids }
-					: activeEntity === "places"
-						? { placeIds: ids }
-						: exportQuery;
-			return runExport(format, scopedQuery, "-selected");
-		},
-		[runExport, selectedRowIds, activeEntity, exportQuery]
-	);
+	const handleExportSelected = React.useCallback(() => {
+		const ids = Array.from(selectedRowIds);
+		const scopedQuery: AdminExportQuery =
+			activeEntity === "projects"
+				? { projectIds: ids }
+				: activeEntity === "places"
+					? { placeIds: ids }
+					: exportQuery;
+		return runExport(scopedQuery, "-selected");
+	}, [runExport, selectedRowIds, activeEntity, exportQuery]);
 
 	/**
-	 * Export the audits/reports selected inside the place-grouped view. The leaf
-	 * export endpoint returns the full rich rows for the active filters; we keep
-	 * only the selected audit ids and write a single sheet.
+	 * Export the audits/reports selected inside the place-grouped view as a ZIP.
+	 * The leaf export endpoint returns the rich rows for the active filters; we
+	 * keep only the selected audit ids. The grouped view asks for the structured
+	 * data format because PDFs are always included alongside that choice.
 	 */
 	const handleExportGroupedSelected = React.useCallback(
-		async (selectedAuditIds: string[]) => {
+		(selectedAuditIds: string[]) => {
 			if (selectedAuditIds.length === 0) return;
-			setIsExporting(true);
-			try {
-				const timestamp = new Date().toISOString().slice(0, 10);
-				const idSet = new Set(selectedAuditIds);
-				const result =
-					activeEntity === "reports"
+			const entity = activeEntity;
+			const isReports = entity === "reports";
+			void exportJobs.startExport({
+				label: t(`tabs.${entity}`),
+				entity,
+				format: "xlsx",
+				run: async onProgress => {
+					const timestamp = new Date().toISOString().slice(0, 10);
+					const baseName = `playspace-${entity}-selected-${timestamp}`;
+					const idSet = new Set(selectedAuditIds);
+					const exportData = isReports
 						? await playspaceApi.admin.exportReports(exportQuery)
 						: await playspaceApi.admin.exportAudits(exportQuery);
-				const records = result.records.filter(r => idSet.has(r.audit_id)).map(auditSheetRecord);
-				await downloadSingleSheet(
-					records,
-					"xlsx",
-					`playspace-${activeEntity}-selected-${timestamp}`,
-					activeEntity === "reports" ? "Reports" : "Audits"
-				);
-			} finally {
-				setIsExporting(false);
-			}
+					const records = exportData.records.filter(r => idSet.has(r.audit_id));
+					const result = await exportAuditsZip({
+						rows: records.map(toAuditRow),
+						indexSheets: [
+							{ sheetName: isReports ? "Reports" : "Audits", records: records.map(auditSheetRecord) }
+						],
+						entityLabel: isReports ? "reports" : "audits",
+						ctx: buildZipContext("xlsx", baseName, onProgress)
+					});
+					return { result, fileName: `${baseName}.zip` };
+				}
+			});
 		},
-		[activeEntity, exportQuery]
+		[activeEntity, exportQuery, buildZipContext, exportJobs, t]
 	);
 
 	// ── Column definitions ────────────────────────────────────────────────────
@@ -765,9 +800,7 @@ export default function AdminRawDataPage() {
 
 	// ── Toolbar extras ────────────────────────────────────────────────────────
 
-	const hasDropdownFilters =
-		accountIds.length + projectIds.length + auditStatuses.length + surveyStatuses.length + auditStatusList.length >
-		0;
+	const hasDropdownFilters = accountIds.length + projectIds.length + auditStatuses.length + surveyStatuses.length > 0;
 
 	const accountFilter = (
 		<FilterPopover
@@ -785,14 +818,6 @@ export default function AdminRawDataPage() {
 			onChange={setProjectIds}
 		/>
 	);
-	const auditStatusFilterPopover = (
-		<FilterPopover
-			title={t("filters.status")}
-			options={auditStatusOptions}
-			selectedValues={auditStatusList}
-			onChange={setAuditStatusList}
-		/>
-	);
 	const clearButton = hasDropdownFilters ? (
 		<Button
 			type="button"
@@ -804,7 +829,6 @@ export default function AdminRawDataPage() {
 				setProjectIds([]);
 				setAuditStatuses([]);
 				setSurveyStatuses([]);
-				setAuditStatusList([]);
 			}}>
 			<XIcon className="size-3.5" />
 			{t("filters.clear")}
@@ -824,60 +848,19 @@ export default function AdminRawDataPage() {
 					{ label: t("breadcrumb") }
 				]}
 				actions={
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button type="button" variant="default" className="gap-2" disabled={isExporting}>
-								{isExporting ? (
-									<Loader2Icon className="size-4 animate-spin" aria-hidden="true" />
-								) : (
-									<DownloadIcon className="size-4" aria-hidden="true" />
-								)}
-								{isExporting ? t("export.exporting") : t("export.button")}
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-56">
-							{/* Export all (filtered) */}
-							<DropdownMenuLabel className="font-normal text-muted-foreground">
-								<span className="font-mono text-xs">
-									{totalCount !== undefined
-										? `${totalCount.toLocaleString()} ${t("tabs." + activeEntity).toLowerCase()}`
-										: t("export.allDocuments")}
-								</span>
-							</DropdownMenuLabel>
-							<DropdownMenuItem onClick={() => void handleExportAll("xlsx")}>
-								{t("export.xlsx")}
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => void handleExportAll("json")}>
-								{t("export.json")}
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={() => void handleExportAll("csv")}>
-								{t("export.csvParentOnly")}
-							</DropdownMenuItem>
-
-							{/* Export selected - only shown when rows are checked */}
-							{selectedCount > 0 && (
-								<>
-									<DropdownMenuSeparator />
-									<DropdownMenuLabel className="font-normal text-muted-foreground">
-										<span className="font-mono text-xs">
-											{t("export.selected", { count: selectedCount })}
-										</span>
-									</DropdownMenuLabel>
-									<DropdownMenuItem onClick={() => void handleExportSelected("xlsx")}>
-										{t("export.selectedXlsx")}
-									</DropdownMenuItem>
-									<DropdownMenuItem onClick={() => void handleExportSelected("json")}>
-										{t("export.selectedJson")}
-									</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem onClick={() => void handleExportSelected("csv")}>
-										{t("export.selectedCsvParentOnly")}
-									</DropdownMenuItem>
-								</>
-							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<Button
+						type="button"
+						variant="default"
+						className="gap-2"
+						disabled={isExporting}
+						onClick={handleExportAll}>
+						{isExporting ? (
+							<Loader2Icon className="size-4 animate-spin" aria-hidden="true" />
+						) : (
+							<DownloadIcon className="size-4" aria-hidden="true" />
+						)}
+						{isExporting ? t("export.exporting") : t("export.button")}
+					</Button>
 				}
 			/>
 
@@ -980,11 +963,12 @@ export default function AdminRawDataPage() {
 					/>
 				</TabsContent>
 
-				{/* Audits - place-grouped, expandable, all statuses, with selection */}
+				{/* Audits - submitted-only place-grouped export selection */}
 				<TabsContent value="audits" className="mt-4 space-y-3">
 					<GroupedReportsView
 						rows={auditRows}
 						basePath="/admin/audits"
+						description={t("table.auditExportDescription")}
 						rolePrefix="admin"
 						variant="audits"
 						searchValue={groupedSearch}
@@ -995,18 +979,18 @@ export default function AdminRawDataPage() {
 							<>
 								{accountFilter}
 								{projectFilter}
-								{auditStatusFilterPopover}
 								{clearButton}
 							</>
 						}
 					/>
 				</TabsContent>
 
-				{/* Reports - place-grouped, expandable, submitted-only, with selection */}
+				{/* Reports - submitted-only place-grouped export selection */}
 				<TabsContent value="reports" className="mt-4 space-y-3">
 					<GroupedReportsView
 						rows={auditRows}
 						basePath="/admin/reports"
+						description={t("table.reportExportDescription")}
 						rolePrefix="admin"
 						variant="reports"
 						searchValue={groupedSearch}
