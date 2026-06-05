@@ -1,0 +1,1255 @@
+<link
+	href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap"
+	rel="stylesheet" />
+<style>
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+	body {
+		font-family: "Inter", var(--font-sans);
+		font-size: 15px;
+		line-height: 1.65;
+		color: var(--color-text-primary);
+		background: transparent;
+	}
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: "Playfair Display", var(--font-serif);
+		line-height: 1.2;
+		color: var(--color-text-primary);
+	}
+	h1 {
+		font-size: 48px;
+		font-weight: 600;
+	}
+	h2 {
+		font-size: 34px;
+		font-weight: 600;
+	}
+	h3 {
+		font-size: 20px;
+		font-weight: 400;
+	}
+	p {
+		color: var(--color-text-secondary);
+		line-height: 1.7;
+	}
+	.section {
+		padding: 56px 0;
+	}
+	.container {
+		max-width: 660px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+	.eyebrow {
+		font-family: "Inter", var(--font-sans);
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-text-tertiary);
+		margin-bottom: 12px;
+	}
+	.badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		padding: 5px 12px;
+		border-radius: 20px;
+		background: var(--color-background-secondary);
+		border: 0.5px solid var(--color-border-secondary);
+		color: var(--color-text-secondary);
+		margin-bottom: 20px;
+	}
+	.btn-primary {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		padding: 11px 22px;
+		border-radius: var(--border-radius-md);
+		background: var(--color-text-primary);
+		color: var(--color-background-primary);
+		border: none;
+		cursor: pointer;
+		text-decoration: none;
+		font-family: "Inter", var(--font-sans);
+	}
+	.btn-secondary {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		padding: 11px 22px;
+		border-radius: var(--border-radius-md);
+		background: transparent;
+		color: var(--color-text-primary);
+		border: 0.5px solid var(--color-border-secondary);
+		cursor: pointer;
+		text-decoration: none;
+		font-family: "Inter", var(--font-sans);
+	}
+	.divider {
+		border: none;
+		border-top: 0.5px solid var(--color-border-tertiary);
+		margin: 0;
+	}
+	.grid-2 {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 16px;
+	}
+	.grid-3 {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 12px;
+	}
+	.grid-4 {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 10px;
+	}
+	.card {
+		background: var(--color-background-primary);
+		border: 0.5px solid var(--color-border-tertiary);
+		border-radius: var(--border-radius-lg);
+		padding: 18px;
+	}
+	.card-raised {
+		background: var(--color-background-secondary);
+		border-radius: var(--border-radius-lg);
+		padding: 20px;
+	}
+	.stat-card {
+		background: var(--color-background-secondary);
+		border-radius: var(--border-radius-md);
+		padding: 16px;
+		text-align: center;
+	}
+	.stat-num {
+		font-family: "Playfair Display", var(--font-serif);
+		font-size: 32px;
+		font-weight: 600;
+		color: var(--color-text-primary);
+	}
+	.stat-lbl {
+		font-size: 12px;
+		color: var(--color-text-tertiary);
+		margin-top: 3px;
+	}
+	.domain-pill {
+		font-size: 12px;
+		padding: 5px 10px;
+		border-radius: 20px;
+		background: var(--color-background-secondary);
+		border: 0.5px solid var(--color-border-tertiary);
+		color: var(--color-text-secondary);
+		white-space: nowrap;
+	}
+	.scale-bar {
+		height: 6px;
+		border-radius: 3px;
+		background: var(--color-border-tertiary);
+		overflow: hidden;
+	}
+	.scale-fill {
+		height: 100%;
+		border-radius: 3px;
+	}
+	.step-num {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		background: var(--color-background-secondary);
+		border: 0.5px solid var(--color-border-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--color-text-primary);
+		font-family: "Inter", var(--font-sans);
+		flex-shrink: 0;
+	}
+	.persona-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: var(--border-radius-md);
+		background: var(--color-background-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 20px;
+		margin-bottom: 12px;
+	}
+	.cite {
+		font-size: 12px;
+		color: var(--color-text-tertiary);
+		font-family: "Inter", var(--font-sans);
+		line-height: 1.5;
+		padding: 12px 16px;
+		border-left: 2px solid var(--color-border-secondary);
+		margin: 12px 0;
+	}
+	.quote {
+		font-family: "Playfair Display", var(--font-serif);
+		font-size: 21px;
+		line-height: 1.45;
+		font-style: italic;
+		color: var(--color-text-primary);
+	}
+	.score-big {
+		font-family: "Playfair Display", var(--font-serif);
+		font-size: 40px;
+		font-weight: 600;
+		line-height: 1;
+	}
+	.mock-header {
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-tertiary);
+		margin-bottom: 12px;
+	}
+</style>
+
+<div style="padding-top: 2rem">
+	<nav
+		style="
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding-bottom: 24px;
+			border-bottom: 0.5px solid var(--color-border-tertiary);
+			margin-bottom: 0;
+			max-width: 660px;
+			margin: 0 auto;
+			padding: 0 1rem 20px;
+		">
+		<span style="font-family: &quot;Playfair Display&quot;, serif; font-size: 20px; font-weight: 600"
+			>COPA<span style="color: var(--color-text-tertiary)">.</span></span
+		>
+		<div style="display: flex; gap: 8px">
+			<a href="#" class="btn-secondary" style="padding: 8px 16px; font-size: 13px">Sign in</a>
+			<a href="#" class="btn-primary" style="padding: 8px 16px; font-size: 13px">Get access</a>
+		</div>
+	</nav>
+
+	<hr class="divider" style="margin-bottom: 0" />
+
+	<section class="section" style="padding: 60px 0 48px">
+		<div class="container">
+			<span class="badge"
+				><i class="ti ti-flask-2" aria-hidden="true"></i>Research-informed · Expert-reviewed</span
+			>
+			<h1 style="margin-bottom: 16px">
+				Beyond accessible.<br /><span style="color: var(--color-text-secondary)">Truly playable.</span>
+			</h1>
+			<p style="font-size: 17px; max-width: 520px; margin-bottom: 28px">
+				COPA is a structured observation tool for evaluating the play value and usability of outdoor playspaces
+				— helping professionals move beyond counting features to understanding what children can actually do
+				there.
+			</p>
+			<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px">
+				<a href="#" class="btn-primary">Start an audit <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+				<a href="#how" class="btn-secondary">See how it works</a>
+			</div>
+			<div class="card" style="max-width: 560px">
+				<p class="mock-header">Maplewood Commons · Audit report</p>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px">
+					<div class="card-raised" style="text-align: center; padding: 16px">
+						<div
+							style="
+								font-size: 11px;
+								font-weight: 500;
+								letter-spacing: 0.1em;
+								text-transform: uppercase;
+								color: var(--color-text-tertiary);
+								margin-bottom: 6px;
+							">
+							Play Value
+						</div>
+						<div class="score-big" style="color: #5a8a3a">4.3</div>
+						<div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px">PV score</div>
+					</div>
+					<div class="card-raised" style="text-align: center; padding: 16px">
+						<div
+							style="
+								font-size: 11px;
+								font-weight: 500;
+								letter-spacing: 0.1em;
+								text-transform: uppercase;
+								color: var(--color-text-tertiary);
+								margin-bottom: 6px;
+							">
+							Usability
+						</div>
+						<div class="score-big" style="color: #2d6e9e">4.1</div>
+						<div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px">U score</div>
+					</div>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+					<div>
+						<div
+							style="
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
+								margin-bottom: 4px;
+							">
+							<span style="font-size: 12px; color: var(--color-text-secondary)">Provision</span
+							><span style="font-size: 12px; font-weight: 500">4.5</span>
+						</div>
+						<div class="scale-bar">
+							<div class="scale-fill" style="width: 90%; background: #5a8a3a"></div>
+						</div>
+					</div>
+					<div>
+						<div
+							style="
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
+								margin-bottom: 4px;
+							">
+							<span style="font-size: 12px; color: var(--color-text-secondary)">Variety</span
+							><span style="font-size: 12px; font-weight: 500">3.8</span>
+						</div>
+						<div class="scale-bar">
+							<div class="scale-fill" style="width: 76%; background: #c17a3a"></div>
+						</div>
+					</div>
+					<div>
+						<div
+							style="
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
+								margin-bottom: 4px;
+							">
+							<span style="font-size: 12px; color: var(--color-text-secondary)">Challenge</span
+							><span style="font-size: 12px; font-weight: 500">3.2</span>
+						</div>
+						<div class="scale-bar">
+							<div class="scale-fill" style="width: 64%; background: #9e3e6a"></div>
+						</div>
+					</div>
+					<div>
+						<div
+							style="
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
+								margin-bottom: 4px;
+							">
+							<span style="font-size: 12px; color: var(--color-text-secondary)">Sociability</span
+							><span style="font-size: 12px; font-weight: 500">4.2</span>
+						</div>
+						<div class="scale-bar">
+							<div class="scale-fill" style="width: 84%; background: #2d6e9e"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section">
+		<div class="container">
+			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px">
+				<div class="stat-card">
+					<div class="stat-num">22</div>
+					<div class="stat-lbl">assessment domains</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-num">124</div>
+					<div class="stat-lbl">scored items</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-num">4</div>
+					<div class="stat-lbl">evaluation scales</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-num">22</div>
+					<div class="stat-lbl">international experts</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section">
+		<div class="container">
+			<p class="eyebrow">The problem</p>
+			<h2 style="margin-bottom: 20px">
+				Most playspaces were built <em>for</em> children. Few have become children's places.
+			</h2>
+			<p style="margin-bottom: 16px">
+				Research involving children with and without disabilities consistently reveals the same gaps: too little
+				variety in play opportunities, too little challenge — especially for older children and those with
+				diverse abilities — and features that don't genuinely invite participation from all users.
+			</p>
+			<p style="margin-bottom: 16px">
+				Meanwhile, professionals responsible for playground provision often lack structured methods for
+				assessing these qualities, making it difficult to identify gaps or justify improvements.
+			</p>
+			<div class="card" style="margin: 28px 0">
+				<p class="quote">
+					"Not every place built for the purpose of play is a children's place. A place built for children can
+					become a children's place when children connect to it through outdoor play — when they can attribute
+					meaning to the environment."
+				</p>
+				<p style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 10px">
+					Rasmussen (2004), as cited in Morgenthaler et al., 2023
+				</p>
+			</div>
+			<div class="grid-2" style="gap: 14px">
+				<div class="card">
+					<div
+						style="font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--color-text-primary)">
+						<i
+							class="ti ti-lock-access"
+							aria-hidden="true"
+							style="margin-right: 6px; color: var(--color-text-tertiary)"></i
+						>Accessibility ≠ usability
+					</div>
+					<p style="font-size: 13px">
+						Accessibility helps a child reach the equipment. Usability asks whether children with diverse
+						abilities can actually participate, explore, challenge themselves, and belong.
+					</p>
+				</div>
+				<div class="card">
+					<div
+						style="font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--color-text-primary)">
+						<i
+							class="ti ti-eye-off"
+							aria-hidden="true"
+							style="margin-right: 6px; color: var(--color-text-tertiary)"></i
+						>Adults count; children play
+					</div>
+					<p style="font-size: 13px">
+						Most assessments describe what a playspace contains. COPA asks a different question: what does
+						the environment <em>afford</em> children to do, experience, and choose?
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section">
+		<div class="container">
+			<p class="eyebrow">What COPA measures</p>
+			<h2 style="margin-bottom: 8px">Two constructs. Four scales.</h2>
+			<p style="margin-bottom: 28px">
+				Every item in the audit is assessed across four scales, generating scores on two primary constructs that
+				reflect what the research identifies as the core dimensions of high-quality outdoor play environments.
+			</p>
+			<div class="grid-2" style="margin-bottom: 24px">
+				<div class="card" style="border-top: 2px solid #5a8a3a">
+					<div
+						style="
+							font-size: 11px;
+							font-weight: 500;
+							letter-spacing: 0.1em;
+							text-transform: uppercase;
+							color: #5a8a3a;
+							margin-bottom: 8px;
+						">
+						Play Value
+					</div>
+					<h3 style="margin-bottom: 8px; font-size: 18px">66 items</h3>
+					<p style="font-size: 13px">
+						Conceptualized as the diverse, multiple, and potential play affordances supported by varied and
+						combined environmental features. A space high in play value invites children into many different
+						kinds of play.
+					</p>
+					<div class="cite">
+						"Play value of a playground is conceptualized by the diverse, multiple, and potential play
+						affordances supported by diverse, varied and combined environmental features." — Morgenthaler et
+						al., 2025, p. 94
+					</div>
+				</div>
+				<div class="card" style="border-top: 2px solid #2d6e9e">
+					<div
+						style="
+							font-size: 11px;
+							font-weight: 500;
+							letter-spacing: 0.1em;
+							text-transform: uppercase;
+							color: #2d6e9e;
+							margin-bottom: 8px;
+						">
+						Usability
+					</div>
+					<h3 style="margin-bottom: 8px; font-size: 18px">71 items</h3>
+					<p style="font-size: 13px">
+						Beyond accessibility. Environmental qualities that enable children with diverse abilities to
+						play — not merely to arrive at the equipment, but to participate, belong, explore, and choose.
+					</p>
+					<div class="cite">
+						Builds on Iwarsson & Ståhl (2003): usability has a stronger focus on equitable use and inclusion
+						than accessibility alone.
+					</div>
+				</div>
+			</div>
+			<p class="eyebrow" style="margin-bottom: 12px">The four scales</p>
+			<div style="display: grid; gap: 10px">
+				<div
+					style="
+						display: flex;
+						gap: 16px;
+						align-items: flex-start;
+						padding: 14px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 28px;
+							height: 28px;
+							border-radius: 50%;
+							background: #5a8a3a22;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<span style="font-size: 13px; font-weight: 500; color: #5a8a3a">Q</span>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Provision (Quantity)
+						</div>
+						<p style="font-size: 13px">
+							In what quantity is this feature or environmental characteristic provided?
+							<em>None / Some / A lot.</em>
+						</p>
+					</div>
+				</div>
+				<div
+					style="
+						display: flex;
+						gap: 16px;
+						align-items: flex-start;
+						padding: 14px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 28px;
+							height: 28px;
+							border-radius: 50%;
+							background: #c17a3a22;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<span style="font-size: 13px; font-weight: 500; color: #c17a3a">V</span>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Variety (Diversity)
+						</div>
+						<p style="font-size: 13px">
+							To what extent is there variety in this feature or characteristic? Are the options diverse
+							or all the same? <em>No diversity / Some / A lot.</em>
+						</p>
+					</div>
+				</div>
+				<div
+					style="
+						display: flex;
+						gap: 16px;
+						align-items: flex-start;
+						padding: 14px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 28px;
+							height: 28px;
+							border-radius: 50%;
+							background: #9e3e6a22;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<span style="font-size: 13px; font-weight: 500; color: #9e3e6a">C</span>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Challenge Opportunities
+						</div>
+						<p style="font-size: 13px">
+							To what extent does this feature provide different levels of challenge for individual
+							children or different abilities? <em>No / Some / A lot.</em>
+						</p>
+					</div>
+				</div>
+				<div
+					style="
+						display: flex;
+						gap: 16px;
+						align-items: flex-start;
+						padding: 14px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 28px;
+							height: 28px;
+							border-radius: 50%;
+							background: #2d6e9e22;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<span style="font-size: 13px; font-weight: 500; color: #2d6e9e">S</span>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Sociability Support
+						</div>
+						<p style="font-size: 13px">
+							Can more than one child use this feature or space together?
+							<em>No / Yes — a pair / Yes — more than two.</em>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section">
+		<div class="container">
+			<p class="eyebrow">The whole playspace</p>
+			<h2 style="margin-bottom: 12px">Not just the equipment. Everything.</h2>
+			<p style="margin-bottom: 24px">
+				COPA evaluates 22 domains — every feature and quality that shapes what children can do in a space. From
+				manufactured structures to loose natural materials, from sensory qualities to community context and
+				management practices.
+			</p>
+			<div style="display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 24px">
+				<span class="domain-pill">Manufactured play features</span>
+				<span class="domain-pill">Natural play features</span>
+				<span class="domain-pill">Loose manufactured parts</span>
+				<span class="domain-pill">Loose natural parts &amp; malleable materials</span>
+				<span class="domain-pill">Topography &amp; surfaces</span>
+				<span class="domain-pill">Open spaces</span>
+				<span class="domain-pill">Enclosed &amp; bounded spaces</span>
+				<span class="domain-pill">Pathways</span>
+				<span class="domain-pill">Boundaries &amp; entrances</span>
+				<span class="domain-pill">Sport &amp; game spaces</span>
+				<span class="domain-pill">Seating</span>
+				<span class="domain-pill">Amenities</span>
+				<span class="domain-pill">Novelty</span>
+				<span class="domain-pill">Sensory qualities &amp; regulation</span>
+				<span class="domain-pill">Accommodating diverse abilities</span>
+				<span class="domain-pill">Playspace suitability for diverse users</span>
+				<span class="domain-pill">Playspace character &amp; community</span>
+				<span class="domain-pill">Location &amp; connectivity</span>
+				<span class="domain-pill">Rules &amp; restrictions</span>
+				<span class="domain-pill">Information &amp; wayfinding</span>
+				<span class="domain-pill">Climate protection &amp; adaptability</span>
+				<span class="domain-pill">Management &amp; maintenance</span>
+			</div>
+			<div class="card" style="background: var(--color-background-secondary)">
+				<p style="font-size: 14px; color: var(--color-text-secondary)">
+					<i class="ti ti-bulb" aria-hidden="true" style="margin-right: 6px"></i
+					><span style="font-weight: 500; color: var(--color-text-primary)"
+						>The insight behind this scope:</span
+					>
+					Research shows that play spaces promote diverse play when they offer not only play equipment, but
+					also open spaces, enclosed spaces, topographic features, natural features, loose parts, and
+					malleable materials working in combination. No single feature type is sufficient.
+				</p>
+				<p style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 8px">
+					Morgenthaler et al. (2024), American Journal of Occupational Therapy
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section id="how" class="section">
+		<div class="container">
+			<p class="eyebrow">How it works</p>
+			<h2 style="margin-bottom: 8px">Two methods. One structured instrument.</h2>
+			<p style="margin-bottom: 28px">
+				COPA combines an on-site audit of physical features with a site survey of operational context. They can
+				be completed together or separately, depending on your access and familiarity with the playspace.
+			</p>
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px">
+				<div class="card">
+					<div
+						style="
+							font-size: 11px;
+							font-weight: 500;
+							letter-spacing: 0.1em;
+							text-transform: uppercase;
+							color: var(--color-text-tertiary);
+							margin-bottom: 8px;
+						">
+						On-site audit
+					</div>
+					<div
+						style="
+							font-size: 24px;
+							font-weight: 600;
+							font-family: &quot;Playfair Display&quot;, serif;
+							margin-bottom: 6px;
+						">
+						88 items
+					</div>
+					<p style="font-size: 13px">
+						Conducted while walking the playspace. Evaluates observable physical characteristics. Completed
+						by anyone familiar with outdoor play and environmental affordances.
+					</p>
+					<div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px">
+						<span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-info);
+								color: var(--color-text-info);
+							"
+							>Educators</span
+						><span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-info);
+								color: var(--color-text-info);
+							"
+							>Researchers</span
+						><span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-info);
+								color: var(--color-text-info);
+							"
+							>OTs</span
+						><span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-info);
+								color: var(--color-text-info);
+							"
+							>Landscape architects</span
+						>
+					</div>
+				</div>
+				<div class="card">
+					<div
+						style="
+							font-size: 11px;
+							font-weight: 500;
+							letter-spacing: 0.1em;
+							text-transform: uppercase;
+							color: var(--color-text-tertiary);
+							margin-bottom: 8px;
+						">
+						Site survey
+					</div>
+					<div
+						style="
+							font-size: 24px;
+							font-weight: 600;
+							font-family: &quot;Playfair Display&quot;, serif;
+							margin-bottom: 6px;
+						">
+						36 items
+					</div>
+					<p style="font-size: 13px">
+						Captures operational history and macro context. Completed by playspace managers, designers, or
+						administrators familiar with the site's history and management practices.
+					</p>
+					<div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px">
+						<span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-success);
+								color: var(--color-text-success);
+							"
+							>Managers</span
+						><span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-success);
+								color: var(--color-text-success);
+							"
+							>Administrators</span
+						><span
+							style="
+								font-size: 11px;
+								padding: 3px 8px;
+								border-radius: 20px;
+								background: var(--color-background-success);
+								color: var(--color-text-success);
+							"
+							>Designers</span
+						>
+					</div>
+				</div>
+			</div>
+			<div style="display: grid; gap: 12px">
+				<div style="display: flex; gap: 16px; align-items: flex-start">
+					<div class="step-num">01</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Select a playspace
+						</div>
+						<p style="font-size: 13px">
+							Assign or select the playspace to be evaluated. Provide basic site information to anchor the
+							audit.
+						</p>
+					</div>
+				</div>
+				<div style="display: flex; gap: 16px; align-items: flex-start">
+					<div class="step-num">02</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Choose your evaluation mode
+						</div>
+						<p style="font-size: 13px">
+							Complete the on-site audit, the site survey, or both — depending on your access,
+							familiarity, and role.
+						</p>
+					</div>
+				</div>
+				<div style="display: flex; gap: 16px; align-items: flex-start">
+					<div class="step-num">03</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Walk, observe, and record
+						</div>
+						<p style="font-size: 13px">
+							For each domain, observe what the environment provides and rate it on the relevant scales.
+							The app structures your observation and captures notes.
+						</p>
+					</div>
+				</div>
+				<div style="display: flex; gap: 16px; align-items: flex-start">
+					<div class="step-num">04</div>
+					<div>
+						<div
+							style="
+								font-size: 14px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Generate scores and reports
+						</div>
+						<p style="font-size: 13px">
+							Scores on Play Value, Usability, and all four scales are computed automatically. Reports
+							identify highest- and lowest-scoring domains and support evidence-based planning.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section">
+		<div class="container">
+			<p class="eyebrow">Who uses COPA</p>
+			<h2 style="margin-bottom: 24px">Built for professionals who shape where children play.</h2>
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+				<div class="card">
+					<div class="persona-icon" aria-hidden="true">
+						<i class="ti ti-microscope" style="font-size: 20px"></i>
+					</div>
+					<div
+						style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px">
+						Researchers
+					</div>
+					<p style="font-size: 13px">
+						A methodologically grounded instrument with a clear citation trail, developed through systematic
+						literature review and expert validation.
+					</p>
+				</div>
+				<div class="card">
+					<div class="persona-icon" aria-hidden="true">
+						<i class="ti ti-stethoscope" style="font-size: 20px"></i>
+					</div>
+					<div
+						style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px">
+						Occupational therapists
+					</div>
+					<p style="font-size: 13px">
+						Evaluate and advocate for play environments that enable participation for children with diverse
+						abilities — beyond compliance, toward genuine inclusion.
+					</p>
+				</div>
+				<div class="card">
+					<div class="persona-icon" aria-hidden="true">
+						<i class="ti ti-building-community" style="font-size: 20px"></i>
+					</div>
+					<div
+						style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px">
+						Park agencies &amp; municipalities
+					</div>
+					<p style="font-size: 13px">
+						Generate structured evidence to prioritize renovation investments, justify resource allocation,
+						and document playspace quality across a portfolio of sites.
+					</p>
+				</div>
+				<div class="card">
+					<div class="persona-icon" aria-hidden="true">
+						<i class="ti ti-pencil-bolt" style="font-size: 20px"></i>
+					</div>
+					<div
+						style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px">
+						Landscape architects &amp; designers
+					</div>
+					<p style="font-size: 13px">
+						Use audit findings to benchmark designs, review proposed spaces before build, and communicate
+						affordance-based rationale to clients and planners.
+					</p>
+				</div>
+				<div class="card">
+					<div class="persona-icon" aria-hidden="true">
+						<i class="ti ti-school" style="font-size: 20px"></i>
+					</div>
+					<div
+						style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px">
+						Educators &amp; schools
+					</div>
+					<p style="font-size: 13px">
+						Assess schoolyard and outdoor play environments for the breadth of play opportunities they
+						provide — and build the case for meaningful improvements.
+					</p>
+				</div>
+				<div class="card">
+					<div class="persona-icon" aria-hidden="true">
+						<i class="ti ti-coins" style="font-size: 20px"></i>
+					</div>
+					<div
+						style="font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px">
+						Funders &amp; policymakers
+					</div>
+					<p style="font-size: 13px">
+						Receive clear, comparable scores across sites to guide investment decisions, policy development,
+						and accountability for playspace quality.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section">
+		<div class="container">
+			<p class="eyebrow">Research foundation</p>
+			<h2 style="margin-bottom: 20px">Grounded in evidence. Built with experts.</h2>
+			<p style="margin-bottom: 24px">
+				The COPA instrument — known in published research as the Playground Play Value and Usability Audit
+				(PVUA) — was developed through a multi-stage, internationally collaborative process grounded in
+				peer-reviewed research and validated with an interdisciplinary expert panel.
+			</p>
+			<div style="display: grid; gap: 14px; margin-bottom: 24px">
+				<div
+					style="
+						display: flex;
+						gap: 14px;
+						align-items: flex-start;
+						padding: 16px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 32px;
+							height: 32px;
+							border-radius: 50%;
+							background: var(--color-background-secondary);
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<i class="ti ti-books" style="font-size: 16px" aria-hidden="true"></i>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 13px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Systematic literature review
+						</div>
+						<p style="font-size: 13px">
+							Developed from a scoping review of 6,095 references across seven academic databases —
+							narrowed to 51 peer-reviewed studies on environmental qualities that enhance play for
+							children with and without disabilities.
+						</p>
+					</div>
+				</div>
+				<div
+					style="
+						display: flex;
+						gap: 14px;
+						align-items: flex-start;
+						padding: 16px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 32px;
+							height: 32px;
+							border-radius: 50%;
+							background: var(--color-background-secondary);
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<i class="ti ti-users-group" style="font-size: 16px" aria-hidden="true"></i>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 13px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							International expert panel validation
+						</div>
+						<p style="font-size: 13px">
+							Content validity evaluated by 22 international, interdisciplinary experts who reviewed item
+							relevance and clarity through iterative rounds of feedback and refinement.
+						</p>
+					</div>
+				</div>
+				<div
+					style="
+						display: flex;
+						gap: 14px;
+						align-items: flex-start;
+						padding: 16px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 32px;
+							height: 32px;
+							border-radius: 50%;
+							background: var(--color-background-secondary);
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<i class="ti ti-child" style="font-size: 16px" aria-hidden="true"></i>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 13px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Children's perspectives at the center
+						</div>
+						<p style="font-size: 13px">
+							Grounded in research soliciting play experiences from children with and without disabilities
+							— not proxy or adult-assumed preferences, but direct user evidence of what children need
+							playgrounds to provide.
+						</p>
+					</div>
+				</div>
+				<div
+					style="
+						display: flex;
+						gap: 14px;
+						align-items: flex-start;
+						padding: 16px;
+						border: 0.5px solid var(--color-border-tertiary);
+						border-radius: var(--border-radius-md);
+					">
+					<div
+						style="
+							width: 32px;
+							height: 32px;
+							border-radius: 50%;
+							background: var(--color-background-secondary);
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							flex-shrink: 0;
+						">
+						<i class="ti ti-atom" style="font-size: 16px" aria-hidden="true"></i>
+					</div>
+					<div>
+						<div
+							style="
+								font-size: 13px;
+								font-weight: 500;
+								color: var(--color-text-primary);
+								margin-bottom: 3px;
+							">
+							Affordance theory foundation
+						</div>
+						<p style="font-size: 13px">
+							Built on Gibson's (1979) theory of affordances — shifting the evaluative frame from "what
+							does this space contain?" to "what can a child potentially do here?" This supports a
+							child-centered, occupation-focused analysis.
+						</p>
+					</div>
+				</div>
+			</div>
+			<p class="eyebrow" style="margin-bottom: 10px">Key publications</p>
+			<div style="display: grid; gap: 8px">
+				<div class="cite">
+					Morgenthaler, T., Loebach, J., Lynch, H., Pentland, D., Kottorp, A., &amp; Schulze, C. (2025).
+					Developing the Playground Play Value and Usability Audit (PVUA) Tool: An Evaluation of Content
+					Validity via an Expert Panel. <em>Children, Youth and Environments</em>, 35(2), 93–122.
+				</div>
+				<div class="cite">
+					Morgenthaler, T., Lynch, H., Loebach, J., Pentland, D., &amp; Schulze, C. (2024). Using the theory
+					of affordance to understand environment–play transactions: Environmental Taxonomy of Outdoor Play
+					Space Features — A scoping review. <em>American Journal of Occupational Therapy</em>, 78(4),
+					7804185120.
+				</div>
+				<div class="cite">
+					Morgenthaler, T., Schulze, C., Pentland, D., &amp; Lynch, H. (2023). Environmental qualities that
+					enhance outdoor play in community playgrounds from the perspective of children with and without
+					disabilities: A scoping review.
+					<em>International Journal of Environmental Research and Public Health</em>, 20, 1763.
+				</div>
+			</div>
+			<div class="card" style="margin-top: 20px">
+				<p style="font-size: 13px; margin-bottom: 8px">
+					<span style="font-weight: 500; color: var(--color-text-primary)">Research team:</span> Dr. Thomas
+					Morgenthaler (Swedish University of Agricultural Sciences / University College Cork) · Dr. Janet
+					Loebach (Cornell University) · Dr. Helen Lynch (University College Cork) · Dr. Duncan Pentland
+					(Queen Margaret University Edinburgh) · Dr. Anders Kottorp (Malmö University) · Dr. Christina
+					Schulze (ZHAW Zurich University of Applied Sciences)
+				</p>
+				<p style="font-size: 12px; color: var(--color-text-tertiary)">
+					Ongoing work includes reliability and validity evidence, field testing across 10+ playspaces, and
+					further app development. The tool is being developed for free access.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<section class="section" style="padding-bottom: 48px">
+		<div class="container" style="text-align: center">
+			<h2 style="margin-bottom: 12px">A playspace worth evaluating<br />deserves a rigorous tool.</h2>
+			<p style="max-width: 440px; margin: 0 auto 28px">
+				COPA provides the structure to see what children actually experience — and the evidence to communicate
+				what needs to change.
+			</p>
+			<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap">
+				<a href="#" class="btn-primary">Request access <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+				<a href="#" class="btn-secondary">Learn about the research</a>
+			</div>
+		</div>
+	</section>
+
+	<hr class="divider" />
+
+	<footer style="padding: 24px 0; max-width: 660px; margin: 0 auto; padding: 24px 1rem">
+		<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px">
+			<span style="font-family: &quot;Playfair Display&quot;, serif; font-size: 16px; font-weight: 600"
+				>COPA<span style="color: var(--color-text-tertiary)">.</span></span
+			>
+			<p style="font-size: 12px; color: var(--color-text-tertiary); margin: 0">
+				Comprehensive Outdoor Playspace Audit Tool · Research in active development
+			</p>
+		</div>
+	</footer>
+</div>
