@@ -21,6 +21,7 @@ import type {
 	WebExportPalette,
 	WorkbookTable
 } from "./types";
+import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS, hexToXlsxRgb, type PvScaleKey } from "@/lib/audit/scale-colors";
 import {
 	OVERVIEW_COLUMN_WIDTHS,
 	SINGLE_RESPONSE_COLUMN_WIDTHS,
@@ -115,27 +116,25 @@ export function calculateDynamicColumnWidths(rows: readonly SpreadsheetRow[]): {
  * Maps Responses-sheet col indices to PV scale keys.
  * Cols 7–10 are Provision / Diversity / Sociability / Challenge.
  */
-const SCALE_COLUMN_MAP: Record<number, "provision" | "diversity" | "sociability" | "challenge"> = {
+const SCALE_COLUMN_MAP: Record<number, PvScaleKey> = {
 	7: "provision",
 	8: "diversity",
 	9: "sociability",
 	10: "challenge"
 };
 
-/** Hex strings for each scale's soft fill - source of truth is SCALE_SOFT_COLORS in types.ts. */
-const SCALE_SOFT_HEX: Record<"provision" | "diversity" | "sociability" | "challenge", string> = {
-	provision: "AEC596",
-	diversity: "EBAC99",
-	sociability: "C596C0",
-	challenge: "B1D4E0"
+const SCALE_SOFT_HEX: Record<PvScaleKey, string> = {
+	provision: hexToXlsxRgb(SCALE_SOFT_COLORS.provision),
+	diversity: hexToXlsxRgb(SCALE_SOFT_COLORS.diversity),
+	sociability: hexToXlsxRgb(SCALE_SOFT_COLORS.sociability),
+	challenge: hexToXlsxRgb(SCALE_SOFT_COLORS.challenge)
 };
 
-/** Hex strings for each scale's accent color (dark text / border). */
-const SCALE_ACCENT_HEX: Record<"provision" | "diversity" | "sociability" | "challenge", string> = {
-	provision: "566E3D",
-	diversity: "BD4926",
-	sociability: "754170",
-	challenge: "0C4767"
+const SCALE_ACCENT_HEX: Record<PvScaleKey, string> = {
+	provision: hexToXlsxRgb(SCALE_ACCENT_COLORS.provision),
+	diversity: hexToXlsxRgb(SCALE_ACCENT_COLORS.diversity),
+	sociability: hexToXlsxRgb(SCALE_ACCENT_COLORS.sociability),
+	challenge: hexToXlsxRgb(SCALE_ACCENT_COLORS.challenge)
 };
 
 const QUESTION_CONTEXT_END_COLUMN_INDEX = 6;

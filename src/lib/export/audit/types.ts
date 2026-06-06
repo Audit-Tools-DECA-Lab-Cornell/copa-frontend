@@ -5,6 +5,7 @@
  * from any sibling module, keeping the dependency graph acyclic.
  */
 
+import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
 import { DESIGN_SYSTEM, type DesignSystemThemeMode, type DesignSystemContrastMode } from "@/lib/design-system";
 import type * as XLSX from "xlsx-js-style";
 
@@ -104,30 +105,8 @@ export function resolveExportPalette(appearance?: AuditExportAppearance): WebExp
 	return DESIGN_SYSTEM.palettes[theme][contrast];
 }
 
-/** Scale key union used across PDF, XLSX, and helpers. */
-export type PvScaleKey = "provision" | "diversity" | "sociability" | "challenge";
-
-/**
- * Canonical background (soft) hex colours for each PV scale column.
- * Sourced from the shared design-system scale tokens (mobile + web).
- */
-export const SCALE_SOFT_COLORS: Record<PvScaleKey, string> = {
-	provision: "#AEC596",
-	diversity: "#EBAC99",
-	sociability: "#C596C0",
-	challenge: "#B1D4E0"
-} as const;
-
-/**
- * Canonical accent hex colours for each PV scale column.
- * Sourced from the shared design-system scale tokens (mobile + web).
- */
-export const SCALE_ACCENT_COLORS: Record<PvScaleKey, string> = {
-	provision: "#566E3D",
-	diversity: "#BD4926",
-	sociability: "#754170",
-	challenge: "#0C4767"
-} as const;
+export type { PvScaleKey } from "@/lib/audit/scale-colors";
+export { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
 
 /**
  * Returns the soft (background) colour for each PV scale column.

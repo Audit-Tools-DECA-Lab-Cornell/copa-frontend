@@ -23,6 +23,14 @@
 	--color-accent-moss: var(--accent-moss);
 	--color-accent-slate: var(--accent-slate);
 	--color-accent-violet: var(--accent-violet);
+	--color-scale-provision: var(--scale-provision);
+	--color-scale-provision-soft: var(--scale-provision-soft);
+	--color-scale-diversity: var(--scale-diversity);
+	--color-scale-diversity-soft: var(--scale-diversity-soft);
+	--color-scale-challenge: var(--scale-challenge);
+	--color-scale-challenge-soft: var(--scale-challenge-soft);
+	--color-scale-sociability: var(--scale-sociability);
+	--color-scale-sociability-soft: var(--scale-sociability-soft);
 	--color-status-success: var(--status-success);
 	--color-status-warning: var(--status-warning);
 	--color-status-danger: var(--status-danger);

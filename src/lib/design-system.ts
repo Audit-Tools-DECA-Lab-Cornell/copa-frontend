@@ -5,6 +5,9 @@
  * visual system can be reused by other applications without copying raw class
  * names or editing multiple CSS files.
  */
+
+import { getPvScaleCssVariables } from "@/lib/audit/scale-colors";
+
 export type DesignSystemThemeMode = "light" | "dark";
 export type DesignSystemContrastMode = "standard" | "high";
 
@@ -352,6 +355,7 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 	const fontScale = clampDesignSystemFontScale(input.fontScale ?? DESIGN_SYSTEM.fontScale.default);
 
 	return {
+		...getPvScaleCssVariables(),
 		"--radius": "6px",
 		"--app-font-scale": String(fontScale),
 		"--font-body-stack": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.body.stack,

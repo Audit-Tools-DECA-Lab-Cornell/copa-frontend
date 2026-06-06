@@ -51,7 +51,17 @@ import {
 	getCombinedReportSources,
 	REPORT_SOURCE_STYLES
 } from "@/lib/audit/report-source-sessions";
+import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS, hexToRgb, type PvScaleKey } from "@/lib/audit/scale-colors";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
+
+function buildScaleRgbMap(colorMap: Record<PvScaleKey, string>): Record<PvScaleKey, [number, number, number]> {
+	return {
+		provision: hexToRgb(colorMap.provision),
+		diversity: hexToRgb(colorMap.diversity),
+		sociability: hexToRgb(colorMap.sociability),
+		challenge: hexToRgb(colorMap.challenge)
+	};
+}
 
 // ── Palette (matches instrument-pdf.ts PALETTE / MOBILE_EXPORT_PALETTE) ──────
 
@@ -78,20 +88,8 @@ const AUDIT_PDF_PALETTE = {
 
 	border: [226, 232, 240] as [number, number, number],
 
-	// Per-scale soft fill RGB - mirrors SCALE_SOFT_COLORS hex values.
-	scaleFill: {
-		provision: [174, 197, 150] as [number, number, number],
-		diversity: [235, 172, 153] as [number, number, number],
-		sociability: [197, 150, 192] as [number, number, number],
-		challenge: [177, 212, 224] as [number, number, number]
-	},
-	// Per-scale accent (dark text) RGB - mirrors SCALE_ACCENT_COLORS hex values.
-	scaleAccent: {
-		provision: [51, 65, 85] as [number, number, number],
-		diversity: [51, 65, 85] as [number, number, number],
-		sociability: [51, 65, 85] as [number, number, number],
-		challenge: [51, 65, 85] as [number, number, number]
-	}
+	scaleFill: buildScaleRgbMap(SCALE_SOFT_COLORS),
+	scaleAccent: buildScaleRgbMap(SCALE_ACCENT_COLORS)
 } as const;
 
 // ── Internal types ────────────────────────────────────────────────────────────

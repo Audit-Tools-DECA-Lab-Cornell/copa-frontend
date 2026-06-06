@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { SCALE_BADGE_CLASS_NAMES, type PvScaleKey } from "@/lib/audit/scale-colors";
 import type { QuestionDisplayCondition } from "@/types/audit";
 
 import { useInstrumentEdit } from "./instrument-edit-context";
@@ -111,16 +112,9 @@ export function StatBox({ label, value, textValue }: Readonly<{ label: string; v
 	);
 }
 
-const SCALE_COLORS: Record<string, string> = {
-	provision: "border-accent-slate/40 bg-accent-slate/10 text-accent-slate",
-	diversity: "border-accent-moss/40 bg-accent-moss/10 text-accent-moss",
-	challenge: "border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta",
-	sociability: "border-accent-violet/40 bg-accent-violet/10 text-accent-violet"
-};
-
 export function ScaleKeyBadge({ scaleKey }: Readonly<{ scaleKey: string }>) {
 	const t = useTranslations("admin.instruments.content");
-	const colorClasses = SCALE_COLORS[scaleKey] ?? "border-edge/40 bg-muted/40";
+	const colorClasses = SCALE_BADGE_CLASS_NAMES[scaleKey as PvScaleKey] ?? "border-edge/40 bg-muted/40";
 	const label = t.has(`scaleLabels.${scaleKey}`) ? t(`scaleLabels.${scaleKey}`) : scaleKey;
 
 	return (
