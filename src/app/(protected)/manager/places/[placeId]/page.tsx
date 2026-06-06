@@ -2,17 +2,18 @@
 
 import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { ExternalLink, MapPin, UserPlusIcon } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ExternalLink, MapPin, UserPlusIcon, PencilLineIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
+import { playspaceApi, PlayspaceType } from "@/lib/api/playspace";
 import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialog";
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { PlaceReportsCard } from "@/components/dashboard/place-reports-card";
+import { PlaceSheet, type PlaceSheetPayload } from "@/components/dashboard/place-sheet";
 import { formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,31 @@ export default function ManagerPlaceDetailPage() {
 	const projectId = searchParams.get("projectId");
 
 	const [isAssignDialogOpen, setIsAssignDialogOpen] = React.useState(false);
+	const [isPlaceSheetOpen, setIsPlaceSheetOpen] = React.useState(false);
+	const queryClient = useQueryClient();
+
+	const placeQuery = useQuery({
+		queryKey: ["playspace", "manager", "placeDetail", placeId],
+		queryFn: () => playspaceApi.management.places.get(placeId),
+		enabled: typeof placeId === "string" && placeId.length > 0
+	});
+
+	const updatePlaceMutation = useMutation({
+		mutationFn: async (payload: PlaceSheetPayload) =>
+			playspaceApi.management.places.update(placeId, {
+				...payload,
+				place_type: payload.place_type as PlayspaceType | null
+			}),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: ["playspace", "manager", "placeDetail", placeId]
+			});
+			await queryClient.invalidateQueries({
+				queryKey: ["playspace", "manager", "placeHistory", projectId, placeId]
+			});
+			setIsPlaceSheetOpen(false);
+		}
+	});
 
 	const historyQuery = useQuery({
 		queryKey: ["playspace", "manager", "placeHistory", projectId, placeId],
@@ -121,6 +147,14 @@ export default function ManagerPlaceDetailPage() {
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						<BackButton href="/manager/places" label={t("actions.backToPlaces")} />
+						<Button
+							type="button"
+							variant="outline"
+							className="gap-2"
+							onClick={() => setIsPlaceSheetOpen(true)}>
+							<PencilLineIcon className="size-4" />
+							<span>{t("actions.editPlace")}</span>
+						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsAssignDialogOpen(true)}>
 							<UserPlusIcon className="size-4" />
 							<span>Assign Auditor</span>
@@ -276,6 +310,37 @@ export default function ManagerPlaceDetailPage() {
 				prefill={{
 					projectId: projectId ?? undefined,
 					placeIds: [placeId]
+				}}
+			/>
+
+			<PlaceSheet
+				open={isPlaceSheetOpen}
+				onOpenChange={setIsPlaceSheetOpen}
+				title={t("actions.editPlace")}
+				description="Update location details and settings."
+				submitLabel="Save changes"
+				initialValues={
+					placeQuery.data
+						? {
+								name: placeQuery.data.name,
+								address: placeQuery.data.address,
+								city: placeQuery.data.city,
+								province: placeQuery.data.province,
+								country: placeQuery.data.country,
+								postalCode: placeQuery.data.postal_code,
+								placeType: placeQuery.data.place_type,
+								latitude: placeQuery.data.lat,
+								longitude: placeQuery.data.lng,
+								startDate: placeQuery.data.start_date,
+								endDate: placeQuery.data.end_date,
+								estimatedAuditors: placeQuery.data.est_auditors,
+								auditorDescription: placeQuery.data.auditor_description
+							}
+						: undefined
+				}
+				isPending={updatePlaceMutation.isPending}
+				onSubmit={async payload => {
+					await updatePlaceMutation.mutateAsync(payload);
 				}}
 			/>
 		</div>

@@ -630,6 +630,8 @@ export const playspaceApi = {
 				})
 		},
 		places: {
+			get: async (placeId: string): Promise<PlaceDetail> =>
+				fetchValidatedJson(`/playspace/places/${encodeURIComponent(placeId)}`, placeDetailSchema),
 			create: async (payload: z.infer<typeof placeCreateRequestSchema>): Promise<PlaceDetail> => {
 				const parsedPayload = placeCreateRequestSchema.parse(payload);
 				return fetchValidatedJson("/playspace/places", placeDetailSchema, {

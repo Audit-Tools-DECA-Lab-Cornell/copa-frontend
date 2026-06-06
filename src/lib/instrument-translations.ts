@@ -359,5 +359,5 @@ export function useLocalizedInstrument(
 		}
 		const translations = getInstrumentTranslations();
 		return localizeInstrument(baseInstrumentOverride, translations);
-	}, [activeLanguage, baseInstrumentOverride]);
+	}, [baseInstrumentOverride]);
 }

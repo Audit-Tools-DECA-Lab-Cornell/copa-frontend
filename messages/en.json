@@ -1385,7 +1385,8 @@
 				"description": "Try refreshing this page. If needed, return to places and open this location again."
 			},
 			"actions": {
-				"backToPlaces": "Back to places"
+				"backToPlaces": "Back to places",
+				"editPlace": "Edit place"
 			},
 			"header": {
 				"eyebrow": "Place Activity",

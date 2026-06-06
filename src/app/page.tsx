@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerAuthSession } from "@/lib/auth/server-session";
 import type { Metadata } from "next";
+import { LandingPage } from "@/components/landing/landing-page";
 
 export const metadata: Metadata = {
 	title: "COPA | Comprehensive Outdoor Playspace Audit Tool",
@@ -22,7 +23,7 @@ export default async function HomePage() {
 	const session = await getServerAuthSession();
 
 	if (!session) {
-		redirect("/login");
+		return <LandingPage />;
 	}
 	if (session.role === "admin") {
 		redirect("/admin/dashboard");

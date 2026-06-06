@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 
 import { EditableField, DisplayConditionBadge } from "../shared-components";
-import { makeDefaultChoiceOption, makeDefaultScaleOption, makeDefaultQuestionScale } from "../defaults";
+import { makeDefaultScaleOption, makeDefaultQuestionScale } from "../defaults";
 import { moveArrayItem, isScaleCustomized, formatQuestionKeyForDisplay, renderInlineMarkdown } from "../utils";
 import { CONSTRUCT_OPTIONS, MODE_OPTIONS, QUESTION_TYPE_OPTIONS, SCALE_KEY_OPTIONS } from "../constants";
 import { useInstrumentEdit } from "../instrument-edit-context";
