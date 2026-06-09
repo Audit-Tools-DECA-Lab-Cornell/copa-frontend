@@ -29,6 +29,8 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 | Frontend facts | `../.claude/memory/frontend.md` |
 | Subagent routing | `../.cursor/AGENT_ROUTING.md` → `web-dashboard-ui` |
 
+**NEVER circumvent restricted env vars or secret files.** Access to `.env`, `.env.*`, and any secret file is restricted on purpose. If a direct read is denied, that denial is **final** - do not reach the same values by any indirect route: no `os.getenv`/`printenv`/`env` dumps, no scripts that print, log, mask, hash, transform, or compare environment variables, no URL/connection-string parsing that echoes host/port/db/credentials, no writing secrets to a file to read later. Masking the password does not make it acceptable - exposing host/db/username still defies the rule. If a restricted value is genuinely needed, STOP and ask the user; never engineer around the control.
+
 ## Hot paths
 
 - `src/lib/api/playspace.ts` - API client

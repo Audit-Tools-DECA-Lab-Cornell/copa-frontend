@@ -27,13 +27,13 @@ alwaysApply: false
 ## Export module layout
 
 - Public surfaces: `src/lib/export/instrument/index.ts` and `src/lib/export/audit/index.ts`.
-- Split implementation across `instrument-shared` / `-pdf` / `-excel` and `audit/` (`types`, `format-utils`, `score-utils`, `row-builders`, `excel`, `pdf`).
+- Split implementation across `instrument-shared` / `-pdf` / `-excel` and `audit/` (`types`, `excel`, `pdf`, `json`, `index`).
 - Dynamically import jsPDF, jspdf-autotable, and xlsx — do not add static top-level imports for heavy export libs.
 
 ## Row builders and shapes
 
-- Preview/list rows (`AdminAuditRow`, etc.) and export records (`AdminAuditExportRecord`, etc.) carry different score field shapes (`score_pair` vs flat `audit_pv_score` / `survey_pv_score` fields). Map between them only via the dedicated helpers in `row-builders.ts`.
-- Combined full-assessment reports (`execution_mode="both"`): top-level export summary omits Mode/Started/Submitted; per-source audit/survey panels keep their own metadata (`row-builders.ts`, `pdf.ts`).
+- Preview/list rows (`AdminAuditRow`, etc.) and export records (`AdminAuditExportRecord`, etc.) carry different score field shapes (`score_pair` vs flat `audit_pv_score` / `survey_pv_score` fields). Map between them only via the dedicated helpers in `audit/index.ts`.
+- Combined full-assessment reports (`execution_mode="both"`): top-level export summary omits Mode/Started/Submitted; per-source audit/survey panels keep their own metadata (`audit/pdf.ts`).
 
 ## Report rendering
 

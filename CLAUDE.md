@@ -17,6 +17,8 @@ pnpm build
 - `.claude/rules/frontend-dashboard-core.mdc` - always apply
 - `.claude/rules/frontend-i18n-and-exports.mdc` - i18n + exports + reports
 
+**NEVER circumvent restricted env vars or secret files.** Access to `.env`, `.env.*`, and any secret file is restricted on purpose. If a direct read is denied, that denial is **final** - do not reach the same values by any indirect route: no `os.getenv`/`printenv`/`env` dumps, no scripts that print, log, mask, hash, transform, or compare environment variables, no URL/connection-string parsing that echoes host/port/db/credentials, no writing secrets to a file to read later. Masking the password does not make it acceptable - exposing host/db/username still defies the rule. If a restricted value is genuinely needed, STOP and ask the user; never engineer around the control.
+
 Cursor mirror: `.cursor/rules/` (same filenames - keep both in sync).
 
 ## Workspace context
