@@ -40,7 +40,7 @@ alwaysApply: false
 - Domain rows: `buildDomainReportRows()` filters by execution mode via `questionMatchesMode()`; pass a question lookup so checklist follow-ups inherit parent domains (`getQuestionDomainKeys()`).
 - Combined mode: use `getCombinedReportSources()`, `buildVisibleQuestionEntries()`, and `getCombinedReportLegend()` from `report-source-sessions.ts` for source-aware place reports.
 - Scale display: `resolveScaleOptionInfo()` drives labels and the N/A + Unsure flags. Faint `-` = scale not asked; unblurred "Not applicable" / "Unsure" = auditor-selected state.
-- Report tables use full scale names (Provision, Variety, Challenge, Sociability), not abbreviations. These scale/construct names and all other `audit-report-view.tsx` chrome are localized via the `shared.reportView` namespace (both en.json + de.json) — German uses the instrument-layer terms (Quantität/Vielfalt/Herausforderung/Geselligkeit), so reports match what the auditor saw during execution. Domain ranking summary uses the `highestScored` / `lowestScored` keys.
+- Report tables use full scale names (Provision, Variety, Challenge, Sociability), not abbreviations. These scale/construct names and all other `audit-report-view.tsx` chrome are localized via the `shared.reportView` namespace (both en.json + de.json) - German uses the instrument-layer terms (Quantität/Vielfalt/Herausforderung/Geselligkeit), so reports match what the auditor saw during execution. Domain ranking summary uses the `highestScored` / `lowestScored` keys.
 - Bold prompt markers (`**text**`) render via `parsePromptSegments` - do not hand-roll parsing except on plain-string badge paths that strip markers with `replaceAll("**", "")`.
 
 ## PDF / Excel specifics
