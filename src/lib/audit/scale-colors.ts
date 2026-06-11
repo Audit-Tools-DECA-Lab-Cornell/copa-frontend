@@ -5,14 +5,14 @@
  * Used by dashboard badges, landing page, report views, PDF, and Excel exports.
  */
 
-export const PV_SCALE_KEYS = ["provision", "diversity", "challenge", "sociability"] as const;
+export const PV_SCALE_KEYS = ["provision", "variety", "challenge", "sociability"] as const;
 
 export type PvScaleKey = (typeof PV_SCALE_KEYS)[number];
 
 /** Canonical accent hex colours for each PV scale. */
 export const SCALE_ACCENT_COLORS: Record<PvScaleKey, string> = {
 	provision: "#566E3D",
-	diversity: "#BD4926",
+	variety: "#D2691E",
 	challenge: "#0C4767",
 	sociability: "#754170"
 };
@@ -58,7 +58,7 @@ function blendHexWithWhite(hex: string, accentWeight: number): string {
 /** Canonical soft background hex colours for scale columns and badge fills. */
 export const SCALE_SOFT_COLORS: Record<PvScaleKey, string> = {
 	provision: blendHexWithWhite(SCALE_ACCENT_COLORS.provision, SCALE_SOFT_BLEND_WEIGHT),
-	diversity: blendHexWithWhite(SCALE_ACCENT_COLORS.diversity, SCALE_SOFT_BLEND_WEIGHT),
+	variety: blendHexWithWhite(SCALE_ACCENT_COLORS.variety, SCALE_SOFT_BLEND_WEIGHT),
 	challenge: blendHexWithWhite(SCALE_ACCENT_COLORS.challenge, SCALE_SOFT_BLEND_WEIGHT),
 	sociability: blendHexWithWhite(SCALE_ACCENT_COLORS.sociability, SCALE_SOFT_BLEND_WEIGHT)
 };
@@ -66,7 +66,7 @@ export const SCALE_SOFT_COLORS: Record<PvScaleKey, string> = {
 /** Fixed accent and soft-fill hex values per PV scale. */
 export const PV_SCALE_PALETTE: Record<PvScaleKey, { readonly accent: string; readonly soft: string }> = {
 	provision: { accent: SCALE_ACCENT_COLORS.provision, soft: SCALE_SOFT_COLORS.provision },
-	diversity: { accent: SCALE_ACCENT_COLORS.diversity, soft: SCALE_SOFT_COLORS.diversity },
+	variety: { accent: SCALE_ACCENT_COLORS.variety, soft: SCALE_SOFT_COLORS.variety },
 	challenge: { accent: SCALE_ACCENT_COLORS.challenge, soft: SCALE_SOFT_COLORS.challenge },
 	sociability: { accent: SCALE_ACCENT_COLORS.sociability, soft: SCALE_SOFT_COLORS.sociability }
 };
@@ -74,7 +74,7 @@ export const PV_SCALE_PALETTE: Record<PvScaleKey, { readonly accent: string; rea
 /** CSS custom property names for each scale accent and soft fill. */
 export const SCALE_CSS_VAR_NAMES: Record<PvScaleKey, { readonly accent: string; readonly soft: string }> = {
 	provision: { accent: "--scale-provision", soft: "--scale-provision-soft" },
-	diversity: { accent: "--scale-diversity", soft: "--scale-diversity-soft" },
+	variety: { accent: "--scale-variety", soft: "--scale-variety-soft" },
 	challenge: { accent: "--scale-challenge", soft: "--scale-challenge-soft" },
 	sociability: { accent: "--scale-sociability", soft: "--scale-sociability-soft" }
 };
@@ -82,7 +82,7 @@ export const SCALE_CSS_VAR_NAMES: Record<PvScaleKey, { readonly accent: string; 
 /** Tailwind classes for scale badges (border / soft fill / text). */
 export const SCALE_BADGE_CLASS_NAMES: Record<PvScaleKey, string> = {
 	provision: "border-scale-provision/40 bg-scale-provision-soft text-scale-provision",
-	diversity: "border-scale-diversity/40 bg-scale-diversity-soft text-scale-diversity",
+	variety: "border-scale-variety/40 bg-scale-variety-soft text-scale-variety",
 	challenge: "border-scale-challenge/40 bg-scale-challenge-soft text-scale-challenge",
 	sociability: "border-scale-sociability/40 bg-scale-sociability-soft text-scale-sociability"
 };
@@ -90,7 +90,7 @@ export const SCALE_BADGE_CLASS_NAMES: Record<PvScaleKey, string> = {
 /** Top accent bar class for cards and report stat headers. */
 export const SCALE_ACCENT_BAR_CLASS_NAMES: Record<PvScaleKey, string> = {
 	provision: "bg-scale-provision",
-	diversity: "bg-scale-diversity",
+	variety: "bg-scale-variety",
 	challenge: "bg-scale-challenge",
 	sociability: "bg-scale-sociability"
 };
@@ -98,7 +98,7 @@ export const SCALE_ACCENT_BAR_CLASS_NAMES: Record<PvScaleKey, string> = {
 /** Text colour class for scale labels. */
 export const SCALE_ACCENT_TEXT_CLASS_NAMES: Record<PvScaleKey, string> = {
 	provision: "text-scale-provision",
-	diversity: "text-scale-diversity",
+	variety: "text-scale-variety",
 	challenge: "text-scale-challenge",
 	sociability: "text-scale-sociability"
 };

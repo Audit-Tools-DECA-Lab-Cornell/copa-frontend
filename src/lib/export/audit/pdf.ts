@@ -14,7 +14,7 @@
  * | 2 | Constructs    | was "Construct"                              |
  * | 3 | Prompt        | was "Items"                                  |
  * | 4 | Provision     | individual scale answer                      |
- * | 5 | Diversity     | individual scale answer                      |
+ * | 5 | Variety     | individual scale answer                      |
  * | 6 | Sociability   | individual scale answer                      |
  * | 7 | Challenge     | individual scale answer                      |
  * | 8 | PV Score      | Play Value construct score                   |
@@ -57,7 +57,7 @@ import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, derive
 function buildScaleRgbMap(colorMap: Record<PvScaleKey, string>): Record<PvScaleKey, [number, number, number]> {
 	return {
 		provision: hexToRgb(colorMap.provision),
-		diversity: hexToRgb(colorMap.diversity),
+		variety: hexToRgb(colorMap.variety),
 		sociability: hexToRgb(colorMap.sociability),
 		challenge: hexToRgb(colorMap.challenge)
 	};
@@ -116,7 +116,7 @@ const RESPONSE_HEADERS = [
 	"Constructs", // 2
 	"Prompt", // 3
 	"Provision", // 4
-	"Diversity", // 5
+	"Variety", // 5
 	"Sociability", // 6
 	"Challenge", // 7
 	"PV Score", // 8
@@ -491,11 +491,11 @@ export async function generatePdfBlob(
 			bold: false
 		},
 		{
-			cells: ["Diversity Total", formatScoreValue(overallScores?.diversity_total ?? 0)],
-			labelFill: AUDIT_PDF_PALETTE.scaleFill.diversity,
-			valueFill: AUDIT_PDF_PALETTE.scaleFill.diversity,
-			labelText: AUDIT_PDF_PALETTE.scaleAccent.diversity,
-			valueText: AUDIT_PDF_PALETTE.scaleAccent.diversity,
+			cells: ["Variety Total", formatScoreValue(overallScores?.variety_total ?? 0)],
+			labelFill: AUDIT_PDF_PALETTE.scaleFill.variety,
+			valueFill: AUDIT_PDF_PALETTE.scaleFill.variety,
+			labelText: AUDIT_PDF_PALETTE.scaleAccent.variety,
+			valueText: AUDIT_PDF_PALETTE.scaleAccent.variety,
 			bold: false
 		},
 		{
@@ -568,7 +568,7 @@ export async function generatePdfBlob(
 	 * 2  Constructs   - 6.5%
 	 * 3  Prompt       - 28%
 	 * 4  Provision    - 10%
-	 * 5  Diversity    - 10%
+	 * 5  Variety    - 10%
 	 * 6  Sociability  - 10%
 	 * 7  Challenge    - 10%
 	 * 8  PV Score     - 6%
@@ -632,7 +632,7 @@ export async function generatePdfBlob(
 	 *   col 0–2  → merged label cell (colSpan 3, amber fill)
 	 *   col 3    → empty spacer (amber fill)
 	 *   col 4    → Provision value  (scale soft fill)
-	 *   col 5    → Diversity value  (scale soft fill)
+	 *   col 5    → Variety value  (scale soft fill)
 	 *   col 6    → Sociability value (scale soft fill)
 	 *   col 7    → Challenge value  (scale soft fill)
 	 *   col 8    → PV value         (amber fill)
@@ -656,11 +656,7 @@ export async function generatePdfBlob(
 			cellPadding: { top: topPad, bottom: bottomPad, left: 4, right: 4 }
 		};
 
-		const scaleCell = (
-			scale: "provision" | "diversity" | "sociability" | "challenge",
-			val: number,
-			max: number
-		) => ({
+		const scaleCell = (scale: "provision" | "variety" | "sociability" | "challenge", val: number, max: number) => ({
 			content: fmt(val, max),
 			styles: {
 				...baseStyles,
@@ -697,7 +693,7 @@ export async function generatePdfBlob(
 				}
 			},
 			scaleCell("provision", totals.provision_total, totals.provision_total_max),
-			scaleCell("diversity", totals.diversity_total, totals.diversity_total_max),
+			scaleCell("variety", totals.variety_total, totals.variety_total_max),
 			scaleCell("sociability", totals.sociability_total, totals.sociability_total_max),
 			scaleCell("challenge", totals.challenge_total, totals.challenge_total_max),
 			scoreCell(totals.play_value_total, totals.play_value_total_max),
@@ -856,7 +852,7 @@ export async function generatePdfBlob(
 
 			// Individual scale answers (cols 4–7)
 			const rawProvision = answers.provision;
-			const rawDiversity = answers.diversity;
+			const rawVariety = answers.variety;
 			const rawSociability = answers.sociability;
 			const rawChallenge = answers.challenge;
 
@@ -868,13 +864,13 @@ export async function generatePdfBlob(
 							"provision",
 							typeof rawProvision === "string" ? rawProvision : undefined
 						);
-			const diversityAnswer =
+			const varietyAnswer =
 				question.question_type === "checklist"
 					? ""
 					: formatQuestionAnswer(
 							question,
-							"diversity",
-							typeof rawDiversity === "string" ? rawDiversity : undefined
+							"variety",
+							typeof rawVariety === "string" ? rawVariety : undefined
 						);
 			const sociabilityAnswer =
 				question.question_type === "checklist"
@@ -927,10 +923,10 @@ export async function generatePdfBlob(
 					}
 				},
 				{
-					content: diversityAnswer,
+					content: varietyAnswer,
 					styles: {
-						fillColor: AUDIT_PDF_PALETTE.scaleFill.diversity,
-						textColor: AUDIT_PDF_PALETTE.scaleAccent.diversity,
+						fillColor: AUDIT_PDF_PALETTE.scaleFill.variety,
+						textColor: AUDIT_PDF_PALETTE.scaleAccent.variety,
 						fontSize: 6.5
 					}
 				},

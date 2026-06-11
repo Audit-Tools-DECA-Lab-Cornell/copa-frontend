@@ -59,9 +59,9 @@ function buildInstrument() {
 								]
 							},
 							{
-								key: "diversity",
-								title: "Diversity",
-								prompt: "Diversity",
+								key: "variety",
+								title: "Variety",
+								prompt: "Variety",
 								options: [
 									{
 										key: "varied",
@@ -120,9 +120,9 @@ function buildInstrument() {
 								]
 							},
 							{
-								key: "diversity",
-								title: "Diversity",
-								prompt: "Diversity",
+								key: "variety",
+								title: "Variety",
+								prompt: "Variety",
 								options: [
 									{
 										key: "varied",
@@ -155,8 +155,8 @@ function buildScoreTotals() {
 	return {
 		provision_total: 2,
 		provision_total_max: 2,
-		diversity_total: 0,
-		diversity_total_max: 2,
+		variety_total: 0,
+		variety_total_max: 2,
 		challenge_total: 0,
 		challenge_total_max: 0,
 		sociability_total: 0,
@@ -209,7 +209,7 @@ function buildAuditSession() {
 				responses: {
 					q_1_1: {
 						provision: "a_lot",
-						diversity: "not_applicable"
+						variety: "not_applicable"
 					},
 					q_1_2: {
 						provision: "no"
@@ -260,13 +260,13 @@ test("buildDomainReportRows distinguishes explicit not-applicable answers from h
 	const explicitNotApplicableRow = movementDomain?.questions.find(question => question.questionKey === "q_1_1");
 	const hiddenFollowUpRow = movementDomain?.questions.find(question => question.questionKey === "q_1_2");
 
-	expect(explicitNotApplicableRow?.diversityApplicable).toBe(true);
-	expect(explicitNotApplicableRow?.diversityAnswered).toBe(true);
-	expect(explicitNotApplicableRow?.diversityIsNotApplicable).toBe(true);
+	expect(explicitNotApplicableRow?.varietyApplicable).toBe(true);
+	expect(explicitNotApplicableRow?.varietyAnswered).toBe(true);
+	expect(explicitNotApplicableRow?.varietyIsNotApplicable).toBe(true);
 	expect(explicitNotApplicableRow?.followUpScalesAsked).toBe(true);
 
-	expect(hiddenFollowUpRow?.diversityApplicable).toBe(true);
-	expect(hiddenFollowUpRow?.diversityAnswered).toBe(false);
-	expect(hiddenFollowUpRow?.diversityIsNotApplicable).toBe(false);
+	expect(hiddenFollowUpRow?.varietyApplicable).toBe(true);
+	expect(hiddenFollowUpRow?.varietyAnswered).toBe(false);
+	expect(hiddenFollowUpRow?.varietyIsNotApplicable).toBe(false);
 	expect(hiddenFollowUpRow?.followUpScalesAsked).toBe(false);
 });

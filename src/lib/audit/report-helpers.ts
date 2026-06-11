@@ -43,10 +43,10 @@ export interface DomainQuestionRow {
 	readonly provisionApplicable: boolean;
 	readonly provisionAnswered: boolean;
 	readonly provisionIsNotApplicable: boolean;
-	readonly diversityLabel: string | null;
-	readonly diversityApplicable: boolean;
-	readonly diversityAnswered: boolean;
-	readonly diversityIsNotApplicable: boolean;
+	readonly varietyLabel: string | null;
+	readonly varietyApplicable: boolean;
+	readonly varietyAnswered: boolean;
+	readonly varietyIsNotApplicable: boolean;
 	/** When `false`, the challenge column must show N/A (scale not present on question). */
 	readonly challengeApplicable: boolean;
 	readonly challengeLabel: string | null;
@@ -80,7 +80,7 @@ export interface VisibleQuestionEntry {
  * Best/worst domain ranking for one scoring construct.
  */
 export interface ConstructRanking {
-	readonly constructKey: "provision" | "diversity" | "challenge" | "sociability" | "play_value" | "usability";
+	readonly constructKey: "provision" | "variety" | "challenge" | "sociability" | "play_value" | "usability";
 	readonly bestDomain: {
 		domainTitle: string;
 		score: number;
@@ -115,9 +115,9 @@ const CONSTRUCT_ACCESSORS: readonly ConstructAccessor[] = [
 		max: t => t.provision_total_max
 	},
 	{
-		key: "diversity",
-		value: t => t.diversity_total,
-		max: t => t.diversity_total_max
+		key: "variety",
+		value: t => t.variety_total,
+		max: t => t.variety_total_max
 	},
 	{
 		key: "challenge",
@@ -144,8 +144,8 @@ const CONSTRUCT_ACCESSORS: readonly ConstructAccessor[] = [
 const EMPTY_SCORE_TOTALS: AuditScoreTotals = {
 	provision_total: 0,
 	provision_total_max: 0,
-	diversity_total: 0,
-	diversity_total_max: 0,
+	variety_total: 0,
+	variety_total_max: 0,
 	challenge_total: 0,
 	challenge_total_max: 0,
 	sociability_total: 0,
@@ -187,7 +187,7 @@ function readProvisionScaleMaximum(question: InstrumentQuestion): number {
 function readMultiplierScaleScore(
 	question: InstrumentQuestion,
 	answers: QuestionResponsePayload,
-	scaleKey: "diversity" | "challenge"
+	scaleKey: "variety" | "challenge"
 ): MultiplierScaleScore {
 	const scale = findScale(question, scaleKey);
 	const rawAnswer = answers[scaleKey];
@@ -211,7 +211,7 @@ function readMultiplierScaleScore(
 
 function readMultiplierScaleMaximum(
 	question: InstrumentQuestion,
-	scaleKey: "diversity" | "challenge"
+	scaleKey: "variety" | "challenge"
 ): MultiplierScaleScore {
 	const scale = findScale(question, scaleKey);
 	if (scale === undefined) {
@@ -281,26 +281,26 @@ function calculateQuestionScores(question: InstrumentQuestion, answers: Question
 	const provisionTotalMax = readProvisionScaleMaximum(question);
 	const shouldReadFollowUpScales = provisionOption?.allows_follow_up_scales === true;
 
-	const diversityScore = shouldReadFollowUpScales
-		? readMultiplierScaleScore(question, answers, "diversity")
+	const varietyScore = shouldReadFollowUpScales
+		? readMultiplierScaleScore(question, answers, "variety")
 		: { columnTotal: 0, boostValue: 1 };
 	const challengeScore = shouldReadFollowUpScales
 		? readMultiplierScaleScore(question, answers, "challenge")
 		: { columnTotal: 0, boostValue: 1 };
 	const sociabilityTotal = shouldReadFollowUpScales ? readSociabilityScaleScore(question, answers) : 0;
 
-	const diversityMaximum = readMultiplierScaleMaximum(question, "diversity");
+	const varietyMaximum = readMultiplierScaleMaximum(question, "variety");
 	const challengeMaximum = readMultiplierScaleMaximum(question, "challenge");
 	const sociabilityTotalMax = readSociabilityScaleMaximum(question);
 
-	const constructTotal = provisionTotal * diversityScore.boostValue * challengeScore.boostValue;
-	const constructTotalMax = provisionTotalMax * diversityMaximum.boostValue * challengeMaximum.boostValue;
+	const constructTotal = provisionTotal * varietyScore.boostValue * challengeScore.boostValue;
+	const constructTotalMax = provisionTotalMax * varietyMaximum.boostValue * challengeMaximum.boostValue;
 
 	return {
 		provision_total: provisionTotal,
 		provision_total_max: provisionTotalMax,
-		diversity_total: diversityScore.columnTotal,
-		diversity_total_max: diversityMaximum.columnTotal,
+		variety_total: varietyScore.columnTotal,
+		variety_total_max: varietyMaximum.columnTotal,
 		challenge_total: challengeScore.columnTotal,
 		challenge_total_max: challengeMaximum.columnTotal,
 		sociability_total: sociabilityTotal,
@@ -381,8 +381,8 @@ function buildDomainQuestionRow(
 			? undefined
 			: findScaleOption(provisionScale, provisionAnswerKey);
 	const followUpScalesAsked = provisionOption?.allows_follow_up_scales === true;
-	const diversityInfo = resolveScaleOptionInfo(question, "diversity", readStringAnswer(answers, "diversity"));
-	const diversityApplicable = findScale(question, "diversity") !== undefined;
+	const varietyInfo = resolveScaleOptionInfo(question, "variety", readStringAnswer(answers, "variety"));
+	const varietyApplicable = findScale(question, "variety") !== undefined;
 	const challengeInfo = resolveScaleOptionInfo(question, "challenge", readStringAnswer(answers, "challenge"));
 	const challengeApplicable = findScale(question, "challenge") !== undefined;
 	const sociabilityInfo = resolveScaleOptionInfo(question, "sociability", readStringAnswer(answers, "sociability"));
@@ -401,10 +401,10 @@ function buildDomainQuestionRow(
 		provisionApplicable,
 		provisionAnswered: provisionInfo.answered,
 		provisionIsNotApplicable: provisionInfo.isNotApplicable,
-		diversityLabel: diversityInfo.label,
-		diversityApplicable,
-		diversityAnswered: diversityInfo.answered,
-		diversityIsNotApplicable: diversityInfo.isNotApplicable,
+		varietyLabel: varietyInfo.label,
+		varietyApplicable,
+		varietyAnswered: varietyInfo.answered,
+		varietyIsNotApplicable: varietyInfo.isNotApplicable,
 		challengeApplicable,
 		challengeLabel: challengeInfo.label,
 		challengeAnswered: challengeInfo.answered,
@@ -553,7 +553,7 @@ export function toDomainTitle(domainKey: string): string {
  * Resolve the human label and state for a selected scale option.
  *
  * @param question - Instrument question definition.
- * @param scaleKey - Scale key (provision, diversity, etc.).
+ * @param scaleKey - Scale key (provision, variety, etc.).
  * @param answerKey - Selected option key from responses.
  * @returns Label and answer-state metadata for report rendering.
  */
@@ -1044,7 +1044,7 @@ export function roundedPercentOfMax(value: number, max: number): number | null {
 }
 
 /**
- * Bar color band from percentage: 70+ high, 40+ mid, below low, null → not assessed.
+ * Bar color band from percentage: 66.6+ high, 33.3+ mid, below low, null → not assessed.
  * Matches the Playspace report bar visualization across web and mobile.
  */
 export type ReportBarScoreTier = "na" | "high" | "mid" | "low";
@@ -1053,10 +1053,10 @@ export function reportBarScoreTier(percent: number | null): ReportBarScoreTier {
 	if (percent === null) {
 		return "na";
 	}
-	if (percent >= 70) {
+	if (percent >= 66.6) {
 		return "high";
 	}
-	if (percent >= 40) {
+	if (percent >= 33.3) {
 		return "mid";
 	}
 	return "low";

@@ -175,7 +175,7 @@ export function formatLabel(raw: string): string {
 		imaginative_play: "Imaginative Play",
 		physical_activity: "Physical Activity",
 		provision: "Provision",
-		diversity: "Diversity",
+		variety: "Variety",
 		challenge: "Challenge",
 		sociability: "Sociability",
 		naturalness: "Naturalness",

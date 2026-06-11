@@ -168,8 +168,8 @@ export const placeSummarySchema = z.object({
 export const scoreTotalsSchema = z.object({
 	provision_total: z.number(),
 	provision_total_max: z.number(),
-	diversity_total: z.number(),
-	diversity_total_max: z.number(),
+	variety_total: z.number(),
+	variety_total_max: z.number(),
 	challenge_total: z.number(),
 	challenge_total_max: z.number(),
 	sociability_total: z.number(),

@@ -8,8 +8,8 @@ function addScoreTotals(a: ScoreTotals, b: ScoreTotals): ScoreTotals {
 	return {
 		provision_total: a.provision_total + b.provision_total,
 		provision_total_max: a.provision_total_max + b.provision_total_max,
-		diversity_total: a.diversity_total + b.diversity_total,
-		diversity_total_max: a.diversity_total_max + b.diversity_total_max,
+		variety_total: a.variety_total + b.variety_total,
+		variety_total_max: a.variety_total_max + b.variety_total_max,
 		challenge_total: a.challenge_total + b.challenge_total,
 		challenge_total_max: a.challenge_total_max + b.challenge_total_max,
 		sociability_total: a.sociability_total + b.sociability_total,

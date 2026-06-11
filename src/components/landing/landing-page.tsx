@@ -186,7 +186,7 @@ function SiteHeader() {
  */
 const SCALE_PREVIEW_LABELS: Record<PvScaleKey, string> = {
 	provision: "Provision",
-	diversity: "Diversity",
+	variety: "Variety",
 	challenge: "Challenge",
 	sociability: "Sociability"
 };
@@ -194,7 +194,7 @@ const SCALE_PREVIEW_LABELS: Record<PvScaleKey, string> = {
 function ProductMock() {
 	const domains: Array<{ key: PvScaleKey; label: string; value: number; score: string }> = [
 		{ key: "provision", label: SCALE_PREVIEW_LABELS.provision, value: 86, score: "4.3" },
-		{ key: "diversity", label: SCALE_PREVIEW_LABELS.diversity, value: 72, score: "3.6" },
+		{ key: "variety", label: SCALE_PREVIEW_LABELS.variety, value: 72, score: "3.6" },
 		{ key: "challenge", label: SCALE_PREVIEW_LABELS.challenge, value: 64, score: "3.2" },
 		{ key: "sociability", label: SCALE_PREVIEW_LABELS.sociability, value: 79, score: "4.0" }
 	];
@@ -435,8 +435,8 @@ function WhatCopasMeasures() {
 			question: "What features, materials, and opportunities are present?"
 		},
 		{
-			key: "diversity",
-			title: "Diversity",
+			key: "variety",
+			title: "Variety",
 			question: "Is there genuine variety in type, scale, and approach?"
 		},
 		{
@@ -475,7 +475,7 @@ function WhatCopasMeasures() {
 						<p className="font-mono text-5xl font-semibold text-accent-terracotta">PV</p>
 						<h3 className="text-xl font-semibold text-foreground">Play Value</h3>
 						<p className="text-sm leading-relaxed text-muted-foreground">
-							The diversity, richness, and flexibility of play opportunities a space supports. A high play
+							The variety, richness, and flexibility of play opportunities a space supports. A high play
 							value space offers many ways to engage - physical, social, creative, sensory, and
 							restorative - across a range of abilities and interests.
 						</p>

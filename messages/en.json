@@ -702,7 +702,7 @@
 				},
 				"scaleLabels": {
 					"provision": "Provision",
-					"diversity": "Diversity",
+					"variety": "Variety",
 					"challenge": "Challenge",
 					"sociability": "Sociability"
 				},
@@ -2013,7 +2013,7 @@
 				"followUpPending": "Choose a positive provision answer to unlock this scale.",
 				"scaleColumns": {
 					"provision": "Provision / Provision",
-					"diversity": "Diversity",
+					"variety": "Variety",
 					"challenge": "Challenge",
 					"sociability": "Sociability"
 				}

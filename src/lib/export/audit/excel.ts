@@ -114,25 +114,25 @@ export function calculateDynamicColumnWidths(rows: readonly SpreadsheetRow[]): {
 
 /**
  * Maps Responses-sheet col indices to PV scale keys.
- * Cols 7–10 are Provision / Diversity / Sociability / Challenge.
+ * Cols 7–10 are Provision / Variety / Sociability / Challenge.
  */
 const SCALE_COLUMN_MAP: Record<number, PvScaleKey> = {
 	7: "provision",
-	8: "diversity",
+	8: "variety",
 	9: "sociability",
 	10: "challenge"
 };
 
 const SCALE_SOFT_HEX: Record<PvScaleKey, string> = {
 	provision: hexToXlsxRgb(SCALE_SOFT_COLORS.provision),
-	diversity: hexToXlsxRgb(SCALE_SOFT_COLORS.diversity),
+	variety: hexToXlsxRgb(SCALE_SOFT_COLORS.variety),
 	sociability: hexToXlsxRgb(SCALE_SOFT_COLORS.sociability),
 	challenge: hexToXlsxRgb(SCALE_SOFT_COLORS.challenge)
 };
 
 const SCALE_ACCENT_HEX: Record<PvScaleKey, string> = {
 	provision: hexToXlsxRgb(SCALE_ACCENT_COLORS.provision),
-	diversity: hexToXlsxRgb(SCALE_ACCENT_COLORS.diversity),
+	variety: hexToXlsxRgb(SCALE_ACCENT_COLORS.variety),
 	sociability: hexToXlsxRgb(SCALE_ACCENT_COLORS.sociability),
 	challenge: hexToXlsxRgb(SCALE_ACCENT_COLORS.challenge)
 };

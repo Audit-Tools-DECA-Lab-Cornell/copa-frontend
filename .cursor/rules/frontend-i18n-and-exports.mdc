@@ -40,7 +40,7 @@ alwaysApply: false
 - Domain rows: `buildDomainReportRows()` filters by execution mode via `questionMatchesMode()`; pass a question lookup so checklist follow-ups inherit parent domains (`getQuestionDomainKeys()`).
 - Combined mode: use `getCombinedReportSources()`, `buildVisibleQuestionEntries()`, and `getCombinedReportLegend()` from `report-source-sessions.ts` for source-aware place reports.
 - Scale display: `resolveScaleOptionInfo()` drives labels and N/A flags. Faint `-` = scale not asked; unblurred "Not applicable" = auditor-selected N/A.
-- Report tables use full scale names (Provision, Diversity, Challenge, Sociability), not abbreviations. Domain ranking summary uses "Highest Scored" / "Lowest Scored".
+- Report tables use full scale names (Provision, Variety, Challenge, Sociability), not abbreviations. Domain ranking summary uses "Highest Scored" / "Lowest Scored".
 - Bold prompt markers (`**text**`) render via `parsePromptSegments` - do not hand-roll parsing except on plain-string badge paths that strip markers with `replaceAll("**", "")`.
 
 ## PDF / Excel specifics

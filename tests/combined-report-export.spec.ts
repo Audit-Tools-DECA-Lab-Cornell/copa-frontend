@@ -172,8 +172,8 @@ function buildScoreTotals(playValueTotal: number, usabilityTotal: number) {
 	return {
 		provision_total: playValueTotal + usabilityTotal,
 		provision_total_max: playValueTotal + usabilityTotal,
-		diversity_total: 0,
-		diversity_total_max: 0,
+		variety_total: 0,
+		variety_total_max: 0,
 		challenge_total: 0,
 		challenge_total_max: 0,
 		sociability_total: 0,

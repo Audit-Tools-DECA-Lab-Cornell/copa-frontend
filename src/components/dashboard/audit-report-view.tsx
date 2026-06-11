@@ -85,7 +85,7 @@ function formatDateTime(iso: string): string {
 
 // ── Metric configuration ────────────────────────────────────────────────────
 
-type MetricKey = "provision" | "diversity" | "challenge" | "sociability" | "play_value" | "usability";
+type MetricKey = "provision" | "variety" | "challenge" | "sociability" | "play_value" | "usability";
 
 interface MetricDef {
 	readonly key: MetricKey;
@@ -104,11 +104,11 @@ const SCALE_METRICS: readonly MetricDef[] = [
 		getMax: t => t.provision_total_max
 	},
 	{
-		key: "diversity",
-		label: "Diversity",
-		shortLabel: "Diversity",
-		getValue: t => t.diversity_total,
-		getMax: t => t.diversity_total_max
+		key: "variety",
+		label: "Variety",
+		shortLabel: "Variety",
+		getValue: t => t.variety_total,
+		getMax: t => t.variety_total_max
 	},
 	{
 		key: "challenge",
@@ -130,14 +130,14 @@ const CONSTRUCT_METRICS: readonly MetricDef[] = [
 	{
 		key: "play_value",
 		label: "Play Value",
-		shortLabel: "PV",
+		shortLabel: "Play Value",
 		getValue: t => t.play_value_total,
 		getMax: t => t.play_value_total_max
 	},
 	{
 		key: "usability",
 		label: "Usability",
-		shortLabel: "U",
+		shortLabel: "Usability",
 		getValue: t => t.usability_total,
 		getMax: t => t.usability_total_max
 	}
@@ -151,7 +151,7 @@ const CONSTRUCT_METRICS: readonly MetricDef[] = [
 
 const BAR_COLORS: Record<MetricKey, string> = {
 	provision: SCALE_ACCENT_COLORS.provision,
-	diversity: SCALE_ACCENT_COLORS.diversity,
+	variety: SCALE_ACCENT_COLORS.variety,
 	challenge: SCALE_ACCENT_COLORS.challenge,
 	sociability: SCALE_ACCENT_COLORS.sociability,
 	play_value: "#2E7D78",
@@ -160,7 +160,7 @@ const BAR_COLORS: Record<MetricKey, string> = {
 
 // Percentage cutoffs where the legacy bar color used to change. Now rendered as
 // horizontal dotted lines across each bar, labeled at the start of each group.
-const BAR_THRESHOLDS = [40, 70] as const;
+const BAR_THRESHOLDS = [33.3, 66.6] as const;
 
 // ── Bar group ────────────────────────────────────────────────────────────────
 
@@ -248,7 +248,7 @@ function BarGroup({
 					{BAR_THRESHOLDS.map(th => (
 						<span
 							key={th}
-							className="absolute right-2 -translate-y-1/2 text-[10px] font-medium tabular-nums text-muted-foreground"
+							className="absolute right-2 text-[10px] font-medium tabular-nums text-muted-foreground"
 							style={{ bottom: (th / 100) * BAR_TRACK_HEIGHT }}>
 							{th}%
 						</span>
@@ -466,7 +466,7 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 							Provision
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
-							Diversity
+							Variety
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
 							Challenge
@@ -525,9 +525,9 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
 									{renderScaleCellState({
-										label: q.diversityLabel,
-										applicable: q.diversityApplicable,
-										isNotApplicable: q.diversityIsNotApplicable,
+										label: q.varietyLabel,
+										applicable: q.varietyApplicable,
+										isNotApplicable: q.varietyIsNotApplicable,
 										followUpScalesAsked: q.followUpScalesAsked
 									})}
 								</td>
@@ -568,11 +568,11 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 
 // ── Best/Worst table ─────────────────────────────────────────────────────────
 
-type ConstructKey = "provision" | "diversity" | "challenge" | "sociability" | "play_value" | "usability";
+type ConstructKey = "provision" | "variety" | "challenge" | "sociability" | "play_value" | "usability";
 
 const CONSTRUCT_LABELS: Record<ConstructKey, string> = {
 	provision: "Provision",
-	diversity: "Diversity",
+	variety: "Variety",
 	challenge: "Challenge Opportunities",
 	sociability: "Sociability Support",
 	play_value: "Play Value",
@@ -580,7 +580,7 @@ const CONSTRUCT_LABELS: Record<ConstructKey, string> = {
 };
 
 const CONSTRUCT_GRID: readonly (readonly [ConstructKey, ConstructKey, ConstructKey])[] = [
-	["provision", "diversity", "challenge"],
+	["provision", "variety", "challenge"],
 	["sociability", "play_value", "usability"]
 ];
 

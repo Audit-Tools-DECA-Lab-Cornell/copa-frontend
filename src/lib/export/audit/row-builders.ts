@@ -109,7 +109,7 @@ export function buildOverviewRows(
 		["Play Value Total", overallScores?.play_value_total ?? "Pending"],
 		["Usability Total", overallScores?.usability_total ?? "Pending"],
 		["Provision Total", overallScores?.provision_total ?? "Pending"],
-		["Diversity Total", overallScores?.diversity_total ?? "Pending"],
+		["Variety Total", overallScores?.variety_total ?? "Pending"],
 		["Sociability Total", overallScores?.sociability_total ?? "Pending"],
 		["Challenge Total", overallScores?.challenge_total ?? "Pending"],
 		...auditorRows
@@ -306,7 +306,7 @@ export function buildQuestionResponseRow(
 	}
 
 	const rawProvision = answers.provision;
-	const rawDiversity = answers.diversity;
+	const rawVariety = answers.variety;
 	const rawSociability = answers.sociability;
 	const rawChallenge = answers.challenge;
 
@@ -319,7 +319,7 @@ export function buildQuestionResponseRow(
 		"",
 		stripPromptMarkup(question.prompt),
 		formatQuestionAnswer(question, "provision", typeof rawProvision === "string" ? rawProvision : undefined),
-		formatQuestionAnswer(question, "diversity", typeof rawDiversity === "string" ? rawDiversity : undefined),
+		formatQuestionAnswer(question, "variety", typeof rawVariety === "string" ? rawVariety : undefined),
 		formatQuestionAnswer(question, "sociability", typeof rawSociability === "string" ? rawSociability : undefined),
 		formatQuestionAnswer(question, "challenge", typeof rawChallenge === "string" ? rawChallenge : undefined),
 		question.constructs.includes("play_value") ? questionScores.play_value_total : "N/A",
@@ -446,7 +446,7 @@ export function buildScoreSummaryRow(
 		return [
 			...base,
 			totals.provision_total,
-			totals.diversity_total,
+			totals.variety_total,
 			totals.sociability_total,
 			totals.challenge_total,
 			totals.play_value_total,
@@ -458,7 +458,7 @@ export function buildScoreSummaryRow(
 		return [
 			...base,
 			totals.provision_total_max,
-			totals.diversity_total_max,
+			totals.variety_total_max,
 			totals.sociability_total_max,
 			totals.challenge_total_max,
 			totals.play_value_total_max,
@@ -469,7 +469,7 @@ export function buildScoreSummaryRow(
 	return [
 		...base,
 		formatPercentage(totals.provision_total, totals.provision_total_max),
-		formatPercentage(totals.diversity_total, totals.diversity_total_max),
+		formatPercentage(totals.variety_total, totals.variety_total_max),
 		formatPercentage(totals.sociability_total, totals.sociability_total_max),
 		formatPercentage(totals.challenge_total, totals.challenge_total_max),
 		formatPercentage(totals.play_value_total, totals.play_value_total_max),

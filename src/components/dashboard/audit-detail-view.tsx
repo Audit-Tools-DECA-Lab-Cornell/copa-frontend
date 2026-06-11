@@ -494,7 +494,7 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 		);
 	}
 
-	const scaleKeys = ["provision", "diversity", "sociability", "challenge"] as const;
+	const scaleKeys = ["provision", "variety", "sociability", "challenge"] as const;
 	const answerEntries = scaleKeys
 		.map(key => {
 			const rawAnswer = answers[key];
@@ -697,9 +697,9 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow, basePath }: Audit
 													maxKey: "provision_total_max"
 												},
 												{
-													label: "Diversity",
-													totalKey: "diversity_total",
-													maxKey: "diversity_total_max"
+													label: "Variety",
+													totalKey: "variety_total",
+													maxKey: "variety_total_max"
 												},
 												{
 													label: "Sociability",

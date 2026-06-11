@@ -83,7 +83,7 @@ export interface WorkbookRowMetadata {
 	readonly sourceComponent?: "audit" | "survey";
 }
 
-/** Partial score contributed by a multiplier (diversity / challenge) scale. */
+/** Partial score contributed by a multiplier (variety / challenge) scale. */
 export interface MultiplierScaleScore {
 	readonly columnTotal: number;
 	readonly boostValue: number;
@@ -110,14 +110,14 @@ export { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors
 
 /**
  * Returns the soft (background) colour for each PV scale column.
- * Used to colour-code Provision / Diversity / Sociability / Challenge columns
+ * Used to colour-code Provision / Variety / Sociability / Challenge columns
  * in the XLSX Responses sheet.
  *
  * The `palette` parameter is retained for API compatibility; the colours are
  * now fixed to the canonical scale tokens rather than derived from the palette.
  */
 export function getWebScaleSoftColor(
-	scaleKey: "provision" | "diversity" | "sociability" | "challenge",
+	scaleKey: "provision" | "variety" | "sociability" | "challenge",
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	_palette: WebExportPalette
 ): string {
@@ -131,7 +131,7 @@ export function getWebScaleSoftColor(
  * now fixed to the canonical scale tokens rather than derived from the palette.
  */
 export function getWebScaleAccentColor(
-	scaleKey: "provision" | "diversity" | "sociability" | "challenge",
+	scaleKey: "provision" | "variety" | "sociability" | "challenge",
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	_palette: WebExportPalette
 ): string {
@@ -150,7 +150,7 @@ export const SINGLE_RESPONSE_HEADERS = [
 	"Instructions",
 	"Items",
 	"Provision",
-	"Diversity",
+	"Variety",
 	"Sociability",
 	"Challenge Opportunities",
 	"Play Value (PV) Construct Score",

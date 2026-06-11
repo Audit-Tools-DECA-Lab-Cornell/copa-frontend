@@ -11,8 +11,8 @@ function createScoreTotals(seed: number): ScoreTotals {
 	return {
 		provision_total: seed + 1,
 		provision_total_max: seed + 11,
-		diversity_total: seed + 2,
-		diversity_total_max: seed + 12,
+		variety_total: seed + 2,
+		variety_total_max: seed + 12,
 		challenge_total: seed + 3,
 		challenge_total_max: seed + 13,
 		sociability_total: seed + 4,

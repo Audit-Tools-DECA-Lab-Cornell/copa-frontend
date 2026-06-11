@@ -23,7 +23,7 @@ export interface SectionQuestionTableProps {
 	readonly onChangeQuestionNote?: (questionKey: string, nextNote: string) => void;
 }
 
-const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["provision", "diversity", "challenge", "sociability"];
+const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["provision", "variety", "challenge", "sociability"];
 
 /**
  * Desktop and tablet matrix layout for audit questions.
