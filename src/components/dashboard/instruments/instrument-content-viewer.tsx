@@ -400,6 +400,11 @@ function ScaleOptionRow({ option }: Readonly<{ option: ScaleOption }>) {
 						{t("notApplicable")}
 					</Badge>
 				)}
+				{option.is_unsure && (
+					<Badge variant="outline" className="text-[10px] px-1.5 py-0">
+						{t("unsure")}
+					</Badge>
+				)}
 			</div>
 			<div className="flex items-center gap-3 text-muted-foreground">
 				<span>
@@ -627,9 +632,11 @@ function ViewerScaleRow({
 						className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] border ${
 							opt.is_not_applicable
 								? "border-dashed border-muted-foreground/40 text-muted-foreground"
-								: opt.allows_follow_up_scales
-									? "border-status-success-border bg-status-success-surface text-foreground font-medium"
-									: "border-edge/50 bg-muted/40"
+								: opt.is_unsure
+									? "border-dashed border-sky-400/50 text-sky-700 dark:text-sky-300"
+									: opt.allows_follow_up_scales
+										? "border-status-success-border bg-status-success-surface text-foreground font-medium"
+										: "border-edge/50 bg-muted/40"
 						}`}>
 						{opt.label}
 						{opt.addition_value > 0 && (

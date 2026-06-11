@@ -180,6 +180,20 @@ export const scoreTotalsSchema = z.object({
 	usability_total_max: z.number()
 });
 
+export const scoreVariantBucketsSchema = z.object({
+	execution_mode: executionModeSchema.nullable().optional().default(null),
+	audit: scoreTotalsSchema.nullable().optional().default(null),
+	survey: scoreTotalsSchema.nullable().optional().default(null),
+	overall: scoreTotalsSchema.nullable(),
+	by_section: z.record(z.string(), scoreTotalsSchema).default({}),
+	by_domain: z.record(z.string(), scoreTotalsSchema).default({})
+});
+
+export const unsureVariantsSchema = z.object({
+	unsure_as_zero: scoreVariantBucketsSchema.nullable().optional().default(null),
+	unsure_as_max: scoreVariantBucketsSchema.nullable().optional().default(null)
+});
+
 export const placeAuditHistoryItemSchema = z.object({
 	audit_id: z.string().uuid(),
 	audit_code: z.string(),
@@ -607,7 +621,9 @@ export const auditScoresSchema = z.object({
 	survey: scoreTotalsSchema.nullable().optional().default(null),
 	overall: scoreTotalsSchema.nullable(),
 	by_section: z.record(z.string(), scoreTotalsSchema),
-	by_domain: z.record(z.string(), scoreTotalsSchema)
+	by_domain: z.record(z.string(), scoreTotalsSchema),
+	unsure_answer_count: z.number().int().nonnegative().optional().default(0),
+	unsure_variants: unsureVariantsSchema.nullable().optional().default(null)
 });
 
 export const auditAggregateSchema = z.object({

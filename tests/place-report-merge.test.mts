@@ -29,6 +29,8 @@ function createScoreTotals(seed: number): ScoreTotals {
  */
 function createSession(mode: ExecutionMode, id: string, scoreSeed: number): AuditSession {
 	const scoreTotals = createScoreTotals(scoreSeed);
+	const zeroTotals = createScoreTotals(scoreSeed + 100);
+	const maxTotals = createScoreTotals(scoreSeed + 200);
 
 	return {
 		audit_id: id,
@@ -50,7 +52,8 @@ function createSession(mode: ExecutionMode, id: string, scoreSeed: number): Audi
 			schema_version: 1,
 			revision: 0,
 			meta: {
-				execution_mode: mode
+				execution_mode: mode,
+				final_comments: null
 			},
 			pre_audit: {
 				place_size: null,
@@ -75,7 +78,8 @@ function createSession(mode: ExecutionMode, id: string, scoreSeed: number): Audi
 		submitted_at: "2026-05-02T12:00:00.000Z",
 		total_minutes: 30,
 		meta: {
-			execution_mode: mode
+			execution_mode: mode,
+			final_comments: null
 		},
 		pre_audit: {
 			place_size: null,
@@ -106,6 +110,33 @@ function createSession(mode: ExecutionMode, id: string, scoreSeed: number): Audi
 			},
 			by_domain: {
 				[`${mode}-domain`]: scoreTotals
+			},
+			unsure_answer_count: 1,
+			unsure_variants: {
+				unsure_as_zero: {
+					execution_mode: mode,
+					audit: mode === "audit" ? zeroTotals : null,
+					survey: mode === "survey" ? zeroTotals : null,
+					overall: zeroTotals,
+					by_section: {
+						[`${mode}-section`]: zeroTotals
+					},
+					by_domain: {
+						[`${mode}-domain`]: zeroTotals
+					}
+				},
+				unsure_as_max: {
+					execution_mode: mode,
+					audit: mode === "audit" ? maxTotals : null,
+					survey: mode === "survey" ? maxTotals : null,
+					overall: maxTotals,
+					by_section: {
+						[`${mode}-section`]: maxTotals
+					},
+					by_domain: {
+						[`${mode}-domain`]: maxTotals
+					}
+				}
 			}
 		},
 		progress: {
@@ -131,4 +162,17 @@ test("mergeAuditSessions keeps both audit and survey score partitions for combin
 	assert.equal(mergedSession.scores.execution_mode, "both");
 	assert.ok(mergedSession.scores.overall !== null);
 	assert.deepEqual(Object.keys(mergedSession.sections).sort(), ["audit-section", "survey-section"]);
+});
+
+test("mergeAuditSessions merges unsure variant buckets for combined reports", () => {
+	const auditSession = createSession("audit", "audit-source", 10);
+	const surveySession = createSession("survey", "survey-source", 40);
+
+	const mergedSession = mergeAuditSessions(auditSession, surveySession);
+
+	assert.equal(mergedSession.scores.unsure_answer_count, 2);
+	assert.ok(mergedSession.scores.unsure_variants?.unsure_as_zero?.overall !== null);
+	assert.ok(mergedSession.scores.unsure_variants?.unsure_as_max?.overall !== null);
+	assert.equal(mergedSession.scores.unsure_variants?.unsure_as_zero?.overall?.play_value_total, 260);
+	assert.equal(mergedSession.scores.unsure_variants?.unsure_as_max?.overall?.play_value_total, 460);
 });

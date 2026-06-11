@@ -36,10 +36,28 @@ import {
 	type ReportSourceComponent
 } from "@/lib/audit/report-source-sessions";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
+import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
 
 interface ResponseTableBuildResult {
 	readonly rows: readonly SpreadsheetRow[];
 	readonly rowMetadata: readonly (WorkbookRowMetadata | null)[];
+}
+
+function formatVariantScoreRow(
+	label: string,
+	variant: ScoreVariantKey,
+	auditSession: ExportableAudit["auditSession"]
+): SpreadsheetRow {
+	const totals = getEffectiveScoreTotals(auditSession.scores, variant);
+	if (totals === null) {
+		return [label, "--"];
+	}
+	const summaryTotal = totals.play_value_total + totals.usability_total;
+	const summaryMax = totals.play_value_total_max + totals.usability_total_max;
+	return [
+		label,
+		`PV ${totals.play_value_total}/${totals.play_value_total_max} (${formatPercentage(totals.play_value_total, totals.play_value_total_max)}) · U ${totals.usability_total}/${totals.usability_total_max} (${formatPercentage(totals.usability_total, totals.usability_total_max)}) · Summary ${summaryTotal}/${summaryMax} (${formatPercentage(summaryTotal, summaryMax)})`
+	];
 }
 
 // ── Overview sheet ────────────────────────────────────────────────────────────
@@ -93,6 +111,15 @@ export function buildOverviewRows(
 				]
 			: [];
 
+	const unsureRows: SpreadsheetRow[] = hasUnsureVariants(auditSession.scores)
+		? [
+				["Unsure Answers", auditSession.scores.unsure_answer_count],
+				formatVariantScoreRow("Unsure Excluded", "canonical", auditSession),
+				formatVariantScoreRow("Unsure As Zero", "unsure_as_zero", auditSession),
+				formatVariantScoreRow("Unsure As Maximum", "unsure_as_max", auditSession)
+			]
+		: [];
+
 	return [
 		["Field", "Value"],
 		["Instrument", `${instrument.instrument_name} v${instrument.instrument_version}`],
@@ -112,6 +139,7 @@ export function buildOverviewRows(
 		["Variety Total", overallScores?.variety_total ?? "Pending"],
 		["Sociability Total", overallScores?.sociability_total ?? "Pending"],
 		["Challenge Total", overallScores?.challenge_total ?? "Pending"],
+		...unsureRows,
 		...auditorRows
 	];
 }

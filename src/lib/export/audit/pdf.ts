@@ -41,10 +41,12 @@ import {
 	formatExecutionModeLabel,
 	formatQuestionAnswer,
 	formatQuestionModeLabel,
+	formatPercentage,
 	formatScoreValue,
 	formatTimestampForDisplay,
 	stripPromptMarkup
 } from "./format-utils";
+import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
 import { buildVisibleQuestionEntries } from "@/lib/audit/report-helpers";
 import {
 	getCombinedReportLegend,
@@ -552,6 +554,60 @@ export async function generatePdfBlob(
 			data.cell.styles.fontStyle = row.bold ? "bold" : "normal";
 		}
 	});
+
+	// ── Page 1: Unsure interpretations (only when Unsure answers exist) ───────
+
+	if (hasUnsureVariants(auditSession.scores)) {
+		const variantOrder: readonly { key: ScoreVariantKey; label: string }[] = [
+			{ key: "canonical", label: "Unsure excluded (saved score)" },
+			{ key: "unsure_as_zero", label: "Unsure as zero" },
+			{ key: "unsure_as_max", label: "Unsure as maximum" }
+		];
+		const variantRows = variantOrder.map(({ key, label }) => {
+			const totals = getEffectiveScoreTotals(auditSession.scores, key);
+			if (totals === null) {
+				return [label, "--", "--", "--"];
+			}
+			const summaryTotal = totals.play_value_total + totals.usability_total;
+			const summaryMax = totals.play_value_total_max + totals.usability_total_max;
+			return [
+				label,
+				`${totals.play_value_total} / ${totals.play_value_total_max} (${formatPercentage(totals.play_value_total, totals.play_value_total_max)})`,
+				`${totals.usability_total} / ${totals.usability_total_max} (${formatPercentage(totals.usability_total, totals.usability_total_max)})`,
+				`${summaryTotal} / ${summaryMax} (${formatPercentage(summaryTotal, summaryMax)})`
+			];
+		});
+
+		const unsureCount = auditSession.scores.unsure_answer_count;
+		autoTable(doc, {
+			head: [["Unsure interpretation", "Play Value", "Usability", "Summary"]],
+			body: variantRows,
+			startY: docWithAutoTable.lastAutoTable.finalY + 8,
+			theme: "plain",
+			styles: {
+				fontSize: 8,
+				cellPadding: { top: 3, bottom: 3, left: 6, right: 6 },
+				lineColor: AUDIT_PDF_PALETTE.border,
+				lineWidth: 0.2
+			},
+			headStyles: {
+				fillColor: AUDIT_PDF_PALETTE.headerFill,
+				lineColor: AUDIT_PDF_PALETTE.headerFill,
+				textColor: AUDIT_PDF_PALETTE.headerText,
+				fontStyle: "bold",
+				fontSize: 8
+			},
+			margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+			tableWidth: USABLE_WIDTH
+		});
+		doc.setFontSize(7.5);
+		doc.setTextColor(...AUDIT_PDF_PALETTE.mutedText);
+		doc.text(
+			`${unsureCount} Unsure answer${unsureCount === 1 ? "" : "s"} found. The saved score uses "Unsure excluded".`,
+			PAGE_MARGIN,
+			docWithAutoTable.lastAutoTable.finalY + 4
+		);
+	}
 
 	// ── Page 2+: response matrix (landscape) ─────────────────────────────────
 

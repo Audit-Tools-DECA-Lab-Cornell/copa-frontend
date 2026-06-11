@@ -1,4 +1,5 @@
 import type { AuditSession, ScoreTotals } from "@/lib/api/playspace-types";
+import type { AuditScoreVariantBuckets, AuditScores } from "@/types/audit";
 import type { CombinedReportSources } from "@/lib/audit/report-source-sessions";
 
 /**
@@ -18,6 +19,61 @@ function addScoreTotals(a: ScoreTotals, b: ScoreTotals): ScoreTotals {
 		play_value_total_max: a.play_value_total_max + b.play_value_total_max,
 		usability_total: a.usability_total + b.usability_total,
 		usability_total_max: a.usability_total_max + b.usability_total_max
+	};
+}
+
+function mergeVariantBuckets(
+	auditVariant: AuditScoreVariantBuckets | null | undefined,
+	surveyVariant: AuditScoreVariantBuckets | null | undefined
+): AuditScoreVariantBuckets | null {
+	if (auditVariant === null || auditVariant === undefined || surveyVariant === null || surveyVariant === undefined) {
+		return null;
+	}
+
+	const auditTotals = auditVariant.audit ?? auditVariant.overall;
+	const surveyTotals = surveyVariant.survey ?? surveyVariant.overall;
+	const combinedOverall =
+		auditTotals !== null && surveyTotals !== null
+			? addScoreTotals(auditTotals, surveyTotals)
+			: (auditTotals ?? surveyTotals ?? null);
+
+	const mergedByDomain: Record<string, ScoreTotals> = { ...surveyVariant.by_domain };
+	for (const [key, totals] of Object.entries(auditVariant.by_domain)) {
+		const existing = mergedByDomain[key];
+		mergedByDomain[key] = existing !== undefined ? addScoreTotals(existing, totals) : totals;
+	}
+
+	const mergedBySection: Record<string, ScoreTotals> = { ...surveyVariant.by_section };
+	for (const [key, totals] of Object.entries(auditVariant.by_section)) {
+		const existing = mergedBySection[key];
+		mergedBySection[key] = existing !== undefined ? addScoreTotals(existing, totals) : totals;
+	}
+
+	return {
+		execution_mode: "both",
+		audit: auditTotals,
+		survey: surveyTotals,
+		overall: combinedOverall,
+		by_domain: mergedByDomain,
+		by_section: mergedBySection
+	};
+}
+
+function mergeUnsureVariants(auditScores: AuditScores, surveyScores: AuditScores): AuditScores["unsure_variants"] {
+	const zero = mergeVariantBuckets(
+		auditScores.unsure_variants?.unsure_as_zero,
+		surveyScores.unsure_variants?.unsure_as_zero
+	);
+	const max = mergeVariantBuckets(
+		auditScores.unsure_variants?.unsure_as_max,
+		surveyScores.unsure_variants?.unsure_as_max
+	);
+	if (zero === null && max === null) {
+		return null;
+	}
+	return {
+		unsure_as_zero: zero,
+		unsure_as_max: max
 	};
 }
 
@@ -81,7 +137,9 @@ export function mergeAuditSessions(auditSession: AuditSession, surveySession: Au
 			survey: surveyTotals,
 			overall: combinedOverall,
 			by_domain: mergedByDomain,
-			by_section: mergedBySection
+			by_section: mergedBySection,
+			unsure_answer_count: auditSession.scores.unsure_answer_count + surveySession.scores.unsure_answer_count,
+			unsure_variants: mergeUnsureVariants(auditSession.scores, surveySession.scores)
 		},
 		status: "SUBMITTED",
 		report_sources: {

@@ -17,7 +17,8 @@ export function makeDefaultScaleOption(): ScaleOption {
 		addition_value: 0,
 		boost_value: 0,
 		allows_follow_up_scales: false,
-		is_not_applicable: false
+		is_not_applicable: false,
+		is_unsure: false
 	};
 }
 

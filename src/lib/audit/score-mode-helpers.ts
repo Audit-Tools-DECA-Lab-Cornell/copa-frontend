@@ -1,21 +1,45 @@
-import type { AuditScores, ExecutionMode, ScoreTotals } from "@/lib/api/playspace-types";
+import type { AuditScores, AuditScoreTotals, AuditScoreVariantBuckets, ExecutionMode } from "@/types/audit";
+
+export type ScoreVariantKey = "canonical" | "unsure_as_zero" | "unsure_as_max";
+
+function selectScoreBuckets(scores: AuditScores, variant: ScoreVariantKey): AuditScores | AuditScoreVariantBuckets {
+	if (variant === "unsure_as_zero") {
+		return scores.unsure_variants?.unsure_as_zero ?? scores;
+	}
+	if (variant === "unsure_as_max") {
+		return scores.unsure_variants?.unsure_as_max ?? scores;
+	}
+	return scores;
+}
 
 /**
  * Returns the score totals that correspond to what the auditor actually completed.
  * For audit-only sessions use the `audit` scores; for survey-only use `survey`;
  * for combined ("both") or unknown fall back to `overall`.
- *
- * @param scores The full audit scores object from an AuditSession.
- * @returns Mode-appropriate score totals, or null if unavailable.
  */
-export function getEffectiveScoreTotals(scores: AuditScores): ScoreTotals | null {
-	if (scores.execution_mode === "audit") {
-		return scores.audit ?? null;
+export function getEffectiveScoreTotals(
+	scores: AuditScores,
+	variant: ScoreVariantKey = "canonical"
+): AuditScoreTotals | null {
+	const selected = selectScoreBuckets(scores, variant);
+	if (selected.execution_mode === "audit") {
+		return selected.audit ?? null;
 	}
-	if (scores.execution_mode === "survey") {
-		return scores.survey ?? null;
+	if (selected.execution_mode === "survey") {
+		return selected.survey ?? null;
 	}
-	return scores.overall ?? null;
+	return selected.overall ?? null;
+}
+
+export function getScoreVariantBuckets(
+	scores: AuditScores,
+	variant: ScoreVariantKey = "canonical"
+): AuditScores | AuditScoreVariantBuckets {
+	return selectScoreBuckets(scores, variant);
+}
+
+export function hasUnsureVariants(scores: AuditScores): boolean {
+	return scores.unsure_answer_count > 0 && scores.unsure_variants !== null;
 }
 
 /** Human-readable labels for each execution mode value. */
@@ -25,12 +49,6 @@ const EXECUTION_MODE_LABELS: Record<ExecutionMode, string> = {
 	both: "Full Assessment"
 };
 
-/**
- * Returns a human-readable label for the audit execution mode.
- *
- * @param mode Execution mode value from the audit row or scores object.
- * @returns Localised label string, or em-dash for null/unknown.
- */
 export function getExecutionModeLabel(mode: ExecutionMode | null | undefined): string {
 	if (mode === null || mode === undefined) {
 		return "-";

@@ -302,6 +302,23 @@ export function ScaleOptionsEditor({
 									disabled={translationMode}
 									onClick={() =>
 										updateOption(oIdx, o => {
+											o.is_unsure = !o.is_unsure;
+										})
+									}
+									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
+										opt.is_unsure
+											? "border-sky-400/60 bg-sky-100 text-sky-800 dark:border-sky-500/40 dark:bg-sky-900/30 dark:text-sky-300"
+											: "border-edge/40 bg-transparent text-muted-foreground hover:border-edge/40/80"
+									}`}
+									title={t("isUnsure")}>
+									{opt.is_unsure && <Check className="h-2.5 w-2.5 shrink-0" />}
+									{t("unsure")}
+								</button>
+								<button
+									type="button"
+									disabled={translationMode}
+									onClick={() =>
+										updateOption(oIdx, o => {
 											o.allows_follow_up_scales = !o.allows_follow_up_scales;
 										})
 									}
@@ -334,7 +351,7 @@ export function ScaleOptionsEditor({
 			)}
 
 			{/* Legend for active flag pills */}
-			{options.some(o => o.is_not_applicable || o.allows_follow_up_scales) && (
+			{options.some(o => o.is_not_applicable || o.is_unsure || o.allows_follow_up_scales) && (
 				<div className="flex items-center gap-3 pt-1 pl-1">
 					<span className="text-[10px] text-muted-foreground/60">{t("flags")}:</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
@@ -342,6 +359,12 @@ export function ScaleOptionsEditor({
 							{t("notApplicable")}
 						</span>
 						= {t("notApplicableDesc")}
+					</span>
+					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+						<span className="rounded-full border border-sky-400/60 bg-sky-100 dark:bg-sky-900/30 px-1.5 text-sky-800 dark:text-sky-300">
+							{t("unsure")}
+						</span>
+						= {t("unsureDesc")}
 					</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
 						<span className="rounded-full border border-violet-400/60 bg-violet-100 dark:bg-violet-900/30 px-1.5 text-violet-800 dark:text-violet-300">

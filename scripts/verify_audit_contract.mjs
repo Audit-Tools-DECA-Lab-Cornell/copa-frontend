@@ -14,6 +14,7 @@ const BACKEND_INSTRUMENT_PATH = path.resolve(
 	"app",
 	"products",
 	"playspace",
+	"instruments",
 	"pvua_v5_2.instrument.json"
 );
 const MODULE_CACHE = new Map();
@@ -81,7 +82,10 @@ function assert(condition, message) {
 	}
 }
 
-const { BASE_PLAYSPACE_INSTRUMENT } = { BASE_PLAYSPACE_INSTRUMENT: loadJsonFile(BACKEND_INSTRUMENT_PATH) };
+const rawBackendInstrument = loadJsonFile(BACKEND_INSTRUMENT_PATH);
+const BASE_PLAYSPACE_INSTRUMENT =
+	rawBackendInstrument.sections !== undefined ? rawBackendInstrument : rawBackendInstrument.en;
+assert(BASE_PLAYSPACE_INSTRUMENT?.sections !== undefined, "Expected backend instrument fixture to expose sections.");
 const { auditDraftPatchSchema, auditDraftSaveSchema, auditSessionSchema } = loadTsModule(
 	path.resolve(REPO_ROOT, "src/types/audit.ts")
 );
@@ -173,9 +177,30 @@ const sessionFixture = {
 	scores: {
 		draft_progress_percent: 18.75,
 		execution_mode: "survey",
+		audit: null,
+		survey: null,
 		overall: null,
 		by_section: {},
-		by_domain: {}
+		by_domain: {},
+		unsure_answer_count: 1,
+		unsure_variants: {
+			unsure_as_zero: {
+				execution_mode: "survey",
+				audit: null,
+				survey: null,
+				overall: null,
+				by_section: {},
+				by_domain: {}
+			},
+			unsure_as_max: {
+				execution_mode: "survey",
+				audit: null,
+				survey: null,
+				overall: null,
+				by_section: {},
+				by_domain: {}
+			}
+		}
 	},
 	progress: {
 		required_pre_audit_complete: true,
@@ -198,6 +223,8 @@ const sessionFixture = {
 
 const parsedSession = auditSessionSchema.parse(sessionFixture);
 assert(parsedSession.aggregate.revision === 5, "Expected audit session revision to parse.");
+assert(parsedSession.scores.unsure_answer_count === 1, "Expected unsure score metadata to parse.");
+assert(parsedSession.scores.unsure_variants?.unsure_as_zero !== null, "Expected unsure score variants to parse.");
 
 const visibleSections = getVisibleSections(
 	parsedSession.instrument,

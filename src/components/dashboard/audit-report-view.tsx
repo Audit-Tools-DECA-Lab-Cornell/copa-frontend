@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
 	CalendarIcon,
 	UserIcon,
@@ -20,7 +21,13 @@ import { JsonViewer } from "./raw-json";
 
 import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
 import type { AuditSession } from "@/lib/api/playspace";
-import { getEffectiveScoreTotals, getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
+import {
+	getEffectiveScoreTotals,
+	getExecutionModeLabel,
+	getScoreVariantBuckets,
+	hasUnsureVariants,
+	type ScoreVariantKey
+} from "@/lib/audit/score-mode-helpers";
 import type { DomainQuestionRow, ConstructRanking } from "@/lib/audit/report-helpers";
 import {
 	buildDomainReportRows,
@@ -50,7 +57,7 @@ const BAR_WIDTH = 44;
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function pct(value: number, max: number): string {
-	if (max <= 0) return "N/A";
+	if (max <= 0) return "--";
 	return `${Math.round((value / max) * 100)}%`;
 }
 
@@ -58,14 +65,28 @@ function renderScaleCellState(options: {
 	label: string | null;
 	applicable: boolean;
 	isNotApplicable: boolean;
+	isUnsure: boolean;
 	followUpScalesAsked?: boolean;
+	notApplicableLabel: string;
+	unsureLabel: string;
 }): React.ReactNode {
-	const { label, applicable, isNotApplicable, followUpScalesAsked = true } = options;
+	const {
+		label,
+		applicable,
+		isNotApplicable,
+		isUnsure,
+		followUpScalesAsked = true,
+		notApplicableLabel,
+		unsureLabel
+	} = options;
 	if (!applicable || !followUpScalesAsked) {
 		return <span className="text-muted-foreground/50">-</span>;
 	}
 	if (isNotApplicable) {
-		return <span className="text-foreground">Not applicable</span>;
+		return <span className="text-foreground">{notApplicableLabel}</span>;
+	}
+	if (isUnsure) {
+		return <span className="font-medium text-foreground">{unsureLabel}</span>;
 	}
 	return label ?? <span className="text-muted-foreground/50">-</span>;
 }
@@ -89,8 +110,8 @@ type MetricKey = "provision" | "variety" | "challenge" | "sociability" | "play_v
 
 interface MetricDef {
 	readonly key: MetricKey;
-	readonly label: string;
-	readonly shortLabel: string;
+	/** Translation key suffix under `shared.reportView`. */
+	readonly labelKey: string;
 	readonly getValue: (t: AuditScoreTotals) => number;
 	readonly getMax: (t: AuditScoreTotals) => number;
 }
@@ -98,29 +119,25 @@ interface MetricDef {
 const SCALE_METRICS: readonly MetricDef[] = [
 	{
 		key: "provision",
-		label: "Provision",
-		shortLabel: "Provision",
+		labelKey: "metricProvision",
 		getValue: t => t.provision_total,
 		getMax: t => t.provision_total_max
 	},
 	{
 		key: "variety",
-		label: "Variety",
-		shortLabel: "Variety",
+		labelKey: "metricVariety",
 		getValue: t => t.variety_total,
 		getMax: t => t.variety_total_max
 	},
 	{
 		key: "challenge",
-		label: "Challenge",
-		shortLabel: "Challenge",
+		labelKey: "metricChallenge",
 		getValue: t => t.challenge_total,
 		getMax: t => t.challenge_total_max
 	},
 	{
 		key: "sociability",
-		label: "Sociability",
-		shortLabel: "Sociability",
+		labelKey: "metricSociability",
 		getValue: t => t.sociability_total,
 		getMax: t => t.sociability_total_max
 	}
@@ -129,19 +146,90 @@ const SCALE_METRICS: readonly MetricDef[] = [
 const CONSTRUCT_METRICS: readonly MetricDef[] = [
 	{
 		key: "play_value",
-		label: "Play Value",
-		shortLabel: "Play Value",
+		labelKey: "metricPlayValue",
 		getValue: t => t.play_value_total,
 		getMax: t => t.play_value_total_max
 	},
 	{
 		key: "usability",
-		label: "Usability",
-		shortLabel: "Usability",
+		labelKey: "metricUsability",
 		getValue: t => t.usability_total,
 		getMax: t => t.usability_total_max
 	}
 ];
+
+/** Translation key suffix (under `shared.reportView`) per score variant. */
+const SCORE_VARIANT_LABEL_KEYS: Record<ScoreVariantKey, string> = {
+	canonical: "variantCanonical",
+	unsure_as_zero: "variantZero",
+	unsure_as_max: "variantMax"
+};
+
+function formatTotalMaxPct(total: number, max: number): string {
+	return `${total} / ${max} (${pct(total, max)})`;
+}
+
+function VariantComparisonTable({ scores }: Readonly<{ scores: AuditSession["scores"] }>) {
+	const t = useTranslations("shared.reportView");
+	if (!hasUnsureVariants(scores)) {
+		return null;
+	}
+	const rows: ScoreVariantKey[] = ["canonical", "unsure_as_zero", "unsure_as_max"];
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle className="text-base">{t("unsureInterpretations")}</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<div className="overflow-x-auto">
+					<table className="w-full min-w-[560px] text-sm">
+						<thead className="text-left text-muted-foreground">
+							<tr>
+								<th className="py-2 pr-4 font-medium">{t("interpretation")}</th>
+								<th className="py-2 pr-4 font-medium">{t("metricPlayValue")}</th>
+								<th className="py-2 pr-4 font-medium">{t("metricUsability")}</th>
+								<th className="py-2 font-medium">{t("summary")}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{rows.map(row => {
+								const totals = getEffectiveScoreTotals(scores, row);
+								const summaryTotal =
+									totals === null ? 0 : totals.play_value_total + totals.usability_total;
+								const summaryMax =
+									totals === null ? 0 : totals.play_value_total_max + totals.usability_total_max;
+								return (
+									<tr key={row} className="border-t border-border/60">
+										<td className="py-2 pr-4 font-medium">{t(SCORE_VARIANT_LABEL_KEYS[row])}</td>
+										<td className="py-2 pr-4 tabular-nums">
+											{totals === null
+												? "--"
+												: formatTotalMaxPct(
+														totals.play_value_total,
+														totals.play_value_total_max
+													)}
+										</td>
+										<td className="py-2 pr-4 tabular-nums">
+											{totals === null
+												? "--"
+												: formatTotalMaxPct(totals.usability_total, totals.usability_total_max)}
+										</td>
+										<td className="py-2 tabular-nums">
+											{formatTotalMaxPct(summaryTotal, summaryMax)}
+										</td>
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
+				<p className="mt-3 text-xs text-muted-foreground">
+					{t("unsureCountFound", { count: scores.unsure_answer_count })}
+				</p>
+			</CardContent>
+		</Card>
+	);
+}
 
 // ── Bar colors & thresholds ──────────────────────────────────────────────────
 // Each bar is colored by its metric identity (not its score). The four PVUA scale
@@ -170,6 +258,7 @@ function BarTrack({
 	scores,
 	colWidth
 }: Readonly<{ metric: MetricDef; scores: AuditScoreTotals | null; colWidth: number }>) {
+	const t = useTranslations("shared.reportView");
 	const value = scores === null ? 0 : metric.getValue(scores);
 	const max = scores === null ? 0 : metric.getMax(scores);
 	const isNa = scores === null || max <= 0;
@@ -190,7 +279,7 @@ function BarTrack({
 				aria-valuenow={value}
 				aria-valuemin={0}
 				aria-valuemax={max}
-				aria-label={`${metric.label}: ${isNa ? "not assessed" : `${percentage}%`}`}>
+				aria-label={`${t(metric.labelKey)}: ${isNa ? t("notAssessed") : `${percentage}%`}`}>
 				{!isNa && fillHeight > 0 ? (
 					<div
 						className="w-full rounded-b-sm opacity-90"
@@ -217,6 +306,7 @@ function BarGroup({
 	scores,
 	colWidth
 }: Readonly<{ metrics: readonly MetricDef[]; scores: AuditScoreTotals | null; colWidth: number }>) {
+	const t = useTranslations("shared.reportView");
 	return (
 		<>
 			{/* Percentage labels */}
@@ -235,7 +325,7 @@ function BarGroup({
 								isNa ? "text-muted-foreground" : "text-foreground"
 							)}
 							style={{ width: colWidth }}>
-							{isNa ? "N/A" : `${percentage}%`}
+							{isNa ? t("na") : `${percentage}%`}
 						</div>
 					);
 				})}
@@ -276,7 +366,7 @@ function BarGroup({
 						key={m.key}
 						className="text-center text-xs leading-tight text-muted-foreground"
 						style={{ width: colWidth }}>
-						{m.shortLabel}
+						{t(m.labelKey)}
 					</div>
 				))}
 			</div>
@@ -290,6 +380,7 @@ function AlignedScoreDisplay({
 	scores,
 	showLabels = true
 }: Readonly<{ scores: AuditScoreTotals | null; showLabels?: boolean }>) {
+	const t = useTranslations("shared.reportView");
 	const scaleTableW = LABEL_COL_W + SCALE_DATA_COL_W * SCALE_METRICS.length;
 	const constructTableW = LABEL_COL_W + CONSTRUCT_DATA_COL_W * CONSTRUCT_METRICS.length;
 
@@ -300,7 +391,7 @@ function AlignedScoreDisplay({
 				<div style={{ width: scaleTableW }}>
 					{showLabels ? (
 						<p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-							Scale Scores
+							{t("scaleScores")}
 						</p>
 					) : null}
 					<BarGroup metrics={SCALE_METRICS} scores={scores} colWidth={SCALE_DATA_COL_W} />
@@ -316,7 +407,7 @@ function AlignedScoreDisplay({
 				<div style={{ width: constructTableW }}>
 					{showLabels ? (
 						<p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-							Play Value & Usability
+							{t("playValueUsability")}
 						</p>
 					) : null}
 					<BarGroup metrics={CONSTRUCT_METRICS} scores={scores} colWidth={CONSTRUCT_DATA_COL_W} />
@@ -338,14 +429,17 @@ function ScoreSubTable({
 	dataColW,
 	tableW
 }: Readonly<{ metrics: readonly MetricDef[]; scores: AuditScoreTotals | null; dataColW: number; tableW: number }>) {
-	const rows: Array<{ label: string; cells: string[]; alt: boolean }> = [
+	const t = useTranslations("shared.reportView");
+	const rows: Array<{ rowKey: string; label: string; cells: string[]; alt: boolean }> = [
 		{
-			label: "Score Achieved",
+			rowKey: "scoreAchieved",
+			label: t("scoreAchieved"),
 			cells: metrics.map(m => (scores === null ? "-" : String(m.getValue(scores)))),
 			alt: false
 		},
 		{
-			label: "Max Score",
+			rowKey: "maxScore",
+			label: t("maxScore"),
 			cells: metrics.map(m => {
 				const max = scores === null ? 0 : m.getMax(scores);
 				return max <= 0 ? "-" : String(max);
@@ -367,14 +461,14 @@ function ScoreSubTable({
 							i < metrics.length - 1 && "border-r border-primary-foreground/20"
 						)}
 						style={{ width: dataColW }}>
-						{m.shortLabel}
+						{t(m.labelKey)}
 					</div>
 				))}
 			</div>
 			{/* Data rows */}
 			{rows.map(row => (
 				<div
-					key={row.label}
+					key={row.rowKey}
 					className={cn("flex border-t border-edge/40", row.alt ? "bg-muted/40" : "bg-card")}>
 					<div
 						className="border-r border-edge/40 px-3 py-2 text-xs font-bold text-muted-foreground"
@@ -383,7 +477,7 @@ function ScoreSubTable({
 					</div>
 					{row.cells.map((cell, i) => (
 						<div
-							key={`${row.label}-${i}`}
+							key={`${row.rowKey}-${i}`}
 							className={cn(
 								"px-3 py-2 text-center font-mono text-xs tabular-nums",
 								i < row.cells.length - 1 && "border-r border-edge/40"
@@ -447,8 +541,11 @@ function ReportStatCard({
 // ── Domain items table (extended view) ───────────────────────────────────────
 
 function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow[] }>) {
+	const t = useTranslations("shared.reportView");
+	const notApplicableLabel = t("notApplicable");
+	const unsureLabel = t("unsure");
 	if (questions.length === 0) {
-		return <p className="text-xs text-muted-foreground italic">No item-level data available.</p>;
+		return <p className="text-xs text-muted-foreground italic">{t("noItemData")}</p>;
 	}
 
 	return (
@@ -457,27 +554,29 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 				<thead>
 					<tr className="bg-muted/60">
 						<th className="w-16 border-b border-r border-edge/40 px-3 py-2 text-left font-bold text-muted-foreground">
-							ID
+							{t("itemId")}
 						</th>
 						<th className="border-b border-r border-edge/40 px-3 py-2 text-left font-bold text-muted-foreground">
-							Item
+							{t("itemLabel")}
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
-							Provision
+							{t("metricProvision")}
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
-							Variety
+							{t("metricVariety")}
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
-							Challenge
+							{t("metricChallenge")}
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
-							Sociability
+							{t("metricSociability")}
 						</th>
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-primary">
-							PV
+							{t("metricPvShort")}
 						</th>
-						<th className="w-20 border-b border-edge/40 px-3 py-2 text-center font-bold text-primary">U</th>
+						<th className="w-20 border-b border-edge/40 px-3 py-2 text-center font-bold text-primary">
+							{t("metricUShort")}
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -511,7 +610,7 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 									</span>
 									{q.checklistAnswerLabel !== null ? (
 										<p className="mt-1.5 rounded-sm border border-edge/40 bg-muted/40 px-2 py-1 text-[11px] leading-4 text-muted-foreground">
-											<span className="font-semibold text-foreground">Selected: </span>
+											<span className="font-semibold text-foreground">{t("selectedAnswer")}</span>
 											{q.checklistAnswerLabel}
 										</p>
 									) : null}
@@ -520,7 +619,10 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 									{renderScaleCellState({
 										label: q.provisionLabel,
 										applicable: q.provisionApplicable,
-										isNotApplicable: q.provisionIsNotApplicable
+										isNotApplicable: q.provisionIsNotApplicable,
+										isUnsure: q.provisionIsUnsure,
+										notApplicableLabel,
+										unsureLabel
 									})}
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
@@ -528,7 +630,10 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										label: q.varietyLabel,
 										applicable: q.varietyApplicable,
 										isNotApplicable: q.varietyIsNotApplicable,
-										followUpScalesAsked: q.followUpScalesAsked
+										isUnsure: q.varietyIsUnsure,
+										followUpScalesAsked: q.followUpScalesAsked,
+										notApplicableLabel,
+										unsureLabel
 									})}
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
@@ -536,7 +641,10 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										label: q.challengeLabel,
 										applicable: q.challengeApplicable,
 										isNotApplicable: q.challengeIsNotApplicable,
-										followUpScalesAsked: q.followUpScalesAsked
+										isUnsure: q.challengeIsUnsure,
+										followUpScalesAsked: q.followUpScalesAsked,
+										notApplicableLabel,
+										unsureLabel
 									})}
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
@@ -544,7 +652,10 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										label: q.sociabilityLabel,
 										applicable: q.sociabilityApplicable,
 										isNotApplicable: q.sociabilityIsNotApplicable,
-										followUpScalesAsked: q.followUpScalesAsked
+										isUnsure: q.sociabilityIsUnsure,
+										followUpScalesAsked: q.followUpScalesAsked,
+										notApplicableLabel,
+										unsureLabel
 									})}
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center font-mono tabular-nums">
@@ -570,13 +681,14 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 
 type ConstructKey = "provision" | "variety" | "challenge" | "sociability" | "play_value" | "usability";
 
-const CONSTRUCT_LABELS: Record<ConstructKey, string> = {
-	provision: "Provision",
-	variety: "Variety",
-	challenge: "Challenge Opportunities",
-	sociability: "Sociability Support",
-	play_value: "Play Value",
-	usability: "Usability"
+/** Translation key suffix (under `shared.reportView`) per construct. */
+const CONSTRUCT_LABEL_KEYS: Record<ConstructKey, string> = {
+	provision: "constructProvision",
+	variety: "constructVariety",
+	challenge: "constructChallengeOpportunities",
+	sociability: "constructSociabilitySupport",
+	play_value: "constructPlayValue",
+	usability: "constructUsability"
 };
 
 const CONSTRUCT_GRID: readonly (readonly [ConstructKey, ConstructKey, ConstructKey])[] = [
@@ -585,16 +697,17 @@ const CONSTRUCT_GRID: readonly (readonly [ConstructKey, ConstructKey, ConstructK
 ];
 
 function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] }>) {
+	const t = useTranslations("shared.reportView");
 	const rankingByKey = new Map(rankings.map(r => [r.constructKey, r] as const));
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className="text-base">Highest & Lowest Scored Domains</CardTitle>
+				<CardTitle className="text-base">{t("highestLowestDomains")}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{rankings.length === 0 ? (
-					<p className="text-sm text-muted-foreground">Not enough domain data for comparison.</p>
+					<p className="text-sm text-muted-foreground">{t("notEnoughDomainData")}</p>
 				) : (
 					<div className="space-y-3">
 						{CONSTRUCT_GRID.map((row, rowIdx) => (
@@ -605,14 +718,14 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 										<div key={key} className="overflow-hidden rounded-lg border border-edge/40">
 											<div className="bg-primary px-3 py-2">
 												<p className="text-center text-xs font-bold text-primary-foreground">
-													{CONSTRUCT_LABELS[key]}
+													{t(CONSTRUCT_LABEL_KEYS[key])}
 												</p>
 											</div>
 											<div className="border-b border-edge/40 bg-emerald-50 px-3 py-2.5 dark:bg-emerald-950/20">
 												<div className="mb-1 flex items-center gap-1.5">
 													<div className="size-2 rounded-full bg-emerald-500" />
 													<span className="text-xs font-bold text-muted-foreground">
-														Highest Scored
+														{t("highestScored")}
 													</span>
 												</div>
 												{ranking?.bestDomain !== null && ranking?.bestDomain !== undefined ? (
@@ -637,7 +750,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 												<div className="mb-1 flex items-center gap-1.5">
 													<div className="size-2 rounded-full bg-rose-500" />
 													<span className="text-xs font-bold text-muted-foreground">
-														Lowest Scored
+														{t("lowestScored")}
 													</span>
 												</div>
 												{ranking?.worstDomain !== null && ranking?.worstDomain !== undefined ? (
@@ -684,23 +797,40 @@ export interface AuditReportViewProps {
  * item-level toggle, overall scores, best/worst table, and export.
  */
 export function AuditReportView({ audit, instrument = null, basePath }: Readonly<AuditReportViewProps>) {
-	const overall = getEffectiveScoreTotals(audit.scores);
+	const t = useTranslations("shared.reportView");
+	const [selectedVariant, setSelectedVariant] = React.useState<ScoreVariantKey>("canonical");
+	const displayAudit = React.useMemo<AuditSession>(() => {
+		const selectedScores = getScoreVariantBuckets(audit.scores, selectedVariant);
+		return {
+			...audit,
+			scores: {
+				...audit.scores,
+				execution_mode: selectedScores.execution_mode,
+				audit: selectedScores.audit,
+				survey: selectedScores.survey,
+				overall: selectedScores.overall,
+				by_section: selectedScores.by_section,
+				by_domain: selectedScores.by_domain
+			}
+		};
+	}, [audit, selectedVariant]);
+	const overall = getEffectiveScoreTotals(displayAudit.scores);
 	const overallPvPct = overall !== null ? pct(overall.play_value_total, overall.play_value_total_max) : "-";
 	const overallUPct = overall !== null ? pct(overall.usability_total, overall.usability_total_max) : "-";
 	const overallSocPct = overall !== null ? pct(overall.sociability_total, overall.sociability_total_max) : "-";
-	const overallCombined = overall !== null ? `PV ${overallPvPct} · U ${overallUPct}` : "Pending";
+	const overallCombined = overall !== null ? `PV ${overallPvPct} · U ${overallUPct}` : t("pending");
 
 	const domainRows = React.useMemo(() => {
 		if (instrument === null) return [];
-		return buildDomainReportRows(audit, instrument);
-	}, [audit, instrument]);
+		return buildDomainReportRows(displayAudit, instrument);
+	}, [displayAudit, instrument]);
 
 	const rankings = React.useMemo(() => {
 		if (domainRows.length < 2) return [];
 		return buildConstructRankings(domainRows);
 	}, [domainRows]);
 
-	const domainKeys = Object.keys(audit.scores.by_domain);
+	const domainKeys = Object.keys(displayAudit.scores.by_domain);
 	const hasDomains = domainKeys.length > 0;
 	const hasInstrumentDomains = domainRows.length > 0;
 
@@ -712,18 +842,20 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 	const [openDomains, setOpenDomains] = React.useState<string[]>([]);
 	const [itemToggles, setItemToggles] = React.useState<Record<string, boolean>>({});
 
-	const expandAll = React.useCallback(() => {
+	// Plain handlers — the React Compiler memoizes these automatically, so manual
+	// useCallback wrappers would only fight the compiler's dependency inference.
+	const expandAll = () => {
 		setOpenDomains([...allDomainAccordionKeys]);
-	}, [allDomainAccordionKeys]);
+	};
 
-	const collapseAll = React.useCallback(() => {
+	const collapseAll = () => {
 		setOpenDomains([]);
 		setItemToggles({});
-	}, []);
+	};
 
-	const toggleItems = React.useCallback((domainKey: string) => {
+	const toggleItems = (domainKey: string) => {
 		setItemToggles(prev => ({ ...prev, [domainKey]: prev[domainKey] !== true }));
-	}, []);
+	};
 
 	return (
 		<div className="space-y-6">
@@ -733,7 +865,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 					<div className="flex items-center justify-between gap-3">
 						<CardTitle className="flex items-center gap-2 text-base">
 							<ActivityIcon className="size-4 text-primary" />
-							Audit Details
+							{t("auditDetails")}
 							<Badge
 								variant={audit.status === "SUBMITTED" ? "default" : "secondary"}
 								className="uppercase">
@@ -744,7 +876,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 							<a href={`${basePath}/audits/${audit.audit_id}`}>
 								<Button variant="outline" size="sm" className="gap-1.5 text-xs">
 									<ClipboardListIcon className="size-3.5" />
-									View Audit Details
+									{t("viewAuditDetails")}
 								</Button>
 							</a>
 						)}
@@ -752,7 +884,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 				</CardHeader>
 				<CardContent>
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						<MetadataRow icon={HashIcon} label="Audit Code">
+						<MetadataRow icon={HashIcon} label={t("auditCode")}>
 							<div className="space-y-1.5">
 								<p className="font-medium text-foreground">
 									{formatAuditCodeReference(audit.audit_code)}
@@ -764,69 +896,99 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 								</div>
 							</div>
 						</MetadataRow>
-						<MetadataRow icon={UserIcon} label="Auditor">
+						<MetadataRow icon={UserIcon} label={t("auditor")}>
 							<code className="inline-flex break-all rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
 								{audit.auditor_code}
 							</code>
 						</MetadataRow>
-						<MetadataRow icon={MapPinIcon} label="Place">
+						<MetadataRow icon={MapPinIcon} label={t("place")}>
 							{audit.place_name}
 						</MetadataRow>
-						<MetadataRow icon={LayersIcon} label="Audit Type">
+						<MetadataRow icon={LayersIcon} label={t("auditType")}>
 							<Badge variant="outline" className="text-xs font-medium">
 								{getExecutionModeLabel(audit.scores.execution_mode)}
 							</Badge>
 						</MetadataRow>
-						<MetadataRow icon={CalendarIcon} label="Started">
+						<MetadataRow icon={CalendarIcon} label={t("started")}>
 							{formatDateTime(audit.started_at)}
 						</MetadataRow>
-						<MetadataRow icon={CalendarIcon} label="Submitted">
+						<MetadataRow icon={CalendarIcon} label={t("submitted")}>
 							{audit.submitted_at !== null ? (
 								formatDateTime(audit.submitted_at)
 							) : (
-								<span className="italic text-muted-foreground">Not yet submitted</span>
+								<span className="italic text-muted-foreground">{t("notYetSubmitted")}</span>
 							)}
 						</MetadataRow>
-						<MetadataRow icon={ClipboardListIcon} label="Progress">
+						<MetadataRow icon={ClipboardListIcon} label={t("progress")}>
 							<span className="font-mono tabular-nums">
 								{audit.progress.answered_visible_questions} / {audit.progress.total_visible_questions}
 							</span>{" "}
-							questions
+							{t("questions")}
 						</MetadataRow>
 					</div>
 				</CardContent>
 			</Card>
 
+			{hasUnsureVariants(audit.scores) ? (
+				<Card>
+					<CardHeader>
+						<CardTitle className="text-base">{t("scoreInterpretation")}</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<div className="flex flex-wrap gap-2">
+							{(["canonical", "unsure_as_zero", "unsure_as_max"] as const).map(variant => (
+								<Button
+									key={variant}
+									type="button"
+									size="sm"
+									variant={selectedVariant === variant ? "default" : "outline"}
+									onClick={() => setSelectedVariant(variant)}>
+									{t(SCORE_VARIANT_LABEL_KEYS[variant])}
+								</Button>
+							))}
+						</div>
+						<p className="mt-3 text-sm text-muted-foreground">{t("interpretationHelp")}</p>
+					</CardContent>
+				</Card>
+			) : null}
+
+			<VariantComparisonTable scores={audit.scores} />
+
 			{/* ── 2. Score summary ─────────────────────────────────── */}
 			<div className="space-y-3">
-				<h2 className="text-base font-bold text-foreground">Score Summary</h2>
+				<h2 className="text-base font-bold text-foreground">{t("scoreSummary")}</h2>
 				<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
 					<ReportStatCard
-						label="Overall Score"
+						label={t("overallScore")}
 						value={overallCombined}
 						helper={
 							overall !== null
-								? `Max PV = ${overall.play_value_total_max}, Max U = ${overall.usability_total_max}`
+								? t("maxPvU", {
+										pv: overall.play_value_total_max,
+										u: overall.usability_total_max
+									})
 								: undefined
 						}
 						accent="bg-accent-terracotta"
 					/>
 					<ReportStatCard
-						label="Play Value"
+						label={t("metricPlayValue")}
 						value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "-"}
-						helper={overall !== null ? `Max score = ${overall.play_value_total_max}` : undefined}
+						helper={overall !== null ? t("maxScoreEq", { value: overall.play_value_total_max }) : undefined}
 						accent="bg-amber-500"
 					/>
 					<ReportStatCard
-						label="Usability"
+						label={t("metricUsability")}
 						value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "-"}
-						helper={overall !== null ? `Max score = ${overall.usability_total_max}` : undefined}
+						helper={overall !== null ? t("maxScoreEq", { value: overall.usability_total_max }) : undefined}
 						accent="bg-primary"
 					/>
 					<ReportStatCard
-						label="Sociability"
+						label={t("metricSociability")}
 						value={overall !== null ? `${overall.sociability_total} (${overallSocPct})` : "-"}
-						helper={overall !== null ? `Max score = ${overall.sociability_total_max}` : undefined}
+						helper={
+							overall !== null ? t("maxScoreEq", { value: overall.sociability_total_max }) : undefined
+						}
 						accent="bg-emerald-500"
 					/>
 				</div>
@@ -837,15 +999,15 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 				<Card>
 					<CardHeader>
 						<div className="flex items-center justify-between gap-3">
-							<CardTitle className="text-base">Domain Breakdown</CardTitle>
+							<CardTitle className="text-base">{t("domainBreakdown")}</CardTitle>
 							<div className="flex gap-1.5">
 								<Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={expandAll}>
 									<ChevronsUpDownIcon className="size-3.5" />
-									Expand All
+									{t("expandAll")}
 								</Button>
 								<Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={collapseAll}>
 									<ChevronsDownUpIcon className="size-3.5" />
-									Collapse All
+									{t("collapseAll")}
 								</Button>
 							</div>
 						</div>
@@ -874,7 +1036,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 											key={domainKey}
 											domainKey={domainKey}
 											title={toDomainTitle(domainKey)}
-											scores={audit.scores.by_domain[domainKey] ?? null}
+											scores={displayAudit.scores.by_domain[domainKey] ?? null}
 											notes={[]}
 											questions={[]}
 											showItems={false}
@@ -889,7 +1051,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 			{/* ── 5. Overall scores ───────────────────────────────── */}
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-base">Overall Scores</CardTitle>
+					<CardTitle className="text-base">{t("overallScores")}</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<AlignedScoreDisplay scores={overall} />
@@ -924,6 +1086,7 @@ function DomainAccordionItem({
 	showItems: boolean;
 	onToggleItems: () => void;
 }>) {
+	const t = useTranslations("shared.reportView");
 	return (
 		<AccordionItem value={domainKey}>
 			<AccordionTrigger className="text-sm">
@@ -932,7 +1095,7 @@ function DomainAccordionItem({
 					<span className="shrink-0 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-mono tabular-nums text-primary">
 						{scores !== null
 							? `PV ${pct(scores.play_value_total, scores.play_value_total_max)} · U ${pct(scores.usability_total, scores.usability_total_max)}`
-							: "Pending"}
+							: t("pending")}
 					</span>
 				</div>
 			</AccordionTrigger>
@@ -943,7 +1106,7 @@ function DomainAccordionItem({
 					{notes.length > 0 ? (
 						<div className="space-y-1.5 rounded-md bg-muted/40 px-4 py-3">
 							<p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-								Auditor Notes
+								{t("auditorNotes")}
 							</p>
 							{notes.map((note, idx) => (
 								<p key={`note-${idx}`} className="text-xs text-foreground">
@@ -961,7 +1124,7 @@ function DomainAccordionItem({
 								className="gap-1.5 text-xs text-muted-foreground"
 								onClick={onToggleItems}>
 								<ListIcon className="size-3.5" />
-								{showItems ? "Hide Items" : `Show Items (${questions.length})`}
+								{showItems ? t("hideItems") : t("showItems", { count: questions.length })}
 								{showItems ? (
 									<ChevronUpIcon className="size-3" />
 								) : (

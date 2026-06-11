@@ -4,10 +4,9 @@ import type {
 	InstrumentSection,
 	InstrumentQuestion,
 	PlayspaceInstrument,
-	QuestionResponsePayload,
-	QuestionScale,
-	ScaleOption
+	QuestionResponsePayload
 } from "@/types/audit";
+import { calculateQuestionScores, findScale, findScaleOption } from "@/lib/audit/question-scoring";
 import {
 	getCombinedReportSources,
 	getReportSourceLabel,
@@ -43,19 +42,23 @@ export interface DomainQuestionRow {
 	readonly provisionApplicable: boolean;
 	readonly provisionAnswered: boolean;
 	readonly provisionIsNotApplicable: boolean;
+	readonly provisionIsUnsure: boolean;
 	readonly varietyLabel: string | null;
 	readonly varietyApplicable: boolean;
 	readonly varietyAnswered: boolean;
 	readonly varietyIsNotApplicable: boolean;
+	readonly varietyIsUnsure: boolean;
 	/** When `false`, the challenge column must show N/A (scale not present on question). */
 	readonly challengeApplicable: boolean;
 	readonly challengeLabel: string | null;
 	readonly challengeAnswered: boolean;
 	readonly challengeIsNotApplicable: boolean;
+	readonly challengeIsUnsure: boolean;
 	readonly sociabilityLabel: string | null;
 	readonly sociabilityApplicable: boolean;
 	readonly sociabilityAnswered: boolean;
 	readonly sociabilityIsNotApplicable: boolean;
+	readonly sociabilityIsUnsure: boolean;
 	readonly followUpScalesAsked: boolean;
 	readonly playValueScore: number | null;
 	readonly playValueMax: number | null;
@@ -103,11 +106,6 @@ type ConstructAccessor = {
 	readonly max: (totals: AuditScoreTotals) => number;
 };
 
-interface MultiplierScaleScore {
-	readonly columnTotal: number;
-	readonly boostValue: number;
-}
-
 const CONSTRUCT_ACCESSORS: readonly ConstructAccessor[] = [
 	{
 		key: "provision",
@@ -141,177 +139,6 @@ const CONSTRUCT_ACCESSORS: readonly ConstructAccessor[] = [
 	}
 ];
 
-const EMPTY_SCORE_TOTALS: AuditScoreTotals = {
-	provision_total: 0,
-	provision_total_max: 0,
-	variety_total: 0,
-	variety_total_max: 0,
-	challenge_total: 0,
-	challenge_total_max: 0,
-	sociability_total: 0,
-	sociability_total_max: 0,
-	play_value_total: 0,
-	play_value_total_max: 0,
-	usability_total: 0,
-	usability_total_max: 0
-};
-
-// ---------------------------------------------------------------------------
-// Score calculation helpers (ported from mobile score-helpers.ts)
-// ---------------------------------------------------------------------------
-
-function createEmptyScoreTotals(): AuditScoreTotals {
-	return { ...EMPTY_SCORE_TOTALS };
-}
-
-function formatScoreValue(value: number): string {
-	return Number.isInteger(value) ? value.toString() : value.toFixed(1);
-}
-
-function findScale(question: InstrumentQuestion, scaleKey: QuestionScale["key"]): QuestionScale | undefined {
-	return question.scales.find(scale => scale.key === scaleKey);
-}
-
-function findScaleOption(scale: QuestionScale, optionKey: string): ScaleOption | undefined {
-	return scale.options.find(option => option.key === optionKey);
-}
-
-function readProvisionScaleMaximum(question: InstrumentQuestion): number {
-	const scale = findScale(question, "provision");
-	if (scale === undefined) {
-		return 0;
-	}
-	return scale.options.reduce((currentMaximum, option) => Math.max(currentMaximum, option.addition_value), 0);
-}
-
-function readMultiplierScaleScore(
-	question: InstrumentQuestion,
-	answers: QuestionResponsePayload,
-	scaleKey: "variety" | "challenge"
-): MultiplierScaleScore {
-	const scale = findScale(question, scaleKey);
-	const rawAnswer = answers[scaleKey];
-	const answerKey = typeof rawAnswer === "string" ? rawAnswer : undefined;
-	if (scale === undefined || answerKey === undefined) {
-		return { columnTotal: 0, boostValue: 1 };
-	}
-
-	const selectedOption = findScaleOption(scale, answerKey);
-	if (selectedOption === undefined) {
-		return { columnTotal: 0, boostValue: 1 };
-	}
-
-	const columnTotal = Math.max(selectedOption.addition_value - 1, 0);
-	if (selectedOption.addition_value <= 0) {
-		return { columnTotal, boostValue: 1 };
-	}
-
-	return { columnTotal, boostValue: selectedOption.boost_value };
-}
-
-function readMultiplierScaleMaximum(
-	question: InstrumentQuestion,
-	scaleKey: "variety" | "challenge"
-): MultiplierScaleScore {
-	const scale = findScale(question, scaleKey);
-	if (scale === undefined) {
-		return { columnTotal: 0, boostValue: 1 };
-	}
-
-	const columnTotal = scale.options.reduce(
-		(currentMaximum, option) => Math.max(currentMaximum, Math.max(option.addition_value - 1, 0)),
-		0
-	);
-	const boostValue = scale.options.reduce(
-		(currentMaximum, option) => Math.max(currentMaximum, option.boost_value),
-		1
-	);
-	return { columnTotal, boostValue };
-}
-
-function readSociabilityScaleScore(question: InstrumentQuestion, answers: QuestionResponsePayload): number {
-	const scale = findScale(question, "sociability");
-	const rawAnswer = answers.sociability;
-	const answerKey = typeof rawAnswer === "string" ? rawAnswer : undefined;
-	if (scale === undefined || answerKey === undefined) {
-		return 0;
-	}
-
-	const selectedOption = findScaleOption(scale, answerKey);
-	if (selectedOption === undefined) {
-		return 0;
-	}
-
-	return Math.max(selectedOption.addition_value - 1, 0);
-}
-
-function readSociabilityScaleMaximum(question: InstrumentQuestion): number {
-	const scale = findScale(question, "sociability");
-	if (scale === undefined) {
-		return 0;
-	}
-
-	return scale.options.reduce(
-		(currentMaximum, option) => Math.max(currentMaximum, Math.max(option.addition_value - 1, 0)),
-		0
-	);
-}
-
-/**
- * Calculate one question's raw and maximum score totals using the same rules
- * as the backend response payload.
- *
- * @param question - Instrument question definition.
- * @param answers - Stored answer payload for the question.
- * @returns Question-level raw and maximum score totals.
- */
-function calculateQuestionScores(question: InstrumentQuestion, answers: QuestionResponsePayload): AuditScoreTotals {
-	if (question.question_type !== "scaled" || question.scales.length === 0) {
-		return createEmptyScoreTotals();
-	}
-
-	const provisionScale = findScale(question, "provision");
-	const rawProvisionAnswer = answers.provision;
-	const provisionAnswerKey = typeof rawProvisionAnswer === "string" ? rawProvisionAnswer : undefined;
-	const provisionOption =
-		provisionScale === undefined || provisionAnswerKey === undefined
-			? undefined
-			: findScaleOption(provisionScale, provisionAnswerKey);
-	const provisionTotal = provisionOption?.addition_value ?? 0;
-	const provisionTotalMax = readProvisionScaleMaximum(question);
-	const shouldReadFollowUpScales = provisionOption?.allows_follow_up_scales === true;
-
-	const varietyScore = shouldReadFollowUpScales
-		? readMultiplierScaleScore(question, answers, "variety")
-		: { columnTotal: 0, boostValue: 1 };
-	const challengeScore = shouldReadFollowUpScales
-		? readMultiplierScaleScore(question, answers, "challenge")
-		: { columnTotal: 0, boostValue: 1 };
-	const sociabilityTotal = shouldReadFollowUpScales ? readSociabilityScaleScore(question, answers) : 0;
-
-	const varietyMaximum = readMultiplierScaleMaximum(question, "variety");
-	const challengeMaximum = readMultiplierScaleMaximum(question, "challenge");
-	const sociabilityTotalMax = readSociabilityScaleMaximum(question);
-
-	const constructTotal = provisionTotal * varietyScore.boostValue * challengeScore.boostValue;
-	const constructTotalMax = provisionTotalMax * varietyMaximum.boostValue * challengeMaximum.boostValue;
-
-	return {
-		provision_total: provisionTotal,
-		provision_total_max: provisionTotalMax,
-		variety_total: varietyScore.columnTotal,
-		variety_total_max: varietyMaximum.columnTotal,
-		challenge_total: challengeScore.columnTotal,
-		challenge_total_max: challengeMaximum.columnTotal,
-		sociability_total: sociabilityTotal,
-		sociability_total_max: sociabilityTotalMax,
-		play_value_total: question.constructs.includes("play_value") ? constructTotal : 0,
-		play_value_total_max: question.constructs.includes("play_value") ? constructTotalMax : 0,
-		usability_total: question.constructs.includes("usability") ? constructTotal : 0,
-		usability_total_max: question.constructs.includes("usability") ? constructTotalMax : 0
-	};
-}
-
 // ---------------------------------------------------------------------------
 // Domain/report helper internals
 // ---------------------------------------------------------------------------
@@ -344,6 +171,10 @@ function countTokenOverlap(a: Set<string>, b: Set<string>): number {
 function readStringAnswer(answers: QuestionResponsePayload, key: string): string | undefined {
 	const raw = answers[key];
 	return typeof raw === "string" ? raw : undefined;
+}
+
+function formatScoreValue(value: number): string {
+	return Number.isInteger(value) ? value.toString() : value.toFixed(1);
 }
 
 function formatChecklistAnswerLabel(question: InstrumentQuestion, answers: QuestionResponsePayload): string | null {
@@ -401,18 +232,22 @@ function buildDomainQuestionRow(
 		provisionApplicable,
 		provisionAnswered: provisionInfo.answered,
 		provisionIsNotApplicable: provisionInfo.isNotApplicable,
+		provisionIsUnsure: provisionInfo.isUnsure,
 		varietyLabel: varietyInfo.label,
 		varietyApplicable,
 		varietyAnswered: varietyInfo.answered,
 		varietyIsNotApplicable: varietyInfo.isNotApplicable,
+		varietyIsUnsure: varietyInfo.isUnsure,
 		challengeApplicable,
 		challengeLabel: challengeInfo.label,
 		challengeAnswered: challengeInfo.answered,
 		challengeIsNotApplicable: challengeInfo.isNotApplicable,
+		challengeIsUnsure: challengeInfo.isUnsure,
 		sociabilityLabel: sociabilityInfo.label,
 		sociabilityApplicable,
 		sociabilityAnswered: sociabilityInfo.answered,
 		sociabilityIsNotApplicable: sociabilityInfo.isNotApplicable,
+		sociabilityIsUnsure: sociabilityInfo.isUnsure,
 		followUpScalesAsked,
 		playValueScore: playValueMax <= 0 ? null : scores.play_value_total,
 		playValueMax: playValueMax <= 0 ? null : playValueMax,
@@ -561,19 +396,20 @@ export function resolveScaleOptionInfo(
 	question: InstrumentQuestion,
 	scaleKey: string,
 	answerKey: string | undefined
-): { label: string | null; answered: boolean; isNotApplicable: boolean } {
+): { label: string | null; answered: boolean; isNotApplicable: boolean; isUnsure: boolean } {
 	if (answerKey === undefined || answerKey.length === 0) {
-		return { label: null, answered: false, isNotApplicable: false };
+		return { label: null, answered: false, isNotApplicable: false, isUnsure: false };
 	}
 	const scale = question.scales.find(candidate => candidate.key === scaleKey);
 	if (scale === undefined) {
-		return { label: null, answered: false, isNotApplicable: false };
+		return { label: null, answered: false, isNotApplicable: false, isUnsure: false };
 	}
 	const option = scale.options.find(candidate => candidate.key === answerKey);
 	return {
 		label: option?.label ?? null,
 		answered: option !== undefined,
-		isNotApplicable: option?.is_not_applicable === true
+		isNotApplicable: option?.is_not_applicable === true,
+		isUnsure: option?.is_unsure === true
 	};
 }
 
