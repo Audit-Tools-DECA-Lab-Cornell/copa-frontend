@@ -205,9 +205,9 @@ function VariantComparisonTable({ scores }: Readonly<{ scores: AuditSession["sco
 											{totals === null
 												? "--"
 												: formatTotalMaxPct(
-														totals.play_value_total,
-														totals.play_value_total_max
-													)}
+													totals.play_value_total,
+													totals.play_value_total_max
+												)}
 										</td>
 										<td className="py-2 pr-4 tabular-nums">
 											{totals === null
@@ -842,7 +842,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 	const [openDomains, setOpenDomains] = React.useState<string[]>([]);
 	const [itemToggles, setItemToggles] = React.useState<Record<string, boolean>>({});
 
-	// Plain handlers — the React Compiler memoizes these automatically, so manual
+	// Plain handlers - the React Compiler memoizes these automatically, so manual
 	// useCallback wrappers would only fight the compiler's dependency inference.
 	const expandAll = () => {
 		setOpenDomains([...allDomainAccordionKeys]);
@@ -964,9 +964,9 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 						helper={
 							overall !== null
 								? t("maxPvU", {
-										pv: overall.play_value_total_max,
-										u: overall.usability_total_max
-									})
+									pv: overall.play_value_total_max,
+									u: overall.usability_total_max
+								})
 								: undefined
 						}
 						accent="bg-accent-terracotta"
@@ -1020,29 +1020,29 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 							className="w-full">
 							{hasInstrumentDomains
 								? domainRows.map(row => (
-										<DomainAccordionItem
-											key={row.domainKey}
-											domainKey={row.domainKey}
-											title={row.domainTitle}
-											scores={row.scoreTotals}
-											notes={row.sectionNotes}
-											questions={row.questions}
-											showItems={itemToggles[row.domainKey] === true}
-											onToggleItems={() => toggleItems(row.domainKey)}
-										/>
-									))
+									<DomainAccordionItem
+										key={row.domainKey}
+										domainKey={row.domainKey}
+										title={row.domainTitle}
+										scores={row.scoreTotals}
+										notes={row.sectionNotes}
+										questions={row.questions}
+										showItems={itemToggles[row.domainKey] === true}
+										onToggleItems={() => toggleItems(row.domainKey)}
+									/>
+								))
 								: domainKeys.map(domainKey => (
-										<DomainAccordionItem
-											key={domainKey}
-											domainKey={domainKey}
-											title={toDomainTitle(domainKey)}
-											scores={displayAudit.scores.by_domain[domainKey] ?? null}
-											notes={[]}
-											questions={[]}
-											showItems={false}
-											onToggleItems={() => undefined}
-										/>
-									))}
+									<DomainAccordionItem
+										key={domainKey}
+										domainKey={domainKey}
+										title={toDomainTitle(domainKey)}
+										scores={displayAudit.scores.by_domain[domainKey] ?? null}
+										notes={[]}
+										questions={[]}
+										showItems={false}
+										onToggleItems={() => undefined}
+									/>
+								))}
 						</Accordion>
 					</CardContent>
 				</Card>

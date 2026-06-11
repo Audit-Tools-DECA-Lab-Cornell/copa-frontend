@@ -13,7 +13,7 @@
  *  7. Who Uses COPA
  *  8. Outcomes / Benefits
  *  9. Research Foundation
- * 10. Pricing (web + mobile platform bundle — no invented dollar amounts)
+ * 10. Pricing (web + mobile platform bundle - no invented dollar amounts)
  * 11. Access Options
  * 12. Final CTA band
  * 13. Site Footer
@@ -57,7 +57,7 @@ const SIGN_IN_PATH = "/login";
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
-/** Section eyebrow — matches dashboard header eyebrow tokens. */
+/** Section eyebrow - matches dashboard header eyebrow tokens. */
 function Eyebrow({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<p className="text-(length:--eyebrow-size) font-semibold uppercase tracking-(--eyebrow-tracking) text-primary">
@@ -66,7 +66,7 @@ function Eyebrow({ children }: Readonly<{ children: React.ReactNode }>) {
 	);
 }
 
-/** Consistent icon treatment for audience cards — muted, no per-card accent colors. */
+/** Consistent icon treatment for audience cards - muted, no per-card accent colors. */
 function IconBadge({ icon: Icon }: Readonly<{ icon: LucideIcon }>) {
 	return (
 		<span className="inline-flex size-10 items-center justify-center rounded-card bg-muted text-muted-foreground">
@@ -75,7 +75,7 @@ function IconBadge({ icon: Icon }: Readonly<{ icon: LucideIcon }>) {
 	);
 }
 
-/** Content card with optional top accent bar — mirrors report stat cards. */
+/** Content card with optional top accent bar - mirrors report stat cards. */
 function AccentCard({
 	accent,
 	className,
@@ -106,7 +106,7 @@ function SiteHeader() {
 	return (
 		<header className="sticky top-0 z-50 border-b border-edge/60 bg-background/90 backdrop-blur">
 			<div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-				<Link href="/" className="flex items-center gap-2.5" aria-label="COPA — home">
+				<Link href="/" className="flex items-center gap-2.5" aria-label="COPA - home">
 					{/* <span className="flex size-9 items-center justify-center rounded-card border border-edge/50 bg-surface-raised shadow-card"> */}
 					<Image
 						className="flex size-9 items-center justify-center rounded-card border border-edge/50 bg-surface-raised shadow-card"
@@ -1106,7 +1106,7 @@ function PricingSection() {
 // ─── 11. Access Options ───────────────────────────────────────────────────────
 
 /**
- * Access section — audience-specific entry points that complement the programme tiers above.
+ * Access section - audience-specific entry points that complement the programme tiers above.
  * Describes who each workflow is for; web + mobile are included in every path.
  */
 function AccessOptions() {
@@ -1277,7 +1277,7 @@ function SiteFooter() {
 		<footer className="border-t-2 border-edge/50 bg-card/70">
 			<div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.6fr_1fr_1fr] lg:px-8">
 				<div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-					<Link href="/" className="flex items-center gap-2.5" aria-label="COPA — home">
+					<Link href="/" className="flex items-center gap-2.5" aria-label="COPA - home">
 						<span className="flex size-9 items-center justify-center rounded-card border border-edge/50 bg-surface-raised shadow-card">
 							<Image src="/icon.png" alt="" width={32} height={32} aria-hidden />
 						</span>
