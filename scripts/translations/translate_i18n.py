@@ -3,7 +3,6 @@
 
 This script is designed for the web app's current i18n setup:
 - Flat JSON locale files under ``messages/<locale>.json``
-- Compact instrument bundles under ``src/lib/<locale>Instrument.ts``
 - Instrument JSON files like ``de.json`` or ``*.instrument.json``
 
 It translates only missing target strings by default:
@@ -21,7 +20,6 @@ import argparse
 import copy
 import json
 import re
-import subprocess
 import sys
 import time
 from dataclasses import dataclass
@@ -33,7 +31,7 @@ from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv(), override=True)
 
-FileKind: TypeAlias = Literal["json", "instrument", "instrument-json"]
+FileKind: TypeAlias = Literal["json", "instrument-json"]
 PathToken: TypeAlias = str | int
 TranslationPath: TypeAlias = tuple[PathToken, ...]
 JsonScalar: TypeAlias = str | int | float | bool | None
@@ -106,7 +104,7 @@ class ScriptConfig:
     overwrite: bool
     dry_run: bool
     file_filters: tuple[str, ...]
-    format_filter: Literal["all", "json", "instrument", "instrument-json"]
+    format_filter: Literal["all", "json", "instrument-json"]
     retries: int
     timeout_seconds: float
     batch_item_limit: int
@@ -230,9 +228,9 @@ def build_argument_parser(locales_dir: Path) -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--format",
-        choices=("all", "json", "instrument", "instrument-json"),
+        choices=("all", "json", "instrument-json"),
         default="all",
-        help="Limit translation to JSON namespaces, instrument bundles, or instrument JSON files.",
+        help="Limit translation to JSON namespaces or instrument JSON files.",
     )
     parser.add_argument(
         "--file",
@@ -321,7 +319,6 @@ def translate_requested_files(
     config: ScriptConfig, translator: LiteLLMTranslator
 ) -> list[FileTranslationResult]:
     """Translate all files selected by the current CLI configuration."""
-    source_instrument_bundle: JsonValue | None = None
     results: list[FileTranslationResult] = []
 
     for locale in config.target_locales:
@@ -335,22 +332,9 @@ def translate_requested_files(
                 result = translate_json_file(
                     config=config, translator=translator, file=file
                 )
-            elif file.kind == "instrument-json":
+            else:
                 result = translate_instrument_json_file(
                     config=config, translator=translator, file=file
-                )
-            else:
-                if source_instrument_bundle is None:
-                    source_instrument_bundle = load_instrument_bundle(
-                        repo_root=config.repo_root,
-                        mode="source",
-                        locale=config.source_locale,
-                    )
-                result = translate_instrument_file(
-                    config=config,
-                    translator=translator,
-                    file=file,
-                    source_bundle=source_instrument_bundle,
                 )
             results.append(result)
     return results
@@ -371,20 +355,6 @@ def discover_translatable_files(
                 locale=locale,
                 source_path=source_locale_path,
                 target_path=target_locale_path,
-            )
-        )
-
-    if config.format_filter in ("all", "instrument"):
-        instrument_export_prefix = locale_to_export_prefix(locale)
-        files.append(
-            TranslatableFile(
-                kind="instrument",
-                locale=locale,
-                source_path=config.repo_root / "src" / "lib" / "enInstrument.ts",
-                target_path=config.repo_root
-                / "src"
-                / "lib"
-                / f"{instrument_export_prefix}Instrument.ts",
             )
         )
 
@@ -481,53 +451,6 @@ def translate_json_file(
     )
 
 
-def translate_instrument_file(
-    config: ScriptConfig,
-    translator: LiteLLMTranslator,
-    file: TranslatableFile,
-    source_bundle: JsonValue,
-) -> FileTranslationResult:
-    """Translate one compact instrument bundle."""
-    current_target_bundle = load_instrument_bundle(
-        repo_root=config.repo_root, mode="current", locale=file.locale
-    )
-    translation_entries = collect_translation_entries(
-        source_value=source_bundle,
-        current_value=current_target_bundle,
-        overwrite=config.overwrite,
-        skip_keys=NON_TRANSLATABLE_KEYS,
-    )
-
-    if len(translation_entries) == 0:
-        print(
-            f"Skipping {file.target_path.relative_to(config.repo_root)} (no missing strings)."
-        )
-        return FileTranslationResult(file=file, translated_count=0, updated=False)
-
-    print(
-        f"Translating {len(translation_entries)} strings in {file.target_path.relative_to(config.repo_root)} ..."
-    )
-    translated_mapping = translator.translate_entries(
-        target_locale=file.locale, entries=translation_entries
-    )
-    next_target_bundle = merge_translations_into_value(
-        source_value=source_bundle,
-        current_value=current_target_bundle,
-        translated_mapping=translated_mapping,
-    )
-    ordered_output = reorder_like_source(
-        source_value=source_bundle, target_value=next_target_bundle
-    )
-
-    if not config.dry_run:
-        write_instrument_typescript(
-            path=file.target_path, locale=file.locale, value=ordered_output
-        )
-    return FileTranslationResult(
-        file=file, translated_count=len(translation_entries), updated=not config.dry_run
-    )
-
-
 def translate_instrument_json_file(
     config: ScriptConfig, translator: LiteLLMTranslator, file: TranslatableFile
 ) -> FileTranslationResult:
@@ -600,30 +523,6 @@ def write_json_file(path: Path, value: JsonValue) -> None:
     with path.open("w", encoding="utf-8", newline="\n") as f:
         json.dump(value, f, ensure_ascii=False, indent=4)
         f.write("\n")
-
-
-def write_instrument_typescript(path: Path, locale: str, value: JsonValue) -> None:
-    export_name = f"{locale_to_export_prefix(locale)}InstrumentTranslations"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    serialized = json.dumps(value, ensure_ascii=False, indent=4)
-    content = f'import type {{ InstrumentTranslations }} from "@/lib/instrument-translations";\n\nexport const {export_name} = {serialized} satisfies InstrumentTranslations;\n'
-    with path.open("w", encoding="utf-8", newline="\n") as f:
-        f.write(content)
-
-
-def load_instrument_bundle(
-    repo_root: Path, mode: Literal["source", "current"], locale: str
-) -> JsonValue:
-    helper = repo_root / "scripts" / "translations" / "export_instrument_bundle.mjs"
-    proc = subprocess.run(
-        ["node", str(helper), mode, locale],
-        cwd=repo_root,
-        capture_output=True,
-        text=True,
-    )
-    if proc.returncode != 0:
-        raise TranslationScriptError(f"Failed to export bundle: {proc.stderr}")
-    return cast(JsonValue, json.loads(proc.stdout))
 
 
 def collect_translation_entries(
@@ -783,11 +682,6 @@ def identifier_to_translation_path(identifier: str) -> TranslationPath:
     if buffer:
         path.append(buffer)
     return tuple(path)
-
-
-def locale_to_export_prefix(locale: str) -> str:
-    segs = [s.lower() for s in re.split(r"[^A-Za-z0-9]+", locale) if s]
-    return segs[0] + "".join(s.capitalize() for s in segs[1:])
 
 
 def print_summary(results: list[FileTranslationResult], dry_run: bool) -> None:
