@@ -51,6 +51,16 @@ skills-lock.json
 # screenshots scripts
 scripts/screenshots/*
 
+# Playwright visual-test captures (regenerate with pnpm screenshots:web; not served by the app)
+public/screenshots/admin/
+public/screenshots/auditor/
+public/screenshots/auth/
+public/screenshots/manager/
+public/screenshots/manifest.json
+public/screenshots/Framed/admin/
+public/screenshots/Framed/auditor/
+public/screenshots/Framed/auth/
+
 docs/superpowers/
 
 test-results/
