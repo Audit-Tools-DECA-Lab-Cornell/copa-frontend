@@ -1,7 +1,26 @@
-import { redirect } from "next/navigation";
-import { getServerAuthSession } from "@/lib/auth/server-session";
+import { createElement } from "react";
 import type { Metadata } from "next";
-import { LandingPage } from "@/components/landing/landing-page";
+import { notFound } from "next/navigation";
+
+import { getRotationConcept } from "@/lib/landing/rotation";
+
+/**
+ * Public homepage.
+ *
+ * The landing page rotates through the COPA concept pages so each gets fair,
+ * peak-hour exposure (see lib/landing/rotation). The page is statically rendered
+ * and regenerated every two hours via ISR, so the rotation costs no client-side
+ * JavaScript - the concept is chosen at render/regeneration time.
+ *
+ * Authenticated visitors are redirected to their dashboard by middleware before
+ * this static page is served, so no per-request session read happens here.
+ */
+
+// The root layout reads the request locale, which would otherwise render every
+// route dynamically. The landing pages use no translations, so we opt the
+// homepage back into static rendering; `revalidate` then drives the rotation.
+export const dynamic = "force-static";
+export const revalidate = 7200; // 2 hours - matches the rotation slot length.
 
 export const metadata: Metadata = {
 	title: "COPA | Comprehensive Outdoor Playspace Audit Tool",
@@ -19,17 +38,12 @@ export const metadata: Metadata = {
 	}
 };
 
-export default async function HomePage() {
-	const session = await getServerAuthSession();
+export default function HomePage() {
+	const { Component: selected } = getRotationConcept();
 
-	if (!session) {
-		return <LandingPage />;
+	if (!selected) {
+		notFound();
 	}
-	if (session.role === "admin") {
-		redirect("/admin/dashboard");
-	}
-	if (session.role === "manager") {
-		redirect("/manager/dashboard");
-	}
-	redirect(session.nextStep === "DASHBOARD" ? "/auditor/dashboard" : "/auditor/onboarding");
+
+	return createElement(selected);
 }

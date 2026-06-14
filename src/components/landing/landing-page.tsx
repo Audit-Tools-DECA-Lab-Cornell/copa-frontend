@@ -5,21 +5,26 @@
  *
  * Implements all required sections from the COPA homepage brief:
  *  1. Header / Navigation
- *  2. Hero (with ProductMock)
+ *  2. Hero (floating product render + instrument stats)
  *  3. Problem section
- *  4. What COPA Measures (constructs + scoring lenses)
+ *  4. What COPA Measures (constructs + scoring lenses, anchored by a report render)
  *  5. Whole-Playspace Evaluation
- *  6. How It Works
- *  7. Who Uses COPA
- *  8. Outcomes / Benefits
- *  9. Research Foundation
- * 10. Pricing (web + mobile platform bundle - no invented dollar amounts)
- * 11. Access Options
- * 12. Final CTA band
- * 13. Site Footer
+ *  6. In the Field (inverted band: guided, offline, resumable audits)
+ *  7. How It Works (alternating screenshot / step layout)
+ *  8. Who Uses COPA
+ *  9. Outcomes / Benefits (paired with the reports + export render)
+ * 10. Research Foundation
+ * 11. Pricing (web + mobile platform bundle - no invented dollar amounts)
+ * 12. Access Options
+ * 13. Final CTA band
+ * 14. Site Footer
+ *
+ * Product renders live in public/marketing/ and are framed by the DeviceShot
+ * primitive: transparent device PNGs on a token-based color halo with an alpha
+ * drop shadow. Light and dark screens are mixed to show the app's two themes.
  *
  * Design system: shadcn Card/Button primitives, semantic foreground tokens,
- * dashboard header eyebrow scale, inverted CTA band, and report-style accent bars.
+ * dashboard header eyebrow scale, inverted bands, and report-style accent bars.
  *
  * Copy rules: no fake metrics, no AI language, no internal dev terms,
  * no fake institutional partners, no testimonials.
@@ -35,19 +40,22 @@ import {
 	FlaskConical,
 	HeartHandshake,
 	Landmark,
+	ListChecks,
 	Menu,
 	Monitor,
+	RotateCcw,
 	School,
 	Smartphone,
 	TreePine,
 	Users,
+	WifiOff,
 	X,
 	type LucideIcon
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SCALE_ACCENT_BAR_CLASS_NAMES, getScaleAccentCssVar, type PvScaleKey } from "@/lib/audit/scale-colors";
+import { SCALE_ACCENT_BAR_CLASS_NAMES, type PvScaleKey } from "@/lib/audit/scale-colors";
 import { cn } from "@/lib/utils";
 
 // ─── Route constants ──────────────────────────────────────────────────────────
@@ -86,6 +94,68 @@ function AccentCard({
 			{accent ? <div className={cn("absolute inset-x-0 top-0 h-1", accent)} aria-hidden /> : null}
 			<CardContent className="space-y-2 px-5 pb-5 pt-6">{children}</CardContent>
 		</Card>
+	);
+}
+
+// ─── Device showcase ──────────────────────────────────────────────────────────
+
+type DeviceGlow = "primary" | "terracotta" | "moss" | "slate" | "violet" | "neutral";
+
+const DEVICE_GLOW_CLASS: Record<DeviceGlow, string> = {
+	primary: "bg-primary/20",
+	terracotta: "bg-accent-terracotta/25",
+	moss: "bg-accent-moss/20",
+	slate: "bg-accent-slate/20",
+	violet: "bg-accent-violet/20",
+	neutral: "bg-foreground/10"
+};
+
+/**
+ * Floating product screenshot. The source renders are transparent device PNGs,
+ * so each sits on a soft brand-color halo with an alpha drop shadow - no card
+ * chrome - which keeps the screens feeling tangible rather than pasted on.
+ */
+function DeviceShot({
+	src,
+	alt,
+	width,
+	height,
+	priority = false,
+	glow = "primary",
+	sizes = "(min-width: 1024px) 24rem, (min-width: 640px) 60vw, 80vw",
+	className,
+	haloClassName
+}: Readonly<{
+	src: string;
+	alt: string;
+	width: number;
+	height: number;
+	priority?: boolean;
+	glow?: DeviceGlow;
+	sizes?: string;
+	className?: string;
+	haloClassName?: string;
+}>) {
+	return (
+		<div className={cn("relative mx-auto w-full max-w-sm", className)}>
+			<div
+				aria-hidden
+				className={cn(
+					"pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl",
+					DEVICE_GLOW_CLASS[glow],
+					haloClassName
+				)}
+			/>
+			<Image
+				src={src}
+				alt={alt}
+				width={width}
+				height={height}
+				priority={priority}
+				sizes={sizes}
+				className="h-auto w-full select-none [filter:drop-shadow(0_28px_50px_rgba(15,23,42,0.22))]"
+			/>
+		</div>
 	);
 }
 
@@ -177,132 +247,30 @@ function SiteHeader() {
 	);
 }
 
-// ─── Product mock ──────────────────────────────────────────────────────────────
-
-/**
- * Stylised audit dashboard preview.
- * All values are illustrative - clearly labelled as a product preview,
- * not real adoption data or metrics.
- */
-const SCALE_PREVIEW_LABELS: Record<PvScaleKey, string> = {
-	provision: "Provision",
-	variety: "Variety",
-	challenge: "Challenge",
-	sociability: "Sociability"
-};
-
-function ProductMock() {
-	const domains: Array<{ key: PvScaleKey; label: string; value: number; score: string }> = [
-		{ key: "provision", label: SCALE_PREVIEW_LABELS.provision, value: 86, score: "4.3" },
-		{ key: "variety", label: SCALE_PREVIEW_LABELS.variety, value: 72, score: "3.6" },
-		{ key: "challenge", label: SCALE_PREVIEW_LABELS.challenge, value: 64, score: "3.2" },
-		{ key: "sociability", label: SCALE_PREVIEW_LABELS.sociability, value: 79, score: "4.0" }
-	];
-
-	const places = [
-		{ name: "Maplewood Commons", pv: "4.3", u: "4.6", done: true },
-		{ name: "Harbor Point Play", pv: "3.8", u: "4.1", done: true },
-		{ name: "Cedar Hollow Field", pv: "_", u: "_", done: false }
-	];
-
-	return (
-		<Card
-			className="gap-0 overflow-hidden py-0 shadow-lift"
-			role="img"
-			aria-label="COPA audit dashboard showing Play Value and Usability scores for a parks district assessment">
-			<div className="border-b border-edge/40 bg-foreground px-5 py-4">
-				<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-background/70">
-					Preview · Riverside Parks District
-				</p>
-				<p className="mt-1 text-sm font-semibold text-background">Q2 Assessment</p>
-			</div>
-
-			<CardContent className="space-y-4 px-5 pb-5 pt-5">
-				<div className="grid grid-cols-3 gap-3">
-					{[
-						{ label: "Spaces", value: "18", ok: false },
-						{ label: "Mean PV", value: "4.1", ok: false },
-						{ label: "Complete", value: "83%", ok: true }
-					].map(s => (
-						<div
-							key={s.label}
-							className="rounded-card border border-edge/40 bg-muted/40 px-3 py-3 text-center">
-							<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-								{s.label}
-							</p>
-							<p
-								className={cn(
-									"mt-1 font-mono text-xl font-semibold tabular-nums",
-									s.ok ? "text-status-success" : "text-foreground"
-								)}>
-								{s.value}
-							</p>
-						</div>
-					))}
-				</div>
-
-				<div className="rounded-card border border-edge/40 bg-card p-4">
-					<p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-						Domain scores · 1–5 scale
-					</p>
-					<div className="space-y-2.5">
-						{domains.map(d => (
-							<div key={d.key} className="flex items-center gap-3">
-								<span className="w-20 shrink-0 text-xs text-muted-foreground">{d.label}</span>
-								<span className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-									<span
-										className="block h-full rounded-full"
-										style={{ width: `${d.value}%`, backgroundColor: getScaleAccentCssVar(d.key) }}
-									/>
-								</span>
-								<span className="w-7 shrink-0 text-right font-mono text-xs font-semibold tabular-nums text-foreground">
-									{d.score}
-								</span>
-							</div>
-						))}
-					</div>
-				</div>
-
-				<div className="space-y-1.5">
-					{places.map(p => (
-						<div
-							key={p.name}
-							className="flex items-center justify-between rounded-card border border-edge/40 bg-card px-3 py-2.5">
-							<span className="truncate text-sm font-medium text-foreground">{p.name}</span>
-							<span className="flex shrink-0 items-center gap-3">
-								<span className="hidden font-mono text-xs text-muted-foreground sm:inline">
-									PV {p.pv} · U {p.u}
-								</span>
-								<span
-									className={cn(
-										"inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-										p.done
-											? "bg-status-success-surface text-status-success"
-											: "bg-status-in-progress-surface text-status-in-progress"
-									)}>
-									{p.done ? "Complete" : "In progress"}
-								</span>
-							</span>
-						</div>
-					))}
-				</div>
-			</CardContent>
-		</Card>
-	);
-}
-
 // ─── 2. Hero ──────────────────────────────────────────────────────────────────
 
 function Hero() {
+	const stats: Array<[string, string]> = [
+		["2", "Core constructs"],
+		["4", "Scoring lenses"],
+		["10", "Playspace elements"]
+	];
+
 	return (
-		<section className="border-b border-edge/40" aria-labelledby="hero-heading">
-			<div className="mx-auto grid w-full max-w-6xl gap-12 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-10 lg:px-8 lg:pb-20 lg:pt-16">
+		<section className="relative overflow-hidden border-b border-edge/40" aria-labelledby="hero-heading">
+			{/* Ambient brand gradient - keeps the dark device feeling lit, not pasted on. */}
+			<div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+				<div className="absolute -right-28 -top-24 size-96 rounded-full bg-accent-terracotta/10 blur-3xl" />
+				<div className="absolute -left-24 top-44 size-80 rounded-full bg-accent-slate/10 blur-3xl" />
+			</div>
+
+			<div className="mx-auto grid w-full max-w-6xl gap-12 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:px-8 lg:pb-24 lg:pt-20">
 				<div className="max-w-xl">
 					<Eyebrow>Research-informed outdoor play assessment</Eyebrow>
 
 					<h1
 						id="hero-heading"
-						className="mt-4 text-4xl font-semibold leading-tight tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl">
+						className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl">
 						Beyond accessible. <span className="text-primary">Truly playable.</span>
 					</h1>
 
@@ -320,16 +288,32 @@ function Hero() {
 							</Link>
 						</Button>
 						<Button asChild size="lg" variant="outline">
-							<a href="#how">Learn how COPA works</a>
+							<a href="#how">See how COPA works</a>
 						</Button>
 					</div>
 
-					<p className="mt-5 text-sm text-muted-foreground">
-						Research-informed · Expert-reviewed · Field-tested
-					</p>
+					<dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-edge/50 pt-6">
+						{stats.map(([value, label]) => (
+							<div key={label}>
+								<dt className="font-mono text-2xl font-semibold tabular-nums text-foreground">
+									{value}
+								</dt>
+								<dd className="mt-0.5 text-xs leading-tight text-muted-foreground">{label}</dd>
+							</div>
+						))}
+					</dl>
 				</div>
 
-				<ProductMock />
+				<DeviceShot
+					src="/marketing/hero-dashboard-dark.png"
+					alt="COPA mobile field dashboard showing assigned and completed playspace audits, a priority task with a progress bar, and offline-ready status"
+					width={1857}
+					height={3096}
+					priority
+					glow="terracotta"
+					sizes="(min-width: 1024px) 26rem, 70vw"
+					className="max-w-[17rem] sm:max-w-sm"
+				/>
 			</div>
 		</section>
 	);
@@ -453,48 +437,69 @@ function WhatCopasMeasures() {
 
 	return (
 		<section id="measures" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="measures-heading">
-			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-				<div className="max-w-2xl">
-					<Eyebrow>What COPA measures</Eyebrow>
-					<h2
-						id="measures-heading"
-						className="mt-3 text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
-						Two constructs. Four scoring lenses.
-					</h2>
-					<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-						Every playspace receives scores on two primary constructs, each assessed through four lenses
-						that ask not just <em>Is it there?</em> but <em>How well does it serve diverse children?</em>
-					</p>
+			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+				<div className="grid gap-12 lg:grid-cols-[1fr_0.82fr] lg:items-center lg:gap-16">
+					<div>
+						<div className="max-w-xl">
+							<Eyebrow>What COPA measures</Eyebrow>
+							<h2
+								id="measures-heading"
+								className="mt-3 text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
+								Two constructs. Four scoring lenses.
+							</h2>
+							<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+								Every playspace receives scores on two primary constructs, each assessed through four
+								lenses that ask not just <em>Is it there?</em> but{" "}
+								<em>How well does it serve diverse children?</em>
+							</p>
+						</div>
+
+						<div className="mt-8 grid gap-4 sm:grid-cols-2">
+							<AccentCard accent="bg-accent-terracotta">
+								<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+									Primary construct
+								</p>
+								<p className="font-mono text-5xl font-semibold text-accent-terracotta">PV</p>
+								<h3 className="text-xl font-semibold text-foreground">Play Value</h3>
+								<p className="text-sm leading-relaxed text-muted-foreground">
+									The variety, richness, and flexibility of play opportunities a space supports. A
+									high play value space offers many ways to engage - physical, social, creative,
+									sensory, and restorative - across a range of abilities and interests.
+								</p>
+							</AccentCard>
+							<AccentCard accent="bg-accent-slate">
+								<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+									Primary construct
+								</p>
+								<p className="font-mono text-5xl font-semibold text-accent-slate">U</p>
+								<h3 className="text-xl font-semibold text-foreground">Usability</h3>
+								<p className="text-sm leading-relaxed text-muted-foreground">
+									Whether children with diverse abilities can actually participate, not just access.
+									Usability considers how well the space supports children who move, sense, process,
+									and communicate differently - individually and together.
+								</p>
+							</AccentCard>
+						</div>
+					</div>
+
+					<figure className="lg:pl-2">
+						<DeviceShot
+							src="/marketing/report-scoring-tilted.png"
+							alt="COPA report screen showing Play Value and Usability scores with a Provision, Variety, Challenge, and Sociability breakdown for a playspace"
+							width={1857}
+							height={3096}
+							glow="slate"
+							sizes="(min-width: 1024px) 22rem, 60vw"
+							className="max-w-[16rem] sm:max-w-xs"
+						/>
+						<figcaption className="mt-5 text-center text-sm leading-relaxed text-muted-foreground">
+							Every audit resolves to comparable Play Value and Usability scores - the same four lenses,
+							applied the same way, on every space.
+						</figcaption>
+					</figure>
 				</div>
 
-				<div className="mt-10 grid gap-4 sm:grid-cols-2">
-					<AccentCard accent="bg-accent-terracotta">
-						<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-							Primary construct
-						</p>
-						<p className="font-mono text-5xl font-semibold text-accent-terracotta">PV</p>
-						<h3 className="text-xl font-semibold text-foreground">Play Value</h3>
-						<p className="text-sm leading-relaxed text-muted-foreground">
-							The variety, richness, and flexibility of play opportunities a space supports. A high play
-							value space offers many ways to engage - physical, social, creative, sensory, and
-							restorative - across a range of abilities and interests.
-						</p>
-					</AccentCard>
-					<AccentCard accent="bg-accent-slate">
-						<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-							Primary construct
-						</p>
-						<p className="font-mono text-5xl font-semibold text-accent-slate">U</p>
-						<h3 className="text-xl font-semibold text-foreground">Usability</h3>
-						<p className="text-sm leading-relaxed text-muted-foreground">
-							Whether children with diverse abilities can actually participate, not just access. Usability
-							considers how well the space supports children who move, sense, process, and communicate
-							differently - individually and together.
-						</p>
-					</AccentCard>
-				</div>
-
-				<div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				<div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					{lenses.map(lens => (
 						<AccentCard key={lens.key} accent={SCALE_ACCENT_BAR_CLASS_NAMES[lens.key]}>
 							<h3 className="text-base font-semibold text-foreground">{lens.title}</h3>
@@ -626,31 +631,125 @@ function WholePlayspace() {
 	);
 }
 
-// ─── 6. How It Works ─────────────────────────────────────────────────────────
+// ─── 6. In the Field (Zeigarnik / offline band) ──────────────────────────────
+
+function FieldBand() {
+	const points = [
+		{
+			icon: ListChecks,
+			title: "Guided, section by section",
+			body: "Structured prompts walk auditors through every element of a playspace, so nothing important is missed in the field."
+		},
+		{
+			icon: WifiOff,
+			title: "Built for no signal",
+			body: "Audits run fully offline. Responses, notes, and photos are stored on the device and sync the moment connectivity returns."
+		},
+		{
+			icon: RotateCcw,
+			title: "Never lose your place",
+			body: "Each audit tracks its own progress. Step away mid-visit and pick up exactly where you left off."
+		}
+	];
+
+	return (
+		<section
+			id="field"
+			className="scroll-mt-20 border-b border-edge/40 bg-foreground text-background"
+			aria-labelledby="field-heading">
+			<div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-16 lg:px-8 lg:py-24">
+				<div className="order-2 max-w-xl lg:order-1">
+					<p className="text-(length:--eyebrow-size) font-semibold uppercase tracking-(--eyebrow-tracking) text-background/55">
+						In the field
+					</p>
+					<h2
+						id="field-heading"
+						className="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+						Designed to be finished onsite.
+					</h2>
+					<p className="mt-4 text-lg leading-relaxed text-background/70">
+						A COPA audit is a guided sequence, not a blank form. Auditors move through each section with
+						clear progress - and the tool holds their place until the assessment is complete.
+					</p>
+
+					<ul className="mt-8 space-y-5">
+						{points.map(point => {
+							const Icon = point.icon;
+							return (
+								<li key={point.title} className="flex gap-4">
+									<span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-card bg-background/10 text-background">
+										<Icon className="size-4" aria-hidden />
+									</span>
+									<div>
+										<h3 className="text-base font-semibold">{point.title}</h3>
+										<p className="mt-1 text-sm leading-relaxed text-background/70">{point.body}</p>
+									</div>
+								</li>
+							);
+						})}
+					</ul>
+				</div>
+
+				<div className="order-1 lg:order-2">
+					<DeviceShot
+						src="/marketing/field-questions-dark.png"
+						alt="COPA mobile audit in progress, showing Provision questions on section three of seven for a playspace with selectable answer options"
+						width={1857}
+						height={3096}
+						glow="terracotta"
+						sizes="(min-width: 1024px) 26rem, 70vw"
+						className="max-w-[17rem] sm:max-w-sm"
+						haloClassName="bg-accent-terracotta/30"
+					/>
+				</div>
+			</div>
+		</section>
+	);
+}
+
+// ─── 7. How It Works ─────────────────────────────────────────────────────────
 
 function HowItWorks() {
-	const steps = [
+	const steps: Array<{
+		title: string;
+		body: string;
+		img: string;
+		alt: string;
+		glow: DeviceGlow;
+	}> = [
 		{
 			title: "Assign a playspace",
-			body: "Select or add the outdoor playspace to assess. Capture site information, location context, and relevant background before the visit."
+			body: "Select or add the outdoor playspace to assess. Capture site information, location context, and relevant background before the visit.",
+			img: "/marketing/step-place-detail.png",
+			alt: "COPA place detail screen showing a playspace with its location, project, and assessment status before an audit begins",
+			glow: "moss"
 		},
 		{
 			title: "Complete an onsite audit",
-			body: "Work through the COPA instrument in the field. Structured prompts guide observation of all playspace elements - not just equipment."
+			body: "Work through the COPA instrument in the field. Structured prompts guide observation of all playspace elements - not just equipment.",
+			img: "/marketing/step-execute-section.png",
+			alt: "COPA mobile audit section showing Playspace Character and Community questions with answer options during an onsite assessment",
+			glow: "slate"
 		},
 		{
 			title: "Capture observations and notes",
-			body: "Record structured responses, contextual notes, and photo documentation, organised by construct, domain, and assessment lens."
+			body: "Record structured responses, contextual notes, and photo documentation, organised by construct, domain, and assessment lens.",
+			img: "/marketing/step-section-notes.png",
+			alt: "COPA mobile section notes screen with a free-text field for recommendations and save-and-next actions",
+			glow: "terracotta"
 		},
 		{
 			title: "Generate reports and guide decisions",
-			body: "Review Play Value and Usability scores, domain breakdowns, and findings. Export reports to support renovation planning, funding requests, and design review."
+			body: "Review Play Value and Usability scores, domain breakdowns, and findings. Export reports to support renovation planning, funding requests, and design review.",
+			img: "/marketing/step-report-detail.png",
+			alt: "COPA report detail screen showing Play Value and Usability scoring tables with per-lens breakdowns for a playspace",
+			glow: "violet"
 		}
 	];
 
 	return (
 		<section id="how" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="how-heading">
-			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
 				<div className="max-w-2xl">
 					<Eyebrow>How it works</Eyebrow>
 					<h2
@@ -664,27 +763,41 @@ function HowItWorks() {
 					</p>
 				</div>
 
-				<ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4" aria-label="How COPA works - four steps">
-					{steps.map((step, i) => (
-						<li key={step.title}>
-							<Card className="h-full gap-0 py-0">
-								<CardContent className="space-y-3 px-5 pb-5 pt-5">
-									<span className="inline-flex size-10 items-center justify-center rounded-card bg-solid-primary font-mono text-sm font-semibold text-solid-primary-text shadow-solid-primary">
+				<ol className="mt-14 space-y-16 lg:space-y-24" aria-label="How COPA works - four steps">
+					{steps.map((step, i) => {
+						const flipped = i % 2 === 1;
+						return (
+							<li key={step.title} className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
+								<div className={cn(flipped && "lg:order-2")}>
+									<span className="inline-flex size-11 items-center justify-center rounded-card bg-solid-primary font-mono text-sm font-semibold text-solid-primary-text shadow-solid-primary">
 										{String(i + 1).padStart(2, "0")}
 									</span>
-									<h3 className="text-base font-semibold text-foreground">{step.title}</h3>
-									<p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
-								</CardContent>
-							</Card>
-						</li>
-					))}
+									<h3 className="mt-5 text-2xl font-semibold tracking-tight text-balance text-foreground">
+										{step.title}
+									</h3>
+									<p className="mt-3 text-base leading-relaxed text-muted-foreground">{step.body}</p>
+								</div>
+								<div className={cn(flipped && "lg:order-1")}>
+									<DeviceShot
+										src={step.img}
+										alt={step.alt}
+										width={1857}
+										height={3096}
+										glow={step.glow}
+										sizes="(min-width: 1024px) 22rem, 55vw"
+										className="max-w-[15rem] sm:max-w-xs"
+									/>
+								</div>
+							</li>
+						);
+					})}
 				</ol>
 			</div>
 		</section>
 	);
 }
 
-// ─── 7. Who Uses COPA ─────────────────────────────────────────────────────────
+// ─── 8. Who Uses COPA ─────────────────────────────────────────────────────────
 
 function WhoUsesCopa() {
 	const audiences = [
@@ -756,7 +869,7 @@ function WhoUsesCopa() {
 	);
 }
 
-// ─── 8. Outcomes ─────────────────────────────────────────────────────────────
+// ─── 9. Outcomes ─────────────────────────────────────────────────────────────
 
 function Outcomes() {
 	const items = [
@@ -788,39 +901,65 @@ function Outcomes() {
 
 	return (
 		<section id="outcomes" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="outcomes-heading">
-			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-				<div className="mx-auto max-w-2xl text-center">
-					<Eyebrow>What COPA enables</Eyebrow>
-					<h2
-						id="outcomes-heading"
-						className="mt-3 text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
-						Turn observation into evidence.
-						<br />
-						Evidence into action.
-					</h2>
-				</div>
+			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+				<div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+					<div className="lg:sticky lg:top-24 lg:self-start">
+						<Eyebrow>What COPA enables</Eyebrow>
+						<h2
+							id="outcomes-heading"
+							className="mt-3 text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
+							Turn observation into evidence.
+							<br />
+							Evidence into action.
+						</h2>
+						<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+							From a single field visit to a board-ready report, COPA produces structured findings your
+							team can act on, share, and compare.
+						</p>
 
-				<div className="mt-10 grid gap-4 sm:grid-cols-2">
-					{items.map(item => (
-						<Card key={item.title} className="gap-0 py-0">
-							<CardContent className="flex items-start gap-4 px-5 pb-5 pt-5">
-								<span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-status-success-surface text-status-success">
-									<Check className="size-3.5" aria-hidden />
-								</span>
-								<div>
-									<h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
-									<p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
-								</div>
-							</CardContent>
-						</Card>
-					))}
+						<figure className="mt-8">
+							<DeviceShot
+								src="/marketing/reports-preview-portrait.png"
+								alt="COPA reports list showing completed playspace audits with Play Value and Usability scores and CSV, Excel, and PDF export options"
+								width={1419}
+								height={2796}
+								glow="moss"
+								sizes="(min-width: 1024px) 20rem, 60vw"
+								className="max-w-[15rem] sm:max-w-xs lg:mx-0"
+							/>
+							<figcaption className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
+								Reports that move decisions forward - exportable as PDF, Excel, or CSV for planning,
+								funding, and design review.
+							</figcaption>
+						</figure>
+					</div>
+
+					<ul className="grid gap-4 sm:grid-cols-2 lg:content-start">
+						{items.map(item => (
+							<li key={item.title}>
+								<Card className="h-full gap-0 py-0">
+									<CardContent className="flex h-full items-start gap-4 px-5 pb-5 pt-5">
+										<span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-status-success-surface text-status-success">
+											<Check className="size-3.5" aria-hidden />
+										</span>
+										<div>
+											<h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+											<p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+												{item.body}
+											</p>
+										</div>
+									</CardContent>
+								</Card>
+							</li>
+						))}
+					</ul>
 				</div>
 			</div>
 		</section>
 	);
 }
 
-// ─── 9. Research Foundation ───────────────────────────────────────────────────
+// ─── 10. Research Foundation ──────────────────────────────────────────────────
 
 function ResearchFoundation() {
 	const pillars = [
@@ -930,7 +1069,7 @@ function ResearchFoundation() {
 	);
 }
 
-// ─── 10. Pricing ──────────────────────────────────────────────────────────────
+// ─── 11. Pricing ──────────────────────────────────────────────────────────────
 
 /**
  * Pricing is marketing copy only: no backend billing gates and no invented prices.
@@ -1103,7 +1242,7 @@ function PricingSection() {
 	);
 }
 
-// ─── 11. Access Options ───────────────────────────────────────────────────────
+// ─── 12. Access Options ───────────────────────────────────────────────────────
 
 /**
  * Access section - audience-specific entry points that complement the programme tiers above.
@@ -1211,7 +1350,7 @@ function AccessOptions() {
 	);
 }
 
-// ─── 12. Final CTA band ───────────────────────────────────────────────────────
+// ─── 13. Final CTA band ───────────────────────────────────────────────────────
 
 function CtaBand() {
 	return (
@@ -1247,7 +1386,7 @@ function CtaBand() {
 	);
 }
 
-// ─── 13. Footer ───────────────────────────────────────────────────────────────
+// ─── 14. Footer ───────────────────────────────────────────────────────────────
 
 function SiteFooter() {
 	const year = new Date().getFullYear();
@@ -1328,6 +1467,7 @@ export function LandingPage() {
 				<Problem />
 				<WhatCopasMeasures />
 				<WholePlayspace />
+				<FieldBand />
 				<HowItWorks />
 				<WhoUsesCopa />
 				<Outcomes />

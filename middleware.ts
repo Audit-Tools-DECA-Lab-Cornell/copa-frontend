@@ -37,9 +37,25 @@ function getAuthState(request: NextRequest) {
 	};
 }
 
+function dashboardPathFor(auth: ReturnType<typeof getAuthState>): string {
+	if (auth.role === "admin") return "/admin/dashboard";
+	if (auth.role === "manager") return "/manager/dashboard";
+	return auth.nextStep === "DASHBOARD" ? "/auditor/dashboard" : "/auditor/onboarding";
+}
+
 export function middleware(request: NextRequest) {
 	const pathname = request.nextUrl.pathname;
 	const auth = getAuthState(request);
+
+	// The homepage is a statically rendered, rotating landing page. Authenticated
+	// users are redirected to their dashboard here, so the page itself never reads
+	// the session and can stay static.
+	if (pathname === "/") {
+		if (auth.isAuthenticated && auth.role) {
+			return NextResponse.redirect(new URL(dashboardPathFor(auth), request.url));
+		}
+		return NextResponse.next();
+	}
 
 	if (pathname.startsWith("/login") || pathname.startsWith("/signup")) {
 		if (!auth.isAuthenticated || !auth.role) return NextResponse.next();
@@ -102,5 +118,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/login", "/signup", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
+	matcher: ["/", "/login", "/signup", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
 };
