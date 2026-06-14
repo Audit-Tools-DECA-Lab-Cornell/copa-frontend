@@ -32,14 +32,17 @@ export default defineConfig({
 		{ name: "web-ui-chromium", testMatch: /.*web-ui.*\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
 		{
 			name: "visual-chromium",
-			testMatch: /.*tests\/visual\/.*\.spec\.ts/,
+			testMatch: /.*visual\/.*\.spec\.ts/,
 			use: {
 				...devices["Desktop Chrome"],
 				colorScheme: "light",
+				// MacBook Pro 16" default scaled resolution ("looks like 1728 × 1117"),
+				// rendered at the display's 2× pixel density for Retina-accurate PNGs.
 				viewport: {
-					width: 1440,
-					height: 1024
-				}
+					width: 1728,
+					height: 1117
+				},
+				deviceScaleFactor: 2
 			}
 		}
 	],

@@ -1,44 +1,102 @@
 {
-	"generated_at": "2026-03-25T18:51:22.664494+00:00",
-	"app_base_url": "https://audit-tools-playspace-frontend.vercel.app",
-	"api_base_url": "https://audit-tools-backend.onrender.com",
-	"output_directory": "/Users/praty/Desktop/StudentJob/playspace/audit-tools-playspace-frontend/public/screenshots",
-	"total_targets": 2,
-	"success_count": 2,
-	"failure_count": 0,
-	"successes": [
+	"captures": [
 		{
-			"route_pattern": "/auditor/execute/[placeId]?projectId=[projectId]",
-			"source_file": "src/app/(protected)/auditor/execute/[placeId]/page.tsx",
-			"access": "auditor",
-			"variant": "auditor::auditor__execute__placeId?projectId=projectId",
-			"resolved_path": "/auditor/execute/38c802ca-7366-5016-93ce-70a8529cc5ec?projectId=f650e79b-d988-515f-a79a-2d44fe865486",
-			"session_label": "auditor",
-			"target_url": "https://audit-tools-playspace-frontend.vercel.app/auditor/execute/38c802ca-7366-5016-93ce-70a8529cc5ec?projectId=f650e79b-d988-515f-a79a-2d44fe865486&__capture=true&__variant=auditor%3A%3Aauditor__execute__placeId%3FprojectId%3DprojectId",
-			"output_file": "screenshots/auditor__auditor__execute__placeId?projectId=projectId.png",
-			"screenshot_url": "https://iad.microlink.io/30A6IzfCBDy_BP_ewG20vhwda0Dn7H1D63JJ10N6o4IHcg8V9zXyT9_W9c7N8-fnfBWeSaU4LbWQ7sxfNUGijg.png",
-			"image_width": 1920,
-			"image_height": 1965,
-			"image_type": "png",
-			"image_size_bytes": 216683,
-			"completed_at": "2026-03-25T18:51:06.835796+00:00"
+			"area": "auditor/dashboard",
+			"state": "overview",
+			"file": "auditor/dashboard/01-overview/01.png",
+			"label": "Auditor Dashboard",
+			"scrolled": true
 		},
 		{
-			"route_pattern": "/manager/places/[placeId]?projectId=[projectId]",
-			"source_file": "src/app/(protected)/manager/places/[placeId]/page.tsx",
-			"access": "manager",
-			"variant": "manager::manager__places__placeId?projectId=projectId",
-			"resolved_path": "/manager/places/66704b8b-460b-51db-a8fe-24913e9d4c53?projectId=22222222-2222-4222-8222-222222222221",
-			"session_label": "manager",
-			"target_url": "https://audit-tools-playspace-frontend.vercel.app/manager/places/66704b8b-460b-51db-a8fe-24913e9d4c53?projectId=22222222-2222-4222-8222-222222222221&__capture=true&__variant=manager%3A%3Amanager__places__placeId%3FprojectId%3DprojectId",
-			"output_file": "screenshots/manager__manager__places__placeId?projectId=projectId.png",
-			"screenshot_url": "https://iad.microlink.io/gznvmwkJ5y_s8-dvkCM7rZk9NPpz2uqXKuKblgxl4Eme6_E6-7lZfZsJ1ELlMO9AnsEV_5nVAyTSxkrfMHUChQ.png",
-			"image_width": 1920,
-			"image_height": 1293,
-			"image_type": "png",
-			"image_size_bytes": 163596,
-			"completed_at": "2026-03-25T18:51:22.664455+00:00"
+			"area": "auditor/dashboard",
+			"state": "overview",
+			"file": "auditor/dashboard/01-overview/02.png",
+			"label": "Auditor Dashboard",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/dashboard",
+			"state": "sidebar-collapsed",
+			"file": "auditor/dashboard/02-sidebar-collapsed/01.png",
+			"label": "Sidebar collapsed",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/dashboard",
+			"state": "sidebar-collapsed",
+			"file": "auditor/dashboard/02-sidebar-collapsed/02.png",
+			"label": "Sidebar collapsed",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/dashboard",
+			"state": "mobile-nav-open",
+			"file": "auditor/dashboard/03-mobile-nav-open.png",
+			"label": "Mobile navigation open",
+			"scrolled": false
+		},
+		{
+			"area": "auditor/dashboard",
+			"state": "account-menu-open",
+			"file": "auditor/dashboard/04-account-menu-open.png",
+			"label": "Account menu open",
+			"scrolled": false
+		},
+		{
+			"area": "auditor/execute",
+			"state": "overview",
+			"file": "auditor/execute/01-overview.png",
+			"label": "Auditor Execute",
+			"scrolled": false
+		},
+		{
+			"area": "auditor/reports",
+			"state": "overview",
+			"file": "auditor/reports/01-overview/01.png",
+			"label": "Auditor Reports",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/reports",
+			"state": "overview",
+			"file": "auditor/reports/01-overview/02.png",
+			"label": "Auditor Reports",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/reports/detail",
+			"state": "overview",
+			"file": "auditor/reports/detail/01-overview/01.png",
+			"label": "Auditor Report Detail",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/reports/detail",
+			"state": "overview",
+			"file": "auditor/reports/detail/01-overview/02.png",
+			"label": "Auditor Report Detail",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/settings",
+			"state": "overview",
+			"file": "auditor/settings/01-overview/01.png",
+			"label": "Auditor Settings",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/settings",
+			"state": "overview",
+			"file": "auditor/settings/01-overview/02.png",
+			"label": "Auditor Settings",
+			"scrolled": true
+		},
+		{
+			"area": "auditor/settings",
+			"state": "account-menu-open",
+			"file": "auditor/settings/02-account-menu-open.png",
+			"label": "Auditor Settings - Account menu",
+			"scrolled": false
 		}
-	],
-	"failures": []
+	]
 }

@@ -63,6 +63,14 @@ export PERCY_TOKEN="your-percy-token"
 pnpm test:visual:percy
 ```
 
+Refresh the curated README screenshots that are wired into visual specs:
+
+```bash
+pnpm screenshots:web
+```
+
+That command runs the same deterministic Playwright visual flow with local screenshot capture enabled, so Percy remains the regression review path while `public/screenshots/` is refreshed only on explicit capture runs.
+
 Useful variants:
 
 ```bash
