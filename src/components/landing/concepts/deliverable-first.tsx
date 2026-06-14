@@ -7,7 +7,7 @@
  * backward toward how that artifact gets produced.
  *
  * Section order:
- *  1. Hero — the Combined Place Report (FramedScreenshot_2) as a product shot
+ *  1. Hero — the Combined Place Report (reports/place-report/01-overview/01.png) as a product shot
  *  2. What the report proves — score summary + domain breakdown
  *  3. Export formats — PDF / Excel / CSV / ZIP + raw data view
  *  4. How it is produced — field audit → scoring → report (phone + audits table)
@@ -53,11 +53,11 @@ import {
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
-	rawData: "/screenshots/Framed/manager/FramedScreenshot_4.png",
-	auditsTable: "/screenshots/Framed/manager/FramedScreenshot_20.png",
-	auditScorecard: "/screenshots/Framed/manager/FramedScreenshot_12.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	rawData: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
+	auditsTable: "/screenshots/Framed/manager/audits/01-overview/02.png",
+	auditScorecard: "/screenshots/Framed/manager/audits/detail/01-overview/01.png",
 	phoneReportScoring: "/marketing/report-scoring-tilted.png",
 	phoneReportDetail: "/marketing/step-report-detail.png"
 } as const;

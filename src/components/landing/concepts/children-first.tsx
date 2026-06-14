@@ -55,8 +55,8 @@ const SHOT = {
 	reportDetail: "/marketing/step-report-detail.png",
 	fieldQuestions: "/marketing/field-questions-dark.png",
 	heroDashboard: "/marketing/hero-dashboard-dark.png",
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
 	reportScoring: "/marketing/report-scoring-tilted.png"
 } as const;
 

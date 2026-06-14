@@ -47,14 +47,14 @@ import { TourNav } from "@/components/landing/concepts/tour-nav";
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	projects: "/screenshots/Framed/manager/FramedScreenshot_30.png",
-	places: "/screenshots/Framed/manager/FramedScreenshot_26.png",
-	audits: "/screenshots/Framed/manager/FramedScreenshot_20.png",
-	roster: "/screenshots/Framed/manager/FramedScreenshot_22.png",
-	scorecard: "/screenshots/Framed/manager/FramedScreenshot_12.png",
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
-	dataExport: "/screenshots/Framed/manager/FramedScreenshot_4.png",
+	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
+	places: "/screenshots/Framed/manager/places/01-overview/01.png",
+	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
+	roster: "/screenshots/Framed/manager/auditors/02-invite-dialog-open.png",
+	scorecard: "/screenshots/Framed/manager/audits/detail/01-overview/01.png",
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	dataExport: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
 	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
 	phoneQuestions: "/marketing/field-questions-dark.png"
 } as const;

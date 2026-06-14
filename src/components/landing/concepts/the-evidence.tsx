@@ -49,11 +49,11 @@ import {
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
-	rawDataExport: "/screenshots/Framed/manager/FramedScreenshot_4.png",
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
-	auditScorecard: "/screenshots/Framed/manager/FramedScreenshot_12.png",
-	reportBuilderList: "/screenshots/Framed/manager/FramedScreenshot_10.png"
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	rawDataExport: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	auditScorecard: "/screenshots/Framed/manager/audits/detail/01-overview/01.png",
+	reportBuilderList: "/screenshots/Framed/manager/reports/01-overview/03.png"
 } as const;
 
 const NAV: NavLink[] = [

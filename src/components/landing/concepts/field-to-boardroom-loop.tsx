@@ -47,13 +47,13 @@ import {
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	projects: "/screenshots/Framed/manager/FramedScreenshot_30.png",
-	places: "/screenshots/Framed/manager/FramedScreenshot_26.png",
-	roster: "/screenshots/Framed/manager/FramedScreenshot_22.png",
-	audits: "/screenshots/Framed/manager/FramedScreenshot_20.png",
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
-	auditScorecard: "/screenshots/Framed/manager/FramedScreenshot_12.png",
+	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
+	places: "/screenshots/Framed/manager/places/01-overview/01.png",
+	roster: "/screenshots/Framed/manager/auditors/02-invite-dialog-open.png",
+	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	auditScorecard: "/screenshots/Framed/manager/audits/detail/01-overview/01.png",
 	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
 	phoneQuestions: "/marketing/field-questions-dark.png",
 	phoneSectionNotes: "/marketing/step-section-notes.png",

@@ -46,13 +46,13 @@ import {
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	projects: "/screenshots/Framed/manager/FramedScreenshot_30.png",
-	places: "/screenshots/Framed/manager/FramedScreenshot_26.png",
-	roster: "/screenshots/Framed/manager/FramedScreenshot_22.png",
-	audits: "/screenshots/Framed/manager/FramedScreenshot_20.png",
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
-	rawData: "/screenshots/Framed/manager/FramedScreenshot_4.png",
+	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
+	places: "/screenshots/Framed/manager/places/01-overview/01.png",
+	roster: "/screenshots/Framed/manager/auditors/02-invite-dialog-open.png",
+	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	rawData: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
 	phoneReportScoring: "/marketing/report-scoring-tilted.png",
 	phoneReportsPreview: "/marketing/reports-preview-portrait.png"
 } as const;

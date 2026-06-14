@@ -37,10 +37,10 @@ import {
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	scoreSummary: "/screenshots/Framed/manager/FramedScreenshot_6.png",
-	projects: "/screenshots/Framed/manager/FramedScreenshot_30.png",
-	audits: "/screenshots/Framed/manager/FramedScreenshot_20.png",
-	combinedReport: "/screenshots/Framed/manager/FramedScreenshot_2.png",
+	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
+	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
+	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
 	phoneScoring: "/marketing/report-scoring-tilted.png",
 	phoneField: "/marketing/field-questions-dark.png"
 } as const;
