@@ -1,4 +1,6 @@
 import React from "react";
+
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import type {
 	InstrumentQuestion,
 	InstrumentSection,
@@ -6,7 +8,6 @@ import type {
 	QuestionScale,
 	ScaleDefinition
 } from "@/types/audit";
-import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 /**
  * Format a backend question key (e.g. `q_8_1`) like the execution question card (`Q 8.1`).

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { buildDomainReportRows } from "@/lib/audit/report-helpers";
 import { auditSessionSchema, playspaceInstrumentSchema } from "@/lib/api/playspace-types";
+import { buildDomainReportRows } from "@/lib/audit/report-helpers";
 
 function buildInstrument() {
 	return playspaceInstrumentSchema.parse({

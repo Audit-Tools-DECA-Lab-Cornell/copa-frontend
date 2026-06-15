@@ -1,12 +1,15 @@
-import type { CSSProperties } from "react";
+import "@fontsource/opendyslexic";
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
-import "@fontsource/opendyslexic";
+import type { CSSProperties } from "react";
+
 import { getRequestLanguageState } from "@/i18n/server-locale";
 import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
-import "./globals.css";
+
 import { Providers } from "./providers";
 
 const bodyFont = Geist({

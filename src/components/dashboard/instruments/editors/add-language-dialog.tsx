@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
 import { Languages } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
 	Dialog,
 	DialogContent,
@@ -15,6 +13,8 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { COMMON_LANGUAGES, languageLabel } from "../instrument-edit-context";

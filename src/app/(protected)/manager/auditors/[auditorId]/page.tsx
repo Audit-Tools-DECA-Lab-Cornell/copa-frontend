@@ -7,12 +7,11 @@ import { useTranslations } from "next-intl";
 import * as React from "react";
 import { use } from "react";
 
-import { playspaceApi, type Assignment } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialog";
 import {
-	AuditorDialog,
 	type AuditorCreatedSummary,
+	AuditorDialog,
 	type AuditorDialogPayload
 } from "@/components/dashboard/auditor-dialog";
 import { BackButton } from "@/components/dashboard/back-button";
@@ -24,6 +23,7 @@ import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type Assignment, playspaceApi } from "@/lib/api/playspace";
 
 interface ManagerAuditorDetailPageProps {
 	params: Promise<{ auditorId: string }>;

@@ -1,6 +1,6 @@
-import { createElement } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { createElement } from "react";
 
 import { getBuiltConceptSlugs, getConceptComponent, getConceptMeta } from "@/lib/landing/concepts";
 

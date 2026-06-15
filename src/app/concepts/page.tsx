@@ -1,10 +1,10 @@
+import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CONCEPT_META, isConceptBuilt, type ConceptAccent } from "@/lib/landing/concepts";
+import { CONCEPT_META, type ConceptAccent, isConceptBuilt } from "@/lib/landing/concepts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {

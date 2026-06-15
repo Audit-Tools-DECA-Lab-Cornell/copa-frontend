@@ -6,19 +6,19 @@ import { useTranslations } from "next-intl";
 import * as React from "react";
 import { z } from "zod";
 
-import {
-	acceptManagerInvite,
-	getManagerInvitePreview,
-	type AuthResponse,
-	type ManagerInvitePreview
-} from "@/lib/auth/auth-api";
-import { setBrowserAuthSession } from "@/lib/auth/browser-session";
-import { mapAccountTypeToRole } from "@/lib/auth/role";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	acceptManagerInvite,
+	type AuthResponse,
+	getManagerInvitePreview,
+	type ManagerInvitePreview
+} from "@/lib/auth/auth-api";
+import { setBrowserAuthSession } from "@/lib/auth/browser-session";
+import { mapAccountTypeToRole } from "@/lib/auth/role";
 
 export interface AcceptInviteFormProps {
 	token: string;

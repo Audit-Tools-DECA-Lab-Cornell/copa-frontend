@@ -1,11 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
 import { Mail } from "lucide-react";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { playspaceApi } from "@/lib/api/playspace";
 
 export interface InviteManagerDialogProps {
 	open: boolean;

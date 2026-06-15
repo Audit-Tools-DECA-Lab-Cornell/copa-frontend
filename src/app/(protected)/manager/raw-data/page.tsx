@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import {
@@ -13,47 +12,21 @@ import {
 	XIcon
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import type {
-	ManagerAuditExportRecord,
-	ManagerAuditorExportRecord,
-	ManagerAuditRow,
-	ManagerAuditsQuery,
-	ManagerExportQuery,
-	ManagerPlaceExportRecord,
-	ManagerPlaceRow,
-	ManagerPlacesQuery,
-	ManagerProjectExportRecord,
-	ProjectSummary
-} from "@/lib/api/playspace";
-import { playspaceApi } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { type AuditActivityRow } from "@/components/dashboard/audits-table";
-import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
+import { useExportJobs } from "@/components/dashboard/export-jobs-provider";
+import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import {
 	CollectionNamespaceBar,
+	type ExportEntity,
 	FilterPopover,
-	SelectionBar,
-	type ExportEntity
+	SelectionBar
 } from "@/components/dashboard/raw-data-export";
-import { useExportJobs } from "@/components/dashboard/export-jobs-provider";
-import type { AuditExportDataFormat } from "@/lib/export/audit";
-import { createRichAuditSource } from "@/lib/export/rich-audit-source";
-import {
-	exportAuditsZip,
-	exportPlacesZip,
-	exportProjectsZip,
-	fetchSavedPlaceReportsViaHistory,
-	type AuditExportRow,
-	type ExportProgress,
-	type IndexSheet,
-	type PlaceExportRow,
-	type ProjectExportRow,
-	type RawDataZipContext
-} from "@/lib/export/raw-data-zip";
 import {
 	getTextColumnFilterValue,
 	preservePreviousData,
@@ -71,6 +44,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type {
+	ManagerAuditExportRecord,
+	ManagerAuditorExportRecord,
+	ManagerAuditRow,
+	ManagerAuditsQuery,
+	ManagerExportQuery,
+	ManagerPlaceExportRecord,
+	ManagerPlaceRow,
+	ManagerPlacesQuery,
+	ManagerProjectExportRecord,
+	ProjectSummary
+} from "@/lib/api/playspace";
+import { playspaceApi } from "@/lib/api/playspace";
+import type { AuditExportDataFormat } from "@/lib/export/audit";
+import {
+	type AuditExportRow,
+	exportAuditsZip,
+	exportPlacesZip,
+	type ExportProgress,
+	exportProjectsZip,
+	fetchSavedPlaceReportsViaHistory,
+	type IndexSheet,
+	type PlaceExportRow,
+	type ProjectExportRow,
+	type RawDataZipContext
+} from "@/lib/export/raw-data-zip";
+import { createRichAuditSource } from "@/lib/export/rich-audit-source";
 import { cn } from "@/lib/utils";
 
 // ── Workbook sheet mappers ──────────────────────────────────────────────────────

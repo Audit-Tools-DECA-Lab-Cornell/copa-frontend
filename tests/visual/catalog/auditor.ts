@@ -1,6 +1,6 @@
-import type { CaptureTarget } from "./types";
 import { dashboardChromeStates } from "./shared";
 import { openUserMenu } from "./steps";
+import type { CaptureTarget } from "./types";
 
 /**
  * Auditor field client. One folder per page under public/screenshots/auditor,

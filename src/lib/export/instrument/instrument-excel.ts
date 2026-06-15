@@ -6,7 +6,7 @@
  */
 
 import type { FlatRow } from "./instrument-shared";
-import { MOBILE_EXPORT_PALETTE, downloadBlob } from "./instrument-shared";
+import { downloadBlob, MOBILE_EXPORT_PALETTE } from "./instrument-shared";
 
 // ─── CSV column metadata ──────────────────────────────────────────────────────
 

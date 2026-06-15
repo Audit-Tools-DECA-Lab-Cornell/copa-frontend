@@ -1,13 +1,24 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { CheckCircle2Icon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import * as React from "react";
+import { Fragment } from "react";
 
-import { playspaceApi, type AuditDraftPatch, type AuditSession } from "@/lib/api/playspace";
-import { useLocalizedInstrument } from "@/lib/instrument-translations";
+import { useAuthSession } from "@/components/app/auth-session-provider";
+import { AuditQuestionCard } from "@/components/audit/question-card";
+import { SectionQuestionTable } from "@/components/audit/section-question-table";
+import { BackButton } from "@/components/dashboard/back-button";
+import { formatAuditCodeReference } from "@/components/dashboard/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { type AuditDraftPatch, type AuditSession, playspaceApi } from "@/lib/api/playspace";
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import {
 	buildNextQuestionAnswers,
 	getInstrumentSectionLocalProgress,
@@ -16,27 +27,15 @@ import {
 	getVisibleSections,
 	isRequiredPreAuditComplete
 } from "@/lib/audit/selectors";
-import { BackButton } from "@/components/dashboard/back-button";
-import { formatAuditCodeReference } from "@/components/dashboard/utils";
+import { useLocalizedInstrument } from "@/lib/instrument-translations";
+import { cn } from "@/lib/utils";
 import type {
 	ExecutionMode,
-	QuestionResponsePayload,
 	InstrumentSection,
 	PlayspaceInstrument,
-	PreAuditQuestion
+	PreAuditQuestion,
+	QuestionResponsePayload
 } from "@/types/audit";
-import { AuditQuestionCard } from "@/components/audit/question-card";
-import { SectionQuestionTable } from "@/components/audit/section-question-table";
-import { useAuthSession } from "@/components/app/auth-session-provider";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-
-import { parsePromptSegments } from "@/lib/audit/prompt-segments";
-import { Fragment } from "react";
 
 export interface AuditExecuteFormProps {
 	placeId: string;

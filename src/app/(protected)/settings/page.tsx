@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
 import {
 	Accessibility,
 	Building2,
 	Globe,
 	LogOut,
+	type LucideIcon,
 	Monitor,
 	Moon,
 	Palette,
@@ -17,35 +14,27 @@ import {
 	Sun,
 	Type,
 	UserPlus,
-	UserRound,
-	type LucideIcon
+	UserRound
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import {
-	playspaceApi,
-	type AccountDetail,
-	type ManagerInviteListItem,
-	type ManagerInviteStatus,
-	type ManagerProfile,
-	type MyAuditorProfile,
-	type MyManagerProfile
-} from "@/lib/api/playspace";
-import { clearBrowserAuthSession, getBrowserAuthSession, setBrowserAuthSession } from "@/lib/auth/browser-session";
-import type { AuthSession } from "@/lib/auth/session";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import {
+	type LanguagePreference,
+	type ThemeMode,
 	usePreferences,
 	WEB_LANGUAGE_OPTIONS,
 	WEB_MAX_FONT_SCALE,
-	WEB_MIN_FONT_SCALE,
-	type LanguagePreference,
-	type ThemeMode
+	WEB_MIN_FONT_SCALE
 } from "@/components/app/preferences-provider";
 import { BackButton } from "@/components/dashboard/back-button";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { InviteManagerDialog } from "@/components/dashboard/invite-manager-dialog";
-import { formatDateLabel, type DashboardTranslator } from "@/components/dashboard/utils";
+import { type DashboardTranslator, formatDateLabel } from "@/components/dashboard/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,6 +43,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	type AccountDetail,
+	type ManagerInviteListItem,
+	type ManagerInviteStatus,
+	type ManagerProfile,
+	type MyAuditorProfile,
+	type MyManagerProfile,
+	playspaceApi
+} from "@/lib/api/playspace";
+import { clearBrowserAuthSession, getBrowserAuthSession, setBrowserAuthSession } from "@/lib/auth/browser-session";
+import type { AuthSession } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 
 const SETTINGS_SKELETON_CARD_IDS = ["profile", "security", "appearance", "accessibility"] as const;

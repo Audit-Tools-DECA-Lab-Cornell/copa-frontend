@@ -1,10 +1,10 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
-import { type APIRequestContext, type Page } from "@playwright/test";
 import percySnapshot from "@percy/playwright";
+import { type APIRequestContext, type Page } from "@playwright/test";
 
-import { createBrowserSessionSeed, type BrowserSessionRole } from "./api";
+import { type BrowserSessionRole, createBrowserSessionSeed } from "./api";
 import { seedBrowserSession } from "./session";
 
 /**

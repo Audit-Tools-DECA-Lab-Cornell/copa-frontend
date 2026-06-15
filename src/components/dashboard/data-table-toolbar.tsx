@@ -1,9 +1,9 @@
 "use client";
 
-import * as React from "react";
 import type { ColumnFiltersState, Table, VisibilityState } from "@tanstack/react-table";
 import { ListFilterIcon, Loader2Icon, Settings2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

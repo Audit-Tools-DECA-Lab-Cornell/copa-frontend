@@ -1,16 +1,15 @@
 "use client";
 
-import * as React from "react";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { CheckIcon, CopyIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
+import { getAuditorCodeSubtitle, getAuditorTableLabel } from "@/components/dashboard/auditor-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
-import { getAuditorCodeSubtitle, getAuditorTableLabel } from "@/components/dashboard/auditor-display";
 
 import { DataTable, getMultiValueFilterFn } from "./data-table";
 import { DataTableColumnHeader } from "./data-table-column-header";

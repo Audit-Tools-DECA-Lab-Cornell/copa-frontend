@@ -1,20 +1,20 @@
 "use client";
 
-import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { XIcon } from "lucide-react";
+import * as React from "react";
 
-import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { buildAuditorNameLookup } from "@/components/dashboard/auditor-display";
-import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
+import { GroupedReportsView } from "@/components/dashboard/grouped-reports-view";
 import { preservePreviousData } from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { type AuditorSummary, type ManagerPlaceRow, playspaceApi } from "@/lib/api/playspace";
 
 export default function ManagerReportsPage() {
 	const session = useAuthSession();

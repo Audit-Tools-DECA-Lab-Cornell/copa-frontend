@@ -11,7 +11,6 @@
  * developer terminology appear on screen.
  */
 
-import Link from "next/link";
 import {
 	ArrowRight,
 	BarChart3,
@@ -21,15 +20,13 @@ import {
 	FileSpreadsheet,
 	FolderKanban,
 	Globe,
+	type LucideIcon,
 	MapPin,
 	Scale,
 	ShieldCheck,
-	Users,
-	type LucideIcon
+	Users
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 import {
 	AmbientGlows,
@@ -42,7 +39,8 @@ import {
 	MARKETING_ROUTES,
 	type NavLink
 } from "@/components/landing/shared";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { screenshotUrl } from "@/lib/asset-url";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────

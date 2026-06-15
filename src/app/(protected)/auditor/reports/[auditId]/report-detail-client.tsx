@@ -1,20 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type AuditSession } from "@/lib/api/playspace";
-import { getEffectiveScoreTotals } from "@/lib/audit/score-mode-helpers";
-import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
-import type { InstrumentQuestion, PreAuditQuestion } from "@/types/audit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type AuditSession, playspaceApi } from "@/lib/api/playspace";
+import { getEffectiveScoreTotals } from "@/lib/audit/score-mode-helpers";
+import { useLocalizedInstrument } from "@/lib/instrument-translations";
+import type { InstrumentQuestion, PreAuditQuestion } from "@/types/audit";
 /**
  * Fall back to a readable label when no instrument option exists.
  */

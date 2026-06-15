@@ -26,35 +26,37 @@
  */
 
 import type { Cell, CellHookData } from "jspdf-autotable";
+
 import type { PromptSegment } from "@/lib/audit/prompt-segments";
 import {
 	normalizePromptSegmentsForPdf,
 	normalizePromptTypographyForPdf,
 	parsePromptSegments
 } from "@/lib/audit/prompt-segments";
-import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
-import type { AuditScoreTotals, ExportableAudit, PlayspaceInstrument } from "./types";
-import {
-	formatAuditStatusLabel,
-	formatChecklistAnswer,
-	formatConstructLabel,
-	formatExecutionModeLabel,
-	formatQuestionAnswer,
-	formatQuestionModeLabel,
-	formatPercentage,
-	formatScoreValue,
-	formatTimestampForDisplay,
-	stripPromptMarkup
-} from "./format-utils";
-import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
 import { buildVisibleQuestionEntries } from "@/lib/audit/report-helpers";
 import {
 	getCombinedReportLegend,
 	getCombinedReportSources,
 	REPORT_SOURCE_STYLES
 } from "@/lib/audit/report-source-sessions";
-import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS, hexToRgb, type PvScaleKey } from "@/lib/audit/scale-colors";
+import { hexToRgb, type PvScaleKey, SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
+import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+
+import {
+	formatAuditStatusLabel,
+	formatChecklistAnswer,
+	formatConstructLabel,
+	formatExecutionModeLabel,
+	formatPercentage,
+	formatQuestionAnswer,
+	formatQuestionModeLabel,
+	formatScoreValue,
+	formatTimestampForDisplay,
+	stripPromptMarkup
+} from "./format-utils";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
+import type { AuditScoreTotals, ExportableAudit, PlayspaceInstrument } from "./types";
 
 function buildScaleRgbMap(colorMap: Record<PvScaleKey, string>): Record<PvScaleKey, [number, number, number]> {
 	return {

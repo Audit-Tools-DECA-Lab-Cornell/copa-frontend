@@ -11,7 +11,6 @@
  * names, no dev jargon on the page.
  */
 
-import Link from "next/link";
 import {
 	ArrowRight,
 	BarChart3,
@@ -20,17 +19,16 @@ import {
 	Download,
 	FileText,
 	FolderKanban,
+	type LucideIcon,
 	MapPin,
 	RotateCcw,
 	ShieldCheck,
 	Users,
-	WifiOff,
-	type LucideIcon
+	WifiOff
 } from "lucide-react";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-
+import { TourNav } from "@/components/landing/concepts/tour-nav";
 import {
 	AmbientGlows,
 	Eyebrow,
@@ -41,8 +39,8 @@ import {
 	MARKETING_ROUTES,
 	type NavLink
 } from "@/components/landing/shared";
-
-import { TourNav } from "@/components/landing/concepts/tour-nav";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { screenshotUrl } from "@/lib/asset-url";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────

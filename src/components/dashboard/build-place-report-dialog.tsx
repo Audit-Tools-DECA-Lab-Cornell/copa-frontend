@@ -1,11 +1,9 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { CheckIcon, FileTextIcon, InfoIcon, Layers2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
-import type { AuditActivityRow } from "./audits-table";
-import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +17,9 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import { cn } from "@/lib/utils";
+
+import type { AuditActivityRow } from "./audits-table";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 
 interface PlaceGroup {
 	placeId: string;

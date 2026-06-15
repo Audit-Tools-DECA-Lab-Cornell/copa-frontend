@@ -3,7 +3,6 @@ import path from "node:path";
 
 import { type APIRequestContext, expect, test } from "@playwright/test";
 
-import { waitForStableVisualPage } from "../helpers/visual-actions";
 import {
 	captureViewportScrollFrames,
 	isLocalScreenshotCaptureEnabled,
@@ -11,6 +10,7 @@ import {
 	takeVisualSnapshot,
 	VISUAL_VIEWPORT
 } from "../helpers/visual";
+import { waitForStableVisualPage } from "../helpers/visual-actions";
 import { buildSeededVisualRoutes } from "../helpers/visual-routes";
 import { captureCatalog } from "./catalog";
 import { StateUnavailableError } from "./catalog/steps";

@@ -1,17 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
 import { ArrowLeftIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
-import { playspaceApi } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditDetailView } from "@/components/dashboard/audit-detail-view";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { playspaceApi } from "@/lib/api/playspace";
 
 /**
  * Manager-scoped audit detail page.

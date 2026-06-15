@@ -1,31 +1,31 @@
 "use client";
 
-import * as React from "react";
-import { useTranslations } from "next-intl";
 import {
 	CalendarIcon,
+	CheckCircle2Icon,
 	ClockIcon,
 	FileTextIcon,
+	FolderOpenIcon,
 	LockIcon,
 	MapPinIcon,
-	FolderOpenIcon,
-	UserIcon,
-	CheckCircle2Icon
+	UserIcon
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import type { AuditSession } from "@/lib/api/playspace";
-import type { PlayspaceInstrument, InstrumentQuestion, QuestionResponsePayload } from "@/types/audit";
-import { getEffectiveScoreTotals, getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { StatCard } from "./stat-card";
-import { formatDateTimeLabel, formatScoreLabel, type DashboardTranslator } from "./utils";
-
+import type { AuditSession } from "@/lib/api/playspace";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import { getEffectiveScoreTotals, getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
+import type { InstrumentQuestion, PlayspaceInstrument, QuestionResponsePayload } from "@/types/audit";
+
 import { AuditExportActions } from "./audit-export-actions";
+import { StatCard } from "./stat-card";
+import { type DashboardTranslator, formatDateTimeLabel, formatScoreLabel } from "./utils";
 
 // ── Internal Helpers ──────────────────────────────────────────────────
 

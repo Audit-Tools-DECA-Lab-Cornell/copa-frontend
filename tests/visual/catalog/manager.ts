@@ -1,4 +1,3 @@
-import type { CaptureTarget } from "./types";
 import { dashboardChromeStates } from "./shared";
 import {
 	expectText,
@@ -10,6 +9,7 @@ import {
 	openUserMenu,
 	StateUnavailableError
 } from "./steps";
+import type { CaptureTarget } from "./types";
 
 /**
  * Manager workspace. One folder per page under public/screenshots/manager,

@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from "react";
-import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
+import { CldImage } from "@/components/cdn/cld-image";
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -14,7 +14,7 @@ import { PlaceReportsCard } from "@/components/dashboard/place-reports-card";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { formatScorePairLabel } from "@/components/dashboard/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CldImage } from "@/components/cdn/cld-image";
+import { playspaceApi } from "@/lib/api/playspace";
 
 function buildStaticMapUrl(lat: number, lng: number): string | null {
 	if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;

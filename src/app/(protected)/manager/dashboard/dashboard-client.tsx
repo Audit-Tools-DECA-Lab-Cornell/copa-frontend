@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import type { AccountDetail, AuditorSummary, ManagerProfile, ProjectSummary } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditorsTable } from "@/components/dashboard/auditors-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -17,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { AccountDetail, AuditorSummary, ManagerProfile, ProjectSummary } from "@/lib/api/playspace";
 
 function OverviewPanels({
 	account,

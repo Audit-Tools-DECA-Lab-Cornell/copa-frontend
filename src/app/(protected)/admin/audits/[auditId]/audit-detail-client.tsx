@@ -1,14 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
 import { ArrowLeftIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
-import { playspaceApi } from "@/lib/api/playspace";
 import { AuditDetailView } from "@/components/dashboard/audit-detail-view";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { Button } from "@/components/ui/button";
+import { playspaceApi } from "@/lib/api/playspace";
 
 /**
  * Admin-scoped audit detail page.

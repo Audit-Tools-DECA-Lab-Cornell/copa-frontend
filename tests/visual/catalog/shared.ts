@@ -1,5 +1,5 @@
-import type { CaptureState } from "./types";
 import { collapseSidebar, openMobileNav, openUserMenu } from "./steps";
+import type { CaptureState } from "./types";
 
 /**
  * App-chrome interactions that exist on every authenticated page. Attached to

@@ -3,15 +3,16 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { z } from "zod";
-import { DESIGN_SYSTEM, applyDesignSystemVariables, clampDesignSystemFontScale } from "@/lib/design-system";
+
 import {
 	LANGUAGE_PREFERENCES,
-	LOCALE_PREFERENCE_COOKIE_NAME,
-	resolveLanguagePreference,
-	resolveSupportedLanguage,
 	type LanguagePreference,
-	type ResolvedLanguage
+	LOCALE_PREFERENCE_COOKIE_NAME,
+	type ResolvedLanguage,
+	resolveLanguagePreference,
+	resolveSupportedLanguage
 } from "@/i18n/config";
+import { applyDesignSystemVariables, clampDesignSystemFontScale, DESIGN_SYSTEM } from "@/lib/design-system";
 
 const PREFERENCES_STORAGE_KEY = "playspace_web_preferences";
 const MIN_FONT_SCALE = DESIGN_SYSTEM.fontScale.min;

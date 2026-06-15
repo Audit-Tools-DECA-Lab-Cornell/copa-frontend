@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+
 import { bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "../helpers/api";
 
 test.describe("@manager-places primary manager can manage places", () => {

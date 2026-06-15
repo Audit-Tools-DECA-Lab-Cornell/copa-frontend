@@ -1,15 +1,15 @@
 "use client";
 
-import { Fragment } from "react";
 import { useTranslations } from "next-intl";
+import { Fragment } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import { getActiveScaleKeysForQuestion } from "@/lib/audit/selectors";
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, ScaleKey } from "@/types/audit";
-import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
-import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 interface QuestionTableRow {
 	readonly question: InstrumentQuestion;

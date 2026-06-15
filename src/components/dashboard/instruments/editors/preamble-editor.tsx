@@ -1,10 +1,12 @@
-import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useInstrumentEdit } from "../instrument-edit-context";
+
 import { AiTranslateFieldButton } from "../ai-translate-button";
+import { useInstrumentEdit } from "../instrument-edit-context";
 
 export function PreambleEditor({
 	preamble,

@@ -1,24 +1,25 @@
+import { z } from "zod";
+
+import { fetchServerJson } from "@/lib/api/playspace-server";
 import {
+	type AccountDetail,
 	accountDetailSchema,
+	type AdminAuditRow,
 	adminAuditRowSchema,
+	type AdminOverview,
 	adminOverviewSchema,
+	type AuditorDashboardSummary,
 	auditorDashboardSummarySchema,
+	type AuditorPlace,
 	auditorPlaceSchema,
+	type AuditorSummary,
 	auditorSummarySchema,
+	type ManagerProfile,
 	managerProfileSchema,
 	paginatedResponseSchema,
-	projectSummarySchema,
-	type AccountDetail,
-	type AdminAuditRow,
-	type AdminOverview,
-	type AuditorDashboardSummary,
-	type AuditorPlace,
-	type AuditorSummary,
-	type ManagerProfile,
-	type ProjectSummary
+	type ProjectSummary,
+	projectSummarySchema
 } from "@/lib/api/playspace-types";
-import { fetchServerJson } from "@/lib/api/playspace-server";
-import { z } from "zod";
 
 export type ServerManagerDashboardData = Readonly<{
 	account: AccountDetail;

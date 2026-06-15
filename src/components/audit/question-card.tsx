@@ -1,13 +1,13 @@
 "use client";
 
-import { Fragment } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "next-intl";
+import { Fragment } from "react";
 
-import type { InstrumentQuestion, QuestionResponsePayload, QuestionScale } from "@/types/audit";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import { cn } from "@/lib/utils";
+import type { InstrumentQuestion, QuestionResponsePayload, QuestionScale } from "@/types/audit";
 
 export interface AuditQuestionCardProps {
 	question: InstrumentQuestion;

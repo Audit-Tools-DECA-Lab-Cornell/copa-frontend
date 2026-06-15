@@ -1,31 +1,21 @@
-import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
 import { Check, Download, FileJson, FileSpreadsheet, FileText, Lock, Pencil, Plus, Save, X } from "lucide-react";
-
-import { Lang, type InstrumentContent } from "./types";
-import { exportInstrument } from "@/lib/export/instrument";
-import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { exportInstrument } from "@/lib/export/instrument";
+import { cn } from "@/lib/utils";
+import { PlayspaceInstrument } from "@/types/audit";
 
-import { PreambleEditor } from "./editors/preamble-editor";
-import { ExecutionModesEditor } from "./editors/execution-modes-editor";
-import { ScaleGuidanceEditor } from "./editors/scale-guidance-editor";
-import { PreAuditQuestionsEditor } from "./editors/pre-audit-questions-editor";
-import { LegalDocumentsEditor } from "./editors/legal-documents-editor";
-import { SectionEditorList } from "./editors/section-editor-list";
-import { SpreadsheetView } from "./spreadsheet-view";
-import { AddLanguageDialog } from "./editors/add-language-dialog";
-import { AiTranslateButton } from "./ai-translate-button";
 import {
 	AdminToolbar,
 	AdminToolbarGroup,
@@ -34,12 +24,19 @@ import {
 	ToolbarDivider,
 	ToolbarLabel
 } from "./admin-toolbar";
-
-import { buildScaleGuidanceMap, getInstrumentChanges, getTranslationCoverage } from "./utils";
+import { AiTranslateButton } from "./ai-translate-button";
+import { AddLanguageDialog } from "./editors/add-language-dialog";
+import { ExecutionModesEditor } from "./editors/execution-modes-editor";
+import { LegalDocumentsEditor } from "./editors/legal-documents-editor";
+import { PreAuditQuestionsEditor } from "./editors/pre-audit-questions-editor";
+import { PreambleEditor } from "./editors/preamble-editor";
+import { ScaleGuidanceEditor } from "./editors/scale-guidance-editor";
+import { SectionEditorList } from "./editors/section-editor-list";
 import { InstrumentEditProvider, languageLabel, resolveBaseLang } from "./instrument-edit-context";
-
-import { ReviewChangesDialog, InstrumentChange } from "./review-changes-dialog";
-import { PlayspaceInstrument } from "@/types/audit";
+import { InstrumentChange, ReviewChangesDialog } from "./review-changes-dialog";
+import { SpreadsheetView } from "./spreadsheet-view";
+import { type InstrumentContent, Lang } from "./types";
+import { buildScaleGuidanceMap, getInstrumentChanges, getTranslationCoverage } from "./utils";
 
 type EditorTab = "overview" | "sections" | "spreadsheet" | "preAudit" | "scales" | "legalDocuments";
 

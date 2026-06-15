@@ -18,7 +18,6 @@
  * no invented metrics.
  */
 
-import Link from "next/link";
 import {
 	ArrowRight,
 	BarChart3,
@@ -29,14 +28,12 @@ import {
 	FileSpreadsheet,
 	FileText,
 	FolderArchive,
+	type LucideIcon,
 	ShieldCheck,
 	SlidersHorizontal,
-	Smartphone,
-	type LucideIcon
+	Smartphone
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 import {
 	AmbientGlows,
@@ -49,7 +46,8 @@ import {
 	MARKETING_ROUTES,
 	type NavLink
 } from "@/components/landing/shared";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { screenshotUrl } from "@/lib/asset-url";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────

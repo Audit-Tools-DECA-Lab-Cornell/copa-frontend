@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import type { AdminAuditRow, AdminOverview } from "@/lib/api/playspace";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -11,6 +10,7 @@ import { formatAuditCodeReference } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { AdminAuditRow, AdminOverview } from "@/lib/api/playspace";
 
 export interface AdminDashboardClientProps {
 	overview?: AdminOverview;

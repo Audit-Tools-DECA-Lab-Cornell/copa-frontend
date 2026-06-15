@@ -6,10 +6,9 @@ import { XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type AdminAccountRow, type AdminProjectRow, type PaginatedResponse } from "@/lib/api/playspace";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
 import {
@@ -19,6 +18,7 @@ import {
 } from "@/components/dashboard/server-table-utils";
 import { formatProjectDateRange, formatScorePairLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
+import { type AdminAccountRow, type AdminProjectRow, type PaginatedResponse, playspaceApi } from "@/lib/api/playspace";
 
 export default function AdminProjectsPage() {
 	const t = useTranslations("admin.projects");

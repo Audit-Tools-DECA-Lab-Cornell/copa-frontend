@@ -1,5 +1,6 @@
-import { useTranslations } from "next-intl";
 import { AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -11,6 +12,7 @@ import {
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { formatDiffPath } from "./utils";
 
 export interface InstrumentChange {

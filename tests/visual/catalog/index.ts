@@ -15,4 +15,4 @@ export const captureCatalog: readonly CaptureTarget[] = [
 	...auditorTargets
 ];
 
-export type { CaptureTarget, CaptureState, CaptureContext, SeededIds } from "./types";
+export type { CaptureContext, CaptureState, CaptureTarget, SeededIds } from "./types";

@@ -12,6 +12,20 @@
  */
 
 import * as XLSX from "xlsx-js-style";
+
+import { hexToXlsxRgb, type PvScaleKey, SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
+
+import { sanitizeSheetName, stringifyCell } from "./format-utils";
+import {
+	buildOverviewRows,
+	buildSingleAuditResponseRowMetadata,
+	buildSingleAuditResponseRows,
+	COMMENT_ROW_SENTINEL,
+	SCORE_ROW_KIND_COL,
+	SCORE_ROW_SENTINEL,
+	SECTION_NOTE_RESPONSE_SENTINEL,
+	SECTION_NOTE_SENTINEL
+} from "./row-builders";
 import type {
 	AuditExportAppearance,
 	ExportableAudit,
@@ -21,24 +35,12 @@ import type {
 	WebExportPalette,
 	WorkbookTable
 } from "./types";
-import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS, hexToXlsxRgb, type PvScaleKey } from "@/lib/audit/scale-colors";
 import {
 	OVERVIEW_COLUMN_WIDTHS,
+	resolveExportPalette,
 	SINGLE_RESPONSE_COLUMN_WIDTHS,
-	SINGLE_RESPONSE_HEADERS,
-	resolveExportPalette
+	SINGLE_RESPONSE_HEADERS
 } from "./types";
-import { sanitizeSheetName, stringifyCell } from "./format-utils";
-import {
-	COMMENT_ROW_SENTINEL,
-	SCORE_ROW_KIND_COL,
-	SCORE_ROW_SENTINEL,
-	SECTION_NOTE_SENTINEL,
-	SECTION_NOTE_RESPONSE_SENTINEL,
-	buildSingleAuditResponseRowMetadata,
-	buildOverviewRows,
-	buildSingleAuditResponseRows
-} from "./row-builders";
 
 // ── XLSX style helpers ────────────────────────────────────────────────────────
 

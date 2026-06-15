@@ -1,7 +1,8 @@
-import { test, expect } from "@playwright/test";
-import { attachBugCollectors } from "./helpers/bugCollector";
-import { openEditableSpreadsheet, editTextCell, cancelTextCellEdit } from "./helpers/spreadsheet";
+import { expect, test } from "@playwright/test";
+
 import { loginAsAdmin } from "./helpers/auth";
+import { attachBugCollectors } from "./helpers/bugCollector";
+import { cancelTextCellEdit, editTextCell, openEditableSpreadsheet } from "./helpers/spreadsheet";
 
 test.describe("Instrument spreadsheet", () => {
 	test.beforeEach(async ({ page }) => {

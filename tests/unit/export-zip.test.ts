@@ -3,8 +3,8 @@ import test from "node:test";
 
 import JSZip from "jszip";
 
-import { ExportZipBuilder, slugifyPath, slugifyFileName, slugifyPathSegment } from "@/lib/export/zip-builder";
 import { estimateRawDataExport, IMMEDIATE_EXPORT_MAX_RICH_ENTITIES } from "@/lib/export/export-estimator";
+import { ExportZipBuilder, slugifyFileName, slugifyPath, slugifyPathSegment } from "@/lib/export/zip-builder";
 
 /**
  * Archive paths must be filesystem-safe: lowercased, non-alphanumerics collapsed

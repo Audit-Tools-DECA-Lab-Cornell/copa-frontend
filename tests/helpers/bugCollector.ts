@@ -1,6 +1,7 @@
-import type { Page, TestInfo } from "@playwright/test";
 import fs from "node:fs/promises";
 import path from "node:path";
+
+import type { Page, TestInfo } from "@playwright/test";
 
 export type CollectedIssue = {
 	type: "console" | "pageerror" | "requestfailed" | "slow-interaction";

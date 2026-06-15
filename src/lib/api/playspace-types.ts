@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { playspaceInstrumentSchema, type PlayspaceInstrument } from "@/types/audit";
+import { type PlayspaceInstrument, playspaceInstrumentSchema } from "@/types/audit";
 
 export { playspaceInstrumentSchema };
 export type { PlayspaceInstrument };

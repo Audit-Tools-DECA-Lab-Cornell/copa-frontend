@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import type {
 	ColumnDef,
 	ColumnFiltersState,
@@ -10,7 +9,6 @@ import type {
 	Updater,
 	VisibilityState
 } from "@tanstack/react-table";
-import { useTranslations } from "next-intl";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -19,12 +17,14 @@ import {
 	getSortedRowModel,
 	useReactTable
 } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { DataTablePagination } from "./data-table-pagination";
-import { DataTableToolbar, type DataTableFilterConfig } from "./data-table-toolbar";
+import { type DataTableFilterConfig, DataTableToolbar } from "./data-table-toolbar";
 
 export const multiValueFilterFn: FilterFn<unknown> = (row, columnId, filterValue) => {
 	if (!Array.isArray(filterValue) || filterValue.length === 0) {

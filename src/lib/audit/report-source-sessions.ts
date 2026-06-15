@@ -1,5 +1,5 @@
-import type { AuditSession as ExportAuditSession } from "@/types/audit";
 import type { AuditSession as SourceAuditSession } from "@/lib/api/playspace-types";
+import type { AuditSession as ExportAuditSession } from "@/types/audit";
 
 /**
  * The source component attached to one question row inside a combined place report.

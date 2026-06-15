@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { MoreHorizontalIcon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";

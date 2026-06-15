@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { legalDocumentSchema, type LegalDocument } from "@/types/audit";
+import { type LegalDocument, legalDocumentSchema } from "@/types/audit";
 
 const publicLegalDocumentsSchema = z.array(legalDocumentSchema);
 

@@ -5,9 +5,10 @@
  * from any sibling module, keeping the dependency graph acyclic.
  */
 
-import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
-import { DESIGN_SYSTEM, type DesignSystemThemeMode, type DesignSystemContrastMode } from "@/lib/design-system";
 import type * as XLSX from "xlsx-js-style";
+
+import { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
+import { DESIGN_SYSTEM, type DesignSystemContrastMode, type DesignSystemThemeMode } from "@/lib/design-system";
 
 // ── Re-exported domain types ─────────────────────────────────────────────────
 

@@ -1,10 +1,21 @@
-import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
 import { CheckCircle2, Download, FileJson, FileSpreadsheet, FileText, ListChecks, Ruler } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import { exportInstrument } from "@/lib/export/instrument";
-import type { InstrumentContent, Lang } from "./types";
 import {
 	InstrumentQuestion,
 	InstrumentSection,
@@ -15,19 +26,10 @@ import {
 	ScaleDefinition,
 	ScaleOption
 } from "@/types/audit";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Separator } from "@/components/ui/separator";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+
+import { DisplayConditionBadge, ScaleKeyBadge, StatBox } from "./shared-components";
 import { SpreadsheetView } from "./spreadsheet-view";
+import type { InstrumentContent, Lang } from "./types";
 import {
 	buildScaleGuidanceMap,
 	collectSectionScaleKeys,
@@ -36,7 +38,6 @@ import {
 	isScaleCustomized,
 	renderInlineMarkdown
 } from "./utils";
-import { DisplayConditionBadge, ScaleKeyBadge, StatBox } from "./shared-components";
 
 export function InstrumentContentViewer({
 	content,

@@ -1,11 +1,11 @@
-import * as React from "react";
-import type { ReactNode } from "react";
 import Link from "next/link";
+import type { ReactNode } from "react";
+import * as React from "react";
 
 import {
 	Breadcrumb,
-	BreadcrumbLink,
 	BreadcrumbItem,
+	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+
 import { loginAsAdmin } from "../helpers/auth";
 
 test.describe("@web-ui Admin Instrument Editor", () => {

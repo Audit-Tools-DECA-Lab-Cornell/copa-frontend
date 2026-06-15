@@ -1,18 +1,20 @@
-import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
 import { Check, CheckCircle2, ListChecks, Maximize2, Minimize2, Pencil, Ruler, X } from "lucide-react";
-import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
-import type { InstrumentQuestion, InstrumentSection, ScaleDefinition } from "@/types/audit";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { isScaleCustomized, renderInlineMarkdown } from "./utils";
-import { ScaleKeyBadge } from "./shared-components";
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+import type { InstrumentQuestion, InstrumentSection, ScaleDefinition } from "@/types/audit";
+
 import { MODE_OPTIONS, QUESTION_TYPE_OPTIONS } from "./constants";
 import { useInstrumentEdit } from "./instrument-edit-context";
+import { ScaleKeyBadge } from "./shared-components";
+import { isScaleCustomized, renderInlineMarkdown } from "./utils";
 
 interface SpreadsheetRow {
 	sectionIndex: number;

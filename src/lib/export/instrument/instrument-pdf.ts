@@ -9,8 +9,10 @@
  */
 
 import type { Cell, CellHookData } from "jspdf-autotable";
+
 import type { PromptSegment } from "@/lib/audit/prompt-segments";
-import { PALETTE, type FlatRow, segmentsToPlainText } from "./instrument-shared";
+
+import { type FlatRow, PALETTE, segmentsToPlainText } from "./instrument-shared";
 
 // ─── Internal types ───────────────────────────────────────────────────────────
 

@@ -1,20 +1,19 @@
 "use client";
 
-import * as React from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { FilterIcon, XIcon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import { playspaceApi, type AuditorPlace } from "@/lib/api/playspace";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DataTable, getMultiValueFilterFn } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { EntityRowActions } from "@/components/dashboard/entity-row-actions";
-import { StatCard } from "@/components/dashboard/stat-card";
 import { preservePreviousData } from "@/components/dashboard/server-table-utils";
+import { StatCard } from "@/components/dashboard/stat-card";
 import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { type AuditorPlace, playspaceApi } from "@/lib/api/playspace";
 
 type SessionStatus = "not_started" | "in_progress" | "submitted";
 

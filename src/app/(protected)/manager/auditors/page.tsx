@@ -6,11 +6,10 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import {
-	AuditorDialog,
 	type AuditorCreatedSummary,
+	AuditorDialog,
 	type AuditorDialogPayload
 } from "@/components/dashboard/auditor-dialog";
 import { AuditorsTable } from "@/components/dashboard/auditors-table";
@@ -21,6 +20,7 @@ import { FilterPopover } from "@/components/dashboard/filter-popover";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { type AuditorSummary, type ManagerPlaceRow, playspaceApi } from "@/lib/api/playspace";
 
 export default function ManagerAuditorsPage() {
 	const t = useTranslations("manager.auditors");

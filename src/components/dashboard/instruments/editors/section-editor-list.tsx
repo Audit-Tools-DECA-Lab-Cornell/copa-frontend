@@ -1,16 +1,17 @@
-import { useTranslations } from "next-intl";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import type { InstrumentSection, ScaleDefinition } from "@/types/audit";
+import { useTranslations } from "next-intl";
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import type { InstrumentSection, ScaleDefinition } from "@/types/audit";
 
-import { EditableField } from "../shared-components";
 import { makeDefaultQuestion, makeDefaultSection } from "../defaults";
+import { useInstrumentEdit } from "../instrument-edit-context";
+import { EditableField } from "../shared-components";
 import { moveArrayItem } from "../utils";
 import { QuestionEditor } from "./shared-editors";
-import { useInstrumentEdit } from "../instrument-edit-context";
 
 export function SectionEditorList({
 	sections,

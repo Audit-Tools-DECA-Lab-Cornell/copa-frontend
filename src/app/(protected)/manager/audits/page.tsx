@@ -1,30 +1,30 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { ClipboardListIcon, MapPinnedIcon, XIcon } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import React from "react";
 
-import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
-import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
 import { buildAuditorNameLookup } from "@/components/dashboard/auditor-display";
+import { type AuditActivityRow, AuditsTable } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
 import {
 	getMultiValueColumnFilter,
-	preservePreviousData,
 	getTextColumnFilterValue,
+	preservePreviousData,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { formatScoreLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import React from "react";
-import { formatScoreLabel } from "@/components/dashboard/utils";
+import { type AuditorSummary, type ManagerPlaceRow, playspaceApi } from "@/lib/api/playspace";
 
 function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {

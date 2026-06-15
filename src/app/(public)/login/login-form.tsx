@@ -6,15 +6,15 @@ import { useTranslations } from "next-intl";
 import * as React from "react";
 import { z } from "zod";
 
-import type { AuthResponse } from "@/lib/auth/auth-api";
-import { loginWithCredentials } from "@/lib/auth/auth-api";
-import { setBrowserAuthSession } from "@/lib/auth/browser-session";
-import { mapAccountTypeToRole, type UserRole } from "@/lib/auth/role";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import type { AuthResponse } from "@/lib/auth/auth-api";
+import { loginWithCredentials } from "@/lib/auth/auth-api";
+import { setBrowserAuthSession } from "@/lib/auth/browser-session";
+import { mapAccountTypeToRole, type UserRole } from "@/lib/auth/role";
 
 const loginSchema = z.object({
 	email: z.email(),

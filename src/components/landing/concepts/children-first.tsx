@@ -13,7 +13,6 @@
  * language appears on the page.
  */
 
-import Link from "next/link";
 import {
 	ArrowRight,
 	Check,
@@ -23,16 +22,13 @@ import {
 	Footprints,
 	Heart,
 	Layers,
+	type LucideIcon,
 	ShieldCheck,
 	Smile,
 	Sparkles,
-	Users,
-	type LucideIcon
+	Users
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 import {
 	AmbientGlows,
@@ -45,8 +41,10 @@ import {
 	MARKETING_ROUTES,
 	type NavLink
 } from "@/components/landing/shared";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { screenshotUrl } from "@/lib/asset-url";
+import { cn } from "@/lib/utils";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 

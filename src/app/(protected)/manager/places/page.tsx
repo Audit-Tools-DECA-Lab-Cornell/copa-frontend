@@ -1,29 +1,28 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
-import { FolderKanbanIcon, MapPinnedIcon, FilterIcon, XIcon } from "lucide-react";
+import { FilterIcon, FolderKanbanIcon, MapPinnedIcon, XIcon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type ManagerPlaceRow, type AuditorSummary } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DataTable, getMultiValueFilterFn } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { EntityRowActions } from "@/components/dashboard/entity-row-actions";
 import {
-	preservePreviousData,
 	getTextColumnFilterValue,
+	preservePreviousData,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import {
 	formatDateTimeLabel,
-	formatRequirementStatusLabel,
 	formatLocationLabel,
+	formatRequirementStatusLabel,
 	formatScorePairLabel,
 	getRequirementStatusClassName
 } from "@/components/dashboard/utils";
@@ -34,6 +33,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { type AuditorSummary, type ManagerPlaceRow, playspaceApi } from "@/lib/api/playspace";
 import { cn } from "@/lib/utils";
 
 function getErrorMessage(error: unknown, fallbackMessage: string): string {

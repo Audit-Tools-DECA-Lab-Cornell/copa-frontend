@@ -128,6 +128,9 @@ importers:
             eslint-plugin-react-hooks:
                 specifier: ^7.1.1
                 version: 7.1.1(eslint@9.39.4(jiti@2.7.0))
+            eslint-plugin-simple-import-sort:
+                specifier: ^13.0.0
+                version: 13.0.0(eslint@9.39.4(jiti@2.7.0))
             playwright:
                 specifier: ^1.60.0
                 version: 1.61.0
@@ -4682,6 +4685,14 @@ packages:
         peerDependencies:
             eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
 
+    eslint-plugin-simple-import-sort@13.0.0:
+        resolution:
+            {
+                integrity: sha512-McAc+/Nlvcg4byY/CABGH8kqnefWBj8s3JA2okEtz8ixbECQgU46p0HkTUKa4YS7wvgGceimlc34p1nXqbWqtA==
+            }
+        peerDependencies:
+            eslint: ">=5.0.0"
+
     eslint-scope@8.4.0:
         resolution:
             {
@@ -9170,24 +9181,18 @@ snapshots:
             "@parcel/watcher-win32-ia32": 2.5.6
             "@parcel/watcher-win32-x64": 2.5.6
 
-    "@percy/cli-app@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
+    "@percy/cli-app@1.31.14(typescript@5.9.3)":
         dependencies:
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
-            "@percy/cli-exec": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
+            "@percy/cli-exec": 1.31.14(typescript@5.9.3)
         transitivePeerDependencies:
-            - bufferutil
-            - supports-color
             - typescript
-            - utf-8-validate
 
-    "@percy/cli-build@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
+    "@percy/cli-build@1.31.14(typescript@5.9.3)":
         dependencies:
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
         transitivePeerDependencies:
-            - bufferutil
-            - supports-color
             - typescript
-            - utf-8-validate
 
     "@percy/cli-command@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
         dependencies:
@@ -9200,14 +9205,11 @@ snapshots:
             - typescript
             - utf-8-validate
 
-    "@percy/cli-config@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
+    "@percy/cli-config@1.31.14(typescript@5.9.3)":
         dependencies:
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
         transitivePeerDependencies:
-            - bufferutil
-            - supports-color
             - typescript
-            - utf-8-validate
 
     "@percy/cli-doctor@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
         dependencies:
@@ -9226,49 +9228,40 @@ snapshots:
             - typescript
             - utf-8-validate
 
-    "@percy/cli-exec@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
+    "@percy/cli-exec@1.31.14(typescript@5.9.3)":
         dependencies:
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
             "@percy/logger": 1.31.14
             cross-spawn: 7.0.6
             which: 2.0.2
         transitivePeerDependencies:
-            - bufferutil
-            - supports-color
             - typescript
-            - utf-8-validate
 
-    "@percy/cli-snapshot@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
+    "@percy/cli-snapshot@1.31.14(typescript@5.9.3)":
         dependencies:
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
             yaml: 2.9.0
         transitivePeerDependencies:
-            - bufferutil
-            - supports-color
             - typescript
-            - utf-8-validate
 
-    "@percy/cli-upload@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
+    "@percy/cli-upload@1.31.14(typescript@5.9.3)":
         dependencies:
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
             fast-glob: 3.3.3
             image-size: 1.2.1
         transitivePeerDependencies:
-            - bufferutil
-            - supports-color
             - typescript
-            - utf-8-validate
 
     "@percy/cli@1.31.14(bufferutil@4.1.0)(typescript@5.9.3)":
         dependencies:
-            "@percy/cli-app": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
-            "@percy/cli-build": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
+            "@percy/cli-app": 1.31.14(typescript@5.9.3)
+            "@percy/cli-build": 1.31.14(typescript@5.9.3)
             "@percy/cli-command": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
-            "@percy/cli-config": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
+            "@percy/cli-config": 1.31.14(typescript@5.9.3)
             "@percy/cli-doctor": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
-            "@percy/cli-exec": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
-            "@percy/cli-snapshot": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
-            "@percy/cli-upload": 1.31.14(bufferutil@4.1.0)(typescript@5.9.3)
+            "@percy/cli-exec": 1.31.14(typescript@5.9.3)
+            "@percy/cli-snapshot": 1.31.14(typescript@5.9.3)
+            "@percy/cli-upload": 1.31.14(typescript@5.9.3)
             "@percy/client": 1.31.14(typescript@5.9.3)
             "@percy/logger": 1.31.14
         transitivePeerDependencies:
@@ -11417,6 +11410,10 @@ snapshots:
             semver: 6.3.1
             string.prototype.matchall: 4.0.12
             string.prototype.repeat: 1.0.0
+
+    eslint-plugin-simple-import-sort@13.0.0(eslint@9.39.4(jiti@2.7.0)):
+        dependencies:
+            eslint: 9.39.4(jiti@2.7.0)
 
     eslint-scope@8.4.0:
         dependencies:

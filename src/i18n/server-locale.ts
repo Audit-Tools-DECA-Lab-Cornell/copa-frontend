@@ -1,14 +1,15 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+
 import { cookies, headers } from "next/headers";
 
 import {
 	DEFAULT_WEB_LOCALE,
-	LOCALE_PREFERENCE_COOKIE_NAME,
 	isLanguagePreference,
-	resolveLanguagePreference,
 	type LanguagePreference,
-	type ResolvedLanguage
+	LOCALE_PREFERENCE_COOKIE_NAME,
+	type ResolvedLanguage,
+	resolveLanguagePreference
 } from "@/i18n/config";
 
 type IntlMessages = Record<string, unknown>;

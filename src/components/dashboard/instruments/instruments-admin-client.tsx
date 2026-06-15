@@ -1,27 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileUp, Plus } from "lucide-react";
-
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { EmptyState } from "@/components/dashboard/empty-state";
-import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
-
-import { playspaceApi } from "@/lib/api/playspace";
-import { instrumentContentSchema } from "@/lib/api/playspace-types";
 import type { z } from "zod";
 
-import type { InstrumentContent, InstrumentVersionRow } from "./types";
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { Button } from "@/components/ui/button";
+import { playspaceApi } from "@/lib/api/playspace";
+import { instrumentContentSchema } from "@/lib/api/playspace-types";
+
+import { ActivateDialog } from "./activate-dialog";
 import { INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
+import { InstrumentEditor } from "./instrument-editor";
+import type { InstrumentContent, InstrumentVersionRow } from "./types";
+import { UploadDialog } from "./upload-dialog";
 import { suggestNextDraftVersion, suggestNextPublishedVersion } from "./utils";
 import { VersionHistory } from "./version-history";
-import { InstrumentEditor } from "./instrument-editor";
-import { ActivateDialog } from "./activate-dialog";
-import { UploadDialog } from "./upload-dialog";
 
 type InstrumentContentPayload = z.infer<typeof instrumentContentSchema>;
 

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+
 import { loginAsAuditor, loginAsManager } from "../helpers/auth";
 
 test.describe("@web-ui seeded backend sync", () => {

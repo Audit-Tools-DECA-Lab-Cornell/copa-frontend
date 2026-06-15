@@ -1,23 +1,23 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ExternalLink, MapPin, PencilLineIcon, UserPlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, MapPin, UserPlusIcon, PencilLineIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, PlayspaceType } from "@/lib/api/playspace";
 import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialog";
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { PlaceReportsCard } from "@/components/dashboard/place-reports-card";
 import { PlaceSheet, type PlaceSheetPayload } from "@/components/dashboard/place-sheet";
-import { formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { playspaceApi, PlayspaceType } from "@/lib/api/playspace";
 
 /**
  * Build an internal static-map proxy URL centered on the given coordinates.

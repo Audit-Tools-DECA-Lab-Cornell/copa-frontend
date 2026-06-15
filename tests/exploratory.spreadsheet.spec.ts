@@ -1,7 +1,8 @@
-import { test, TestInfo } from "@playwright/test";
-import { chromium } from "playwright";
 // pseudo-import; swap for Stagehand or Browser Use
 import { Stagehand, type V3Env } from "@browserbasehq/stagehand";
+import { test, TestInfo } from "@playwright/test";
+import { chromium } from "playwright";
+
 import { attachBugCollectors } from "./helpers/bugCollector";
 
 test("ai exploratory spreadsheet run", {}, async ({ page }, testInfo) => {

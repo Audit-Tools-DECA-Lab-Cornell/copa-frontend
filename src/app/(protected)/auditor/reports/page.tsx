@@ -1,28 +1,28 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { FileTextIcon, FilterIcon, XIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import { playspaceApi, type AuditorAuditSummary } from "@/lib/api/playspace";
-import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
+import { type AuditActivityRow, AuditsTable } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { StatCard } from "@/components/dashboard/stat-card";
 import {
 	getTextColumnFilterValue,
 	preservePreviousData,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
+import { StatCard } from "@/components/dashboard/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { type AuditorAuditSummary, playspaceApi } from "@/lib/api/playspace";
 
 interface FilterPopoverProps {
 	title: string;

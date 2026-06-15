@@ -1,26 +1,37 @@
 "use client";
 
-import * as React from "react";
-import { useTranslations } from "next-intl";
 import {
+	ActivityIcon,
 	CalendarIcon,
-	UserIcon,
-	MapPinIcon,
+	ChevronDownIcon,
+	ChevronsDownUpIcon,
+	ChevronsUpDownIcon,
+	ChevronUpIcon,
 	ClipboardListIcon,
 	HashIcon,
-	ActivityIcon,
 	LayersIcon,
-	ChevronsUpDownIcon,
-	ChevronDownIcon,
-	ChevronUpIcon,
 	ListIcon,
-	ChevronsDownUpIcon
+	MapPinIcon,
+	UserIcon
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import { JsonViewer } from "./raw-json";
-
-import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
+import { formatAuditCodeReference } from "@/components/dashboard/utils";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AuditSession } from "@/lib/api/playspace";
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import type { ConstructRanking, DomainQuestionRow } from "@/lib/audit/report-helpers";
+import {
+	buildConstructRankings,
+	buildDomainReportRows,
+	formatConstructDomainLine,
+	roundedPercentOfMax,
+	toDomainTitle
+} from "@/lib/audit/report-helpers";
 import {
 	getEffectiveScoreTotals,
 	getExecutionModeLabel,
@@ -28,22 +39,11 @@ import {
 	hasUnsureVariants,
 	type ScoreVariantKey
 } from "@/lib/audit/score-mode-helpers";
-import type { DomainQuestionRow, ConstructRanking } from "@/lib/audit/report-helpers";
-import {
-	buildDomainReportRows,
-	buildConstructRankings,
-	toDomainTitle,
-	formatConstructDomainLine,
-	roundedPercentOfMax
-} from "@/lib/audit/report-helpers";
 import { SCALE_ACCENT_COLORS } from "@/lib/export/audit/types";
-import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { formatAuditCodeReference } from "@/components/dashboard/utils";
+import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
+
+import { JsonViewer } from "./raw-json";
 
 // ── Layout constants ─────────────────────────────────────────────────────────
 // Fixed column widths shared between bar cells and table cells for alignment.

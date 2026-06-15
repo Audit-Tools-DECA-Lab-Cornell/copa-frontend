@@ -1,11 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { useForm } from "@tanstack/react-form";
-import { useTranslations } from "next-intl";
-import { z } from "zod";
-
 import { CheckCircle2Icon, ClipboardCopyIcon, LockIcon, MailIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import * as React from "react";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {

@@ -1,5 +1,6 @@
-import { expect, type APIRequestContext } from "@playwright/test";
-import { e2eUsers, type E2ERole } from "../fixtures/users";
+import { type APIRequestContext, expect } from "@playwright/test";
+
+import { type E2ERole, e2eUsers } from "../fixtures/users";
 
 export type AuthNextStep = "VERIFY_EMAIL" | "WAITING_APPROVAL" | "COMPLETE_PROFILE" | "DASHBOARD";
 export type BrowserSessionRole = Extract<E2ERole, "admin" | "manager" | "auditor">;

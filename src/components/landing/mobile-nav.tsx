@@ -8,12 +8,12 @@
  * statically with no client bundle beyond this small toggle.
  */
 
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { MARKETING_ROUTES, type NavLink } from "@/components/landing/shared";
+import { Button } from "@/components/ui/button";
 
 export function MobileNav({
 	links,

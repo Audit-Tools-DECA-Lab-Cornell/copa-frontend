@@ -1,11 +1,13 @@
-import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
-import type { ChoiceOption } from "@/types/audit";
+import { useTranslations } from "next-intl";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EditableField } from "../shared-components";
+import type { ChoiceOption } from "@/types/audit";
+
 import { makeDefaultExecutionMode } from "../defaults";
 import { useInstrumentEdit } from "../instrument-edit-context";
+import { EditableField } from "../shared-components";
 
 export function ExecutionModesEditor({
 	modes,

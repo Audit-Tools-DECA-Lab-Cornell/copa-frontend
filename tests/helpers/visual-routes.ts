@@ -2,8 +2,8 @@ import type { APIRequestContext, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 import { e2eIds } from "../fixtures/ids";
-import { bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "./api";
 import type { BrowserSessionRole } from "./api";
+import { bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "./api";
 
 export type VisualRouteRole = BrowserSessionRole;
 

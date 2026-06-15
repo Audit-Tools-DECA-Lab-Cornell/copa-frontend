@@ -6,28 +6,6 @@
  * identical outputs with no side effects.
  */
 
-import type {
-	AuditScoreTotals,
-	ExportableAudit,
-	PlayspaceInstrument,
-	SpreadsheetRow,
-	WorkbookRowMetadata
-} from "./types";
-import {
-	formatAuditStatusLabel,
-	formatChecklistAnswer,
-	formatConstructLabel,
-	formatExecutionModeLabel,
-	formatQuestionModeLabel,
-	formatLocality,
-	formatPercentage,
-	formatQuestionAnswer,
-	formatQuestionDomainLabel,
-	formatTimestampForDisplay,
-	questionDomainFallback,
-	stripPromptMarkup
-} from "./format-utils";
-import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import { buildVisibleQuestionEntries } from "@/lib/audit/report-helpers";
 import {
 	getCombinedReportLegend,
@@ -35,8 +13,31 @@ import {
 	getReportSourceLabel,
 	type ReportSourceComponent
 } from "@/lib/audit/report-source-sessions";
-import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
 import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+
+import {
+	formatAuditStatusLabel,
+	formatChecklistAnswer,
+	formatConstructLabel,
+	formatExecutionModeLabel,
+	formatLocality,
+	formatPercentage,
+	formatQuestionAnswer,
+	formatQuestionDomainLabel,
+	formatQuestionModeLabel,
+	formatTimestampForDisplay,
+	questionDomainFallback,
+	stripPromptMarkup
+} from "./format-utils";
+import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
+import type {
+	AuditScoreTotals,
+	ExportableAudit,
+	PlayspaceInstrument,
+	SpreadsheetRow,
+	WorkbookRowMetadata
+} from "./types";
 
 interface ResponseTableBuildResult {
 	readonly rows: readonly SpreadsheetRow[];

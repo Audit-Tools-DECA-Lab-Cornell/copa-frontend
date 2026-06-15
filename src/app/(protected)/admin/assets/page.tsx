@@ -1,13 +1,13 @@
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { StatCard } from "@/components/dashboard/stat-card";
 import { AssetGallery } from "@/components/dashboard/asset-gallery";
 import { BackButton } from "@/components/dashboard/back-button";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { StatCard } from "@/components/dashboard/stat-card";
 import type { AssetIndex } from "@/lib/cloudinary-images";
 
 function loadIndex(): AssetIndex | null {

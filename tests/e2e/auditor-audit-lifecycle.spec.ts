@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+
 import { bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "../helpers/api";
 
 test.describe("@auditor-web-audit seeded auditor lifecycle", () => {

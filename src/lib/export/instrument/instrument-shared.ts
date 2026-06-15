@@ -3,9 +3,9 @@
  * and instrument-flattening logic used by all export formats.
  */
 
-import type { PlayspaceInstrument } from "@/types/audit";
-import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import { parsePromptSegments, type PromptSegment } from "@/lib/audit/prompt-segments";
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+import type { PlayspaceInstrument } from "@/types/audit";
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 

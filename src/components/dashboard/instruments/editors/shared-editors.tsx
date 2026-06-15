@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { useTranslations } from "next-intl";
 import {
 	ArrowDown,
 	ArrowUp,
@@ -13,6 +11,15 @@ import {
 	Ruler,
 	Trash2
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import type {
 	ChoiceOption,
 	InstrumentQuestion,
@@ -21,19 +28,13 @@ import type {
 	ScaleDefinition,
 	ScaleOption
 } from "@/types/audit";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 
-import { EditableField, DisplayConditionBadge } from "../shared-components";
-import { makeDefaultScaleOption, makeDefaultQuestionScale } from "../defaults";
-import { moveArrayItem, isScaleCustomized, formatQuestionKeyForDisplay, renderInlineMarkdown } from "../utils";
-import { CONSTRUCT_OPTIONS, MODE_OPTIONS, QUESTION_TYPE_OPTIONS, SCALE_KEY_OPTIONS } from "../constants";
-import { useInstrumentEdit } from "../instrument-edit-context";
 import { AiTranslateFieldButton } from "../ai-translate-button";
+import { CONSTRUCT_OPTIONS, MODE_OPTIONS, QUESTION_TYPE_OPTIONS, SCALE_KEY_OPTIONS } from "../constants";
+import { makeDefaultQuestionScale, makeDefaultScaleOption } from "../defaults";
+import { useInstrumentEdit } from "../instrument-edit-context";
+import { DisplayConditionBadge, EditableField } from "../shared-components";
+import { formatQuestionKeyForDisplay, isScaleCustomized, moveArrayItem, renderInlineMarkdown } from "../utils";
 
 export function ChoiceOptionsEditor({
 	options,

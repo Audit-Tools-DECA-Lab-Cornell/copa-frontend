@@ -1,12 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import {
 	Popover,
 	PopoverContent,
@@ -15,6 +13,8 @@ import {
 	PopoverTitle,
 	PopoverTrigger
 } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 /**
  * Compact, per-field premium "translate this block with AI" affordance.

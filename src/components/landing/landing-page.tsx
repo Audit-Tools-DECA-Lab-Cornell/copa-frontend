@@ -30,9 +30,6 @@
  * no fake institutional partners, no testimonials.
  */
 
-import Image from "next/image";
-import Link from "next/link";
-import * as React from "react";
 import {
 	ArrowRight,
 	Building2,
@@ -41,6 +38,7 @@ import {
 	HeartHandshake,
 	Landmark,
 	ListChecks,
+	type LucideIcon,
 	Menu,
 	Monitor,
 	RotateCcw,
@@ -49,13 +47,15 @@ import {
 	TreePine,
 	Users,
 	WifiOff,
-	X,
-	type LucideIcon
+	X
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SCALE_ACCENT_BAR_CLASS_NAMES, type PvScaleKey } from "@/lib/audit/scale-colors";
+import { type PvScaleKey, SCALE_ACCENT_BAR_CLASS_NAMES } from "@/lib/audit/scale-colors";
 import { cn } from "@/lib/utils";
 
 // ─── Route constants ──────────────────────────────────────────────────────────

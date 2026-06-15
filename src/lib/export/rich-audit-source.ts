@@ -14,8 +14,9 @@
  * `RichAuditSource` implementation - nothing else in the pipeline changes.
  */
 
-import { playspaceApi, type AuditSession } from "@/lib/api/playspace";
+import { type AuditSession, playspaceApi } from "@/lib/api/playspace";
 import type { PlayspaceInstrument } from "@/types/audit";
+
 import type { ExportableAudit } from "./audit";
 
 /** A fully-resolved audit ready to be handed to the export generators. */

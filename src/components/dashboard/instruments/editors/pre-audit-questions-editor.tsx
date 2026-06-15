@@ -1,17 +1,19 @@
+import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Plus, Trash2, GripVertical } from "lucide-react";
-import type { PreAuditQuestion } from "@/types/audit";
+import { useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { EditableField } from "../shared-components";
-import { makeDefaultPreAuditQuestion } from "../defaults";
-import { ChoiceOptionsEditor } from "./shared-editors";
+import { Separator } from "@/components/ui/separator";
+import type { PreAuditQuestion } from "@/types/audit";
+
 import { INPUT_TYPE_OPTIONS, MODE_OPTIONS, PAGE_KEY_OPTIONS } from "../constants";
+import { makeDefaultPreAuditQuestion } from "../defaults";
 import { useInstrumentEdit } from "../instrument-edit-context";
-import { useState } from "react";
+import { EditableField } from "../shared-components";
+import { ChoiceOptionsEditor } from "./shared-editors";
 
 // Add this new component below PreAuditQuestionsEditor
 

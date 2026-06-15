@@ -1,36 +1,32 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import * as React from "react";
 import {
 	ChevronDown,
 	ClipboardList,
 	DatabaseIcon,
 	FileText,
 	FolderKanban,
+	Form,
 	Images,
 	LayoutDashboard,
 	LogOut,
+	type LucideIcon,
 	MapPin,
 	Menu,
-	Form,
+	MonitorCog,
 	PanelLeftClose,
 	PanelLeftOpen,
 	Settings,
-	MonitorCog,
 	Shield,
-	Users,
-	type LucideIcon
+	Users
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import * as React from "react";
 
-import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
-import type { UserRole } from "@/lib/auth/role";
-import { cn } from "@/lib/utils";
+import { CldImage } from "@/components/cdn/cld-image";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -39,7 +35,11 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { CldImage } from "@/components/cdn/cld-image";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
+import type { UserRole } from "@/lib/auth/role";
+import { cn } from "@/lib/utils";
 
 export interface AppShellProps {
 	role: UserRole;

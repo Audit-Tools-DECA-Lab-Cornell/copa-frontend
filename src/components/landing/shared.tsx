@@ -14,14 +14,13 @@
  * (a laptop with a phone floating in front, etc.).
  */
 
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 import { MobileNav } from "@/components/landing/mobile-nav";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const MARKETING_ROUTES = {
 	signUp: "/signup",

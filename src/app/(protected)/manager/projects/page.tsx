@@ -1,10 +1,9 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
 import { FolderOpenIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -14,6 +13,7 @@ import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { playspaceApi } from "@/lib/api/playspace";
 
 function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {

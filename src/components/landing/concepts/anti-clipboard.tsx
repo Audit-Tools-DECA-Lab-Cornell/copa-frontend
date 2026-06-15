@@ -12,7 +12,6 @@
  * only — never on the page.
  */
 
-import Link from "next/link";
 import {
 	AlertCircle,
 	ArrowRight,
@@ -25,17 +24,15 @@ import {
 	Heart,
 	Layers,
 	Lightbulb,
+	type LucideIcon,
 	MapPin,
 	MoveRight,
 	ShieldCheck,
 	Shuffle,
 	Smile,
-	Sparkles,
-	type LucideIcon
+	Sparkles
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 import {
 	AmbientGlows,
@@ -48,7 +45,8 @@ import {
 	MARKETING_ROUTES,
 	type NavLink
 } from "@/components/landing/shared";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { screenshotUrl } from "@/lib/asset-url";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────

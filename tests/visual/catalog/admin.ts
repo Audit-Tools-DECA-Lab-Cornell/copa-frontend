@@ -1,6 +1,6 @@
-import type { CaptureTarget } from "./types";
 import { dashboardChromeStates } from "./shared";
 import { expectText, openBuildDialogForPlace, openRowMenu, openUserMenu, StateUnavailableError } from "./steps";
+import type { CaptureTarget } from "./types";
 
 /**
  * Admin console. One folder per page under public/screenshots/admin, mirroring

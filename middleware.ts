@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { AUTH_COOKIE_NAMES, parseUserRole } from "./src/lib/auth/role";
 

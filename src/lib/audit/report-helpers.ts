@@ -1,17 +1,17 @@
-import type {
-	AuditScoreTotals,
-	AuditSession,
-	InstrumentSection,
-	InstrumentQuestion,
-	PlayspaceInstrument,
-	QuestionResponsePayload
-} from "@/types/audit";
 import { calculateQuestionScores, findScale, findScaleOption } from "@/lib/audit/question-scoring";
 import {
 	getCombinedReportSources,
 	getReportSourceLabel,
 	type ReportSourceComponent
 } from "@/lib/audit/report-source-sessions";
+import type {
+	AuditScoreTotals,
+	AuditSession,
+	InstrumentQuestion,
+	InstrumentSection,
+	PlayspaceInstrument,
+	QuestionResponsePayload
+} from "@/types/audit";
 
 // ---------------------------------------------------------------------------
 // Exported interfaces

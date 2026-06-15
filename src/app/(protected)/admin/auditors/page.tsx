@@ -6,17 +6,9 @@ import { XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import {
-	playspaceApi,
-	type AdminAccountRow,
-	type AdminAuditorRow,
-	type AdminPlaceRow,
-	type AdminProjectRow,
-	type PaginatedResponse
-} from "@/lib/api/playspace";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { FilterPopover } from "@/components/dashboard/filter-popover";
 import {
@@ -27,6 +19,14 @@ import {
 import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	type AdminAccountRow,
+	type AdminAuditorRow,
+	type AdminPlaceRow,
+	type AdminProjectRow,
+	type PaginatedResponse,
+	playspaceApi
+} from "@/lib/api/playspace";
 
 export default function AdminAuditorsPage() {
 	const t = useTranslations("admin.auditors");

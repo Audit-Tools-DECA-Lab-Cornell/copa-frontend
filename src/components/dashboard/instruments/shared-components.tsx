@@ -1,16 +1,17 @@
-import { useId } from "react";
-import { useTranslations } from "next-intl";
 import { GitBranch, Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useId } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { SCALE_BADGE_CLASS_NAMES, type PvScaleKey } from "@/lib/audit/scale-colors";
+import { type PvScaleKey, SCALE_BADGE_CLASS_NAMES } from "@/lib/audit/scale-colors";
 import type { QuestionDisplayCondition } from "@/types/audit";
 
-import { useInstrumentEdit } from "./instrument-edit-context";
 import { AiTranslateFieldButton } from "./ai-translate-button";
+import { useInstrumentEdit } from "./instrument-edit-context";
 
 export function EditableField({
 	label,

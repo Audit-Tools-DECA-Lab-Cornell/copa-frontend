@@ -1,6 +1,6 @@
 import type { AuditSession, ScoreTotals } from "@/lib/api/playspace-types";
-import type { AuditScoreVariantBuckets, AuditScores } from "@/types/audit";
 import type { CombinedReportSources } from "@/lib/audit/report-source-sessions";
+import type { AuditScores, AuditScoreVariantBuckets } from "@/types/audit";
 
 /**
  * Add two score-total objects together field by field.

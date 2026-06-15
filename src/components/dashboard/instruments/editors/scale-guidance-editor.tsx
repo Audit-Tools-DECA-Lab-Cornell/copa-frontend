@@ -1,12 +1,14 @@
-import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
-import type { ScaleDefinition, ScaleKey } from "@/types/audit";
+import { useTranslations } from "next-intl";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { EditableField } from "../shared-components";
+import type { ScaleDefinition, ScaleKey } from "@/types/audit";
+
 import { makeDefaultScaleDefinition } from "../defaults";
-import { ScaleOptionsEditor } from "./shared-editors";
 import { useInstrumentEdit } from "../instrument-edit-context";
+import { EditableField } from "../shared-components";
+import { ScaleOptionsEditor } from "./shared-editors";
 
 export function ScaleGuidanceEditor({
 	scales,

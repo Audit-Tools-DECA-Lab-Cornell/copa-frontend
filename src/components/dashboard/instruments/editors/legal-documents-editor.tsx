@@ -1,14 +1,16 @@
-import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
-import type { LegalDocument } from "@/types/audit";
+import { useTranslations } from "next-intl";
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { EditableField } from "../shared-components";
+import type { LegalDocument } from "@/types/audit";
+
+import { AiTranslateFieldButton } from "../ai-translate-button";
 import { makeDefaultLegalDocument, makeDefaultLegalSection } from "../defaults";
 import { useInstrumentEdit } from "../instrument-edit-context";
-import { AiTranslateFieldButton } from "../ai-translate-button";
+import { EditableField } from "../shared-components";
 
 export function LegalDocumentsEditor({
 	documents,

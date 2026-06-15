@@ -14,7 +14,6 @@
  * names, or backend implementation details appear in the UI.
  */
 
-import Link from "next/link";
 import {
 	ArrowRight,
 	BarChart3,
@@ -25,17 +24,15 @@ import {
 	Globe,
 	Link2,
 	ListChecks,
+	type LucideIcon,
 	MapPin,
 	RefreshCcw,
 	ShieldCheck,
 	Smartphone,
 	Users,
-	WifiOff,
-	type LucideIcon
+	WifiOff
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 import {
 	AmbientGlows,
@@ -48,7 +45,8 @@ import {
 	MARKETING_ROUTES,
 	type NavLink
 } from "@/components/landing/shared";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { screenshotUrl } from "@/lib/asset-url";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────

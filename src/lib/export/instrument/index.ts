@@ -9,13 +9,13 @@
  * Consumers should import from this file; the split is an internal concern.
  */
 
-export type { InstrumentContent, ExportFormat } from "./instrument-shared";
+export type { ExportFormat, InstrumentContent } from "./instrument-shared";
 export { formatLabel } from "./instrument-shared";
 
-import { flattenInstrument, downloadBlob } from "./instrument-shared";
-import type { InstrumentContent, ExportFormat } from "./instrument-shared";
+import { downloadInstrumentCsv, downloadInstrumentXlsx } from "./instrument-excel";
 import { downloadInstrumentPdf } from "./instrument-pdf";
-import { downloadInstrumentXlsx, downloadInstrumentCsv } from "./instrument-excel";
+import type { ExportFormat, InstrumentContent } from "./instrument-shared";
+import { downloadBlob, flattenInstrument } from "./instrument-shared";
 
 /**
  * Exports the instrument in the requested format and triggers a browser

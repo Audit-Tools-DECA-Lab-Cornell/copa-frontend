@@ -1,5 +1,5 @@
-import { getServerAuthSession } from "@/lib/auth/server-session";
 import { getServerManagerDashboardData } from "@/lib/api/server-playspace-dashboard";
+import { getServerAuthSession } from "@/lib/auth/server-session";
 
 import { ManagerDashboardClient } from "./dashboard-client";
 

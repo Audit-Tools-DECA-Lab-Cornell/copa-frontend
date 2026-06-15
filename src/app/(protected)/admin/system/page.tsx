@@ -1,20 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 import { usePreferences } from "@/components/app/preferences-provider";
-import { playspaceApi, type AdminSystem } from "@/lib/api/playspace";
-import type { PlayspaceInstrument } from "@/types/audit";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type AdminSystem, playspaceApi } from "@/lib/api/playspace";
+import type { PlayspaceInstrument } from "@/types/audit";
 
 /**
  * Resolve the localized instrument from the content map,

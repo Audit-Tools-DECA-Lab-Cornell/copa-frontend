@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-import Link from "next/link";
 import type { ColumnDef, ExpandedState, SortingState } from "@tanstack/react-table";
 import {
 	flexRender,
@@ -24,11 +22,9 @@ import {
 	PlusCircleIcon,
 	SearchIcon
 } from "lucide-react";
+import Link from "next/link";
+import * as React from "react";
 
-import type { AuditActivityRow } from "./audits-table";
-import { getAuditorCodeSubtitle, getAuditorTableLabel } from "./auditor-display";
-import { BuildPlaceReportDialogView } from "./build-place-report-dialog";
-import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +34,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import { cn } from "@/lib/utils";
+
+import { getAuditorCodeSubtitle, getAuditorTableLabel } from "./auditor-display";
+import type { AuditActivityRow } from "./audits-table";
+import { BuildPlaceReportDialogView } from "./build-place-report-dialog";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 
 /**
  * Display variant. "reports" groups only SUBMITTED submissions and offers the
