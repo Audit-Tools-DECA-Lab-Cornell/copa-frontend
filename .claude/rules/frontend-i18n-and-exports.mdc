@@ -27,7 +27,7 @@ alwaysApply: false
 ## Export module layout
 
 - Public surfaces: `src/lib/export/instrument/index.ts` and `src/lib/export/audit/index.ts`.
-- Split implementation across `instrument-shared` / `-pdf` / `-excel` and `audit/` (`types`, `excel`, `pdf`, `json`, `index`).
+- Split implementation across `instrument-shared` / `-pdf` / `-excel` and `audit/` (`types`, `excel`, `pdf`, `row-builders`, `score-utils`, `json`, `index`).
 - Dynamically import jsPDF, jspdf-autotable, and xlsx — do not add static top-level imports for heavy export libs.
 
 ## Row builders and shapes
