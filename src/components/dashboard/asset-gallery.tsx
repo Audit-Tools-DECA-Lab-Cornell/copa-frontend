@@ -1,8 +1,7 @@
 "use client";
-
-import { Check, Clock, Cloud, Copy, ImageOff, Monitor, Search, Smartphone, Tablet, X } from "lucide-react";
+import { Check, Clock, Cloud, Copy, ImageOff, Maximize2, Monitor, Search, Smartphone, Tablet, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CldImage } from "@/components/cdn/cld-image";
 import { Badge } from "@/components/ui/badge";
@@ -88,84 +87,156 @@ function DeviceIcon({ device, className }: Readonly<{ device: AssetEntry["device
 
 function AssetCard({ asset }: Readonly<{ asset: AssetEntry }>) {
 	const t = useTranslations("assets");
+	const [expanded, setExpanded] = useState(false);
+
 	const publicId = asset.uploadedAt && asset.cloudinaryPublicId ? asset.cloudinaryPublicId : null;
 	const copyUrl = getAssetDisplayUrl(asset, "full");
 	const { width, height } = getDeviceDimensions(asset.device);
 	const isPortrait = width / height < 1;
 
+	useEffect(() => {
+		if (!expanded) return;
+
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape") setExpanded(false);
+		}
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, [expanded]);
+
 	return (
-		<div className="group overflow-hidden rounded-card border border-edge/40 bg-card transition-all duration-150 hover:-translate-y-0.5 hover:border-edge/70 hover:shadow-lg">
-			{/* thumbnail */}
-			<div
-				className={cn(
-					"relative w-full overflow-hidden bg-surface-sunken",
-					isPortrait ? "aspect-9/16" : "aspect-video"
-				)}>
-				{publicId ? (
-					<CldImage
-						src={publicId}
-						alt={asset.slug}
-						fill
-						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-						className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.02]"
-					/>
-				) : (
-					<div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center">
-						<ImageOff className="size-6 text-muted-foreground/40" />
-						<p className="text-xs font-medium text-muted-foreground/70">{t("card.notUploaded")}</p>
-						<p className="break-all font-mono text-[10px] leading-4 text-muted-foreground/50">
-							{asset.localPath}
-						</p>
-					</div>
-				)}
+		<>
+			<div className="group overflow-hidden rounded-card border border-edge/40 bg-card transition-all duration-150 hover:-translate-y-0.5 hover:border-edge/70 hover:shadow-lg">
+				{/* thumbnail */}
+				<div
+					className={cn(
+						"relative w-full overflow-hidden bg-surface-sunken",
+						isPortrait ? "aspect-9/16" : "aspect-video"
+					)}>
+					{publicId ? (
+						<button
+							type="button"
+							onClick={() => setExpanded(true)}
+							className="relative block size-full cursor-zoom-in overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40"
+							aria-label={`Expand ${asset.slug}`}>
+							<CldImage
+								src={publicId}
+								alt={asset.slug}
+								fill
+								sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+								className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.02]"
+							/>
 
-				{/* delivery / status badge */}
-				<div className="absolute bottom-2 right-2">
-					{asset.uploadedAt ? (
-						<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-							<Cloud className="size-3" />
-							{t("card.uploadedBadge")}
-						</span>
+							<span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+								<Maximize2 className="size-3" />
+								Expand
+							</span>
+						</button>
 					) : (
-						<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-amber-300/90 backdrop-blur-sm">
-							<Clock className="size-3" />
-							{t("card.pendingBadge")}
+						<div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center">
+							<ImageOff className="size-6 text-muted-foreground/40" />
+							<p className="text-xs font-medium text-muted-foreground/70">{t("card.notUploaded")}</p>
+							<p className="break-all font-mono text-[10px] leading-4 text-muted-foreground/50">
+								{asset.localPath}
+							</p>
+						</div>
+					)}
+
+					{/* delivery / status badge */}
+					<div className="pointer-events-none absolute bottom-2 right-2">
+						{asset.uploadedAt ? (
+							<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+								<Cloud className="size-3" />
+								{t("card.uploadedBadge")}
+							</span>
+						) : (
+							<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-amber-300/90 backdrop-blur-sm">
+								<Clock className="size-3" />
+								{t("card.pendingBadge")}
+							</span>
+						)}
+					</div>
+				</div>
+
+				{/* metadata */}
+				<div className="space-y-2 p-3">
+					<div className="flex items-start justify-between gap-2">
+						<p
+							className="truncate font-mono text-[11px] text-muted-foreground"
+							title={asset.cloudinaryPublicId ?? asset.localPath}>
+							{asset.cloudinaryPublicId ?? asset.filename}
+						</p>
+						{copyUrl && <CopyUrlButton url={copyUrl} title={t("card.copyUrl")} />}
+					</div>
+
+					<div className="flex flex-wrap items-center gap-1.5">
+						<span className="text-muted-foreground">
+							<DeviceIcon device={asset.device} className="size-3.5" />
 						</span>
-					)}
+						<Badge variant="outline" className="h-4 px-1.5 text-[10px]">
+							{asset.type}
+						</Badge>
+						{asset.theme !== "light" && (
+							<Badge variant="outline" className="h-4 px-1.5 text-[10px]">
+								{asset.theme}
+							</Badge>
+						)}
+						{asset.role && (
+							<Badge variant="outline" className="h-4 px-1.5 text-[10px]">
+								{asset.role}
+							</Badge>
+						)}
+					</div>
 				</div>
 			</div>
 
-			{/* metadata */}
-			<div className="space-y-2 p-3">
-				<div className="flex items-start justify-between gap-2">
-					<p
-						className="truncate font-mono text-[11px] text-muted-foreground"
-						title={asset.cloudinaryPublicId ?? asset.localPath}>
-						{asset.cloudinaryPublicId ?? asset.filename}
-					</p>
-					{copyUrl && <CopyUrlButton url={copyUrl} title={t("card.copyUrl")} />}
-				</div>
+			{expanded && publicId && (
+				<div
+					role="dialog"
+					aria-modal="true"
+					aria-label={asset.slug}
+					className="fixed inset-0 z-50 flex items-center justify-center p-4">
+					<button
+						type="button"
+						className="absolute inset-0 cursor-zoom-out bg-black/75 backdrop-blur-sm"
+						aria-label="Close expanded image"
+						onClick={() => setExpanded(false)}
+					/>
 
-				<div className="flex flex-wrap items-center gap-1.5">
-					<span className="text-muted-foreground">
-						<DeviceIcon device={asset.device} className="size-3.5" />
-					</span>
-					<Badge variant="outline" className="h-4 px-1.5 text-[10px]">
-						{asset.type}
-					</Badge>
-					{asset.theme !== "light" && (
-						<Badge variant="outline" className="h-4 px-1.5 text-[10px]">
-							{asset.theme}
-						</Badge>
-					)}
-					{asset.role && (
-						<Badge variant="outline" className="h-4 px-1.5 text-[10px]">
-							{asset.role}
-						</Badge>
-					)}
+					<div className="relative z-10 flex max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-card border border-white/15 bg-card shadow-2xl">
+						<div className="flex items-center justify-between gap-3 border-b border-edge/40 px-3 py-2">
+							<p className="truncate font-mono text-xs text-muted-foreground">
+								{asset.cloudinaryPublicId ?? asset.filename}
+							</p>
+
+							<div className="flex items-center gap-1">
+								{copyUrl && <CopyUrlButton url={copyUrl} title={t("card.copyUrl")} />}
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className="size-7 shrink-0"
+									aria-label="Close expanded image"
+									onClick={() => setExpanded(false)}>
+									<X className="size-4" />
+								</Button>
+							</div>
+						</div>
+
+						<div className="relative h-[82vh] w-full bg-surface-sunken">
+							<CldImage
+								src={publicId}
+								alt={asset.slug}
+								fill
+								sizes="100vw"
+								className="object-contain object-center"
+							/>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
+			)}
+		</>
 	);
 }
 

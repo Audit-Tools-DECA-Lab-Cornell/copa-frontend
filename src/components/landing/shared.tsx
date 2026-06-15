@@ -117,7 +117,7 @@ export function FramedMacbook({
 				height={1430}
 				priority={priority}
 				sizes={sizes}
-				className="h-auto w-full select-none [filter:drop-shadow(0_34px_60px_rgba(15,23,42,0.30))]"
+				className="h-auto w-full select-none filter-[drop-shadow(0_34px_60px_rgba(15,23,42,0.30))]"
 			/>
 		</div>
 	);
@@ -161,7 +161,7 @@ export function FloatingPhone({
 				height={3096}
 				priority={priority}
 				sizes={sizes}
-				className="h-auto w-full select-none [filter:drop-shadow(0_26px_46px_rgba(15,23,42,0.26))]"
+				className="h-auto w-full select-none filter-[drop-shadow(0_26px_46px_rgba(15,23,42,0.26))]"
 			/>
 		</div>
 	);
