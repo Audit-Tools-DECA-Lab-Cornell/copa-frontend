@@ -1,19 +1,29 @@
-// components/upload-button.tsx
 "use client";
 
-import { CldUploadWidget } from "next-cloudinary";
+import { Upload } from "lucide-react";
+import { CldUploadWidget, type CloudinaryUploadWidgetResults } from "next-cloudinary";
 
-export function UploadButton() {
+import { Button } from "@/components/ui/button";
+
+export interface UploadButtonProps {
+	label: string;
+	/** Called with the Cloudinary result after each successful upload. */
+	onUploaded?: (result: CloudinaryUploadWidgetResults) => void;
+}
+
+/**
+ * Opens the Cloudinary upload widget in signed mode. Each upload's parameters
+ * are signed by /api/sign-cloudinary-params using the server-side API secret,
+ * so the widget never needs an unsigned upload preset or a client-exposed secret.
+ */
+export function UploadButton({ label, onUploaded }: Readonly<UploadButtonProps>) {
 	return (
-		<CldUploadWidget
-			uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!}
-			onSuccess={result => {
-				console.log("uploaded:", result?.info);
-			}}>
+		<CldUploadWidget signatureEndpoint="/api/sign-cloudinary-params" onSuccess={result => onUploaded?.(result)}>
 			{({ open }) => (
-				<button type="button" onClick={() => open()}>
-					Upload screenshot
-				</button>
+				<Button type="button" variant="secondary" size="sm" onClick={() => open()}>
+					<Upload className="size-4" aria-hidden="true" />
+					{label}
+				</Button>
 			)}
 		</CldUploadWidget>
 	);

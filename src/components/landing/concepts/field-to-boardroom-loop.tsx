@@ -268,7 +268,7 @@ function StageOne() {
 							alt="COPA auditor management on a laptop with the invite-auditor dialog open over a roster showing assignments and progress"
 							glow="violet"
 							sizes="(min-width: 1024px) 28rem, 70vw"
-							className="absolute -bottom-6 -right-4 w-[62%] max-w-[22rem] [filter:drop-shadow(0_28px_48px_rgba(15,23,42,0.32))] sm:-right-8"
+							className="absolute -bottom-6 -right-4 w-[62%] max-w-88 filter-[drop-shadow(0_28px_48px_rgba(15,23,42,0.32))] sm:-right-8"
 						/>
 					</DeviceScene>
 				</div>
@@ -433,7 +433,7 @@ function StageThree() {
 							alt="COPA field app on a phone showing a section notes screen where an auditor is adding observations during an offline visit"
 							glow="terracotta"
 							sizes="(min-width: 1024px) 16rem, 52vw"
-							className="w-[72%] max-w-[14rem]"
+							className="w-[72%] max-w-56"
 						/>
 					</DeviceScene>
 				</div>

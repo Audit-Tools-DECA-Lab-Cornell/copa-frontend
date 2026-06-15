@@ -488,7 +488,7 @@ function FromConvictionToChange() {
 							alt="COPA field app on a phone showing a completed audit score summary with Play Value and Usability results"
 							glow="terracotta"
 							sizes="(min-width: 1024px) 10rem, 28vw"
-							className="absolute -bottom-4 -right-2 w-[28%] max-w-[8rem] sm:-right-4"
+							className="absolute -bottom-4 -right-2 w-[28%] max-w-32 sm:-right-4"
 						/>
 					</DeviceScene>
 				</div>

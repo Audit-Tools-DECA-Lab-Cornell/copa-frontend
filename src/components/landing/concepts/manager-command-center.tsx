@@ -118,7 +118,7 @@ function Hero() {
 						alt="COPA field app on a phone showing an auditor's assigned and completed audits with a priority task and offline-ready status"
 						glow="terracotta"
 						sizes="(min-width: 1024px) 13rem, 36vw"
-						className="absolute -bottom-6 -left-2 w-[38%] max-w-[11rem] sm:-left-6 sm:w-[34%] lg:-bottom-2 lg:left-0"
+						className="absolute -bottom-6 -left-2 w-[38%] max-w-44 sm:-left-6 sm:w-[34%] lg:-bottom-2 lg:left-0"
 					/>
 				</DeviceScene>
 			</div>
@@ -431,7 +431,7 @@ function Reports() {
 							alt="COPA reports list on a phone showing completed audits with their Play Value and Usability scores"
 							glow="terracotta"
 							sizes="(min-width: 1024px) 11rem, 30vw"
-							className="absolute -bottom-4 right-0 w-[30%] max-w-[8.5rem] sm:-right-4"
+							className="absolute -bottom-4 right-0 w-[30%] max-w-34 sm:-right-4"
 						/>
 					</DeviceScene>
 

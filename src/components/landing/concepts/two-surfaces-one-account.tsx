@@ -124,7 +124,7 @@ function Hero() {
 						alt="COPA mobile field app on a phone showing an auditor's assigned and completed audits with an offline-ready status indicator"
 						glow="terracotta"
 						sizes="(min-width: 1024px) 13rem, 36vw"
-						className="absolute -bottom-6 -left-2 w-[38%] max-w-[11rem] sm:-left-6 sm:w-[34%] lg:-bottom-2 lg:left-0"
+						className="absolute -bottom-6 -left-2 w-[38%] max-w-44 sm:-left-6 sm:w-[34%] lg:-bottom-2 lg:left-0"
 					/>
 				</DeviceScene>
 			</div>
@@ -415,7 +415,7 @@ function AuditorSurface() {
 								alt="COPA mobile field app showing an auditor working through a section with scoring options and progress indicators"
 								glow="neutral"
 								sizes="(min-width: 1024px) 18rem, 44vw"
-								className="w-full max-w-[14rem] sm:max-w-[16rem]"
+								className="w-full max-w-56 sm:max-w-[16rem]"
 							/>
 							<p className="text-center text-sm font-medium text-background/70">
 								Working through a section
@@ -427,7 +427,7 @@ function AuditorSurface() {
 								alt="COPA mobile field app showing a section notes screen where an auditor captures on-site observations"
 								glow="neutral"
 								sizes="(min-width: 1024px) 18rem, 44vw"
-								className="w-full max-w-[14rem] sm:max-w-[16rem]"
+								className="w-full max-w-56 sm:max-w-[16rem]"
 							/>
 							<p className="text-center text-sm font-medium text-background/70">
 								Capturing section observations
@@ -562,7 +562,7 @@ function SharedRecord() {
 								alt="COPA mobile field app showing an audit score summary on a phone with Play Value and Usability results after an auditor completes a session"
 								glow="terracotta"
 								sizes="(min-width: 1024px) 14rem, 40vw"
-								className="w-[55%] max-w-[13rem]"
+								className="w-[55%] max-w-52"
 							/>
 						</div>
 

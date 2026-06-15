@@ -3,10 +3,15 @@
 
 export type CloudinaryVariant = "thumbnail" | "card" | "full";
 
+// Source screenshots are very high-resolution (web framed shots up to ~4340px
+// wide). The `full` variant feeds the landing/showcase pages, which render in
+// slots up to ~960px CSS — ~2880px on a 3x display — so it is sized to stay
+// crisp on retina rather than being downscaled below display needs. q_auto:good
+// keeps UI text and sharp edges clean (plain q_auto over-compresses them).
 const VARIANT_TRANSFORMS: Record<CloudinaryVariant, string> = {
 	thumbnail: "w_200,c_fill,f_auto,q_auto",
 	card: "w_480,c_fill,f_auto,q_auto",
-	full: "w_1440,f_auto,q_auto"
+	full: "w_2880,f_auto,q_auto:good"
 };
 
 export interface AssetEntry {

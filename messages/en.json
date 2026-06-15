@@ -87,6 +87,7 @@
 		"description": "All screenshots tagged by source, device, theme, and type — served through Cloudinary.",
 		"descriptionEmpty": "Tagged, versioned screenshots served through Cloudinary.",
 		"backToDashboard": "Back to Dashboard",
+		"uploadCta": "Upload screenshot",
 		"breadcrumbDashboard": "Dashboard",
 		"noIndexTitle": "No asset index found",
 		"noIndexBody": "Run {code} from the frontend directory to scan the assets/ repo and generate the index.",

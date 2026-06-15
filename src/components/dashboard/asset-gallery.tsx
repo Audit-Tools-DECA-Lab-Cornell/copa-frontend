@@ -1,10 +1,10 @@
 "use client";
 
 import { Check, Clock, Cloud, Copy, ImageOff, Monitor, Search, Smartphone, Tablet, X } from "lucide-react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
+import { CldImage } from "@/components/cdn/cld-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,7 +88,8 @@ function DeviceIcon({ device, className }: Readonly<{ device: AssetEntry["device
 
 function AssetCard({ asset }: Readonly<{ asset: AssetEntry }>) {
 	const t = useTranslations("assets");
-	const displayUrl = getAssetDisplayUrl(asset, "card");
+	const publicId = asset.uploadedAt && asset.cloudinaryPublicId ? asset.cloudinaryPublicId : null;
+	const copyUrl = getAssetDisplayUrl(asset, "full");
 	const { width, height } = getDeviceDimensions(asset.device);
 	const isPortrait = width / height < 1;
 
@@ -98,14 +99,14 @@ function AssetCard({ asset }: Readonly<{ asset: AssetEntry }>) {
 			<div
 				className={cn(
 					"relative w-full overflow-hidden bg-surface-sunken",
-					isPortrait ? "aspect-[9/16]" : "aspect-video"
+					isPortrait ? "aspect-9/16" : "aspect-video"
 				)}>
-				{displayUrl ? (
-					<Image
-						src={displayUrl}
+				{publicId ? (
+					<CldImage
+						src={publicId}
 						alt={asset.slug}
 						fill
-						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
 						className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.02]"
 					/>
 				) : (
@@ -142,7 +143,7 @@ function AssetCard({ asset }: Readonly<{ asset: AssetEntry }>) {
 						title={asset.cloudinaryPublicId ?? asset.localPath}>
 						{asset.cloudinaryPublicId ?? asset.filename}
 					</p>
-					{displayUrl && <CopyUrlButton url={displayUrl} title={t("card.copyUrl")} />}
+					{copyUrl && <CopyUrlButton url={copyUrl} title={t("card.copyUrl")} />}
 				</div>
 
 				<div className="flex flex-wrap items-center gap-1.5">

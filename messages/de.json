@@ -87,6 +87,7 @@
 		"description": "Alle Screenshots nach Quelle, Gerät, Thema und Typ getaggt – ausgeliefert über Cloudinary.",
 		"descriptionEmpty": "Getaggte, versionierte Screenshots, ausgeliefert über Cloudinary.",
 		"backToDashboard": "Zurück zum Dashboard",
+		"uploadCta": "Screenshot hochladen",
 		"breadcrumbDashboard": "Dashboard",
 		"noIndexTitle": "Kein Asset-Index gefunden",
 		"noIndexBody": "Führen Sie {code} im Frontend-Verzeichnis aus, um das assets/-Repository zu scannen und den Index zu erzeugen.",

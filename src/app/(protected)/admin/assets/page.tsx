@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { UploadButton } from "@/components/cdn/upload";
 import { AssetGallery } from "@/components/dashboard/asset-gallery";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -66,7 +67,12 @@ export default async function AssetsPage() {
 				title={t("title")}
 				description={t("description")}
 				breadcrumbs={breadcrumbs}
-				actions={<BackButton href="/admin/dashboard" label={t("backToDashboard")} />}
+				actions={
+					<div className="flex items-center gap-2">
+						<UploadButton label={t("uploadCta")} />
+						<BackButton href="/admin/dashboard" label={t("backToDashboard")} />
+					</div>
+				}
 			/>
 
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
