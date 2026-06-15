@@ -1,0 +1,12 @@
+[
+	{
+		"relation": ["delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "com.pratyush.sudhakar.audittoolsplayspacemobile",
+			"sha256_cert_fingerprints": [
+				"04:83:B8:10:01:31:6A:B0:5A:9E:DC:AA:EA:A6:01:C1:0C:BF:B3:F3:FC:37:FB:1B:2F:66:06:4C:93:13:B3:B2"
+			]
+		}
+	}
+]
