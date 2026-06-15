@@ -69,6 +69,7 @@
 			"reports": "Reports",
 			"rawData": "Raw Data",
 			"instruments": "Instruments",
+			"assets": "Assets",
 			"system": "System",
 			"settings": "Settings",
 			"assignments": "Assignments"
@@ -78,6 +79,58 @@
 			"accountLabel": "Account",
 			"settings": "Settings",
 			"signOut": "Sign out"
+		}
+	},
+	"assets": {
+		"eyebrow": "Admin",
+		"title": "Asset Library",
+		"description": "All screenshots tagged by source, device, theme, and type — served through Cloudinary.",
+		"descriptionEmpty": "Tagged, versioned screenshots served through Cloudinary.",
+		"backToDashboard": "Back to Dashboard",
+		"breadcrumbDashboard": "Dashboard",
+		"noIndexTitle": "No asset index found",
+		"noIndexBody": "Run {code} from the frontend directory to scan the assets/ repo and generate the index.",
+		"stats": {
+			"total": "Total Assets",
+			"totalHelper": "Index built {date}",
+			"mobile": "Mobile",
+			"web": "Web",
+			"breakdownHelper": "{framed} framed · {raw} raw",
+			"pending": "Pending Upload",
+			"pendingAllHelper": "All assets on Cloudinary",
+			"pendingHelper": "{uploaded} of {total} confirmed"
+		},
+		"filters": {
+			"source": "Source",
+			"type": "Type",
+			"device": "Device",
+			"theme": "Theme",
+			"status": "Status",
+			"all": "All",
+			"mobile": "Mobile",
+			"web": "Web",
+			"framed": "Framed",
+			"raw": "Raw",
+			"iphone": "iPhone",
+			"ipad": "iPad",
+			"desktop": "Desktop",
+			"light": "Light",
+			"dark": "Dark",
+			"uploaded": "Uploaded",
+			"pending": "Pending"
+		},
+		"searchPlaceholder": "Search by screen, section, or Cloudinary ID…",
+		"clearFilters": "Clear filters",
+		"resultsAll": "{count} assets",
+		"resultsFiltered": "{filtered} of {total} assets",
+		"noMatch": "No assets match the current filters.",
+		"pendingHint": "{count} assets pending upload — run <code>pnpm assets:upload</code> to push them to Cloudinary.",
+		"card": {
+			"uploadedBadge": "Cloudinary",
+			"pendingBadge": "Pending",
+			"notUploaded": "Not uploaded yet",
+			"uploadedOn": "Uploaded {date}",
+			"copyUrl": "Copy Cloudinary URL"
 		}
 	},
 	"shared": {

@@ -50,17 +50,19 @@ import {
 	type NavLink
 } from "@/components/landing/shared";
 
+import { screenshotUrl } from "@/lib/asset-url";
+
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
-	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
-	rawData: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
-	auditsTable: "/screenshots/Framed/manager/audits/01-overview/02.png",
-	auditScorecard: "/screenshots/Framed/manager/audits/detail/01-overview/01.png",
+	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
+	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
+	rawData: screenshotUrl("/screenshots/Framed/manager/raw-data/01-overview/01.png"),
+	auditsTable: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
+	auditScorecard: screenshotUrl("/screenshots/Framed/manager/audits/detail/01-overview/01.png"),
 	phoneReportScoring: "/marketing/report-scoring-tilted.png",
 	phoneReportDetail: "/marketing/step-report-detail.png"
-} as const;
+};
 
 const NAV: NavLink[] = [
 	{ href: "#report", label: "The report" },

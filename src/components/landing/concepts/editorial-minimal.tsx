@@ -34,16 +34,18 @@ import {
 	type NavLink
 } from "@/components/landing/shared";
 
+import { screenshotUrl } from "@/lib/asset-url";
+
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
-	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
-	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
-	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
+	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
+	projects: screenshotUrl("/screenshots/Framed/manager/projects/01-overview/01.png"),
+	audits: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
+	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	phoneScoring: "/marketing/report-scoring-tilted.png",
 	phoneField: "/marketing/field-questions-dark.png"
-} as const;
+};
 
 const NAV: NavLink[] = [
 	{ href: "#method", label: "Method" },

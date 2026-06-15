@@ -42,7 +42,10 @@ Cursor mirror: `.cursor/rules/` (same filenames - keep both in sync).
 - `src/components/dashboard/instruments/` - instrument editor submodule (editors, version history, spreadsheet view)
 - `src/components/dashboard/raw-data-export.tsx` - raw data export component (admin + manager)
 - `src/lib/design-system.ts` - design tokens and CSS custom properties
-
+- `src/lib/cloudinary-images.ts` + `src/lib/asset-url.ts` - CDN asset types and URL builders
+- `src/components/cdn/` - Cloudinary upload and image display components
+- `src/components/dashboard/asset-gallery.tsx` - asset browser (admin)
+- `public/asset-index.json` - asset manifest (generated; do not edit manually)
 
 ## Before Committing
 

@@ -46,6 +46,8 @@ import {
 	type NavLink
 } from "@/components/landing/shared";
 
+import { screenshotUrl } from "@/lib/asset-url";
+
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
@@ -55,10 +57,10 @@ const SHOT = {
 	reportDetail: "/marketing/step-report-detail.png",
 	fieldQuestions: "/marketing/field-questions-dark.png",
 	heroDashboard: "/marketing/hero-dashboard-dark.png",
-	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
-	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
+	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
 	reportScoring: "/marketing/report-scoring-tilted.png"
-} as const;
+};
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 

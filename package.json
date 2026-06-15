@@ -19,7 +19,9 @@
 		"test:visual:list": "E2E_BASE_URL=http://localhost:3000 playwright test --project=visual-chromium --list",
 		"test:visual:percy": "percy exec -- pnpm test:visual",
 		"test:contracts:shared": "node ../testing/scripts/validate-contracts.mjs",
-		"screenshots:web": "node scripts/capture-local-screenshots.mjs"
+		"screenshots:web": "node scripts/capture-local-screenshots.mjs",
+		"assets:index": "node ../assets/scripts/build-asset-index.mjs",
+		"assets:upload": "node ../assets/scripts/upload-to-cloudinary.mjs"
 	},
 	"dependencies": {
 		"@fontsource/opendyslexic": "^5.2.5",
@@ -28,6 +30,7 @@
 		"@tanstack/react-table": "^8.21.3",
 		"axios": "^1.16.1",
 		"class-variance-authority": "^0.7.1",
+		"cloudinary": "^2.10.0",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.1.0",
 		"jspdf": "^4.2.1",
@@ -36,6 +39,7 @@
 		"lucide-react": "^0.577.0",
 		"microdiff": "^1.5.0",
 		"next": "15.5.12",
+		"next-cloudinary": "^6.17.5",
 		"next-intl": "^4.12.0",
 		"next-themes": "^0.4.6",
 		"prettier": "^3.8.3",
@@ -55,6 +59,7 @@
 		"@percy/playwright": "^1.1.0",
 		"@playwright/test": "^1.60.0",
 		"@tailwindcss/postcss": "^4.3.0",
+		"@tsconfig/recommended": "^1.0.13",
 		"@types/node": "^20.19.41",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",

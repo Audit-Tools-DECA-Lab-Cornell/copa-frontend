@@ -4,7 +4,6 @@ import * as React from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -15,6 +14,7 @@ import { PlaceReportsCard } from "@/components/dashboard/place-reports-card";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { formatScorePairLabel } from "@/components/dashboard/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CldImage } from "@/components/cdn/cld-image";
 
 function buildStaticMapUrl(lat: number, lng: number): string | null {
 	if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
@@ -118,7 +118,7 @@ export default function AdminPlaceDetailPage() {
 			{hasCoords && mapUrl && (
 				<Card className="overflow-hidden">
 					<CardContent className="p-0">
-						<Image
+						<CldImage
 							src={mapUrl}
 							alt={`Map of ${history.place_name}`}
 							width={640}

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export interface EmptyStateProps {
 	title: string;
-	description: string;
+	description: ReactNode;
 	action?: ReactNode;
 }
 

@@ -43,21 +43,22 @@ import {
 } from "@/components/landing/shared";
 
 import { TourNav } from "@/components/landing/concepts/tour-nav";
+import { screenshotUrl } from "@/lib/asset-url";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
-	places: "/screenshots/Framed/manager/places/01-overview/01.png",
-	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
-	roster: "/screenshots/Framed/manager/auditors/02-invite-dialog-open.png",
-	scorecard: "/screenshots/Framed/manager/audits/detail/01-overview/01.png",
-	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
-	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
-	dataExport: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
+	projects: screenshotUrl("/screenshots/Framed/manager/projects/01-overview/01.png"),
+	places: screenshotUrl("/screenshots/Framed/manager/places/01-overview/01.png"),
+	audits: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
+	roster: screenshotUrl("/screenshots/Framed/manager/auditors/02-invite-dialog-open.png"),
+	scorecard: screenshotUrl("/screenshots/Framed/manager/audits/detail/01-overview/01.png"),
+	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
+	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
+	dataExport: screenshotUrl("/screenshots/Framed/manager/raw-data/01-overview/01.png"),
 	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
 	phoneQuestions: "/marketing/field-questions-dark.png"
-} as const;
+};
 
 // ─── Tour stop definitions ────────────────────────────────────────────────────
 

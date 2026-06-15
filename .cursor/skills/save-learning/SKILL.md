@@ -16,11 +16,11 @@ will be applied in all future sessions on this project.
    - Any stated convention, preference, or rule
 2. Refine the instruction into a clean, actionable learning bullet with
    an appropriate type prefix:
-   - `**[convention]**` - coding style, workflow, git conventions
-   - `**[pattern]**` - reusable code patterns
-   - `**[anti-pattern]**` - things to avoid
-   - `**[preference]**` - personal/team preferences
-   - `**[context]**` - project-specific context
+   - `**[convention]**` — coding style, workflow, git conventions
+   - `**[pattern]**` — reusable code patterns
+   - `**[anti-pattern]**` — things to avoid
+   - `**[preference]**` — personal/team preferences
+   - `**[context]**` — project-specific context
 3. Show the refined learning to the user and ask for confirmation
 4. If confirmed, run:
    ```bash

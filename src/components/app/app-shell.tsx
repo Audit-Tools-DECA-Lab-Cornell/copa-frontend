@@ -21,7 +21,8 @@ import {
 	MonitorCog,
 	Shield,
 	Users,
-	type LucideIcon
+	type LucideIcon,
+	Camera
 } from "lucide-react";
 
 import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
@@ -38,7 +39,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
+import { CldImage } from "@/components/cdn/cld-image";
 
 export interface AppShellProps {
 	role: UserRole;
@@ -68,6 +69,7 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("reports"), href: "/admin/reports", icon: ClipboardList },
 			{ label: t("rawData"), href: "/admin/raw-data", icon: DatabaseIcon },
 			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
+			{ label: t("assets"), href: "/admin/assets", icon: Camera },
 			{ label: t("system"), href: "/admin/system", icon: MonitorCog },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
@@ -219,7 +221,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 								)}>
 								<div className="flex min-w-0 items-center gap-3">
 									<div className="flex size-18 items-center justify-end ml-0.5 shadow-focus">
-										<Image src="/icon.png" alt="COPA Tool" width={40} height={40} />
+										<CldImage src="/icon.png" alt="COPA Tool" width={40} height={40} />
 									</div>
 									<div className={cn("grid", isSidebarCollapsed && "hidden")}>
 										<span className="text-base font-semibold leading-5">

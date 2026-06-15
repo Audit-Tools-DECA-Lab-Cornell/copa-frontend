@@ -49,20 +49,22 @@ import {
 	type NavLink
 } from "@/components/landing/shared";
 
+import { screenshotUrl } from "@/lib/asset-url";
+
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
-	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
-	roster: "/screenshots/Framed/manager/auditors/02-invite-dialog-open.png",
-	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
-	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
+	projects: screenshotUrl("/screenshots/Framed/manager/projects/01-overview/01.png"),
+	audits: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
+	roster: screenshotUrl("/screenshots/Framed/manager/auditors/02-invite-dialog-open.png"),
+	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
+	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
 	phoneHeroDark: "/marketing/hero-dashboard-dark.png",
 	phoneQuestionsDark: "/marketing/field-questions-dark.png",
 	phoneExecuteSection: "/marketing/step-execute-section.png",
 	phoneSectionNotes: "/marketing/step-section-notes.png",
 	phoneReportScoring: "/marketing/report-scoring-tilted.png"
-} as const;
+};
 
 const NAV: NavLink[] = [
 	{ href: "#manager-surface", label: "Your dashboard" },

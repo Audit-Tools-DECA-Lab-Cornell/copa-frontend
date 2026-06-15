@@ -69,6 +69,7 @@
 			"reports": "Berichte",
 			"rawData": "Rohdaten",
 			"instruments": "Instrumente",
+			"assets": "Assets",
 			"system": "System",
 			"settings": "Einstellungen",
 			"assignments": "Zuweisungen"
@@ -78,6 +79,58 @@
 			"accountLabel": "Konto",
 			"settings": "Einstellungen",
 			"signOut": "Abmelden"
+		}
+	},
+	"assets": {
+		"eyebrow": "Admin",
+		"title": "Asset-Bibliothek",
+		"description": "Alle Screenshots nach Quelle, Gerät, Thema und Typ getaggt – ausgeliefert über Cloudinary.",
+		"descriptionEmpty": "Getaggte, versionierte Screenshots, ausgeliefert über Cloudinary.",
+		"backToDashboard": "Zurück zum Dashboard",
+		"breadcrumbDashboard": "Dashboard",
+		"noIndexTitle": "Kein Asset-Index gefunden",
+		"noIndexBody": "Führen Sie {code} im Frontend-Verzeichnis aus, um das assets/-Repository zu scannen und den Index zu erzeugen.",
+		"stats": {
+			"total": "Assets gesamt",
+			"totalHelper": "Index erstellt {date}",
+			"mobile": "Mobile",
+			"web": "Web",
+			"breakdownHelper": "{framed} gerahmt · {raw} roh",
+			"pending": "Ausstehender Upload",
+			"pendingAllHelper": "Alle Assets auf Cloudinary",
+			"pendingHelper": "{uploaded} von {total} bestätigt"
+		},
+		"filters": {
+			"source": "Quelle",
+			"type": "Typ",
+			"device": "Gerät",
+			"theme": "Thema",
+			"status": "Status",
+			"all": "Alle",
+			"mobile": "Mobile",
+			"web": "Web",
+			"framed": "Gerahmt",
+			"raw": "Roh",
+			"iphone": "iPhone",
+			"ipad": "iPad",
+			"desktop": "Desktop",
+			"light": "Hell",
+			"dark": "Dunkel",
+			"uploaded": "Hochgeladen",
+			"pending": "Ausstehend"
+		},
+		"searchPlaceholder": "Nach Screen, Bereich oder Cloudinary-ID suchen…",
+		"clearFilters": "Filter zurücksetzen",
+		"resultsAll": "{count} Assets",
+		"resultsFiltered": "{filtered} von {total} Assets",
+		"noMatch": "Keine Assets entsprechen den aktuellen Filtern.",
+		"pendingHint": "{count} Assets warten auf den Upload – führen Sie <code>pnpm assets:upload</code> aus, um sie zu Cloudinary zu übertragen.",
+		"card": {
+			"uploadedBadge": "Cloudinary",
+			"pendingBadge": "Ausstehend",
+			"notUploaded": "Noch nicht hochgeladen",
+			"uploadedOn": "Hochgeladen am {date}",
+			"copyUrl": "Cloudinary-URL kopieren"
 		}
 	},
 	"shared": {

@@ -43,19 +43,21 @@ import {
 	type NavLink
 } from "@/components/landing/shared";
 
+import { screenshotUrl } from "@/lib/asset-url";
+
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	projects: "/screenshots/Framed/manager/projects/01-overview/01.png",
-	places: "/screenshots/Framed/manager/places/01-overview/01.png",
-	roster: "/screenshots/Framed/manager/auditors/02-invite-dialog-open.png",
-	audits: "/screenshots/Framed/manager/audits/01-overview/02.png",
-	combinedReport: "/screenshots/Framed/manager/reports/place-report/01-overview/01.png",
-	scoreSummary: "/screenshots/Framed/manager/reports/detail/01-overview/01.png",
-	rawData: "/screenshots/Framed/manager/raw-data/01-overview/01.png",
+	projects: screenshotUrl("/screenshots/Framed/manager/projects/01-overview/01.png"),
+	places: screenshotUrl("/screenshots/Framed/manager/places/01-overview/01.png"),
+	roster: screenshotUrl("/screenshots/Framed/manager/auditors/02-invite-dialog-open.png"),
+	audits: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
+	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
+	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
+	rawData: screenshotUrl("/screenshots/Framed/manager/raw-data/01-overview/01.png"),
 	phoneReportScoring: "/marketing/report-scoring-tilted.png",
 	phoneReportsPreview: "/marketing/reports-preview-portrait.png"
-} as const;
+};
 
 const NAV: NavLink[] = [
 	{ href: "#portfolio", label: "Portfolio" },
