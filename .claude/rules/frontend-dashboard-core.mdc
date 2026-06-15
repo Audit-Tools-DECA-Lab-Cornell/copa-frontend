@@ -1,5 +1,5 @@
 ---
-description: Next.js dashboard conventions — role guards, shared components, API client, and UI copy. Mirror in .cursor/rules/ — edit both when changing.
+description: Next.js dashboard conventions — role guards, shared components, API client, and UI copy. Mirror in .claude/rules/ — edit both when changing.
 alwaysApply: true
 ---
 

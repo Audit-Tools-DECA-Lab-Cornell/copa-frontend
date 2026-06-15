@@ -10,6 +10,7 @@ import {
 	DatabaseIcon,
 	FileText,
 	FolderKanban,
+	Images,
 	LayoutDashboard,
 	LogOut,
 	MapPin,
@@ -21,8 +22,7 @@ import {
 	MonitorCog,
 	Shield,
 	Users,
-	type LucideIcon,
-	Camera
+	type LucideIcon
 } from "lucide-react";
 
 import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
@@ -69,7 +69,7 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("reports"), href: "/admin/reports", icon: ClipboardList },
 			{ label: t("rawData"), href: "/admin/raw-data", icon: DatabaseIcon },
 			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
-			{ label: t("assets"), href: "/admin/assets", icon: Camera },
+			{ label: t("assets"), href: "/admin/assets", icon: Images },
 			{ label: t("system"), href: "/admin/system", icon: MonitorCog },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
