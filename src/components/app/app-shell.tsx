@@ -20,12 +20,12 @@ import {
 	Shield,
 	Users
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { CldImage } from "@/components/cdn/cld-image";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -221,7 +221,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 								)}>
 								<div className="flex min-w-0 items-center gap-3">
 									<div className="flex size-18 items-center justify-end ml-0.5 shadow-focus">
-										<CldImage src="/icon.png" alt="COPA Tool" width={40} height={40} />
+										<Image src="/icon.png" alt="" width={40} height={40} aria-hidden />
 									</div>
 									<div className={cn("grid", isSidebarCollapsed && "hidden")}>
 										<span className="text-base font-semibold leading-5">

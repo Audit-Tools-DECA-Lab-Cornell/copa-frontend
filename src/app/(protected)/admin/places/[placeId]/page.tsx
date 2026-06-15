@@ -2,11 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
+import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { CldImage } from "@/components/cdn/cld-image";
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -118,7 +118,7 @@ export default function AdminPlaceDetailPage() {
 			{hasCoords && mapUrl && (
 				<Card className="overflow-hidden">
 					<CardContent className="p-0">
-						<CldImage
+						<Image
 							src={mapUrl}
 							alt={`Map of ${history.place_name}`}
 							width={640}
