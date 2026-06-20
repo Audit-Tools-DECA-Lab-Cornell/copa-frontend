@@ -55,6 +55,7 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 	const [matches, setMatches] = React.useState<KnownIssueMatch[]>([]);
 	const [hasCheckedMatches, setHasCheckedMatches] = React.useState(false);
 	const [isSubmitting, setIsSubmitting] = React.useState(false);
+	const [screenshotWidgetOpen, setScreenshotWidgetOpen] = React.useState(false);
 
 	const reset = React.useCallback(() => {
 		setTitle("");
@@ -64,6 +65,7 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 		setMatches([]);
 		setHasCheckedMatches(false);
 		setIsSubmitting(false);
+		setScreenshotWidgetOpen(false);
 	}, []);
 
 	const handleOpenChange = React.useCallback(
@@ -129,8 +131,12 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 	const submitLabel = hasCheckedMatches && matches.length > 0 ? t("submitAnyway") : t("submit");
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+		<Dialog open={open} onOpenChange={handleOpenChange} modal={!screenshotWidgetOpen}>
+			<DialogContent
+				className="max-h-[90vh] overflow-y-auto sm:max-w-lg"
+				onInteractOutside={event => {
+					if (screenshotWidgetOpen) event.preventDefault();
+				}}>
 				<DialogHeader>
 					<DialogTitle>{t("title")}</DialogTitle>
 					<DialogDescription>{t("subtitle")}</DialogDescription>
@@ -182,6 +188,7 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 						<div className="flex items-center gap-2">
 							<UploadButton
 								label={screenshot ? t("screenshotReplace") : t("screenshotAdd")}
+								onWidgetOpenChange={setScreenshotWidgetOpen}
 								onUploaded={result => {
 									const info = result.info;
 									if (info && typeof info === "object" && "secure_url" in info) {

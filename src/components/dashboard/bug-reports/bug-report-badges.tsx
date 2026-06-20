@@ -1,6 +1,6 @@
 "use client";
 
-import { Laptop, Monitor, Smartphone } from "lucide-react";
+import { Circle, Laptop, Monitor, Smartphone, Square, Triangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ComponentType } from "react";
 
@@ -18,19 +18,17 @@ const TONE_CLASS: Record<Tone, string> = {
 	neutral: "bg-muted text-muted-foreground border-border"
 };
 
-const TONE_DOT: Record<Tone, string> = {
-	danger: "bg-status-danger",
-	warning: "bg-status-warning",
-	info: "bg-status-info",
-	success: "bg-status-success",
-	inProgress: "bg-status-in-progress",
-	neutral: "bg-muted-foreground"
-};
-
 const SEVERITY_TONE: Record<BugReportSeverity, Tone> = {
 	blocking: "danger",
 	major: "warning",
 	minor: "info"
+};
+
+/** Distinct shape per severity so the cue survives color-blindness (WCAG 1.4.1). */
+const SEVERITY_SHAPE: Record<BugReportSeverity, ComponentType<{ className?: string }>> = {
+	blocking: Triangle,
+	major: Circle,
+	minor: Square
 };
 
 const STATUS_TONE: Record<BugReportStatus, Tone> = {
@@ -52,26 +50,30 @@ const SURFACE_ICON: Record<BugReportSurface, ComponentType<{ className?: string 
 export function Pill({
 	tone,
 	children,
-	className
-}: Readonly<{ tone: Tone; children: React.ReactNode; className?: string }>) {
+	className,
+	...props
+}: Readonly<{ tone: Tone; children: React.ReactNode; className?: string } & React.ComponentProps<"span">>) {
 	return (
 		<span
 			className={cn(
 				"inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap",
 				TONE_CLASS[tone],
 				className
-			)}>
+			)}
+			{...props}>
 			{children}
 		</span>
 	);
 }
 
 export function SeverityBadge({ severity }: Readonly<{ severity: BugReportSeverity }>) {
-	const t = useTranslations("bugReport.severity");
+	const t = useTranslations("bugReport.severityShort");
+	const ariaT = useTranslations("bugReport.severityAria");
 	const tone = SEVERITY_TONE[severity];
+	const Shape = SEVERITY_SHAPE[severity];
 	return (
-		<Pill tone={tone}>
-			<span className={cn("size-1.5 rounded-full", TONE_DOT[tone])} aria-hidden="true" />
+		<Pill tone={tone} aria-label={ariaT(severity)}>
+			<Shape className="size-2.5 fill-current" aria-hidden="true" />
 			{t(severity)}
 		</Pill>
 	);
@@ -98,7 +100,7 @@ export function SurfaceBadge({ surface }: Readonly<{ surface: BugReportSurface }
 	const Icon = SURFACE_ICON[surface];
 	return (
 		<span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
-			<Icon className="size-3.5" aria-hidden="true" />
+			<Icon className="size-4 shrink-0" aria-hidden="true" />
 			{t(surface)}
 		</span>
 	);

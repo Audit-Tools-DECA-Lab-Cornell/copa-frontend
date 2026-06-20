@@ -55,21 +55,19 @@ export interface UploadButtonProps {
 	label: string;
 	/** Called with the Cloudinary result after each successful upload. */
 	onUploaded?: (result: CloudinaryUploadWidgetResults) => void;
+	onWidgetOpenChange?: (open: boolean) => void;
 }
 
-/**
- * Opens the Cloudinary upload widget in signed mode. Each upload's parameters
- * are signed by /api/sign-cloudinary-params using the server-side API secret,
- * so the widget never needs an unsigned upload preset or a client-exposed secret.
- */
-export function UploadButton({ label, onUploaded }: Readonly<UploadButtonProps>) {
+export function UploadButton({ label, onUploaded, onWidgetOpenChange }: Readonly<UploadButtonProps>) {
 	const options = useCloudinaryUploadOptions();
 
 	return (
 		<CldUploadWidget
 			signatureEndpoint="/api/sign-cloudinary-params"
 			options={options}
-			onSuccess={result => onUploaded?.(result)}>
+			onSuccess={result => onUploaded?.(result)}
+			onOpen={() => onWidgetOpenChange?.(true)}
+			onClose={() => onWidgetOpenChange?.(false)}>
 			{({ open }) => (
 				<Button type="button" variant="secondary" size="sm" onClick={() => open()}>
 					<Upload className="size-4" aria-hidden="true" />

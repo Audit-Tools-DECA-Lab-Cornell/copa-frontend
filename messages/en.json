@@ -105,6 +105,16 @@
 			"major": "It's getting in the way",
 			"minor": "Minor annoyance"
 		},
+		"severityShort": {
+			"blocking": "Blocking",
+			"major": "Major",
+			"minor": "Minor"
+		},
+		"severityAria": {
+			"blocking": "Severity: Blocking",
+			"major": "Severity: Major",
+			"minor": "Severity: Minor"
+		},
 		"status": {
 			"new": "New",
 			"triaged": "Triaged",
@@ -154,6 +164,11 @@
 			},
 			"reports": {
 				"title": "Reports",
+				"cardDescription": "Open a report to review its full detail, screenshot, and captured context.",
+				"reportsCount": "{count} reports",
+				"showingSummary": "Showing {shown} of {total} reports.",
+				"expandAll": "Expand all",
+				"collapseAll": "Collapse all",
 				"allStatuses": "All statuses",
 				"emptyTitle": "No reports",
 				"emptyDescription": "No bug reports match the current filter.",
@@ -169,6 +184,9 @@
 				"searchPlaceholder": "Search title, description, or reporter",
 				"allSurfaces": "All surfaces",
 				"allSeverities": "All severities",
+				"sortBy": "Sort by {column}",
+				"clearFilter": "Clear {field} filter",
+				"clearFilters": "Clear filters",
 				"hasScreenshot": "Has screenshot",
 				"detail": {
 					"description": "Description",

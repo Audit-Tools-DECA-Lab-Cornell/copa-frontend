@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import { BackButton } from "@/components/dashboard/back-button";
 import { BugReportsTable } from "@/components/dashboard/bug-reports/bug-reports-table";
 import { KnownIssuesManager } from "@/components/dashboard/bug-reports/known-issues-manager";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -74,7 +73,6 @@ export default function AdminBugReportsPage() {
 					{ label: t("breadcrumbs.dashboard"), href: "/admin/dashboard" },
 					{ label: t("breadcrumbs.bugReports") }
 				]}
-				actions={<BackButton href="/admin/dashboard" label={t("header.back")} />}
 			/>
 
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -82,7 +80,7 @@ export default function AdminBugReportsPage() {
 					title={t("stats.total")}
 					value={String(totalCount)}
 					helper={t("stats.totalHelper")}
-					tone="info"
+					tone="neutral"
 				/>
 				<StatCard
 					title={t("stats.new")}
@@ -94,7 +92,7 @@ export default function AdminBugReportsPage() {
 					title={t("stats.blocking")}
 					value={String(blockingCount)}
 					helper={t("stats.blockingHelper")}
-					tone={blockingCount > 0 ? "primary" : "neutral"}
+					tone={blockingCount > 0 ? "danger" : "neutral"}
 				/>
 				<StatCard
 					title={t("stats.resolved")}
@@ -106,8 +104,12 @@ export default function AdminBugReportsPage() {
 
 			<Tabs defaultValue="reports" className="space-y-4">
 				<TabsList>
-					<TabsTrigger value="reports">{t("tabs.reports")}</TabsTrigger>
-					<TabsTrigger value="known-issues">{t("tabs.knownIssues")}</TabsTrigger>
+					<TabsTrigger value="reports" className="data-[state=active]:font-semibold">
+						{t("tabs.reports")}
+					</TabsTrigger>
+					<TabsTrigger value="known-issues" className="data-[state=active]:font-semibold">
+						{t("tabs.knownIssues")}
+					</TabsTrigger>
 				</TabsList>
 				<TabsContent value="reports">
 					<BugReportsTable

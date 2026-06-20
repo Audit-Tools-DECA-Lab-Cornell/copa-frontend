@@ -105,6 +105,16 @@
 			"major": "Es behindert mich",
 			"minor": "Kleine Unannehmlichkeit"
 		},
+		"severityShort": {
+			"blocking": "Blockierend",
+			"major": "Erheblich",
+			"minor": "Gering"
+		},
+		"severityAria": {
+			"blocking": "Schweregrad: Blockierend",
+			"major": "Schweregrad: Erheblich",
+			"minor": "Schweregrad: Gering"
+		},
 		"status": {
 			"new": "Neu",
 			"triaged": "Gesichtet",
@@ -154,6 +164,11 @@
 			},
 			"reports": {
 				"title": "Berichte",
+				"cardDescription": "Öffnen Sie einen Bericht, um Details, Screenshot und erfassten Kontext zu sehen.",
+				"reportsCount": "{count} Berichte",
+				"showingSummary": "{shown} von {total} Berichten werden angezeigt.",
+				"expandAll": "Alle ausklappen",
+				"collapseAll": "Alle einklappen",
 				"allStatuses": "Alle Status",
 				"emptyTitle": "Keine Berichte",
 				"emptyDescription": "Keine Fehlerberichte entsprechen dem aktuellen Filter.",
@@ -169,6 +184,9 @@
 				"searchPlaceholder": "Titel, Beschreibung oder Melder suchen",
 				"allSurfaces": "Alle Plattformen",
 				"allSeverities": "Alle Schweregrade",
+				"sortBy": "Nach {column} sortieren",
+				"clearFilter": "Filter {field} zurücksetzen",
+				"clearFilters": "Filter zurücksetzen",
 				"hasScreenshot": "Hat Screenshot",
 				"detail": {
 					"description": "Beschreibung",

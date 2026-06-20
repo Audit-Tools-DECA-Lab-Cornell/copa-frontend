@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-type StatTone = "neutral" | "primary" | "success" | "warning" | "info" | "violet";
+type StatTone = "neutral" | "primary" | "success" | "warning" | "info" | "danger" | "violet";
 
 const toneClassesByTone: Record<StatTone, string> = {
 	neutral: "bg-solid-neutral",
@@ -9,6 +9,7 @@ const toneClassesByTone: Record<StatTone, string> = {
 	success: "bg-status-success",
 	warning: "bg-status-warning",
 	info: "bg-stat-accent-info",
+	danger: "bg-status-danger",
 	violet: "bg-accent-violet"
 };
 
@@ -18,6 +19,7 @@ const toneBorderByTone: Record<StatTone, string> = {
 	success: "border-l-status-success",
 	warning: "border-l-status-warning",
 	info: "border-l-stat-accent-info",
+	danger: "border-l-status-danger",
 	violet: "border-l-accent-violet"
 };
 
