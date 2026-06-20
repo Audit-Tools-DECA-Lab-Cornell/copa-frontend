@@ -71,6 +71,7 @@
 			"instruments": "Instruments",
 			"assets": "Assets",
 			"system": "System",
+			"bugReports": "Bug Reports",
 			"settings": "Settings",
 			"assignments": "Assignments"
 		},
@@ -79,6 +80,183 @@
 			"accountLabel": "Account",
 			"settings": "Settings",
 			"signOut": "Sign out"
+		}
+	},
+	"bugReport": {
+		"launch": "Report an issue",
+		"title": "Report an issue",
+		"subtitle": "Tell us what went wrong. We capture a few technical details automatically to help us fix it.",
+		"submit": "Submit report",
+		"submitAnyway": "Submit anyway",
+		"cancel": "Cancel",
+		"success": "Thanks, your report has been sent.",
+		"fields": {
+			"title": "What happened?",
+			"description": "Describe the problem",
+			"severity": "How much does this block you?",
+			"screenshot": "Screenshot (optional)"
+		},
+		"placeholders": {
+			"title": "Short summary",
+			"description": "What did you do, what did you expect, and what happened instead?"
+		},
+		"severity": {
+			"blocking": "I can't continue",
+			"major": "It's getting in the way",
+			"minor": "Minor annoyance"
+		},
+		"status": {
+			"new": "New",
+			"triaged": "Triaged",
+			"in_progress": "In progress",
+			"resolved": "Resolved",
+			"wont_fix": "Won't fix",
+			"duplicate": "Duplicate"
+		},
+		"knownIssueStatus": {
+			"open": "Open",
+			"monitoring": "Monitoring",
+			"fixed": "Fixed"
+		},
+		"screenshotPrivacyNote": "Only attach a screenshot if it doesn't show sensitive information. It's optional.",
+		"screenshotAdd": "Add screenshot",
+		"screenshotReplace": "Replace screenshot",
+		"screenshotRemove": "Remove",
+		"matches": {
+			"heading": "This might already be known",
+			"workaroundLabel": "Workaround"
+		},
+		"errors": {
+			"offline": "You're offline. Your report wasn't sent — please try again once you're back online.",
+			"generic": "Something went wrong sending your report. Please try again."
+		},
+		"admin": {
+			"header": {
+				"eyebrow": "Support",
+				"title": "Bug reports",
+				"description": "Review reports from across all accounts and maintain the known-issues list.",
+				"back": "Back to dashboard"
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"bugReports": "Bug reports"
+			},
+			"stats": {
+				"total": "Total reports",
+				"new": "Needs triage",
+				"shown": "Shown",
+				"totalHelper": "All reports received",
+				"newHelper": "Not yet reviewed",
+				"blocking": "Blocking",
+				"blockingHelper": "Open reports that stop work",
+				"resolved": "Resolved",
+				"resolvedHelper": "Marked fixed"
+			},
+			"reports": {
+				"title": "Reports",
+				"allStatuses": "All statuses",
+				"emptyTitle": "No reports",
+				"emptyDescription": "No bug reports match the current filter.",
+				"columns": {
+					"title": "Issue",
+					"surface": "Surface",
+					"severity": "Severity",
+					"reporter": "Reporter",
+					"status": "Status",
+					"report": "Report",
+					"created": "Reported"
+				},
+				"searchPlaceholder": "Search title, description, or reporter",
+				"allSurfaces": "All surfaces",
+				"allSeverities": "All severities",
+				"hasScreenshot": "Has screenshot",
+				"detail": {
+					"description": "Description",
+					"context": "Captured context",
+					"linkedRecords": "Linked records",
+					"screenshot": "Screenshot",
+					"knownIssue": "Linked known issue",
+					"linkKnownIssue": "Link a known issue",
+					"noKnownIssue": "Not linked"
+				}
+			},
+			"toast": {
+				"statusUpdated": "Report status updated.",
+				"error": "Something went wrong. Please try again.",
+				"linked": "Report linked to a known issue."
+			},
+			"disabled": {
+				"title": "Bug reporting is off",
+				"description": "Enable developer mode to review bug reports."
+			},
+			"knownIssues": {
+				"title": "Known issues",
+				"createHeading": "Add a known issue",
+				"create": "Add known issue",
+				"fields": {
+					"title": "Title",
+					"symptoms": "Symptoms",
+					"workaround": "Workaround",
+					"status": "Status",
+					"published": "Show to reporters"
+				},
+				"toast": {
+					"created": "Known issue added.",
+					"deleted": "Known issue deleted.",
+					"error": "Something went wrong. Please try again."
+				},
+				"emptyTitle": "No known issues",
+				"emptyDescription": "Add a known issue so reporters see it before filing a duplicate.",
+				"published": "Published",
+				"draft": "Draft",
+				"publish": "Publish",
+				"unpublish": "Unpublish",
+				"delete": "Delete",
+				"explainerTitle": "What reporters see",
+				"explainerBody": "Published known issues appear while a user writes a report, so they can try a workaround before filing a duplicate.",
+				"placeholders": {
+					"title": "Short, recognizable name",
+					"symptoms": "What the user sees or experiences",
+					"workaround": "Steps the user can take to keep working"
+				},
+				"summary": "{published} of {total} published",
+				"workaroundLabel": "Workaround",
+				"publishedShort": "Published"
+			},
+			"tabs": {
+				"reports": "Reports",
+				"knownIssues": "Known issues"
+			},
+			"context": {
+				"appVersion": "App version",
+				"build": "Build",
+				"platform": "Platform",
+				"device": "Device",
+				"browser": "Browser",
+				"route": "Screen",
+				"network": "Network",
+				"syncPhase": "Sync state",
+				"locale": "Language",
+				"viewport": "Viewport",
+				"capturedAt": "Captured at",
+				"online": "Online",
+				"offline": "Offline",
+				"project": "Project",
+				"place": "Place",
+				"submission": "Audit",
+				"section": "Section",
+				"question": "Question"
+			},
+			"screenshot": {
+				"none": "No screenshot attached",
+				"view": "View screenshot",
+				"alt": "Screenshot for {title}"
+			}
+		},
+		"surface": {
+			"web": "Web",
+			"mobile": "Mobile",
+			"desktop": "Desktop"
 		}
 	},
 	"assets": {

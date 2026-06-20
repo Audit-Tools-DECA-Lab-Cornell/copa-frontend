@@ -1130,6 +1130,170 @@ export function paginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSchema: 
 	});
 }
 
+// ── Bug reporting & known issues ─────────────────────────────────────────────
+// These value sets are mirrored from the backend (app/models.py) and the shared
+// contract (testing/contracts/bug-reports.contract.json). Keep all three in sync.
+export const bugReportSurfaceSchema = z.enum(["web", "mobile", "desktop"]);
+export const bugReportSeveritySchema = z.enum(["blocking", "major", "minor"]);
+export const bugReportStatusSchema = z.enum(["new", "triaged", "in_progress", "resolved", "wont_fix", "duplicate"]);
+export const knownIssueStatusSchema = z.enum(["open", "monitoring", "fixed"]);
+
+// Diagnostic context is a privacy-filtered allow-list: only these fields are
+// ever sent. Never audit answers, notes, tokens, or PII.
+export const bugReportContextSchema = z
+	.object({
+		app_version: z.string().optional(),
+		build: z.string().optional(),
+		route: z.string().optional(),
+		screen: z.string().optional(),
+		route_params: z.record(z.string(), z.string()).optional(),
+		platform: z.string().optional(),
+		os_version: z.string().optional(),
+		device_model: z.string().optional(),
+		browser: z.string().optional(),
+		user_agent: z.string().optional(),
+		viewport_width: z.number().int().optional(),
+		viewport_height: z.number().int().optional(),
+		locale: z.string().optional(),
+		network_online: z.boolean().optional(),
+		network_type: z.string().optional(),
+		sync_phase: z.string().optional(),
+		project_id: z.string().optional(),
+		place_id: z.string().optional(),
+		playspace_submission_id: z.string().optional(),
+		section_id: z.string().optional(),
+		question_id: z.string().optional(),
+		client_timestamp: z.string().optional()
+	})
+	.strict();
+
+export const bugReportSchema = z.object({
+	id: z.string(),
+	account_id: z.string().nullable(),
+	reporter_user_id: z.string().nullable(),
+	reporter_email: z.string().nullable(),
+	reporter_role: z.string().nullable(),
+	surface: bugReportSurfaceSchema,
+	title: z.string(),
+	description: z.string(),
+	severity: bugReportSeveritySchema,
+	status: bugReportStatusSchema,
+	linked_known_issue_id: z.string().nullable(),
+	project_id: z.string().nullable(),
+	place_id: z.string().nullable(),
+	playspace_submission_id: z.string().nullable(),
+	context: z.record(z.string(), z.unknown()),
+	screenshot_url: z.string().nullable(),
+	screenshot_public_id: z.string().nullable(),
+	created_at: z.string(),
+	updated_at: z.string()
+});
+
+export const bugReportListItemSchema = z.object({
+	id: z.string(),
+	account_id: z.string().nullable(),
+	reporter_email: z.string().nullable(),
+	reporter_role: z.string().nullable(),
+	surface: bugReportSurfaceSchema,
+	title: z.string(),
+	description: z.string(),
+	severity: bugReportSeveritySchema,
+	status: bugReportStatusSchema,
+	linked_known_issue_id: z.string().nullable(),
+	project_id: z.string().nullable(),
+	place_id: z.string().nullable(),
+	playspace_submission_id: z.string().nullable(),
+	context: z.record(z.string(), z.unknown()),
+	screenshot_url: z.string().nullable(),
+	screenshot_public_id: z.string().nullable(),
+	created_at: z.string(),
+	updated_at: z.string()
+});
+
+export const bugReportCreateRequestSchema = z.object({
+	surface: bugReportSurfaceSchema,
+	title: z.string().min(1).max(200),
+	description: z.string().min(1).max(5000),
+	severity: bugReportSeveritySchema,
+	project_id: z.string().uuid().optional(),
+	place_id: z.string().uuid().optional(),
+	playspace_submission_id: z.string().uuid().optional(),
+	context: bugReportContextSchema.optional(),
+	screenshot_url: z.string().max(2000).optional(),
+	screenshot_public_id: z.string().max(255).optional()
+});
+
+export const bugReportStatusUpdateRequestSchema = z.object({
+	status: bugReportStatusSchema.optional(),
+	linked_known_issue_id: z.string().uuid().optional()
+});
+
+export const knownIssueMatchSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	symptoms: z.string(),
+	workaround: z.string().nullable(),
+	status: knownIssueStatusSchema,
+	tags: z.array(z.string()),
+	surfaces: z.array(z.string())
+});
+
+export const knownIssueSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	symptoms: z.string(),
+	workaround: z.string().nullable(),
+	status: knownIssueStatusSchema,
+	tags: z.array(z.string()),
+	surfaces: z.array(z.string()),
+	is_published: z.boolean(),
+	created_at: z.string(),
+	updated_at: z.string()
+});
+
+export const knownIssueCreateRequestSchema = z.object({
+	title: z.string().min(1).max(200),
+	symptoms: z.string().min(1).max(5000),
+	workaround: z.string().max(5000).optional(),
+	status: knownIssueStatusSchema.default("open"),
+	tags: z.array(z.string()).default([]),
+	surfaces: z.array(z.string()).default([]),
+	is_published: z.boolean().default(false)
+});
+
+export const knownIssueUpdateRequestSchema = z.object({
+	title: z.string().min(1).max(200).optional(),
+	symptoms: z.string().min(1).max(5000).optional(),
+	workaround: z.string().max(5000).nullable().optional(),
+	status: knownIssueStatusSchema.optional(),
+	tags: z.array(z.string()).optional(),
+	surfaces: z.array(z.string()).optional(),
+	is_published: z.boolean().optional()
+});
+
+export interface AdminBugReportsQuery {
+	page?: number;
+	pageSize?: number;
+	search?: string;
+	statuses?: Array<z.infer<typeof bugReportStatusSchema>>;
+	surfaces?: Array<z.infer<typeof bugReportSurfaceSchema>>;
+	severities?: Array<z.infer<typeof bugReportSeveritySchema>>;
+}
+
+export type BugReportSurface = z.infer<typeof bugReportSurfaceSchema>;
+export type BugReportSeverity = z.infer<typeof bugReportSeveritySchema>;
+export type BugReportStatus = z.infer<typeof bugReportStatusSchema>;
+export type KnownIssueStatus = z.infer<typeof knownIssueStatusSchema>;
+export type BugReportContext = z.infer<typeof bugReportContextSchema>;
+export type BugReport = z.infer<typeof bugReportSchema>;
+export type BugReportListItem = z.infer<typeof bugReportListItemSchema>;
+export type BugReportCreateRequest = z.infer<typeof bugReportCreateRequestSchema>;
+export type BugReportStatusUpdateRequest = z.infer<typeof bugReportStatusUpdateRequestSchema>;
+export type KnownIssueMatch = z.infer<typeof knownIssueMatchSchema>;
+export type KnownIssue = z.infer<typeof knownIssueSchema>;
+export type KnownIssueCreateRequest = z.infer<typeof knownIssueCreateRequestSchema>;
+export type KnownIssueUpdateRequest = z.infer<typeof knownIssueUpdateRequestSchema>;
+
 export type ManagerInviteStatus = z.infer<typeof managerInviteStatusSchema>;
 export type ManagerInviteListItem = z.infer<typeof managerInviteListItemSchema>;
 export type ManagerInviteCreatedResponse = z.infer<typeof managerInviteCreatedResponseSchema>;

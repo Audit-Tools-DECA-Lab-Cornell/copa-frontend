@@ -22,6 +22,7 @@ import {
 	type AdminAuditsExportResponse,
 	adminAuditsExportResponseSchema,
 	type AdminAuditsQuery,
+	type AdminBugReportsQuery,
 	type AdminExportQuery,
 	type AdminOverview,
 	adminOverviewSchema,
@@ -65,6 +66,14 @@ import {
 	auditorUpdateRequestSchema,
 	type AuditSession,
 	auditSessionSchema,
+	type BugReport,
+	type BugReportCreateRequest,
+	bugReportCreateRequestSchema,
+	type BugReportListItem,
+	bugReportListItemSchema,
+	bugReportSchema,
+	type BugReportStatusUpdateRequest,
+	bugReportStatusUpdateRequestSchema,
 	type BulkAssignmentWrite,
 	bulkAssignmentWriteSchema,
 	type ChangePasswordRequest,
@@ -73,6 +82,14 @@ import {
 	instrumentCreateRequestSchema,
 	instrumentResponseSchema,
 	instrumentUpdateRequestSchema,
+	type KnownIssue,
+	type KnownIssueCreateRequest,
+	knownIssueCreateRequestSchema,
+	type KnownIssueMatch,
+	knownIssueMatchSchema,
+	knownIssueSchema,
+	type KnownIssueUpdateRequest,
+	knownIssueUpdateRequestSchema,
 	type ManagerAuditsExportResponse,
 	managerAuditsExportResponseSchema,
 	type ManagerAuditsList,
@@ -874,5 +891,87 @@ export const playspaceApi = {
 				})}`,
 				adminPlacesExportBundleSchema
 			)
+	},
+	bugReports: {
+		/**
+		 * File a new bug report from the web dashboard.
+		 */
+		create: async (payload: BugReportCreateRequest): Promise<BugReport> => {
+			const parsedPayload = bugReportCreateRequestSchema.parse(payload);
+			return fetchValidatedJson("/playspace/bug-reports", bugReportSchema, {
+				method: "POST",
+				body: JSON.stringify(parsedPayload)
+			});
+		},
+		/**
+		 * Return the current user's own bug reports.
+		 */
+		mine: async (): Promise<BugReport[]> =>
+			fetchValidatedJson("/playspace/bug-reports/mine", z.array(bugReportSchema)),
+		/**
+		 * Return published known issues matching the reporter's query (deflection).
+		 */
+		matchKnownIssues: async (query: string, surface?: string): Promise<KnownIssueMatch[]> =>
+			fetchValidatedJson(
+				`/playspace/known-issues/match${buildQueryString({ q: query, surface })}`,
+				z.array(knownIssueMatchSchema)
+			),
+		admin: {
+			/**
+			 * Return a paginated, filtered view of every account's bug reports.
+			 */
+			list: async (query: AdminBugReportsQuery = {}): Promise<PaginatedResponse<BugReportListItem>> =>
+				fetchValidatedJson(
+					`/playspace/admin/bug-reports${buildQueryString({
+						page: query.page,
+						page_size: query.pageSize,
+						search: query.search,
+						status: query.statuses,
+						surface: query.surfaces,
+						severity: query.severities
+					})}`,
+					paginatedResponseSchema(bugReportListItemSchema)
+				),
+			/**
+			 * Apply a triage update (status and/or known-issue link) to a report.
+			 */
+			update: async (reportId: string, payload: BugReportStatusUpdateRequest): Promise<BugReport> => {
+				const parsedPayload = bugReportStatusUpdateRequestSchema.parse(payload);
+				return fetchValidatedJson(
+					`/playspace/admin/bug-reports/${encodeURIComponent(reportId)}`,
+					bugReportSchema,
+					{
+						method: "PATCH",
+						body: JSON.stringify(parsedPayload)
+					}
+				);
+			},
+			knownIssues: {
+				list: async (): Promise<KnownIssue[]> =>
+					fetchValidatedJson("/playspace/admin/known-issues", z.array(knownIssueSchema)),
+				create: async (payload: KnownIssueCreateRequest): Promise<KnownIssue> => {
+					const parsedPayload = knownIssueCreateRequestSchema.parse(payload);
+					return fetchValidatedJson("/playspace/admin/known-issues", knownIssueSchema, {
+						method: "POST",
+						body: JSON.stringify(parsedPayload)
+					});
+				},
+				update: async (issueId: string, payload: KnownIssueUpdateRequest): Promise<KnownIssue> => {
+					const parsedPayload = knownIssueUpdateRequestSchema.parse(payload);
+					return fetchValidatedJson(
+						`/playspace/admin/known-issues/${encodeURIComponent(issueId)}`,
+						knownIssueSchema,
+						{
+							method: "PATCH",
+							body: JSON.stringify(parsedPayload)
+						}
+					);
+				},
+				delete: async (issueId: string): Promise<void> =>
+					fetchNoContent(`/playspace/admin/known-issues/${encodeURIComponent(issueId)}`, {
+						method: "DELETE"
+					})
+			}
+		}
 	}
 };

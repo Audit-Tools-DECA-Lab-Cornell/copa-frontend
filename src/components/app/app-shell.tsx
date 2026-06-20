@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	Bug,
 	ChevronDown,
 	ClipboardList,
 	DatabaseIcon,
@@ -26,6 +27,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
+import { BugReportLauncher } from "@/components/bug-report/bug-report-launcher";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -39,6 +41,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
 import type { UserRole } from "@/lib/auth/role";
+import { isBugReportingEnabled } from "@/lib/bug-report/feature";
 import { cn } from "@/lib/utils";
 
 export interface AppShellProps {
@@ -71,6 +74,7 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
 			{ label: t("assets"), href: "/admin/assets", icon: Images },
 			{ label: t("system"), href: "/admin/system", icon: MonitorCog },
+			...(isBugReportingEnabled() ? [{ label: t("bugReports"), href: "/admin/bug-reports", icon: Bug }] : []),
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
 	}
@@ -327,6 +331,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 					<main className="px-4 py-6 md:px-6 md:py-4">{children}</main>
 				</div>
 			</div>
+			<BugReportLauncher />
 		</div>
 	);
 }

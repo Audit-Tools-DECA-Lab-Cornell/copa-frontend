@@ -71,6 +71,7 @@
 			"instruments": "Instrumente",
 			"assets": "Assets",
 			"system": "System",
+			"bugReports": "Fehlerberichte",
 			"settings": "Einstellungen",
 			"assignments": "Zuweisungen"
 		},
@@ -79,6 +80,183 @@
 			"accountLabel": "Konto",
 			"settings": "Einstellungen",
 			"signOut": "Abmelden"
+		}
+	},
+	"bugReport": {
+		"launch": "Problem melden",
+		"title": "Problem melden",
+		"subtitle": "Beschreiben Sie, was schiefgelaufen ist. Einige technische Details erfassen wir automatisch, um das Problem zu beheben.",
+		"submit": "Bericht senden",
+		"submitAnyway": "Trotzdem senden",
+		"cancel": "Abbrechen",
+		"success": "Danke – Ihr Bericht wurde gesendet.",
+		"fields": {
+			"title": "Was ist passiert?",
+			"description": "Beschreiben Sie das Problem",
+			"severity": "Wie stark blockiert es Sie?",
+			"screenshot": "Screenshot (optional)"
+		},
+		"placeholders": {
+			"title": "Kurze Zusammenfassung",
+			"description": "Was haben Sie getan, was erwartet und was ist stattdessen passiert?"
+		},
+		"severity": {
+			"blocking": "Ich kann nicht weiterarbeiten",
+			"major": "Es behindert mich",
+			"minor": "Kleine Unannehmlichkeit"
+		},
+		"status": {
+			"new": "Neu",
+			"triaged": "Gesichtet",
+			"in_progress": "In Bearbeitung",
+			"resolved": "Behoben",
+			"wont_fix": "Wird nicht behoben",
+			"duplicate": "Duplikat"
+		},
+		"knownIssueStatus": {
+			"open": "Offen",
+			"monitoring": "Beobachtung",
+			"fixed": "Behoben"
+		},
+		"screenshotPrivacyNote": "Fügen Sie nur dann einen Screenshot hinzu, wenn er keine sensiblen Informationen zeigt. Optional.",
+		"screenshotAdd": "Screenshot hinzufügen",
+		"screenshotReplace": "Screenshot ersetzen",
+		"screenshotRemove": "Entfernen",
+		"matches": {
+			"heading": "Das ist möglicherweise bereits bekannt",
+			"workaroundLabel": "Behelfslösung"
+		},
+		"errors": {
+			"offline": "Sie sind offline. Ihr Bericht wurde nicht gesendet – bitte versuchen Sie es erneut, sobald Sie wieder online sind.",
+			"generic": "Beim Senden Ihres Berichts ist etwas schiefgelaufen. Bitte versuchen Sie es erneut."
+		},
+		"admin": {
+			"header": {
+				"eyebrow": "Support",
+				"title": "Fehlerberichte",
+				"description": "Berichte aus allen Konten prüfen und die Liste bekannter Probleme pflegen.",
+				"back": "Zurück zum Dashboard"
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"bugReports": "Fehlerberichte"
+			},
+			"stats": {
+				"total": "Berichte gesamt",
+				"new": "Zu sichten",
+				"shown": "Angezeigt",
+				"totalHelper": "Alle eingegangenen Berichte",
+				"newHelper": "Noch nicht geprüft",
+				"blocking": "Blockierend",
+				"blockingHelper": "Offene Berichte, die die Arbeit stoppen",
+				"resolved": "Gelöst",
+				"resolvedHelper": "Als behoben markiert"
+			},
+			"reports": {
+				"title": "Berichte",
+				"allStatuses": "Alle Status",
+				"emptyTitle": "Keine Berichte",
+				"emptyDescription": "Keine Fehlerberichte entsprechen dem aktuellen Filter.",
+				"columns": {
+					"title": "Problem",
+					"surface": "Oberfläche",
+					"severity": "Schweregrad",
+					"reporter": "Melder",
+					"status": "Status",
+					"report": "Bericht",
+					"created": "Gemeldet"
+				},
+				"searchPlaceholder": "Titel, Beschreibung oder Melder suchen",
+				"allSurfaces": "Alle Plattformen",
+				"allSeverities": "Alle Schweregrade",
+				"hasScreenshot": "Hat Screenshot",
+				"detail": {
+					"description": "Beschreibung",
+					"context": "Erfasster Kontext",
+					"linkedRecords": "Verknüpfte Datensätze",
+					"screenshot": "Screenshot",
+					"knownIssue": "Verknüpftes bekanntes Problem",
+					"linkKnownIssue": "Bekanntes Problem verknüpfen",
+					"noKnownIssue": "Nicht verknüpft"
+				}
+			},
+			"toast": {
+				"statusUpdated": "Berichtsstatus aktualisiert.",
+				"error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+				"linked": "Bericht mit einem bekannten Problem verknüpft."
+			},
+			"disabled": {
+				"title": "Fehlerberichte sind deaktiviert",
+				"description": "Aktivieren Sie den Entwicklermodus, um Fehlerberichte zu prüfen."
+			},
+			"knownIssues": {
+				"title": "Bekannte Probleme",
+				"createHeading": "Bekanntes Problem hinzufügen",
+				"create": "Bekanntes Problem hinzufügen",
+				"fields": {
+					"title": "Titel",
+					"symptoms": "Symptome",
+					"workaround": "Behelfslösung",
+					"status": "Status",
+					"published": "Für Melder anzeigen"
+				},
+				"toast": {
+					"created": "Bekanntes Problem hinzugefügt.",
+					"deleted": "Bekanntes Problem gelöscht.",
+					"error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+				},
+				"emptyTitle": "Keine bekannten Probleme",
+				"emptyDescription": "Fügen Sie ein bekanntes Problem hinzu, damit Melder es sehen, bevor sie ein Duplikat melden.",
+				"published": "Veröffentlicht",
+				"draft": "Entwurf",
+				"publish": "Veröffentlichen",
+				"unpublish": "Zurückziehen",
+				"delete": "Löschen",
+				"explainerTitle": "Was Melder sehen",
+				"explainerBody": "Veröffentlichte bekannte Probleme erscheinen, während ein Benutzer einen Bericht schreibt, damit er eine Behelfslösung ausprobieren kann, bevor er ein Duplikat meldet.",
+				"placeholders": {
+					"title": "Kurzer, einprägsamer Name",
+					"symptoms": "Was der Benutzer sieht oder erlebt",
+					"workaround": "Schritte, mit denen der Benutzer weiterarbeiten kann"
+				},
+				"summary": "{published} von {total} veröffentlicht",
+				"workaroundLabel": "Behelfslösung",
+				"publishedShort": "Veröffentlicht"
+			},
+			"tabs": {
+				"reports": "Berichte",
+				"knownIssues": "Bekannte Probleme"
+			},
+			"context": {
+				"appVersion": "App-Version",
+				"build": "Build",
+				"platform": "Plattform",
+				"device": "Gerät",
+				"browser": "Browser",
+				"route": "Bildschirm",
+				"network": "Netzwerk",
+				"syncPhase": "Sync-Status",
+				"locale": "Sprache",
+				"viewport": "Ansichtsfenster",
+				"capturedAt": "Erfasst am",
+				"online": "Online",
+				"offline": "Offline",
+				"project": "Projekt",
+				"place": "Ort",
+				"submission": "Audit",
+				"section": "Abschnitt",
+				"question": "Frage"
+			},
+			"screenshot": {
+				"none": "Kein Screenshot angehängt",
+				"view": "Screenshot ansehen",
+				"alt": "Screenshot für {title}"
+			}
+		},
+		"surface": {
+			"web": "Web",
+			"mobile": "Mobil",
+			"desktop": "Desktop"
 		}
 	},
 	"assets": {
