@@ -19,6 +19,7 @@ export type {
 	ExecutionMode,
 	InstrumentQuestion,
 	PlayspaceInstrument,
+	PreAuditQuestion,
 	QuestionResponsePayload,
 	QuestionScale,
 	ScaleOption
@@ -158,11 +159,17 @@ export const SINGLE_RESPONSE_HEADERS = [
 	"Usability (U) Construct Score"
 ] as const;
 
+/** Column headers for the Space Audit Setup table (CSV, XLSX Space Audit sheet, PDF). */
+export const SPACE_AUDIT_HEADERS = ["Question", "Recorded Answer"] as const;
+
 /** XLSX column characters that are illegal in sheet names. */
 export const INVALID_SHEET_NAME_CHARACTERS = [":", "\\", "/", "?", "*", "[", "]"] as const;
 
 /** Fixed column widths (characters) for the Overview worksheet. */
 export const OVERVIEW_COLUMN_WIDTHS = [28, 56] as const;
+
+/** Fixed column widths (characters) for the Space Audit Setup worksheet. */
+export const SPACE_AUDIT_COLUMN_WIDTHS = [44, 56] as const;
 
 /** Fixed column widths (characters) for the Responses worksheet. */
 export const SINGLE_RESPONSE_COLUMN_WIDTHS = [12, 16, 16, 28, 64, 40, 72, 22, 22, 22, 26, 22, 22] as const;

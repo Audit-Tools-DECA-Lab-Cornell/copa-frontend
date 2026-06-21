@@ -70,10 +70,14 @@
 			"rawData": "Rohdaten",
 			"instruments": "Instrumente",
 			"assets": "Assets",
-			"system": "System",
 			"bugReports": "Fehlerberichte",
 			"settings": "Einstellungen",
-			"assignments": "Zuweisungen"
+			"assignments": "Zuweisungen",
+			"sections": {
+				"fieldwork": "Feldarbeit",
+				"reportsData": "Berichte & Daten",
+				"configuration": "Konfiguration"
+			}
 		},
 		"userMenu": {
 			"auditorWithCode": "Prüfer ({code})",
@@ -820,6 +824,26 @@
 			},
 			"title": "Instrumentenverwaltung",
 			"description": "Verwalten Sie Audit-Instrumentversionen, Übersetzungen und veröffentlichen Sie neue Definitionen.",
+			"overview": {
+				"stats": {
+					"instrumentVersion": {
+						"title": "Instrumentversion",
+						"helper": "Aktuell für Audit-Sitzungen bereitgestellte Version."
+					},
+					"auditSections": {
+						"title": "Audit-Abschnitte",
+						"helper": "Strukturierte Bereiche im Kerninstrument."
+					},
+					"questionCount": {
+						"title": "Anzahl der Fragen",
+						"helper": "{preAuditCount} Vorab-Fragen und {sectionCount} Abschnittsfragen."
+					},
+					"executionModes": {
+						"title": "Ausführungsmodi",
+						"helper": "Unterstützte Kombinationen aus Vor-Ort- und Umfrage-Workflows."
+					}
+				}
+			},
 			"uploadAction": "JSON hochladen",
 			"createDraft": "Neuen Entwurf erstellen",
 			"activeVersion": "Aktive Version",
@@ -1130,52 +1154,6 @@
 				"publishing": "Veröffentliche...",
 				"publishAndActivate": "Veröffentlichen & Aktivieren",
 				"versionLabel": "Entwurfsversion"
-			}
-		},
-		"system": {
-			"error": {
-				"title": "Systemmetadaten nicht verfügbar",
-				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Systemmetadaten erneut.",
-				"retry": "Erneut versuchen"
-			},
-			"header": {
-				"eyebrow": "Administrator-Arbeitsbereich",
-				"title": "Systemmetadaten",
-				"description": "Laufzeitmetadaten und Instrument-Versionierung für die Audit-Plattform.",
-				"back": "Zurück zum Dashboard"
-			},
-			"breadcrumbs": {
-				"dashboard": "Dashboard",
-				"system": "System"
-			},
-			"stats": {
-				"instrumentVersion": {
-					"title": "Instrumentenversion",
-					"helper": "Aktuelle Version, die für Auditsitzungen bereitgestellt wird."
-				},
-				"auditSections": {
-					"title": "Audit-Abschnitte",
-					"helper": "Strukturierte Bereiche im Kerninstrument."
-				},
-				"questionCount": {
-					"title": "Anzahl der Fragen",
-					"helper": "{preAuditCount} Vor-Audit-Abfragen und {sectionCount} Abschnittsfragen."
-				},
-				"executionModes": {
-					"title": "Ausführungsmodi",
-					"helper": "Unterstützte Kombinationen aus Vor-Ort- und Umfrage-Workflows."
-				}
-			},
-			"instrumentMetadata": {
-				"title": "Instrumentenmetadaten",
-				"key": "Schlüssel",
-				"name": "Name",
-				"currentSheet": "Aktuelles Blatt",
-				"generated": "Generiert"
-			},
-			"executionCoverage": {
-				"title": "Ausführungserfassung",
-				"description": "Die Plattform unterstützt derzeit separate Prüfungsabläufe für Vor-Ort-, Survey- und kombinierte Audits. Diese Modi steuern, welche Abschnitte während der Ausführung freigeschaltet werden."
 			}
 		}
 	},

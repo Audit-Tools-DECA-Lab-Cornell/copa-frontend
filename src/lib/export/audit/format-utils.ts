@@ -11,6 +11,7 @@ import type {
 	ExecutionMode,
 	InstrumentQuestion,
 	PlayspaceInstrument,
+	PreAuditQuestion,
 	QuestionResponsePayload,
 	QuestionScale,
 	ScaleOption,
@@ -233,6 +234,64 @@ export function formatQuestionAnswer(
 		return answerKey;
 	}
 	return formatOptionScoreLabel(option);
+}
+
+// ── Space audit (pre-audit) formatters ─────────────────────────────────────────
+
+/**
+ * Reads the recorded value(s) for one space-setup question. Single-select keys
+ * yield zero or one value; `weather_conditions` yields its full list. Keys
+ * outside the space-setup set return an empty list.
+ */
+export function readSpaceAuditQuestionValues(
+	auditSession: AuditSession,
+	question: PreAuditQuestion
+): readonly string[] {
+	const preAudit = auditSession.pre_audit;
+	switch (question.key) {
+		case "place_size":
+			return preAudit.place_size === null ? [] : [preAudit.place_size];
+		case "current_users_0_5":
+			return preAudit.current_users_0_5 === null ? [] : [preAudit.current_users_0_5];
+		case "current_users_6_12":
+			return preAudit.current_users_6_12 === null ? [] : [preAudit.current_users_6_12];
+		case "current_users_13_17":
+			return preAudit.current_users_13_17 === null ? [] : [preAudit.current_users_13_17];
+		case "current_users_18_plus":
+			return preAudit.current_users_18_plus === null ? [] : [preAudit.current_users_18_plus];
+		case "playspace_busyness":
+			return preAudit.playspace_busyness === null ? [] : [preAudit.playspace_busyness];
+		case "season":
+			return preAudit.season === null ? [] : [preAudit.season];
+		case "weather_conditions":
+			return preAudit.weather_conditions;
+		case "wind_conditions":
+			return preAudit.wind_conditions === null ? [] : [preAudit.wind_conditions];
+		default:
+			return [];
+	}
+}
+
+/** Maps raw option keys to their labels; returns raw values when the question has no options. */
+export function resolveSpaceAuditDisplayValues(
+	question: PreAuditQuestion,
+	rawValues: readonly string[]
+): readonly string[] {
+	if (question.options.length === 0) {
+		return rawValues;
+	}
+	return rawValues.map(rawValue => {
+		const option = question.options.find(currentOption => currentOption.key === rawValue);
+		return option?.label ?? rawValue;
+	});
+}
+
+/** Joins pre-audit display values with `" | "`, dropping empty fragments. */
+export function joinSpaceAuditDisplayValues(values: readonly string[]): string {
+	return values
+		.map(value => value.trim())
+		.filter(value => value.length > 0)
+		.join(" | ");
 }
 
 /**

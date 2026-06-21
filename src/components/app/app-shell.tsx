@@ -14,7 +14,6 @@ import {
 	type LucideIcon,
 	MapPin,
 	Menu,
-	MonitorCog,
 	PanelLeftClose,
 	PanelLeftOpen,
 	Settings,
@@ -58,76 +57,174 @@ interface NavItem {
 	icon: LucideIcon;
 }
 
+// Sections without a `label` render without a header; collapsed rail shows a divider instead.
+interface NavSection {
+	label?: string;
+	items: NavItem[];
+}
+
 type NavigationTranslator = (key: string) => string;
 
-function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
+function getNavSections(role: UserRole, t: NavigationTranslator): NavSection[] {
 	if (role === "admin") {
 		return [
-			{ label: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
-			{ label: t("accounts"), href: "/admin/accounts", icon: Shield },
-			{ label: t("projects"), href: "/admin/projects", icon: FolderKanban },
-			{ label: t("places"), href: "/admin/places", icon: MapPin },
-			{ label: t("auditors"), href: "/admin/auditors", icon: Users },
-			{ label: t("audits"), href: "/admin/audits", icon: Form },
-			{ label: t("reports"), href: "/admin/reports", icon: ClipboardList },
-			{ label: t("rawData"), href: "/admin/raw-data", icon: DatabaseIcon },
-			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
-			{ label: t("assets"), href: "/admin/assets", icon: Images },
-			{ label: t("system"), href: "/admin/system", icon: MonitorCog },
-			...(isBugReportingEnabled() ? [{ label: t("bugReports"), href: "/admin/bug-reports", icon: Bug }] : []),
-			{ label: t("settings"), href: "/settings", icon: Settings }
+			{ items: [{ label: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard }] },
+			{
+				label: t("sections.fieldwork"),
+				items: [
+					{ label: t("projects"), href: "/admin/projects", icon: FolderKanban },
+					{ label: t("places"), href: "/admin/places", icon: MapPin },
+					{ label: t("auditors"), href: "/admin/auditors", icon: Users },
+					{ label: t("audits"), href: "/admin/audits", icon: Form }
+				]
+			},
+			{
+				label: t("sections.reportsData"),
+				items: [
+					{ label: t("reports"), href: "/admin/reports", icon: ClipboardList },
+					{ label: t("rawData"), href: "/admin/raw-data", icon: DatabaseIcon }
+				]
+			},
+			{
+				label: t("sections.configuration"),
+				items: [
+					{ label: t("accounts"), href: "/admin/accounts", icon: Shield },
+					{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
+					{ label: t("assets"), href: "/admin/assets", icon: Images },
+					...(isBugReportingEnabled()
+						? [{ label: t("bugReports"), href: "/admin/bug-reports", icon: Bug }]
+						: [])
+				]
+			},
+			{ items: [{ label: t("settings"), href: "/settings", icon: Settings }] }
 		];
 	}
 
 	if (role === "manager") {
 		return [
-			{ label: t("dashboard"), href: "/manager/dashboard", icon: LayoutDashboard },
-			{ label: t("projects"), href: "/manager/projects", icon: FolderKanban },
-			{ label: t("places"), href: "/manager/places", icon: MapPin },
-			{ label: t("auditors"), href: "/manager/auditors", icon: Users },
-			{ label: t("audits"), href: "/manager/audits", icon: Form },
-			{ label: t("reports"), href: "/manager/reports", icon: ClipboardList },
-			{ label: t("rawData"), href: "/manager/raw-data", icon: DatabaseIcon },
-			{ label: t("settings"), href: "/settings", icon: Settings }
+			{ items: [{ label: t("dashboard"), href: "/manager/dashboard", icon: LayoutDashboard }] },
+			{
+				label: t("sections.fieldwork"),
+				items: [
+					{ label: t("projects"), href: "/manager/projects", icon: FolderKanban },
+					{ label: t("places"), href: "/manager/places", icon: MapPin },
+					{ label: t("auditors"), href: "/manager/auditors", icon: Users },
+					{ label: t("audits"), href: "/manager/audits", icon: Form }
+				]
+			},
+			{
+				label: t("sections.reportsData"),
+				items: [
+					{ label: t("reports"), href: "/manager/reports", icon: ClipboardList },
+					{ label: t("rawData"), href: "/manager/raw-data", icon: DatabaseIcon }
+				]
+			},
+			{ items: [{ label: t("settings"), href: "/settings", icon: Settings }] }
 		];
 	}
 
 	return [
-		{ label: t("dashboard"), href: "/auditor/dashboard", icon: LayoutDashboard },
-		{ label: t("reports"), href: "/auditor/reports", icon: ClipboardList },
-		{ label: t("settings"), href: "/settings", icon: Settings }
+		{
+			items: [
+				{ label: t("dashboard"), href: "/auditor/dashboard", icon: LayoutDashboard },
+				{ label: t("reports"), href: "/auditor/reports", icon: ClipboardList },
+				{ label: t("settings"), href: "/settings", icon: Settings }
+			]
+		}
 	];
 }
 
 function NavLinks({
-	items,
+	sections,
 	onNavigate,
 	isCollapsed = false
-}: Readonly<{ items: NavItem[]; onNavigate?: () => void; isCollapsed?: boolean }>) {
+}: Readonly<{ sections: NavSection[]; onNavigate?: () => void; isCollapsed?: boolean }>) {
 	const pathname = usePathname();
+	const [collapsedGroups, setCollapsedGroups] = React.useState<ReadonlySet<string>>(new Set());
+
+	const toggleGroup = (label: string) => {
+		setCollapsedGroups(prev => {
+			const next = new Set(prev);
+			if (next.has(label)) {
+				next.delete(label);
+			} else {
+				next.add(label);
+			}
+			return next;
+		});
+	};
 
 	return (
 		<nav className="grid gap-1.5">
-			{items.map(item => {
-				const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-				const Icon = item.icon;
+			{sections.map((section, sectionIndex) => {
+				const isGroupCollapsed = section.label ? collapsedGroups.has(section.label) : false;
+				const collapsible = !!section.label && !isCollapsed;
 
 				return (
-					<Link
-						key={item.href}
-						href={item.href}
-						onClick={onNavigate}
-						title={isCollapsed ? item.label : undefined}
-						className={cn(
-							"flex min-h-11 items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-[background,box-shadow,color] duration-75",
-							isCollapsed && "mx-auto size-11 min-h-0 justify-center p-0",
-							isActive
-								? "bg-solid-neutral text-solid-neutral-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] hover:bg-(--solid-neutral-edge) hover:text-solid-neutral-text"
-								: "text-muted-foreground hover:bg-accent hover:text-foreground"
-						)}>
-						<Icon className="size-5" aria-hidden="true" />
-						<span className={cn("leading-5", isCollapsed && "sr-only")}>{item.label}</span>
-					</Link>
+					<React.Fragment key={section.label ?? `section-${sectionIndex}`}>
+						{sectionIndex > 0 &&
+							(isCollapsed ? (
+								<Separator className="my-1" />
+							) : section.label ? (
+								<button
+									type="button"
+									onClick={() => toggleGroup(section.label as string)}
+									aria-expanded={!isGroupCollapsed}
+									className="flex w-full items-center gap-2 rounded-md px-4 pt-3 pb-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-text-secondary uppercase transition-colors hover:text-foreground">
+									<ChevronDown
+										className={cn(
+											"size-3.5 shrink-0 transition-transform duration-200 ease-out",
+											isGroupCollapsed && "-rotate-90"
+										)}
+										aria-hidden="true"
+									/>
+									<span>{section.label}</span>
+								</button>
+							) : (
+								<Separator className="my-1" />
+							))}
+						{/* grid-template-rows 0fr→1fr animates height without touching height:auto */}
+						<div
+							className={cn(
+								"grid transition-[grid-template-rows] ease-out",
+								collapsible ? "duration-200" : "duration-0",
+								collapsible && isGroupCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+							)}>
+							<div className="overflow-hidden">
+								<div
+									className={cn(
+										"grid gap-1",
+										collapsible && "mt-0.5 rounded-lg bg-[--surface-sunken]/30 px-1.5 pb-1.5"
+									)}>
+									{section.items.map(item => {
+										const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+										const Icon = item.icon;
+
+										return (
+											<Link
+												key={item.href}
+												href={item.href}
+												onClick={onNavigate}
+												title={isCollapsed ? item.label : undefined}
+												className={cn(
+													"flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-[background,box-shadow,color] duration-75",
+													!collapsible && "rounded-lg px-4 py-3",
+													isCollapsed && "mx-auto size-11 min-h-0 justify-center p-0",
+													isActive
+														? "bg-solid-neutral text-solid-neutral-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] hover:bg-(--solid-neutral-edge) hover:text-solid-neutral-text"
+														: "text-muted-foreground hover:bg-accent hover:text-foreground"
+												)}>
+												<Icon className="size-5" aria-hidden="true" />
+												<span className={cn("leading-5", isCollapsed && "sr-only")}>
+													{item.label}
+												</span>
+											</Link>
+										);
+									})}
+								</div>
+							</div>
+						</div>
+					</React.Fragment>
 				);
 			})}
 		</nav>
@@ -200,7 +297,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 	const shellT = useTranslations("shell");
 	const roleT = useTranslations("common.workspace");
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState<boolean>(false);
-	const navItems = getNavItems(role, navigationT);
+	const navSections = getNavSections(role, navigationT);
 	const roleLabel =
 		role === "admin" ? roleT("administrator") : role === "manager" ? roleT("manager") : roleT("auditor");
 
@@ -286,14 +383,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 						</div>
 						<Separator />
 						<div className={cn("flex-1 overflow-auto p-3", isSidebarCollapsed && "px-2")}>
-							<p
-								className={cn(
-									"px-3 pb-2 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-text-secondary uppercase",
-									isSidebarCollapsed && "sr-only"
-								)}>
-								{shellT("workspaceLabel")}
-							</p>
-							<NavLinks items={navItems} isCollapsed={isSidebarCollapsed} />
+							<NavLinks sections={navSections} isCollapsed={isSidebarCollapsed} />
 						</div>
 					</div>
 				</aside>
@@ -317,7 +407,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 									</SheetHeader>
 									<Separator />
 									<div className="p-3">
-										<NavLinks items={navItems} />
+										<NavLinks sections={navSections} />
 									</div>
 								</SheetContent>
 							</Sheet>

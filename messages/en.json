@@ -70,10 +70,14 @@
 			"rawData": "Raw Data",
 			"instruments": "Instruments",
 			"assets": "Assets",
-			"system": "System",
 			"bugReports": "Bug Reports",
 			"settings": "Settings",
-			"assignments": "Assignments"
+			"assignments": "Assignments",
+			"sections": {
+				"fieldwork": "Fieldwork",
+				"reportsData": "Reports & Data",
+				"configuration": "Configuration"
+			}
 		},
 		"userMenu": {
 			"auditorWithCode": "Auditor ({code})",
@@ -838,6 +842,26 @@
 			},
 			"title": "Instrument Management",
 			"description": "Manage audit instrument versions, translations, and publish new definitions.",
+			"overview": {
+				"stats": {
+					"instrumentVersion": {
+						"title": "Instrument Version",
+						"helper": "Current version served to audit sessions."
+					},
+					"auditSections": {
+						"title": "Audit Sections",
+						"helper": "Structured domains in the core instrument."
+					},
+					"questionCount": {
+						"title": "Question Count",
+						"helper": "{preAuditCount} pre-audit prompts and {sectionCount} section questions."
+					},
+					"executionModes": {
+						"title": "Execution Modes",
+						"helper": "Supported combinations of onsite and survey workflows."
+					}
+				}
+			},
 			"uploadAction": "Upload JSON",
 			"createDraft": "Create New Draft",
 			"activeVersion": "Active Version",
@@ -1148,52 +1172,6 @@
 				"publishing": "Publishing...",
 				"publishAndActivate": "Publish & Activate",
 				"versionLabel": "Draft version"
-			}
-		},
-		"system": {
-			"error": {
-				"title": "System metadata unavailable",
-				"description": "Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen system metadata.",
-				"retry": "Try again"
-			},
-			"header": {
-				"eyebrow": "Administrator Workspace",
-				"title": "System metadata",
-				"description": "Runtime metadata and instrument versioning for the audit platform.",
-				"back": "Back to dashboard"
-			},
-			"breadcrumbs": {
-				"dashboard": "Dashboard",
-				"system": "System"
-			},
-			"stats": {
-				"instrumentVersion": {
-					"title": "Instrument Version",
-					"helper": "Current version served to audit sessions."
-				},
-				"auditSections": {
-					"title": "Audit Sections",
-					"helper": "Structured domains in the core instrument."
-				},
-				"questionCount": {
-					"title": "Question Count",
-					"helper": "{preAuditCount} pre-audit prompts and {sectionCount} section questions."
-				},
-				"executionModes": {
-					"title": "Execution Modes",
-					"helper": "Supported combinations of onsite and survey workflows."
-				}
-			},
-			"instrumentMetadata": {
-				"title": "Instrument metadata",
-				"key": "Key",
-				"name": "Name",
-				"currentSheet": "Current sheet",
-				"generated": "Generated"
-			},
-			"executionCoverage": {
-				"title": "Execution coverage",
-				"description": "The platform currently supports distinct onsite, survey, and combined audit paths. These modes control which sections unlock during execution."
 			}
 		}
 	},

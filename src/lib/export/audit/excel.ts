@@ -20,6 +20,7 @@ import {
 	buildOverviewRows,
 	buildSingleAuditResponseRowMetadata,
 	buildSingleAuditResponseRows,
+	buildSpaceAuditRows,
 	COMMENT_ROW_SENTINEL,
 	SCORE_ROW_KIND_COL,
 	SCORE_ROW_SENTINEL,
@@ -39,7 +40,9 @@ import {
 	OVERVIEW_COLUMN_WIDTHS,
 	resolveExportPalette,
 	SINGLE_RESPONSE_COLUMN_WIDTHS,
-	SINGLE_RESPONSE_HEADERS
+	SINGLE_RESPONSE_HEADERS,
+	SPACE_AUDIT_COLUMN_WIDTHS,
+	SPACE_AUDIT_HEADERS
 } from "./types";
 
 // ── XLSX style helpers ────────────────────────────────────────────────────────
@@ -436,8 +439,9 @@ export function buildCsvText(rows: readonly SpreadsheetRow[]): string {
 // ── Public blob generators ────────────────────────────────────────────────────
 
 /**
- * Generates a styled XLSX workbook blob with two sheets:
+ * Generates a styled XLSX workbook blob with up to three sheets:
  * - **Overview** - key/value metadata and aggregate scores
+ * - **Space Audit** - the space-setup pre-audit responses (omitted when none)
  * - **Responses** - the full PVUA response matrix
  */
 export function generateXlsxBlob(
@@ -446,6 +450,7 @@ export function generateXlsxBlob(
 	appearance?: AuditExportAppearance
 ): Blob {
 	const overviewRows = buildOverviewRows(exportableAudit, instrument);
+	const spaceAuditRows = buildSpaceAuditRows(exportableAudit, instrument);
 	const responseRows = buildSingleAuditResponseRows(exportableAudit, instrument);
 	const responseRowMetadata = buildSingleAuditResponseRowMetadata(exportableAudit, instrument);
 	const palette = resolveExportPalette(appearance);
@@ -457,6 +462,16 @@ export function generateXlsxBlob(
 			rows: overviewRows,
 			columnWidths: OVERVIEW_COLUMN_WIDTHS
 		},
+		...(spaceAuditRows.length > 0
+			? [
+					{
+						name: "Space Audit",
+						title: "Space Audit Setup",
+						rows: [[...SPACE_AUDIT_HEADERS], ...spaceAuditRows],
+						columnWidths: SPACE_AUDIT_COLUMN_WIDTHS
+					} satisfies WorkbookTable
+				]
+			: []),
 		{
 			name: "Responses",
 			title: "PVUA Response Matrix",
@@ -490,12 +505,17 @@ export function generateXlsxBlob(
 }
 
 /**
- * Generates a CSV blob containing only the response matrix (no overview data).
- * The header row is prepended automatically.
+ * Generates a CSV blob of the response matrix, preceded by a titled "Space Audit
+ * Setup" block (with its own header) when space-setup questions exist.
  */
 export function generateCsvBlob(exportableAudit: ExportableAudit, instrument: PlayspaceInstrument): Blob {
 	const responseRows = buildSingleAuditResponseRows(exportableAudit, instrument);
-	const allRows: SpreadsheetRow[] = [[...SINGLE_RESPONSE_HEADERS], ...responseRows];
+	const spaceAuditRows = buildSpaceAuditRows(exportableAudit, instrument);
+
+	const spaceAuditBlock: SpreadsheetRow[] =
+		spaceAuditRows.length > 0 ? [["Space Audit Setup"], [...SPACE_AUDIT_HEADERS], ...spaceAuditRows, []] : [];
+
+	const allRows: SpreadsheetRow[] = [...spaceAuditBlock, [...SINGLE_RESPONSE_HEADERS], ...responseRows];
 	const csvContent = buildCsvText(allRows);
 	return new Blob([csvContent], { type: "text/csv;charset=utf-8" });
 }

@@ -27,7 +27,10 @@ import {
 	formatQuestionDomainLabel,
 	formatQuestionModeLabel,
 	formatTimestampForDisplay,
+	joinSpaceAuditDisplayValues,
 	questionDomainFallback,
+	readSpaceAuditQuestionValues,
+	resolveSpaceAuditDisplayValues,
 	stripPromptMarkup
 } from "./format-utils";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
@@ -143,6 +146,28 @@ export function buildOverviewRows(
 		...unsureRows,
 		...auditorRows
 	];
+}
+
+// ── Space Audit sheet ─────────────────────────────────────────────────────────
+
+/**
+ * Builds the "Space Audit Setup" data rows - one `[label, answer]` per
+ * space-setup question. No header row (callers prepend their own); empty when
+ * the instrument has no space-setup questions, so callers can skip the table.
+ */
+export function buildSpaceAuditRows(
+	exportableAudit: ExportableAudit,
+	instrument: PlayspaceInstrument
+): readonly SpreadsheetRow[] {
+	const { auditSession } = exportableAudit;
+	const spaceSetupQuestions = instrument.pre_audit_questions.filter(question => question.page_key === "space_setup");
+
+	return spaceSetupQuestions.map(question => [
+		stripPromptMarkup(question.label),
+		joinSpaceAuditDisplayValues(
+			resolveSpaceAuditDisplayValues(question, readSpaceAuditQuestionValues(auditSession, question))
+		)
+	]);
 }
 
 // ── Responses sheet ───────────────────────────────────────────────────────────

@@ -17,6 +17,7 @@ import { instrumentContentSchema } from "@/lib/api/playspace-types";
 import { ActivateDialog } from "./activate-dialog";
 import { INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
 import { InstrumentEditor } from "./instrument-editor";
+import { InstrumentOverview } from "./instrument-overview";
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
 import { UploadDialog } from "./upload-dialog";
 import { suggestNextDraftVersion, suggestNextPublishedVersion } from "./utils";
@@ -232,6 +233,13 @@ export function InstrumentsAdminClient() {
 				</div>
 			) : (
 				<>
+					{!editingContent && activeVersion && (
+						<InstrumentOverview
+							content={activeVersion.content as unknown as InstrumentContent}
+							version={activeVersion.version}
+						/>
+					)}
+
 					{!editingContent && allVersions.length > 0 && (
 						<VersionHistory
 							versions={allVersions}
