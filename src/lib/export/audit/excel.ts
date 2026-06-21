@@ -440,8 +440,8 @@ export function buildCsvText(rows: readonly SpreadsheetRow[]): string {
 
 /**
  * Generates a styled XLSX workbook blob with up to three sheets:
- * - **Overview** - key/value metadata and aggregate scores
  * - **Space Audit** - the space-setup pre-audit responses (omitted when none)
+ * - **Overview** - key/value metadata and aggregate scores
  * - **Responses** - the full PVUA response matrix
  */
 export function generateXlsxBlob(
@@ -456,12 +456,7 @@ export function generateXlsxBlob(
 	const palette = resolveExportPalette(appearance);
 
 	const tables: WorkbookTable[] = [
-		{
-			name: "Overview",
-			title: "Audit Overview",
-			rows: overviewRows,
-			columnWidths: OVERVIEW_COLUMN_WIDTHS
-		},
+		// Space Audit precedes Overview so the space setup is seen before the scores.
 		...(spaceAuditRows.length > 0
 			? [
 					{
@@ -472,6 +467,12 @@ export function generateXlsxBlob(
 					} satisfies WorkbookTable
 				]
 			: []),
+		{
+			name: "Overview",
+			title: "Audit Overview",
+			rows: overviewRows,
+			columnWidths: OVERVIEW_COLUMN_WIDTHS
+		},
 		{
 			name: "Responses",
 			title: "PVUA Response Matrix",

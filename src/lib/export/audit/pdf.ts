@@ -521,6 +521,44 @@ export async function generatePdfBlob(
 		}
 	];
 
+	// ── Page 1: Space Audit Setup (before scores; only when space-setup questions exist) ─
+
+	const spaceAuditRows = buildSpaceAuditRows(exportableAudit, instrument);
+	if (spaceAuditRows.length > 0) {
+		autoTable(doc, {
+			head: [["Space Audit Setup", "Recorded Answer"]],
+			body: spaceAuditRows.map(row => [String(row[0] ?? ""), String(row[1] ?? "")]),
+			startY: lastY + 8,
+			theme: "plain",
+			styles: {
+				fontSize: 9,
+				cellPadding: { top: 3, bottom: 3, left: 6, right: 6 },
+				lineColor: AUDIT_PDF_PALETTE.border,
+				lineWidth: 0.2,
+				overflow: "linebreak"
+			},
+			headStyles: {
+				fillColor: AUDIT_PDF_PALETTE.headerFill,
+				lineColor: AUDIT_PDF_PALETTE.headerFill,
+				textColor: AUDIT_PDF_PALETTE.headerText,
+				fontStyle: "bold",
+				fontSize: 9
+			},
+			columnStyles: {
+				0: { cellWidth: USABLE_WIDTH * 0.5, textColor: AUDIT_PDF_PALETTE.mutedText, fontStyle: "bold" },
+				1: { cellWidth: USABLE_WIDTH * 0.5, textColor: AUDIT_PDF_PALETTE.bodyText }
+			},
+			margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+			tableWidth: USABLE_WIDTH,
+			didParseCell: data => {
+				if (data.section !== "body") return;
+				data.cell.styles.fillColor =
+					data.row.index % 2 === 0 ? AUDIT_PDF_PALETTE.rowEven : AUDIT_PDF_PALETTE.rowOdd;
+			}
+		});
+		lastY = docWithAutoTable.lastAutoTable.finalY;
+	}
+
 	autoTable(doc, {
 		head: [["Score Metric", "Value"]],
 		body: scoreRows.map(r => r.cells),
@@ -610,43 +648,6 @@ export async function generatePdfBlob(
 			PAGE_MARGIN,
 			docWithAutoTable.lastAutoTable.finalY + 4
 		);
-	}
-
-	// ── Page 1: Space Audit Setup (only when space-setup questions exist) ─────
-
-	const spaceAuditRows = buildSpaceAuditRows(exportableAudit, instrument);
-	if (spaceAuditRows.length > 0) {
-		autoTable(doc, {
-			head: [["Space Audit Setup", "Recorded Answer"]],
-			body: spaceAuditRows.map(row => [String(row[0] ?? ""), String(row[1] ?? "")]),
-			startY: docWithAutoTable.lastAutoTable.finalY + 8,
-			theme: "plain",
-			styles: {
-				fontSize: 9,
-				cellPadding: { top: 3, bottom: 3, left: 6, right: 6 },
-				lineColor: AUDIT_PDF_PALETTE.border,
-				lineWidth: 0.2,
-				overflow: "linebreak"
-			},
-			headStyles: {
-				fillColor: AUDIT_PDF_PALETTE.headerFill,
-				lineColor: AUDIT_PDF_PALETTE.headerFill,
-				textColor: AUDIT_PDF_PALETTE.headerText,
-				fontStyle: "bold",
-				fontSize: 9
-			},
-			columnStyles: {
-				0: { cellWidth: USABLE_WIDTH * 0.5, textColor: AUDIT_PDF_PALETTE.mutedText, fontStyle: "bold" },
-				1: { cellWidth: USABLE_WIDTH * 0.5, textColor: AUDIT_PDF_PALETTE.bodyText }
-			},
-			margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
-			tableWidth: USABLE_WIDTH,
-			didParseCell: data => {
-				if (data.section !== "body") return;
-				data.cell.styles.fillColor =
-					data.row.index % 2 === 0 ? AUDIT_PDF_PALETTE.rowEven : AUDIT_PDF_PALETTE.rowOdd;
-			}
-		});
 	}
 
 	// ── Page 2+: response matrix (landscape) ─────────────────────────────────
