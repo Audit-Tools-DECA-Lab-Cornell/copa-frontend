@@ -87,6 +87,7 @@
 		"title": "Report an issue",
 		"subtitle": "Tell us what went wrong. We capture a few technical details automatically to help us fix it.",
 		"submit": "Submit report",
+		"submitting": "Submitting…",
 		"submitAnyway": "Submit anyway",
 		"cancel": "Cancel",
 		"success": "Thanks, your report has been sent.",
@@ -169,7 +170,6 @@
 				"showingSummary": "Showing {shown} of {total} reports.",
 				"expandAll": "Expand all",
 				"collapseAll": "Collapse all",
-				"allStatuses": "All statuses",
 				"emptyTitle": "No reports",
 				"emptyDescription": "No bug reports match the current filter.",
 				"columns": {
@@ -182,10 +182,7 @@
 					"created": "Reported"
 				},
 				"searchPlaceholder": "Search title, description, or reporter",
-				"allSurfaces": "All surfaces",
-				"allSeverities": "All severities",
 				"sortBy": "Sort by {column}",
-				"clearFilter": "Clear {field} filter",
 				"clearFilters": "Clear filters",
 				"hasScreenshot": "Has screenshot",
 				"detail": {
@@ -211,6 +208,12 @@
 				"title": "Known issues",
 				"createHeading": "Add a known issue",
 				"create": "Add known issue",
+				"sortBy": "Sort by {column}",
+				"columns": {
+					"issue": "Issue",
+					"visibility": "Reporters can see",
+					"actions": "Actions"
+				},
 				"fields": {
 					"title": "Title",
 					"symptoms": "Symptoms",
@@ -230,16 +233,13 @@
 				"publish": "Publish",
 				"unpublish": "Unpublish",
 				"delete": "Delete",
-				"explainerTitle": "What reporters see",
 				"explainerBody": "Published known issues appear while a user writes a report, so they can try a workaround before filing a duplicate.",
 				"placeholders": {
 					"title": "Short, recognizable name",
 					"symptoms": "What the user sees or experiences",
 					"workaround": "Steps the user can take to keep working"
 				},
-				"summary": "{published} of {total} published",
-				"workaroundLabel": "Workaround",
-				"publishedShort": "Published"
+				"summary": "{published} of {total} published"
 			},
 			"tabs": {
 				"reports": "Reports",

@@ -87,6 +87,7 @@
 		"title": "Problem melden",
 		"subtitle": "Beschreiben Sie, was schiefgelaufen ist. Einige technische Details erfassen wir automatisch, um das Problem zu beheben.",
 		"submit": "Bericht senden",
+		"submitting": "Wird gesendet…",
 		"submitAnyway": "Trotzdem senden",
 		"cancel": "Abbrechen",
 		"success": "Danke – Ihr Bericht wurde gesendet.",
@@ -169,7 +170,6 @@
 				"showingSummary": "{shown} von {total} Berichten werden angezeigt.",
 				"expandAll": "Alle ausklappen",
 				"collapseAll": "Alle einklappen",
-				"allStatuses": "Alle Status",
 				"emptyTitle": "Keine Berichte",
 				"emptyDescription": "Keine Fehlerberichte entsprechen dem aktuellen Filter.",
 				"columns": {
@@ -182,10 +182,7 @@
 					"created": "Gemeldet"
 				},
 				"searchPlaceholder": "Titel, Beschreibung oder Melder suchen",
-				"allSurfaces": "Alle Plattformen",
-				"allSeverities": "Alle Schweregrade",
 				"sortBy": "Nach {column} sortieren",
-				"clearFilter": "Filter {field} zurücksetzen",
 				"clearFilters": "Filter zurücksetzen",
 				"hasScreenshot": "Hat Screenshot",
 				"detail": {
@@ -211,6 +208,12 @@
 				"title": "Bekannte Probleme",
 				"createHeading": "Bekanntes Problem hinzufügen",
 				"create": "Bekanntes Problem hinzufügen",
+				"sortBy": "Nach {column} sortieren",
+				"columns": {
+					"issue": "Problem",
+					"visibility": "Für Melder sichtbar",
+					"actions": "Aktionen"
+				},
 				"fields": {
 					"title": "Titel",
 					"symptoms": "Symptome",
@@ -230,16 +233,13 @@
 				"publish": "Veröffentlichen",
 				"unpublish": "Zurückziehen",
 				"delete": "Löschen",
-				"explainerTitle": "Was Melder sehen",
 				"explainerBody": "Veröffentlichte bekannte Probleme erscheinen, während ein Benutzer einen Bericht schreibt, damit er eine Behelfslösung ausprobieren kann, bevor er ein Duplikat meldet.",
 				"placeholders": {
 					"title": "Kurzer, einprägsamer Name",
 					"symptoms": "Was der Benutzer sieht oder erlebt",
 					"workaround": "Schritte, mit denen der Benutzer weiterarbeiten kann"
 				},
-				"summary": "{published} von {total} veröffentlicht",
-				"workaroundLabel": "Behelfslösung",
-				"publishedShort": "Veröffentlicht"
+				"summary": "{published} von {total} veröffentlicht"
 			},
 			"tabs": {
 				"reports": "Berichte",

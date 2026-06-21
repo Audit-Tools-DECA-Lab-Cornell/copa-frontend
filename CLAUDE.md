@@ -41,6 +41,9 @@ Cursor mirror: `.cursor/rules/` (same filenames - keep both in sync).
 - `src/components/dashboard/**` - shared tables, reports, filters, instrument editor
 - `src/components/dashboard/instruments/` - instrument editor submodule (editors, version history, spreadsheet view)
 - `src/components/dashboard/raw-data-export.tsx` - raw data export component (admin + manager)
+- `src/components/dashboard/bug-reports/` - admin bug reports dashboard (table, badges, screenshot)
+- `src/components/bug-report/` - in-app bug reporting (dialog, launcher, known-issue match)
+- `src/lib/bug-report/` - bug report feature flags and context
 - `src/lib/design-system.ts` - design tokens and CSS custom properties
 - `src/lib/cloudinary-images.ts` + `src/lib/asset-url.ts` - CDN asset types and URL builders
 - `src/components/cdn/` - Cloudinary upload and image display components
