@@ -42,7 +42,7 @@ pnpm exec playwright test   # tests/e2e/ when API or flows change
 - `src/components/dashboard/` - tables, reports, filters, instrument editor
 - `src/components/dashboard/instruments/` - instrument editor submodule (editors, version history, spreadsheet view)
 - `src/components/dashboard/raw-data-export.tsx` - raw data export component (admin + manager)
-- `src/components/dashboard/bug-reports/` - admin bug reports dashboard (table, badges, screenshot)
+- `src/components/dashboard/bug-reports/` - admin bug reports dashboard (table, badges, screenshot, known-issues manager)
 - `src/components/bug-report/` - in-app bug reporting (dialog, launcher, known-issue match)
 - `src/lib/bug-report/` - bug report feature flags and context
 - `src/lib/design-system.ts` - design tokens and CSS custom properties
