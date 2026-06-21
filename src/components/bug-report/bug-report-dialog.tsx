@@ -150,7 +150,7 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange} modal={!screenshotWidgetOpen}>
 			<DialogContent
-				className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-lg"
+				className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-xl"
 				onInteractOutside={event => {
 					if (screenshotWidgetOpen) event.preventDefault();
 				}}>
@@ -205,15 +205,11 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 										aria-checked={selected}
 										onClick={() => setSeverity(value)}
 										className={cn(
-											"flex items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors",
+											"flex items-center justify-start rounded-md border px-3 py-3 text-sm font-medium transition-colors",
 											selected
 												? SEVERITY_STYLES[value].selected
 												: "border-border bg-card text-text-secondary hover:bg-accent"
 										)}>
-										<span
-											className={cn("size-1.5 rounded-full", SEVERITY_STYLES[value].dot)}
-											aria-hidden="true"
-										/>
 										{t(`severity.${value}`)}
 									</button>
 								);
@@ -221,7 +217,7 @@ export function BugReportDialog({ open, onOpenChange }: Readonly<BugReportDialog
 						</div>
 					</div>
 
-					<div className="grid gap-1.5">
+					<div className="grid gap-2.5">
 						<Label>{t("fields.screenshot")}</Label>
 						<p className="text-xs text-muted-foreground">{t("screenshotPrivacyNote")}</p>
 						{screenshot ? (
