@@ -154,7 +154,7 @@ export function BugReportsTable({
 				cell: ({ row }) => {
 					const email = row.original.reporter_email ?? null;
 					if (!email) {
-						return <span className="text-text-secondary">—</span>;
+						return <span className="text-text-secondary">-</span>;
 					}
 					return (
 						<div className="flex min-w-[220px] items-center gap-2.5 py-1">

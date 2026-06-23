@@ -374,7 +374,7 @@ function KnownIssueDetail({ issue }: Readonly<{ issue: KnownIssue }>) {
 					{t("fields.workaround")}
 				</h4>
 				<p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-					{issue.workaround ? issue.workaround : <span className="text-text-secondary">—</span>}
+					{issue.workaround ? issue.workaround : <span className="text-text-secondary">-</span>}
 				</p>
 			</section>
 		</div>

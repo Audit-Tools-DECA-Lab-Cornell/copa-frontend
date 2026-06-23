@@ -7,12 +7,12 @@
  * backward toward how that artifact gets produced.
  *
  * Section order:
- *  1. Hero — the Combined Place Report (reports/place-report/01-overview/01.png) as a product shot
- *  2. What the report proves — score summary + domain breakdown
- *  3. Export formats — PDF / Excel / CSV / ZIP + raw data view
- *  4. How it is produced — field audit → scoring → report (phone + audits table)
- *  5. Research foundation — brief authority block
- *  6. Final CTA — tangible, output-focused
+ *  1. Hero - the Combined Place Report (reports/place-report/01-overview/01.png) as a product shot
+ *  2. What the report proves - score summary + domain breakdown
+ *  3. Export formats - PDF / Excel / CSV / ZIP + raw data view
+ *  4. How it is produced - field audit → scoring → report (phone + audits table)
+ *  5. Research foundation - brief authority block
+ *  6. Final CTA - tangible, output-focused
  *
  * All visible copy is user-facing. No internal/dev terms, no role enum names,
  * no invented metrics.
@@ -88,7 +88,7 @@ function Hero() {
 						Board-ready reports, straight from the field.
 					</h1>
 					<p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
-						The evidence you hand to the people who control decisions and money — structured, defensible,
+						The evidence you hand to the people who control decisions and money - structured, defensible,
 						and ready to export the moment the fieldwork is done.
 					</p>
 					<div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -107,7 +107,7 @@ function Hero() {
 					</p>
 				</div>
 
-				{/* Report product shot — full-bleed at the bottom of the hero so it
+				{/* Report product shot - full-bleed at the bottom of the hero so it
 				    bleeds into the next section, giving it the weight of a product hero */}
 				<div className="relative mt-14 px-0 sm:px-4 lg:px-10">
 					<FramedMacbook
@@ -130,7 +130,7 @@ function WhatItProves() {
 	const lenses: Array<{ name: string; body: string }> = [
 		{
 			name: "Provision",
-			body: "What the space contains — the range and quantity of play opportunities available."
+			body: "What the space contains - the range and quantity of play opportunities available."
 		},
 		{
 			name: "Variety",
@@ -181,7 +181,7 @@ function WhatItProves() {
 						</div>
 
 						<p className="mt-6 border-l-2 border-primary pl-5 text-base font-medium leading-relaxed text-foreground">
-							Ten playspace elements assessed across both constructs — from natural features and loose
+							Ten playspace elements assessed across both constructs - from natural features and loose
 							parts to seating, shade, and community context.
 						</p>
 					</div>
@@ -229,7 +229,7 @@ function ExportFormats() {
 		{
 			icon: FolderArchive,
 			label: "ZIP bundle",
-			body: "A complete data package organized by project, place, audit, and saved reports — for portfolio-level or research use."
+			body: "A complete data package organized by project, place, audit, and saved reports - for portfolio-level or research use."
 		}
 	];
 
@@ -247,7 +247,7 @@ function ExportFormats() {
 					</h2>
 					<p className="mt-4 text-lg leading-relaxed text-background/70">
 						A board wants a PDF. Your data team wants a spreadsheet. A research partner wants structured
-						CSV. One completed COPA cycle produces everything — you just choose what to hand over.
+						CSV. One completed COPA cycle produces everything - you just choose what to hand over.
 					</p>
 				</div>
 
@@ -314,7 +314,7 @@ function HowProduced() {
 			num: "02",
 			icon: SlidersHorizontal,
 			title: "Submissions score automatically",
-			body: "When fieldwork syncs, Play Value and Usability scores calculate immediately across all four lenses — Provision, Variety, Challenge, and Sociability. No manual tabulation."
+			body: "When fieldwork syncs, Play Value and Usability scores calculate immediately across all four lenses - Provision, Variety, Challenge, and Sociability. No manual tabulation."
 		},
 		{
 			num: "03",
@@ -408,7 +408,7 @@ function Research() {
 		},
 		{
 			title: "Inclusive play and usability research",
-			body: "Usability scoring reflects who can genuinely access and participate — not who is nominally permitted."
+			body: "Usability scoring reflects who can genuinely access and participate - not who is nominally permitted."
 		},
 		{
 			title: "Children's perspectives",
@@ -478,7 +478,7 @@ function CtaBand() {
 					See what you could hand upward after one COPA cycle.
 				</h2>
 				<p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-background/70">
-					A structured assessment, automatically scored, exported in the format your audience needs — ready
+					A structured assessment, automatically scored, exported in the format your audience needs - ready
 					before the meeting that decides the next stage of the project.
 				</p>
 				<div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">

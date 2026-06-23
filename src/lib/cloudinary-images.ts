@@ -5,7 +5,7 @@ export type CloudinaryVariant = "thumbnail" | "card" | "full";
 
 // Source screenshots are very high-resolution (web framed shots up to ~4340px
 // wide). The `full` variant feeds the landing/showcase pages, which render in
-// slots up to ~960px CSS — ~2880px on a 3x display — so it is sized to stay
+// slots up to ~960px CSS - ~2880px on a 3x display - so it is sized to stay
 // crisp on retina rather than being downscaled below display needs. q_auto:good
 // keeps UI text and sharp edges clean (plain q_auto over-compresses them).
 const VARIANT_TRANSFORMS: Record<CloudinaryVariant, string> = {
@@ -55,7 +55,7 @@ export function buildCloudinaryUrl(publicId: string, variant: CloudinaryVariant 
 // Returns a Cloudinary URL only once the asset is confirmed on Cloudinary
 // (uploadedAt is set by the upload script). The public_id is pre-computed for
 // every asset, so gating on uploadedAt is what distinguishes a live image from
-// one that has not been pushed yet — otherwise pending cards would request a
+// one that has not been pushed yet - otherwise pending cards would request a
 // public_id that does not exist on Cloudinary and render as a broken image.
 export function getAssetDisplayUrl(asset: AssetEntry, variant: CloudinaryVariant = "card"): string | null {
 	if (asset.uploadedAt && asset.cloudinaryPublicId) return buildCloudinaryUrl(asset.cloudinaryPublicId, variant);

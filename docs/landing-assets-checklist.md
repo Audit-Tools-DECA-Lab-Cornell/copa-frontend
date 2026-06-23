@@ -1,4 +1,4 @@
-# COPA Landing — Asset Checklist
+# COPA Landing - Asset Checklist
 
 Purpose-made device mockups / photography for the landing concept pages. Each
 page already ships complete on existing assets; the items below fill the
@@ -6,7 +6,7 @@ page already ships complete on existing assets; the items below fill the
 
 **Workflow:** generate the assets below (screenhance / frameuse / photography),
 drop them at the exact paths given, then tell me to integrate. I'll wire each
-into its slot — no layout changes needed on your side.
+into its slot - no layout changes needed on your side.
 
 ---
 
@@ -26,61 +26,61 @@ into its slot — no layout changes needed on your side.
 
 ---
 
-## Already in place — no action needed
+## Already in place - no action needed
 
 - ✅ Framed web screens (semantic paths under `Framed/manager/...`)
 - ✅ 8 mobile renders in `public/marketing/` (`hero-dashboard-dark`, `field-questions-dark`, `step-*`, `reports-preview-portrait`, `report-scoring-tilted`)
-- ✅ `composites/hero-laptop-phone-dashboard-field.png` — **produced, not yet wired in.** I'll integrate this as the upgraded hero for **Manager Command Center**, **Two Surfaces**, and **Portfolio at Scale**.
+- ✅ `composites/hero-laptop-phone-dashboard-field.png` - **produced, not yet wired in.** I'll integrate this as the upgraded hero for **Manager Command Center**, **Two Surfaces**, and **Portfolio at Scale**.
 
 ---
 
 ## Assets to produce
 
-### Composites — `public/marketing/composites/`
+### Composites - `public/marketing/composites/`
 
-- [ ] **`field-trio-dark.png`** — *highest priority; one asset fills 5 slots*
-  - **Depicts:** three **dark** phones fanned in an arc — field dashboard + guided question flow + a third dark field screen (section notes or execute).
+- [ ] **`field-trio-dark.png`** - *highest priority; one asset fills 5 slots*
+  - **Depicts:** three **dark** phones fanned in an arc - field dashboard + guided question flow + a third dark field screen (section notes or execute).
   - **Source:** `marketing/hero-dashboard-dark.png`, `marketing/field-questions-dark.png`, + a **dark** notes/execute screen (see note ↓).
   - **Canvas:** landscape, transparent, ~2800×1700, baked shadow.
   - **Fills:** Manager Command Center, Anti-Clipboard, Interactive Platform Tour, Two Surfaces, Field-to-Boardroom (Stage 02).
   - **Note:** `step-section-notes.png` / `step-execute-section.png` are currently **light**. For theme cohesion, supply a dark variant of one of them as the third phone, or use `report-scoring-tilted` if it reads dark.
 
 - [ ] **`plan-laptop-roster-phone.png`**
-  - **Depicts:** a laptop (projects or places overview) with the **auditor roster** phone floating in front — a two-screen "planning / assign" feel.
+  - **Depicts:** a laptop (projects or places overview) with the **auditor roster** phone floating in front - a two-screen "planning / assign" feel.
   - **Source:** `Framed/manager/projects/01-overview/01.png` (or `places/...`) + a roster phone render.
   - **Canvas:** landscape, transparent, ~3000×2000, baked shadow.
-  - **Fills:** Field-to-Boardroom (Stage 01 — *Plan & assign*).
+  - **Fills:** Field-to-Boardroom (Stage 01 - *Plan & assign*).
 
 - [ ] **`report-laptop-phone.png`**
-  - **Depicts:** the **combined place report** on a laptop with the report phone overlaid front-right — "same evidence, every surface."
+  - **Depicts:** the **combined place report** on a laptop with the report phone overlaid front-right - "same evidence, every surface."
   - **Source:** `Framed/manager/reports/place-report/01-overview/01.png` + `marketing/reports-preview-portrait.png`.
   - **Canvas:** landscape, transparent, ~3000×2000, baked shadow.
   - **Fills:** Portfolio at Scale (comparable-outputs section).
 
 - [ ] **`report-phone-fullbleed.png`**
-  - **Depicts:** a single, beautifully staged **report phone**, full-bleed, with selective-focus / depth post-processing — gallery-grade.
+  - **Depicts:** a single, beautifully staged **report phone**, full-bleed, with selective-focus / depth post-processing - gallery-grade.
   - **Source:** `marketing/report-scoring-tilted.png` or `reports-preview-portrait.png`.
   - **Canvas:** portrait, ~1900×2700 (transparent or subtle gradient bg).
   - **Fills:** Editorial Minimal (hero/report moment).
 
-### Single device renders — `public/marketing/`
+### Single device renders - `public/marketing/`
 
 - [ ] **`field-offline-landscape.png`**
   - **Depicts:** a phone rotated to **landscape**, cropped close on the **offline-ready / sync** indicator.
   - **Source:** the field dashboard screen, landscape orientation, zoomed on the connectivity/offline state.
   - **Canvas:** landscape, transparent, ~2400×1400.
-  - **Fills:** Field-to-Boardroom (Stage 03 — *Capture & sync*).
+  - **Fills:** Field-to-Boardroom (Stage 03 - *Capture & sync*).
 
 - [ ] **`field-dashboard-offline-badge.png`**
-  - **Depicts:** the field dashboard phone with the **offline badge** prominent — a clean campaign shot.
+  - **Depicts:** the field dashboard phone with the **offline badge** prominent - a clean campaign shot.
   - **Source:** `marketing/hero-dashboard-dark.png` recomposed with the offline badge emphasized.
   - **Canvas:** portrait, transparent, ~1857×3096.
   - **Fills:** Editorial Minimal (offline / reliability moment).
 
-### Photography — `public/marketing/photo/`
+### Photography - `public/marketing/photo/`
 
 - [ ] **`playground-overhead.png`** (or `.jpg`)
-  - **Depicts:** an **overhead or child's-eye** view of a real outdoor playspace — natural features, varied play, inclusive.
+  - **Depicts:** an **overhead or child's-eye** view of a real outdoor playspace - natural features, varied play, inclusive.
   - **Canvas:** landscape, ~2400×1600, high-res, licensed.
   - **Fills:** Children-First (hero / "the child's question").
 
@@ -116,14 +116,14 @@ into its slot — no layout changes needed on your side.
 
 ---
 
-## Optional — future polish (not blocking)
+## Optional - future polish (not blocking)
 
 These unlock new section treatments but aren't required to fill any current slot:
 
-- [ ] **`marketing/ipad-execute-landscape.png`** — iPad in landscape running the execute/audit view (field auditors on tablets). Great for Platform Tour & Two Surfaces.
-- [ ] **Dark framed laptop** — every framed laptop is the light theme, so dark inverted bands can only show phones. A dark-theme laptop export would let dark bands show the web app too.
-- [ ] **Right-tilt phone renders** — we only have left-tilt/straight; a mirrored right-tilt makes symmetric multi-phone arcs cleaner.
-- [ ] **`Framed/manager/dashboard/01-overview/01.png` is available** — the true "workspace dashboard" overview is framed but not yet used on any page; consider featuring it.
+- [ ] **`marketing/ipad-execute-landscape.png`** - iPad in landscape running the execute/audit view (field auditors on tablets). Great for Platform Tour & Two Surfaces.
+- [ ] **Dark framed laptop** - every framed laptop is the light theme, so dark inverted bands can only show phones. A dark-theme laptop export would let dark bands show the web app too.
+- [ ] **Right-tilt phone renders** - we only have left-tilt/straight; a mirrored right-tilt makes symmetric multi-phone arcs cleaner.
+- [ ] **`Framed/manager/dashboard/01-overview/01.png` is available** - the true "workspace dashboard" overview is framed but not yet used on any page; consider featuring it.
 
 ---
 

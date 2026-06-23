@@ -205,7 +205,7 @@ function StopCoordinate() {
 								glow="slate"
 								sizes="(min-width: 1024px) 38rem, 92vw"
 							/>
-							<ScreenCaption>Project portfolio — total, active, and completed at a glance</ScreenCaption>
+							<ScreenCaption>Project portfolio - total, active, and completed at a glance</ScreenCaption>
 						</div>
 						<div>
 							<FramedMacbook
@@ -214,7 +214,7 @@ function StopCoordinate() {
 								glow="moss"
 								sizes="(min-width: 1024px) 38rem, 92vw"
 							/>
-							<ScreenCaption>Places table — audit status and scores for every site</ScreenCaption>
+							<ScreenCaption>Places table - audit status and scores for every site</ScreenCaption>
 						</div>
 					</div>
 				</div>
@@ -248,7 +248,7 @@ function StopOversee() {
 				<h2
 					id="oversee-heading"
 					className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
-					Know exactly where every audit stands — and who is doing it.
+					Know exactly where every audit stands - and who is doing it.
 				</h2>
 				<p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
 					The audits table and auditor roster give you a clear picture of workload, progress, and team
@@ -263,7 +263,7 @@ function StopOversee() {
 						sizes="(min-width: 1024px) 56rem, 92vw"
 						className="mx-auto max-w-4xl"
 					/>
-					<ScreenCaption>Audits table — every submission with auditor, dates, and PV/U scores</ScreenCaption>
+					<ScreenCaption>Audits table - every submission with auditor, dates, and PV/U scores</ScreenCaption>
 				</div>
 
 				<div className="mt-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
@@ -431,7 +431,7 @@ function StopScore() {
 								glow="moss"
 								sizes="(min-width: 1024px) 38rem, 92vw"
 							/>
-							<ScreenCaption>Audit scorecard — PV, U, and per-lens breakdown in one view</ScreenCaption>
+							<ScreenCaption>Audit scorecard - PV, U, and per-lens breakdown in one view</ScreenCaption>
 						</div>
 						<div>
 							<FramedMacbook
@@ -441,7 +441,7 @@ function StopScore() {
 								sizes="(min-width: 1024px) 38rem, 92vw"
 							/>
 							<ScreenCaption>
-								Report summary — domain-by-domain breakdown across all ten elements
+								Report summary - domain-by-domain breakdown across all ten elements
 							</ScreenCaption>
 						</div>
 					</div>
@@ -525,7 +525,7 @@ function StopReport() {
 							glow="moss"
 							sizes="(min-width: 1024px) 38rem, 92vw"
 						/>
-						<ScreenCaption>Combined place report — ready to export as PDF or Excel</ScreenCaption>
+						<ScreenCaption>Combined place report - ready to export as PDF or Excel</ScreenCaption>
 					</div>
 					<div>
 						<FramedMacbook

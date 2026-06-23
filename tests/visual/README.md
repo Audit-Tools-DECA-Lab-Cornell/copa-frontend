@@ -1,7 +1,7 @@
 # Visual screenshot catalog
 
-Captures every page of the web dashboard **and** its interactive surfaces —
-dialogs, sidebars, dropdown menus, and the same things closed again — into a
+Captures every page of the web dashboard **and** its interactive surfaces -
+dialogs, sidebars, dropdown menus, and the same things closed again - into a
 nested folder tree that mirrors where each feature lives in the app.
 
 ## How it runs
@@ -20,7 +20,7 @@ off) are **skipped**, never failed.
 
 ## Screen size and scrolling
 
-Everything is captured at a **MacBook Pro 16"** screen (1728 × 1117 — the default
+Everything is captured at a **MacBook Pro 16"** screen (1728 × 1117 - the default
 scaled resolution), showing exactly what fits on that screen, not stretched
 full-page images.
 
@@ -65,7 +65,7 @@ The combined place report is special: a place report merges a submitted place
 audit with a submitted place survey. The seed resolver finds a place that has
 both, opens the builder for it (so the modal shows the audit + survey pair
 selected), and the `place-report` view is captured by loading that built report
-with real `?audit=&survey=&placeId=` source ids — not the bare route, which
+with real `?audit=&survey=&placeId=` source ids - not the bare route, which
 shows an error because it has no sources to load.
 
 The pre-existing flat `*__*.png` files in `public/screenshots/` are the README's

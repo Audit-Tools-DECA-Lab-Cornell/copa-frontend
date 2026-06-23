@@ -293,7 +293,7 @@ function TheGap() {
 						{
 							value: "2",
 							label: "Core constructs",
-							note: "Play Value and Usability — what a space offers, and who can truly take part."
+							note: "Play Value and Usability - what a space offers, and who can truly take part."
 						},
 						{
 							value: "4",

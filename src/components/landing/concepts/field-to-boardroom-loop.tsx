@@ -4,7 +4,7 @@
  * Audience: managers and programme coordinators who need to see the full
  * assessment cycle before committing. The page is organized as four numbered
  * stages that trace a single audit from initial planning through to a
- * board-ready report — showing how the web dashboard and the field app
+ * board-ready report - showing how the web dashboard and the field app
  * hand off to each other at each turn.
  *
  * All visible copy is written from the visitor's point of view. No internal
@@ -129,7 +129,7 @@ function Hero() {
 						</h1>
 
 						<p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-							From your desk to the field and back — one system that closes the loop. Plan your assessment
+							From your desk to the field and back - one system that closes the loop. Plan your assessment
 							on the web, let your team collect data in the field, and walk away with a report you can act
 							on.
 						</p>
@@ -157,7 +157,7 @@ function Hero() {
 							{
 								n: "01",
 								title: "Plan & assign",
-								body: "Create projects, add playspaces, invite auditors, and assign work — all before your team leaves the office.",
+								body: "Create projects, add playspaces, invite auditors, and assign work - all before your team leaves the office.",
 								icon: FolderOpen
 							},
 							{
@@ -175,7 +175,7 @@ function Hero() {
 							{
 								n: "04",
 								title: "Report & decide",
-								body: "Submitted data becomes a structured Play Value and Usability report — exportable and ready to share.",
+								body: "Submitted data becomes a structured Play Value and Usability report - exportable and ready to share.",
 								icon: FileText
 							}
 						].map(step => (
@@ -211,7 +211,7 @@ function StageOne() {
 		{
 			icon: Users,
 			title: "Build your auditor roster",
-			body: "Invite auditors, review their work history, and assign them to specific playspaces — all from one roster view."
+			body: "Invite auditors, review their work history, and assign them to specific playspaces - all from one roster view."
 		},
 		{
 			icon: ClipboardCheck,
@@ -223,7 +223,7 @@ function StageOne() {
 	return (
 		<section id="stage-01" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="stage-01-heading">
 			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-				<StageNumber n="01" label="Plan & assign — web" />
+				<StageNumber n="01" label="Plan & assign - web" />
 				<StageDivider />
 
 				<div className="mt-8 grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
@@ -235,7 +235,7 @@ function StageOne() {
 						</h2>
 						<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
 							The web dashboard is where the assessment begins. Create your project, add the playspaces
-							you want to evaluate, and assign auditors — in the time it takes to run a short meeting.
+							you want to evaluate, and assign auditors - in the time it takes to run a short meeting.
 						</p>
 
 						<ul className="mt-8 space-y-5">
@@ -283,7 +283,7 @@ function StageTwo() {
 	const capabilities: Array<{ title: string; body: string }> = [
 		{
 			title: "Guided, section-by-section flow",
-			body: "COPA walks auditors through all 10 playspace elements in order — natural features, equipment, surfaces, pathways, seating, shade, maintenance, and more."
+			body: "COPA walks auditors through all 10 playspace elements in order - natural features, equipment, surfaces, pathways, seating, shade, maintenance, and more."
 		},
 		{
 			title: "Covers Play Value and Usability in one visit",
@@ -301,7 +301,7 @@ function StageTwo() {
 			className="scroll-mt-20 bg-foreground text-background"
 			aria-labelledby="stage-02-heading">
 			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-				<StageNumber n="02" label="Audit on site — mobile" inverted />
+				<StageNumber n="02" label="Audit on site - mobile" inverted />
 				<StageDivider inverted />
 
 				<div className="mt-8 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
@@ -338,7 +338,7 @@ function StageTwo() {
 						</h2>
 						<p className="mt-4 text-lg leading-relaxed text-background/70">
 							The mobile app is what auditors carry to the playspace. It gives them a structured,
-							repeatable method so every assessment covers the same ground — and the scores you compare
+							repeatable method so every assessment covers the same ground - and the scores you compare
 							later actually mean something.
 						</p>
 
@@ -372,7 +372,7 @@ function StageThree() {
 		{
 			icon: ClipboardCheck,
 			title: "Pick up where you left off",
-			body: "Interrupted visits — a rain shower, a call, a second day on a large site — are not a problem. Drafts resume exactly where the auditor stopped."
+			body: "Interrupted visits - a rain shower, a call, a second day on a large site - are not a problem. Drafts resume exactly where the auditor stopped."
 		},
 		{
 			icon: RefreshCw,
@@ -387,7 +387,7 @@ function StageThree() {
 			className="scroll-mt-20 border-b border-edge/40 bg-muted/30"
 			aria-labelledby="stage-03-heading">
 			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-				<StageNumber n="03" label="Capture & sync — mobile" />
+				<StageNumber n="03" label="Capture & sync - mobile" />
 				<StageDivider />
 
 				<div className="mt-8 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
@@ -395,7 +395,7 @@ function StageThree() {
 						<h2
 							id="stage-03-heading"
 							className="text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
-							The data comes home — even when the signal does not.
+							The data comes home - even when the signal does not.
 						</h2>
 						<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
 							Playspaces are rarely in the best spots for mobile reception. COPA is built around that
@@ -421,7 +421,7 @@ function StageThree() {
 							<ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
 							<p className="text-sm leading-relaxed text-muted-foreground">
 								From the moment an auditor arrives at a playspace to the moment the data appears on your
-								dashboard — COPA keeps the chain intact.
+								dashboard - COPA keeps the chain intact.
 							</p>
 						</div>
 					</div>
@@ -450,7 +450,7 @@ function StageFour() {
 	const reportPoints: Array<{ title: string; body: string }> = [
 		{
 			title: "Provision, Variety, Challenge, Sociability",
-			body: "Four scoring lenses applied to Play Value and Usability give stakeholders a structured picture — not just a single number."
+			body: "Four scoring lenses applied to Play Value and Usability give stakeholders a structured picture - not just a single number."
 		},
 		{
 			title: "One combined place report",
@@ -465,7 +465,7 @@ function StageFour() {
 	return (
 		<section id="stage-04" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="stage-04-heading">
 			<div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-				<StageNumber n="04" label="Report & decide — web" />
+				<StageNumber n="04" label="Report & decide - web" />
 				<StageDivider />
 
 				<div className="mt-8">
@@ -553,7 +553,7 @@ function Method() {
 		{
 			value: "4",
 			label: "Scoring lenses",
-			body: "Provision, Variety, Challenge, and Sociability — applied to both constructs so scores are structured, not subjective."
+			body: "Provision, Variety, Challenge, and Sociability - applied to both constructs so scores are structured, not subjective."
 		},
 		{
 			value: "10",
@@ -573,7 +573,7 @@ function Method() {
 					<h2
 						id="method-heading"
 						className="mt-3 text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
-						Built on rigorous, research-informed assessment — not checklists.
+						Built on rigorous, research-informed assessment - not checklists.
 					</h2>
 					<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
 						The scores auditors collect are grounded in children&apos;s play research, affordance theory,
@@ -628,7 +628,7 @@ function ClosingBand() {
 						</h2>
 						<p className="mt-4 max-w-xl text-lg leading-relaxed text-background/70">
 							Set up a project, invite an auditor, and run your first assessment. The whole cycle takes
-							one visit — and the report is waiting for you when they sync.
+							one visit - and the report is waiting for you when they sync.
 						</p>
 
 						<div className="mt-8 flex flex-col gap-3 sm:flex-row">

@@ -55,7 +55,7 @@ export const managerTargets: readonly CaptureTarget[] = [
 		states: [
 			{ name: "overview", label: "Manager Places" },
 			{
-				// Places are filtered here, not created — capture a filter popover open.
+				// Places are filtered here, not created - capture a filter popover open.
 				name: "filter-popover-open",
 				label: "Manager Places - Filter popover",
 				optional: true,

@@ -5,7 +5,7 @@ description: Sets up Caliber for automatic AI agent context sync. Installs pre-c
 
 # Setup Caliber
 
-Dynamic onboarding for Caliber — automatic AI agent context sync.
+Dynamic onboarding for Caliber - automatic AI agent context sync.
 Run all diagnostic steps below on every invocation to determine what's already
 set up and what still needs to be done.
 
@@ -40,7 +40,7 @@ command -v caliber >/dev/null 2>&1 && caliber --version || echo "NOT_INSTALLED"
 grep -q "caliber" .git/hooks/pre-commit 2>/dev/null && echo "HOOK_ACTIVE" || echo "NO_HOOK"
 ```
 
-- If HOOK_ACTIVE → Tell the user: "Pre-commit hook is active — configs sync on every commit." Move to Step 3.
+- If HOOK_ACTIVE → Tell the user: "Pre-commit hook is active - configs sync on every commit." Move to Step 3.
 - If NO_HOOK → Tell the user: "I'll install the pre-commit hook so your agent configs sync automatically on every commit."
   ```bash
   $CALIBER hooks --install
@@ -102,7 +102,7 @@ Ask the user: "Are you setting up for yourself only, or for your team too?"
   $CALIBER learn status 2>/dev/null | head -3
   ```
   - If learning is already enabled → note it in the summary.
-  - If not enabled → ask the user: "Caliber can learn from your coding sessions — when you correct a mistake or fix a pattern, it remembers for next time. Enable session learning?"
+  - If not enabled → ask the user: "Caliber can learn from your coding sessions - when you correct a mistake or fix a pattern, it remembers for next time. Enable session learning?"
     If yes:
     ```bash
     $CALIBER learn install
@@ -190,10 +190,10 @@ After completing all steps, show the user what's configured:
 ```
 Caliber Setup Complete:
 ✓ Caliber installed (vX.X.X)
-✓ Pre-commit hook — configs sync on every commit
-✓ Agent configs — CLAUDE.md, Cursor rules, AGENTS.md
+✓ Pre-commit hook - configs sync on every commit
+✓ Agent configs - CLAUDE.md, Cursor rules, AGENTS.md
 ✓ Config score: X/100
-✓ GitHub Action — nightly sync + PR checks (team only)
+✓ GitHub Action - nightly sync + PR checks (team only)
 
 From now on, every commit keeps all your agent configs in sync automatically.
 ```

@@ -1,7 +1,7 @@
 /**
  * Concept: Editorial Minimal.
  *
- * Audience: design-sensitive institutional buyers — landscape architects, urban
+ * Audience: design-sensitive institutional buyers - landscape architects, urban
  * play designers, and premium programme commissioners who respond to restraint
  * and authority rather than feature lists.
  *
@@ -9,8 +9,8 @@
  * statement paired with one carefully chosen visual. Negative space does the
  * persuasion that copy would undermine in this audience.
  *
- * PV / U score motif appears quietly in each section — never shouted, just
- * present — so the construct accumulates meaning as the visitor moves down.
+ * PV / U score motif appears quietly in each section - never shouted, just
+ * present - so the construct accumulates meaning as the visitor moves down.
  *
  * All visible copy is user-facing. No internal terminology, no data-model
  * names, no implementation details.
@@ -52,7 +52,7 @@ const NAV: NavLink[] = [
 	{ href: "#report", label: "Report" }
 ];
 
-// ─── Score pill — the quiet recurring motif ───────────────────────────────────
+// ─── Score pill - the quiet recurring motif ───────────────────────────────────
 
 /**
  * A small PV / U score indicator used as a visual anchor across sections.
@@ -99,7 +99,7 @@ function Hero() {
 				</h1>
 
 				<p className="mt-8 max-w-md text-lg leading-relaxed text-muted-foreground">
-					A structured audit that measures what a playspace actually offers children — not just what it
+					A structured audit that measures what a playspace actually offers children - not just what it
 					complies with.
 				</p>
 
@@ -188,7 +188,7 @@ function FieldMoment() {
 							device, so a lost connection never interrupts fieldwork.
 						</p>
 
-						<ScorePill pv="—" u="—" className="mt-8 border-background/20 bg-background/10" />
+						<ScorePill pv="-" u="-" className="mt-8 border-background/20 bg-background/10" />
 					</div>
 
 					{/* HYBRID SLOT: offline-badge overlay render positioned on phone for premium campaign shoot */}
@@ -243,7 +243,7 @@ function ReportMoment() {
 
 /**
  * Brief authority section for the framework. Kept to one paragraph and one
- * accreditation line — enough to satisfy a professional buyer, not so much
+ * accreditation line - enough to satisfy a professional buyer, not so much
  * that it turns into a literature review.
  */
 function MethodNote() {
@@ -262,7 +262,7 @@ function MethodNote() {
 					</h2>
 
 					<p className="mt-6 text-lg leading-[1.75] text-muted-foreground">
-						COPA assesses two constructs — what a playspace offers (Play Value) and who can genuinely take
+						COPA assesses two constructs - what a playspace offers (Play Value) and who can genuinely take
 						part (Usability). Each is scored across four lenses: Provision, Variety, Challenge, and
 						Sociability. Together they cover the whole environment: natural features, surfaces, loose parts,
 						shade, pathways, seating, community context, and more.

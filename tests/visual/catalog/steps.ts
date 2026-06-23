@@ -40,7 +40,7 @@ export async function openDialog(page: Page, buttonName: RegExp | string): Promi
 		}
 		sawTrigger = true;
 		// A present-but-disabled trigger means the feature is gated off for the
-		// current seed data (e.g. nothing submitted yet) — keep looking for an
+		// current seed data (e.g. nothing submitted yet) - keep looking for an
 		// actionable row before giving up.
 		if (!(await candidate.isEnabled().catch(() => false))) {
 			continue;

@@ -9,7 +9,7 @@
  *
  * All visible copy is written from the visitor's point of view. Internal
  * strategy terms, data-model names, and developer language are in comments
- * only — never on the page.
+ * only - never on the page.
  */
 
 import {
@@ -84,7 +84,7 @@ function Hero() {
 					</h1>
 					<p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
 						Counting equipment tells you what&apos;s installed. It doesn&apos;t tell you whether children
-						can actually play — whether the space invites exploration, accommodates every child, or holds
+						can actually play - whether the space invites exploration, accommodates every child, or holds
 						attention beyond the first five minutes.
 					</p>
 					<div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -121,10 +121,10 @@ const OLD_WAY: ContrastItem[] = [
 
 const NEW_WAY: ContrastItem[] = [
 	{ icon: Eye, label: "Can children choose what to do and how to do it?" },
-	{ icon: Shuffle, label: "Does the space offer variety — different types of challenge and play?" },
+	{ icon: Shuffle, label: "Does the space offer variety - different types of challenge and play?" },
 	{ icon: Heart, label: "Can every child find a way in, a way to belong?" },
 	{ icon: Sparkles, label: "Are there materials, loose parts, or spaces that invite exploration?" },
-	{ icon: Smile, label: "Does it support social play, retreat, and return — together and alone?" }
+	{ icon: Smile, label: "Does it support social play, retreat, and return - together and alone?" }
 ];
 
 function OldVsNew() {
@@ -165,7 +165,7 @@ function OldVsNew() {
 							))}
 						</ul>
 						<p className="mt-6 border-t border-edge/40 pt-4 text-xs leading-relaxed text-muted-foreground">
-							Compliance checks are necessary — but they tell you about what is installed, not whether it
+							Compliance checks are necessary - but they tell you about what is installed, not whether it
 							works for children.
 						</p>
 					</div>
@@ -187,7 +187,7 @@ function OldVsNew() {
 							))}
 						</ul>
 						<p className="mt-6 border-t border-primary/20 pt-4 text-xs leading-relaxed text-muted-foreground">
-							Grounded in Play Value and Usability — what a space affords, and who can genuinely take
+							Grounded in Play Value and Usability - what a space affords, and who can genuinely take
 							part.
 						</p>
 					</div>
@@ -198,7 +198,7 @@ function OldVsNew() {
 					<MoveRight className="size-5 shrink-0 text-primary" aria-hidden />
 					<p className="text-sm leading-relaxed text-muted-foreground">
 						<span className="font-semibold text-foreground">COPA doesn&apos;t replace compliance.</span> It
-						asks the questions that come after — and gives you evidence to act on.
+						asks the questions that come after - and gives you evidence to act on.
 					</p>
 				</div>
 			</div>
@@ -229,7 +229,7 @@ const ELEMENTS: ElementItem[] = [
 	{
 		icon: MapPin,
 		name: "Enclosure & open space",
-		body: "Places to retreat, to hide, to watch — and places to run, see, and be seen."
+		body: "Places to retreat, to hide, to watch - and places to run, see, and be seen."
 	},
 	{
 		icon: Heart,
@@ -239,7 +239,7 @@ const ELEMENTS: ElementItem[] = [
 	{
 		icon: Eye,
 		name: "Pathways",
-		body: "How children and caregivers move through the space — and who can move where."
+		body: "How children and caregivers move through the space - and who can move where."
 	},
 	{
 		icon: Sparkles,
@@ -279,7 +279,7 @@ function WholeSystem() {
 					</h2>
 					<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
 						A single slide tells you almost nothing. How it sits among natural features, loose parts,
-						pathways, enclosure, and social space — that&apos;s where play quality lives. COPA evaluates the
+						pathways, enclosure, and social space - that&apos;s where play quality lives. COPA evaluates the
 						entire environment across ten elements.
 					</p>
 				</div>
@@ -315,12 +315,12 @@ const STRUCTURE_FEATURES: StructureFeature[] = [
 	{
 		icon: CheckSquare,
 		title: "Guided, not freeform",
-		body: "Every assessor works through the same structured instrument — Provision, Variety, Challenge, Sociability — across the whole playspace. No two people scoring it differently."
+		body: "Every assessor works through the same structured instrument - Provision, Variety, Challenge, Sociability - across the whole playspace. No two people scoring it differently."
 	},
 	{
 		icon: FileText,
 		title: "Notes and evidence built in",
-		body: "The app captures observations and supporting notes as you go, so the scoring is grounded in what you actually saw — not reconstructed afterward."
+		body: "The app captures observations and supporting notes as you go, so the scoring is grounded in what you actually saw - not reconstructed afterward."
 	},
 	{
 		icon: Smile,
@@ -346,7 +346,7 @@ function StructuredAudit() {
 						Structured and guided. Not just prettier.
 					</h2>
 					<p className="mt-4 text-lg leading-relaxed text-background/70">
-						COPA isn&apos;t a digital version of a paper form. It&apos;s a different kind of instrument —
+						COPA isn&apos;t a digital version of a paper form. It&apos;s a different kind of instrument -
 						one that walks assessors through the whole playspace with a consistent method, then turns those
 						observations into scores you can compare and act on.
 					</p>
@@ -365,13 +365,13 @@ function StructuredAudit() {
 						))}
 					</ul>
 
-					{/* Honest caveat — adds credibility */}
+					{/* Honest caveat - adds credibility */}
 					<div className="mt-8 flex items-start gap-3 rounded-card border border-background/20 bg-background/8 px-4 py-3">
 						<AlertCircle className="mt-0.5 size-4 shrink-0 text-background/60" aria-hidden />
 						<p className="text-sm leading-relaxed text-background/65">
 							<span className="font-semibold text-background/80">What COPA is not:</span> it&apos;s not a
 							compliance checklist, and it&apos;s not automated. A COPA assessment is conducted by a
-							knowledgeable practitioner — the tool structures and records their judgment, it doesn&apos;t
+							knowledgeable practitioner - the tool structures and records their judgment, it doesn&apos;t
 							replace it.
 						</p>
 					</div>
@@ -407,7 +407,7 @@ const EVIDENCE_POINTS: Array<{ icon: LucideIcon; title: string; body: string }> 
 	{
 		icon: Layers,
 		title: "Play Value and Usability scores",
-		body: "Every audit produces structured scores across Provision, Variety, Challenge, and Sociability — for what the space offers, and who can participate."
+		body: "Every audit produces structured scores across Provision, Variety, Challenge, and Sociability - for what the space offers, and who can participate."
 	},
 	{
 		icon: Eye,
@@ -433,7 +433,7 @@ function Evidence() {
 						From observation to evidence, without the manual assembly.
 					</h2>
 					<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-						When fieldwork is done, COPA turns it into something defensible — structured scores and a
+						When fieldwork is done, COPA turns it into something defensible - structured scores and a
 						formatted report you can hand to funders, planners, or board members without an afternoon of
 						cut-and-paste.
 					</p>
@@ -480,8 +480,8 @@ function Evidence() {
 							Scores that hold up to scrutiny.
 						</h3>
 						<p className="mt-3 text-base leading-relaxed text-muted-foreground">
-							Play Value and Usability are assessed through four scoring lenses — Provision, Variety,
-							Challenge, and Sociability — grounded in affordance theory, inclusive design research, and
+							Play Value and Usability are assessed through four scoring lenses - Provision, Variety,
+							Challenge, and Sociability - grounded in affordance theory, inclusive design research, and
 							children&apos;s perspectives. The framework was developed and expert-reviewed by Dr. Thomas
 							Morgenthaler and Dr. Janet Loebach.
 						</p>
@@ -528,7 +528,7 @@ function CtaBand() {
 				</h2>
 				<p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-background/70">
 					COPA gives you a structured method, a guided field tool, and a report that answers the question the
-					clipboard never could — whether children can actually play.
+					clipboard never could - whether children can actually play.
 				</p>
 				<div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
 					<Button asChild size="lg" variant="secondary">

@@ -5,7 +5,7 @@
  * programs, and any organisation running COPA assessments across many places and
  * teams. The page is written from the perspective of an institutional buyer who
  * needs standardised, comparable, and exportable evidence across a whole
- * portfolio — not just one playspace.
+ * portfolio - not just one playspace.
  *
  * All visible copy is user-facing. No strategy terms, internal labels, or
  * developer terminology appear on screen.
@@ -78,12 +78,12 @@ function Hero() {
 					<h1
 						id="hero-heading"
 						className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-balance text-foreground sm:text-5xl lg:text-6xl">
-						One playspace or thirty — assessed the same rigorous way.
+						One playspace or thirty - assessed the same rigorous way.
 					</h1>
 
 					<p className="mt-5 text-lg leading-relaxed text-muted-foreground">
 						COPA gives your organisation a single, standardised approach to Play Value and Usability
-						assessment. Comparable scores, coordinated teams, and structured data ready for analysis —
+						assessment. Comparable scores, coordinated teams, and structured data ready for analysis -
 						across every site in your portfolio.
 					</p>
 
@@ -132,7 +132,7 @@ function Portfolio() {
 		{
 			icon: FolderKanban,
 			title: "Organise work into projects",
-			body: "Group sites under named projects — by season, funding cycle, district, or any structure that matches how your programme runs."
+			body: "Group sites under named projects - by season, funding cycle, district, or any structure that matches how your programme runs."
 		},
 		{
 			icon: BarChart3,
@@ -159,7 +159,7 @@ function Portfolio() {
 						</h2>
 						<p className="mt-4 text-lg leading-relaxed text-muted-foreground">
 							Whether you manage a dozen parks or a hundred, COPA keeps your projects and places in one
-							organised view — with progress and scores updating as fieldwork is submitted.
+							organised view - with progress and scores updating as fieldwork is submitted.
 						</p>
 
 						<ul className="mt-8 space-y-5">
@@ -313,7 +313,7 @@ function ComparableOutputs() {
 		{
 			icon: Scale,
 			title: "Scores that stand up to comparison",
-			body: "Because every audit uses the same COPA instrument and the same scoring lenses, a Play Value score from one site means the same thing as the same score from another — across your whole portfolio."
+			body: "Because every audit uses the same COPA instrument and the same scoring lenses, a Play Value score from one site means the same thing as the same score from another - across your whole portfolio."
 		},
 		{
 			icon: Globe,
@@ -342,7 +342,7 @@ function ComparableOutputs() {
 						</h2>
 						<p className="mt-4 text-lg leading-relaxed text-background/70">
 							Standardised assessment is only useful if the outputs are equally consistent. COPA produces
-							structured reports with the same scoring framework applied to every site — so comparisons
+							structured reports with the same scoring framework applied to every site - so comparisons
 							are meaningful, not approximate.
 						</p>
 
@@ -405,7 +405,7 @@ function DataForAnalysis() {
 			icon: Database,
 			label: "ZIP bundle",
 			description:
-				"Full organisation export — projects, places, audits, and saved reports in one structured archive."
+				"Full organisation export - projects, places, audits, and saved reports in one structured archive."
 		},
 		{
 			icon: FileSpreadsheet,
@@ -438,7 +438,7 @@ function DataForAnalysis() {
 						<p className="mt-4 text-base leading-relaxed text-muted-foreground">
 							COPA organises assessment data so it can leave the dashboard and enter your analysis
 							pipeline. Export full organisation data for use in GIS platforms, statistical software, or
-							external research programmes — structured by project, place, and audit.
+							external research programmes - structured by project, place, and audit.
 						</p>
 
 						<div className="mt-8 space-y-3">
@@ -463,7 +463,7 @@ function DataForAnalysis() {
 							<ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
 							<p className="text-xs leading-relaxed text-muted-foreground">
 								Organisation-wide exports are available to account managers and do not include auditor
-								personal details — only the assessment data and scoring records your analysis needs.
+								personal details - only the assessment data and scoring records your analysis needs.
 							</p>
 						</div>
 					</div>
@@ -507,7 +507,7 @@ function ResearchFoundation() {
 							Scores that hold up across sites because the method holds up first.
 						</h2>
 						<p className="mt-4 text-base leading-relaxed text-muted-foreground">
-							COPA assesses two constructs — Play Value and Usability — each through four scoring lenses
+							COPA assesses two constructs - Play Value and Usability - each through four scoring lenses
 							applied consistently across all ten playspace elements. Scores are grounded in affordance
 							theory, inclusive play research, and children&apos;s perspectives, then reviewed and
 							field-tested by researchers with play environment expertise.
@@ -524,7 +524,7 @@ function ResearchFoundation() {
 
 					<div>
 						<p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-							Four scoring lenses — applied to every site, every audit
+							Four scoring lenses - applied to every site, every audit
 						</p>
 						<div className="mt-4 grid gap-3 sm:grid-cols-2">
 							{lenses.map(lens => (
@@ -537,7 +537,7 @@ function ResearchFoundation() {
 							))}
 						</div>
 						<p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-							The same four lenses evaluate both Play Value and Usability — so scores across constructs,
+							The same four lenses evaluate both Play Value and Usability - so scores across constructs,
 							sites, and seasons are directly comparable.
 						</p>
 					</div>
@@ -611,7 +611,7 @@ function PartnershipCta() {
 						</h3>
 						<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
 							Portfolio pricing, instrument configuration, and data-export options are scoped through
-							partner conversations. No standard monthly rate applies at this scale — we work with you
+							partner conversations. No standard monthly rate applies at this scale - we work with you
 							directly.
 						</p>
 					</div>
