@@ -53,8 +53,8 @@ const SHOT = {
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
 	rawData: screenshotUrl("/screenshots/Framed/manager/raw-data/01-overview/01.png"),
-	phoneReportScoring: "/marketing/report-scoring-tilted.png",
-	phoneReportsPreview: "/marketing/reports-preview-portrait.png"
+	phoneReportScoring: screenshotUrl("/marketing/report-scoring-tilted.png"),
+	phoneReportsPreview: screenshotUrl("/marketing/reports-preview-portrait.png")
 };
 
 const NAV: NavLink[] = [

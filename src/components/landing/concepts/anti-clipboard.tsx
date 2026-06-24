@@ -55,10 +55,10 @@ const SHOT = {
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
 	auditScorecard: screenshotUrl("/screenshots/Framed/manager/audits/detail/01-overview/01.png"),
-	phoneFieldQuestions: "/marketing/field-questions-dark.png",
-	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
-	phoneExecuteSection: "/marketing/step-execute-section.png",
-	phoneSectionNotes: "/marketing/step-section-notes.png"
+	phoneFieldQuestions: screenshotUrl("/marketing/field-questions-dark.png"),
+	phoneFieldDashboard: screenshotUrl("/marketing/hero-dashboard-dark.png"),
+	phoneExecuteSection: screenshotUrl("/marketing/step-execute-section.png"),
+	phoneSectionNotes: screenshotUrl("/marketing/step-section-notes.png")
 };
 
 const NAV: NavLink[] = [

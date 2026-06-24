@@ -41,8 +41,8 @@ const SHOT = {
 	projects: screenshotUrl("/screenshots/Framed/manager/projects/01-overview/01.png"),
 	audits: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
-	phoneScoring: "/marketing/report-scoring-tilted.png",
-	phoneField: "/marketing/field-questions-dark.png"
+	phoneScoring: screenshotUrl("/marketing/report-scoring-tilted.png"),
+	phoneField: screenshotUrl("/marketing/field-questions-dark.png")
 };
 
 const NAV: NavLink[] = [

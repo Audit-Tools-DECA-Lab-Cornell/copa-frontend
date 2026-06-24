@@ -54,9 +54,9 @@ const SHOT = {
 	roster: screenshotUrl("/screenshots/Framed/manager/auditors/02-invite-dialog-open.png"),
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
-	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
-	phoneQuestions: "/marketing/field-questions-dark.png",
-	phoneReports: "/marketing/reports-preview-portrait.png"
+	phoneFieldDashboard: screenshotUrl("/marketing/hero-dashboard-dark.png"),
+	phoneQuestions: screenshotUrl("/marketing/field-questions-dark.png"),
+	phoneReports: screenshotUrl("/marketing/reports-preview-portrait.png")
 };
 
 const NAV: NavLink[] = [

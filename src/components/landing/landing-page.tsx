@@ -1,4 +1,3 @@
-"use client";
 
 /**
  * COPA Public Homepage - Major Redesign
@@ -19,7 +18,9 @@
  * 13. Final CTA band
  * 14. Site Footer
  *
- * Product renders live in public/marketing/ and are framed by the DeviceShot
+ * Product renders are delivered from Cloudinary (mirrored from public/marketing/
+ * by assets/scripts/upload-to-cloudinary.mjs) via screenshotUrl(), and are framed
+ * by the DeviceShot
  * primitive: transparent device PNGs on a token-based color halo with an alpha
  * drop shadow. Light and dark screens are mixed to show the app's two themes.
  *
@@ -55,6 +56,7 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { screenshotUrl } from "@/lib/asset-url";
 import { type PvScaleKey, SCALE_ACCENT_BAR_CLASS_NAMES } from "@/lib/audit/scale-colors";
 import { cn } from "@/lib/utils";
 
@@ -305,7 +307,7 @@ function Hero() {
 				</div>
 
 				<DeviceShot
-					src="/marketing/hero-dashboard-dark.png"
+					src={screenshotUrl("/marketing/hero-dashboard-dark.png")}
 					alt="COPA mobile field dashboard showing assigned and completed playspace audits, a priority task with a progress bar, and offline-ready status"
 					width={1857}
 					height={3096}
@@ -484,7 +486,7 @@ function WhatCopasMeasures() {
 
 					<figure className="lg:pl-2">
 						<DeviceShot
-							src="/marketing/report-scoring-tilted.png"
+							src={screenshotUrl("/marketing/report-scoring-tilted.png")}
 							alt="COPA report screen showing Play Value and Usability scores with a Provision, Variety, Challenge, and Sociability breakdown for a playspace"
 							width={1857}
 							height={3096}
@@ -692,13 +694,13 @@ function FieldBand() {
 
 				<div className="order-1 lg:order-2">
 					<DeviceShot
-						src="/marketing/field-questions-dark.png"
+						src={screenshotUrl("/marketing/field-questions-dark.png")}
 						alt="COPA mobile audit in progress, showing Provision questions on section three of seven for a playspace with selectable answer options"
 						width={1857}
 						height={3096}
 						glow="terracotta"
 						sizes="(min-width: 1024px) 26rem, 70vw"
-						className="max-w-[17rem] sm:max-w-sm"
+						className="max-w-68 sm:max-w-sm"
 						haloClassName="bg-accent-terracotta/30"
 					/>
 				</div>
@@ -717,35 +719,35 @@ function HowItWorks() {
 		alt: string;
 		glow: DeviceGlow;
 	}> = [
-		{
-			title: "Assign a playspace",
-			body: "Select or add the outdoor playspace to assess. Capture site information, location context, and relevant background before the visit.",
-			img: "/marketing/step-place-detail.png",
-			alt: "COPA place detail screen showing a playspace with its location, project, and assessment status before an audit begins",
-			glow: "moss"
-		},
-		{
-			title: "Complete an onsite audit",
-			body: "Work through the COPA instrument in the field. Structured prompts guide observation of all playspace elements - not just equipment.",
-			img: "/marketing/step-execute-section.png",
-			alt: "COPA mobile audit section showing Playspace Character and Community questions with answer options during an onsite assessment",
-			glow: "slate"
-		},
-		{
-			title: "Capture observations and notes",
-			body: "Record structured responses, contextual notes, and photo documentation, organised by construct, domain, and assessment lens.",
-			img: "/marketing/step-section-notes.png",
-			alt: "COPA mobile section notes screen with a free-text field for recommendations and save-and-next actions",
-			glow: "terracotta"
-		},
-		{
-			title: "Generate reports and guide decisions",
-			body: "Review Play Value and Usability scores, domain breakdowns, and findings. Export reports to support renovation planning, funding requests, and design review.",
-			img: "/marketing/step-report-detail.png",
-			alt: "COPA report detail screen showing Play Value and Usability scoring tables with per-lens breakdowns for a playspace",
-			glow: "violet"
-		}
-	];
+			{
+				title: "Assign a playspace",
+				body: "Select or add the outdoor playspace to assess. Capture site information, location context, and relevant background before the visit.",
+				img: screenshotUrl("/marketing/step-place-detail.png"),
+				alt: "COPA place detail screen showing a playspace with its location, project, and assessment status before an audit begins",
+				glow: "moss"
+			},
+			{
+				title: "Complete an onsite audit",
+				body: "Work through the COPA instrument in the field. Structured prompts guide observation of all playspace elements - not just equipment.",
+				img: screenshotUrl("/marketing/step-execute-section.png"),
+				alt: "COPA mobile audit section showing Playspace Character and Community questions with answer options during an onsite assessment",
+				glow: "slate"
+			},
+			{
+				title: "Capture observations and notes",
+				body: "Record structured responses, contextual notes, and photo documentation, organised by construct, domain, and assessment lens.",
+				img: screenshotUrl("/marketing/step-section-notes.png"),
+				alt: "COPA mobile section notes screen with a free-text field for recommendations and save-and-next actions",
+				glow: "terracotta"
+			},
+			{
+				title: "Generate reports and guide decisions",
+				body: "Review Play Value and Usability scores, domain breakdowns, and findings. Export reports to support renovation planning, funding requests, and design review.",
+				img: screenshotUrl("/marketing/step-report-detail.png"),
+				alt: "COPA report detail screen showing Play Value and Usability scoring tables with per-lens breakdowns for a playspace",
+				glow: "violet"
+			}
+		];
 
 	return (
 		<section id="how" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="how-heading">
@@ -919,7 +921,7 @@ function Outcomes() {
 
 						<figure className="mt-8">
 							<DeviceShot
-								src="/marketing/reports-preview-portrait.png"
+								src={screenshotUrl("/marketing/reports-preview-portrait.png")}
 								alt="COPA reports list showing completed playspace audits with Play Value and Usability scores and CSV, Excel, and PDF export options"
 								width={1419}
 								height={2796}

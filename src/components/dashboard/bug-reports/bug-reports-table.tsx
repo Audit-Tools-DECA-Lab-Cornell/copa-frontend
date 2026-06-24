@@ -536,7 +536,9 @@ function BugReportDetail({
 								{contextRows.map(row => (
 									<div key={row.label} className="flex flex-col">
 										<dt className="text-xs font-medium text-text-secondary">{row.label}</dt>
-										<dd className="text-sm font-medium wrap-break-word text-foreground">{row.value}</dd>
+										<dd className="text-sm font-medium wrap-break-word text-foreground">
+											{row.value}
+										</dd>
 									</div>
 								))}
 							</dl>

@@ -58,8 +58,8 @@ const SHOT = {
 	rawData: screenshotUrl("/screenshots/Framed/manager/raw-data/01-overview/01.png"),
 	auditsTable: screenshotUrl("/screenshots/Framed/manager/audits/01-overview/02.png"),
 	auditScorecard: screenshotUrl("/screenshots/Framed/manager/audits/detail/01-overview/01.png"),
-	phoneReportScoring: "/marketing/report-scoring-tilted.png",
-	phoneReportDetail: "/marketing/step-report-detail.png"
+	phoneReportScoring: screenshotUrl("/marketing/report-scoring-tilted.png"),
+	phoneReportDetail: screenshotUrl("/marketing/step-report-detail.png")
 };
 
 const NAV: NavLink[] = [

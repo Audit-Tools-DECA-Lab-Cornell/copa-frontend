@@ -54,8 +54,8 @@ const SHOT = {
 	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	dataExport: screenshotUrl("/screenshots/Framed/manager/raw-data/01-overview/01.png"),
-	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
-	phoneQuestions: "/marketing/field-questions-dark.png"
+	phoneFieldDashboard: screenshotUrl("/marketing/hero-dashboard-dark.png"),
+	phoneQuestions: screenshotUrl("/marketing/field-questions-dark.png")
 };
 
 // ─── Tour stop definitions ────────────────────────────────────────────────────

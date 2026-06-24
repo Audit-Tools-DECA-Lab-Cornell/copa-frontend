@@ -49,15 +49,15 @@ import { cn } from "@/lib/utils";
 // ─── Asset paths ──────────────────────────────────────────────────────────────
 
 const SHOT = {
-	placeDetail: "/marketing/step-place-detail.png",
-	executeSection: "/marketing/step-execute-section.png",
-	sectionNotes: "/marketing/step-section-notes.png",
-	reportDetail: "/marketing/step-report-detail.png",
-	fieldQuestions: "/marketing/field-questions-dark.png",
-	heroDashboard: "/marketing/hero-dashboard-dark.png",
+	placeDetail: screenshotUrl("/marketing/step-place-detail.png"),
+	executeSection: screenshotUrl("/marketing/step-execute-section.png"),
+	sectionNotes: screenshotUrl("/marketing/step-section-notes.png"),
+	reportDetail: screenshotUrl("/marketing/step-report-detail.png"),
+	fieldQuestions: screenshotUrl("/marketing/field-questions-dark.png"),
+	heroDashboard: screenshotUrl("/marketing/hero-dashboard-dark.png"),
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
-	reportScoring: "/marketing/report-scoring-tilted.png"
+	reportScoring: screenshotUrl("/marketing/report-scoring-tilted.png")
 };
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────

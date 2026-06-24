@@ -54,12 +54,12 @@ const SHOT = {
 	combinedReport: screenshotUrl("/screenshots/Framed/manager/reports/place-report/01-overview/01.png"),
 	scoreSummary: screenshotUrl("/screenshots/Framed/manager/reports/detail/01-overview/01.png"),
 	auditScorecard: screenshotUrl("/screenshots/Framed/manager/audits/detail/01-overview/01.png"),
-	phoneFieldDashboard: "/marketing/hero-dashboard-dark.png",
-	phoneQuestions: "/marketing/field-questions-dark.png",
-	phoneSectionNotes: "/marketing/step-section-notes.png",
-	phoneExecute: "/marketing/step-execute-section.png",
-	phoneReportDetail: "/marketing/step-report-detail.png",
-	phoneReports: "/marketing/reports-preview-portrait.png"
+	phoneFieldDashboard: screenshotUrl("/marketing/hero-dashboard-dark.png"),
+	phoneQuestions: screenshotUrl("/marketing/field-questions-dark.png"),
+	phoneSectionNotes: screenshotUrl("/marketing/step-section-notes.png"),
+	phoneExecute: screenshotUrl("/marketing/step-execute-section.png"),
+	phoneReportDetail: screenshotUrl("/marketing/step-report-detail.png"),
+	phoneReports: screenshotUrl("/marketing/reports-preview-portrait.png")
 };
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
