@@ -142,7 +142,7 @@
 			"workaroundLabel": "Workaround"
 		},
 		"errors": {
-			"offline": "You're offline. Your report wasn't sent — please try again once you're back online.",
+			"offline": "You're offline. Your report wasn't sent - please try again once you're back online.",
 			"generic": "Something went wrong sending your report. Please try again."
 		},
 		"admin": {
@@ -284,7 +284,7 @@
 	"assets": {
 		"eyebrow": "Admin",
 		"title": "Asset Library",
-		"description": "All screenshots tagged by source, device, theme, and type — served through Cloudinary.",
+		"description": "All screenshots tagged by source, device, theme, and type - served through Cloudinary.",
 		"descriptionEmpty": "Tagged, versioned screenshots served through Cloudinary.",
 		"backToDashboard": "Back to Dashboard",
 		"uploadCta": "Upload screenshot",
@@ -325,7 +325,7 @@
 		"resultsAll": "{count} assets",
 		"resultsFiltered": "{filtered} of {total} assets",
 		"noMatch": "No assets match the current filters.",
-		"pendingHint": "{count} assets pending upload — run <code>pnpm assets:upload</code> to push them to Cloudinary.",
+		"pendingHint": "{count} assets pending upload - run <code>pnpm assets:upload</code> to push them to Cloudinary.",
 		"card": {
 			"uploadedBadge": "Cloudinary",
 			"pendingBadge": "Pending",
@@ -1078,6 +1078,8 @@
 				"addQuestion": "Add question",
 				"removeQuestion": "Remove question",
 				"addOption": "Add option",
+				"addUnsureOption": "Add \"Unsure\" option",
+				"unsureOptionExists": "This scale already has an \"Unsure\" option",
 				"moveOptionUp": "Move up",
 				"moveOptionDown": "Move down",
 				"removeOption": "Remove",

@@ -22,6 +22,21 @@ export function makeDefaultScaleOption(): ScaleOption {
 	};
 }
 
+export function makeDefaultUnsureOption(): ScaleOption {
+	// A ready-to-use "I don't know" answer. Selecting it scores zero and, with
+	// follow-up scales locked off, hides Variety / Challenge / Sociability so the
+	// auditor only confirms they could not assess provision.
+	return {
+		key: "unsure",
+		label: "Unsure / I don't know",
+		addition_value: 0,
+		boost_value: 1,
+		allows_follow_up_scales: false,
+		is_not_applicable: false,
+		is_unsure: true
+	};
+}
+
 export function makeDefaultChoiceOption(): ChoiceOption {
 	return { key: "new_option", label: "New Option", description: null };
 }

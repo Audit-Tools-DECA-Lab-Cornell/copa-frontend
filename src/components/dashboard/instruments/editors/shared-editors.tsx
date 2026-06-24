@@ -31,7 +31,7 @@ import type {
 
 import { AiTranslateFieldButton } from "../ai-translate-button";
 import { CONSTRUCT_OPTIONS, MODE_OPTIONS, QUESTION_TYPE_OPTIONS, SCALE_KEY_OPTIONS } from "../constants";
-import { makeDefaultQuestionScale, makeDefaultScaleOption } from "../defaults";
+import { makeDefaultQuestionScale, makeDefaultScaleOption, makeDefaultUnsureOption } from "../defaults";
 import { useInstrumentEdit } from "../instrument-edit-context";
 import { DisplayConditionBadge, EditableField } from "../shared-components";
 import { formatQuestionKeyForDisplay, isScaleCustomized, moveArrayItem, renderInlineMarkdown } from "../utils";
@@ -156,9 +156,16 @@ export function ScaleOptionsEditor({
 		onChange([...options, makeDefaultScaleOption()]);
 	}
 
+	function addUnsureOption() {
+		onChange([...options, makeDefaultUnsureOption()]);
+	}
+
 	function removeOption(index: number) {
 		onChange(options.filter((_, i) => i !== index));
 	}
+
+	// One "I don't know" answer per scale is enough; the preset button is disabled once present.
+	const hasUnsureOption = options.some(o => o.is_unsure || o.key === "unsure");
 
 	function moveOption(index: number, direction: "up" | "down") {
 		onChange(moveArrayItem(options, index, direction));
@@ -171,10 +178,22 @@ export function ScaleOptionsEditor({
 					{t("scaleOptions")} ({options.length})
 				</Label>
 				{!translationMode && (
-					<Button variant="ghost" size="sm" onClick={addOption}>
-						<Plus className="mr-1 h-3 w-3" />
-						{t("addOption")}
-					</Button>
+					<div className="flex items-center gap-1">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={addUnsureOption}
+							disabled={hasUnsureOption}
+							title={hasUnsureOption ? t("unsureOptionExists") : t("isUnsure")}
+							className="text-sky-700 hover:text-sky-800 hover:bg-sky-100/60 dark:text-sky-300 dark:hover:bg-sky-900/30">
+							<Plus className="mr-1 h-3 w-3" />
+							{t("addUnsureOption")}
+						</Button>
+						<Button variant="ghost" size="sm" onClick={addOption}>
+							<Plus className="mr-1 h-3 w-3" />
+							{t("addOption")}
+						</Button>
+					</div>
 				)}
 			</div>
 

@@ -1060,6 +1060,8 @@
 				"addQuestion": "Frage hinzufügen",
 				"removeQuestion": "Frage entfernen",
 				"addOption": "Option hinzufügen",
+				"addUnsureOption": "„Unsicher“-Option hinzufügen",
+				"unsureOptionExists": "Diese Skala hat bereits eine „Unsicher“-Option",
 				"moveOptionUp": "Nach oben",
 				"moveOptionDown": "Nach unten",
 				"removeOption": "Entfernen",
