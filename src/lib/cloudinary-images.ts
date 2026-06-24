@@ -17,10 +17,10 @@ const VARIANT_TRANSFORMS: Record<CloudinaryVariant, string> = {
 export interface AssetEntry {
 	id: string;
 	source: "web" | "mobile";
-	type: "framed" | "raw";
+	type: "framed" | "raw" | "marketing";
 	device: "desktop" | "iphone" | "ipad";
 	theme: "light" | "dark";
-	category: "screenshots";
+	category: "screenshots" | "marketing";
 	role: string | null;
 	filename: string;
 	slug: string;
@@ -41,6 +41,7 @@ export interface AssetIndex {
 		mobileRaw: number;
 		webFramed: number;
 		webRaw: number;
+		webMarketing: number;
 	};
 	assets: AssetEntry[];
 }
