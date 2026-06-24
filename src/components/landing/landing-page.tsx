@@ -155,7 +155,7 @@ function DeviceShot({
 				height={height}
 				priority={priority}
 				sizes={sizes}
-				className="h-auto w-full select-none [filter:drop-shadow(0_28px_50px_rgba(15,23,42,0.22))]"
+				className="h-auto w-full select-none filter-[drop-shadow(0_28px_50px_rgba(15,23,42,0.22))]"
 			/>
 		</div>
 	);
@@ -314,7 +314,7 @@ function Hero() {
 					priority
 					glow="terracotta"
 					sizes="(min-width: 1024px) 26rem, 70vw"
-					className="max-w-[17rem] sm:max-w-sm"
+					className="max-w-68 sm:max-w-sm"
 				/>
 			</div>
 		</section>
@@ -787,7 +787,7 @@ function HowItWorks() {
 										height={3096}
 										glow={step.glow}
 										sizes="(min-width: 1024px) 22rem, 55vw"
-										className="max-w-[15rem] sm:max-w-xs"
+										className="max-w-60 sm:max-w-xs"
 									/>
 								</div>
 							</li>
@@ -927,7 +927,7 @@ function Outcomes() {
 								height={2796}
 								glow="moss"
 								sizes="(min-width: 1024px) 20rem, 60vw"
-								className="max-w-[15rem] sm:max-w-xs lg:mx-0"
+								className="max-w-60 sm:max-w-xs lg:mx-0"
 							/>
 							<figcaption className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">
 								Reports that move decisions forward - exportable as PDF, Excel, or CSV for planning,
