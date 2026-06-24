@@ -117,7 +117,7 @@ function Hero() {
 						alt="COPA field app on a phone showing a score summary with Play Value and Usability results after a completed audit"
 						glow="moss"
 						sizes="(min-width: 1024px) 12rem, 34vw"
-						className="absolute -bottom-6 -left-2 w-[36%] max-w-[10rem] sm:-left-6 sm:w-[32%] lg:-bottom-2 lg:left-0"
+						className="absolute -bottom-6 -left-2 w-[36%] max-w-40 sm:-left-6 sm:w-[32%] lg:-bottom-2 lg:left-0"
 					/>
 				</DeviceScene>
 			</div>

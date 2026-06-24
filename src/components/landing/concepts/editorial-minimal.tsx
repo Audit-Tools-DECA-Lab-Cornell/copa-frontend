@@ -92,7 +92,7 @@ function Hero() {
 
 				<h1
 					id="hero-heading"
-					className="mt-6 max-w-3xl text-5xl font-semibold leading-[1.0] tracking-[-0.03em] text-balance text-foreground sm:text-6xl lg:text-7xl">
+					className="mt-6 max-w-3xl text-5xl font-semibold leading-none tracking-[-0.03em] text-balance text-foreground sm:text-6xl lg:text-7xl">
 					Beyond accessible.
 					<br />
 					Truly playable.
@@ -198,7 +198,7 @@ function FieldMoment() {
 							alt="COPA field app on a phone displaying a guided audit question with answer options, showing structured step-by-step progress through a playspace section"
 							glow="neutral"
 							sizes="(min-width: 1024px) 14rem, 48vw"
-							className="w-[54%] max-w-[14rem] sm:w-[40%] lg:w-[60%]"
+							className="w-[54%] max-w-56 sm:w-[40%] lg:w-[60%]"
 						/>
 					</DeviceScene>
 				</div>
