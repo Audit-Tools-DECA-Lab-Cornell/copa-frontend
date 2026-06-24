@@ -1,6 +1,6 @@
 # CLAUDE - Frontend quick reference
 
-Next.js 15 dashboard for COPA / Playspace (admin, manager, auditor). Part of the workspace monorepo; backend is `audit-tools-backend/`.
+Next.js 15 dashboard for COPA / Playspace (admin, manager, auditor). Part of the workspace layout under `playspace/`; the shared backend lives at `../../audit-tools-backend/`.
 
 ## Commands
 

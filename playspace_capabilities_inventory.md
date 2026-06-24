@@ -69,13 +69,13 @@ Handles starting, saving, resuming, and submitting audits across three execution
 
 * **Capability: Execution Mode Filtering & Question Gating**
   * **Files:**
-    * Backend: [execution_mode_scope.py](file:///Users/praty/Desktop/StudentJob.nosync/playspace/audit-tools-backend/app/products/playspace/execution_mode_scope.py) (gating database rows by mode)
+    * Backend: [execution_mode_scope.py](file:///Users/praty/Desktop/StudentJob.nosync/audit-tools-backend/app/products/playspace/execution_mode_scope.py) (gating database rows by mode)
     * Mobile: [execute-flow.ts](file:///Users/praty/Desktop/StudentJob.nosync/playspace/copa-mobile/lib/audit/execute-flow.ts) (client-side execution state helpers)
   * **Shipped:** Yes
   * **Notes:** Mode choice hides/shows questions (e.g. physical vs ecological) and dictates the submission category (`place_audit`, `place_survey`, or `full_audit`).
 * **Capability: Quantity-Gated Scales & Progress Metrics**
   * **Files:**
-    * Backend: [scoring.py](file:///Users/praty/Desktop/StudentJob.nosync/playspace/audit-tools-backend/app/products/playspace/scoring.py) (validates completeness)
+    * Backend: [scoring.py](file:///Users/praty/Desktop/StudentJob.nosync/audit-tools-backend/app/products/playspace/scoring.py) (validates completeness)
     * Mobile: [checklist-helpers.ts](file:///Users/praty/Desktop/StudentJob.nosync/playspace/copa-mobile/lib/audit/checklist-helpers.ts) (renders scales when quantity > 0)
   * **Shipped:** Yes
   * **Notes:** Completing follow-up scales (Variety, Challenge, Sociability) is blocked if the primary Quantity scale answer is `None` (0).
@@ -127,7 +127,7 @@ Scores are computed from completed submissions on the backend and cached. The ma
 
 * **Capability: Construct & Column Scoring Aggregation**
   * **Files:**
-    * Backend: [scoring.py](file:///Users/praty/Desktop/StudentJob.nosync/playspace/audit-tools-backend/app/products/playspace/scoring.py)
+    * Backend: [scoring.py](file:///Users/praty/Desktop/StudentJob.nosync/audit-tools-backend/app/products/playspace/scoring.py)
     * Mobile: [score-helpers.ts](file:///Users/praty/Desktop/StudentJob.nosync/playspace/copa-mobile/lib/audit/score-helpers.ts)
   * **Shipped:** Yes
   * **Notes:** Computes column totals (Provision, Variety, Challenge, Sociability) and construct scores (Play Value, Usability) without using percentages.
@@ -162,7 +162,7 @@ Clients generate CSV, XLSX, and PDF exports. Large raw-data bulk exports are bun
   * **Notes:** Generates a relational structure containing root indexes and subfolders per project/place containing single audits and saved combined reports.
 * **Capability: Export Finished Notification Email**
   * **Files:**
-    * Backend: [routes/exports.py](file:///Users/praty/Desktop/StudentJob.nosync/playspace/audit-tools-backend/app/products/playspace/routes/exports.py) (POST `/exports/notify-ready`)
+    * Backend: [routes/exports.py](file:///Users/praty/Desktop/StudentJob.nosync/audit-tools-backend/app/products/playspace/routes/exports.py) (POST `/exports/notify-ready`)
     * Backend: `app/email_service.py` (`send_export_ready_email`)
   * **Shipped:** Yes
   * **Notes:** Emails the manager/admin when their client-side browser bulk-export finishes assembling.

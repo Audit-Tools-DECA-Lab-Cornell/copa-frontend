@@ -1,6 +1,6 @@
 # Frontend — Claude Code / agent config
 
-Repo-local agent guidance for `audit-tools-playspace-frontend`. Workspace-wide laws and memory live at the monorepo root (`AGENTS.md`, `CLAUDE.md`, `.claude/memory/`).
+Repo-local agent guidance for `copa-frontend`. Workspace-wide laws and memory live at the monorepo root (`AGENTS.md`, `CLAUDE.md`, `.claude/memory/`).
 
 ## Rules (keep in sync)
 
