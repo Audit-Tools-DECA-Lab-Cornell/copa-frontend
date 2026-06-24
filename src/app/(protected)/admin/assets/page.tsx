@@ -12,8 +12,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import type { AssetIndex } from "@/lib/cloudinary-images";
 
 function loadIndex(): AssetIndex | null {
-	// assets/ is a sibling directory of the frontend repo
-	const path = join(process.cwd(), "../assets/asset-index.json");
+	const path = join(process.cwd(), "public/asset-index.json");
 	if (!existsSync(path)) return null;
 	try {
 		return JSON.parse(readFileSync(path, "utf-8")) as AssetIndex;

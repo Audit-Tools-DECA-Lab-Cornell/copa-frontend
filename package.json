@@ -21,8 +21,8 @@
 		"test:visual:percy": "percy exec -- pnpm test:visual",
 		"test:contracts:shared": "node ../testing/scripts/validate-contracts.mjs",
 		"screenshots:web": "node scripts/capture-local-screenshots.mjs",
-		"assets:index": "node ../assets/scripts/build-asset-index.mjs",
-		"assets:upload": "node ../assets/scripts/upload-to-cloudinary.mjs"
+		"assets:index": "node ../copa-assets/scripts/build-asset-index.mjs",
+		"assets:upload": "node ../copa-assets/scripts/upload-to-cloudinary.mjs"
 	},
 	"dependencies": {
 		"@fontsource/opendyslexic": "^5.2.5",
