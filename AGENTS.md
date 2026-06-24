@@ -1,6 +1,6 @@
 # AGENTS.md - Playspace web dashboard
 
-Next.js 15 App Router dashboard (admin, manager, auditor). Sibling repos in the workspace: `audit-tools-backend/`, `audit-tools-playspace-mobile/`.
+Next.js 15 App Router dashboard (admin, manager, auditor). Sibling repos in the workspace: `audit-tools-backend/`, `copa-mobile/`.
 
 ## Commands
 

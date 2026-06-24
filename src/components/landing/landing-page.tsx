@@ -1,4 +1,3 @@
-
 /**
  * COPA Public Homepage - Major Redesign
  *
@@ -719,35 +718,35 @@ function HowItWorks() {
 		alt: string;
 		glow: DeviceGlow;
 	}> = [
-			{
-				title: "Assign a playspace",
-				body: "Select or add the outdoor playspace to assess. Capture site information, location context, and relevant background before the visit.",
-				img: screenshotUrl("/marketing/step-place-detail.png"),
-				alt: "COPA place detail screen showing a playspace with its location, project, and assessment status before an audit begins",
-				glow: "moss"
-			},
-			{
-				title: "Complete an onsite audit",
-				body: "Work through the COPA instrument in the field. Structured prompts guide observation of all playspace elements - not just equipment.",
-				img: screenshotUrl("/marketing/step-execute-section.png"),
-				alt: "COPA mobile audit section showing Playspace Character and Community questions with answer options during an onsite assessment",
-				glow: "slate"
-			},
-			{
-				title: "Capture observations and notes",
-				body: "Record structured responses, contextual notes, and photo documentation, organised by construct, domain, and assessment lens.",
-				img: screenshotUrl("/marketing/step-section-notes.png"),
-				alt: "COPA mobile section notes screen with a free-text field for recommendations and save-and-next actions",
-				glow: "terracotta"
-			},
-			{
-				title: "Generate reports and guide decisions",
-				body: "Review Play Value and Usability scores, domain breakdowns, and findings. Export reports to support renovation planning, funding requests, and design review.",
-				img: screenshotUrl("/marketing/step-report-detail.png"),
-				alt: "COPA report detail screen showing Play Value and Usability scoring tables with per-lens breakdowns for a playspace",
-				glow: "violet"
-			}
-		];
+		{
+			title: "Assign a playspace",
+			body: "Select or add the outdoor playspace to assess. Capture site information, location context, and relevant background before the visit.",
+			img: screenshotUrl("/marketing/step-place-detail.png"),
+			alt: "COPA place detail screen showing a playspace with its location, project, and assessment status before an audit begins",
+			glow: "moss"
+		},
+		{
+			title: "Complete an onsite audit",
+			body: "Work through the COPA instrument in the field. Structured prompts guide observation of all playspace elements - not just equipment.",
+			img: screenshotUrl("/marketing/step-execute-section.png"),
+			alt: "COPA mobile audit section showing Playspace Character and Community questions with answer options during an onsite assessment",
+			glow: "slate"
+		},
+		{
+			title: "Capture observations and notes",
+			body: "Record structured responses, contextual notes, and photo documentation, organised by construct, domain, and assessment lens.",
+			img: screenshotUrl("/marketing/step-section-notes.png"),
+			alt: "COPA mobile section notes screen with a free-text field for recommendations and save-and-next actions",
+			glow: "terracotta"
+		},
+		{
+			title: "Generate reports and guide decisions",
+			body: "Review Play Value and Usability scores, domain breakdowns, and findings. Export reports to support renovation planning, funding requests, and design review.",
+			img: screenshotUrl("/marketing/step-report-detail.png"),
+			alt: "COPA report detail screen showing Play Value and Usability scoring tables with per-lens breakdowns for a playspace",
+			glow: "violet"
+		}
+	];
 
 	return (
 		<section id="how" className="scroll-mt-20 border-b border-edge/40" aria-labelledby="how-heading">
