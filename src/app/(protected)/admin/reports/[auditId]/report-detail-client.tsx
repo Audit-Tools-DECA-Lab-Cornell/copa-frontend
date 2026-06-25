@@ -47,7 +47,7 @@ export function AdminReportDetailClient({ auditId }: Readonly<AdminReportDetailC
 			<DashboardHeader
 				eyebrow="Administrator Workspace"
 				title={audit?.place_name ?? "Audit Report"}
-				description={audit !== undefined ? audit.project_name : "Loading report details\u2026"}
+				description={audit !== undefined ? audit.project_name : "Loading report details..."}
 				breadcrumbs={[
 					{ label: "Dashboard", href: "/admin/dashboard" },
 					{ label: "Reports", href: "/admin/reports" },
