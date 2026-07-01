@@ -19,7 +19,7 @@
 		"test:visual:ui": "E2E_BASE_URL=http://localhost:3000 playwright test --project=visual-chromium --ui",
 		"test:visual:list": "E2E_BASE_URL=http://localhost:3000 playwright test --project=visual-chromium --list",
 		"test:visual:percy": "percy exec -- pnpm test:visual",
-		"test:contracts:shared": "node ../testing/scripts/validate-contracts.mjs",
+		"test:contracts:shared": "node ../copa-testing/scripts/validate-contracts.mjs",
 		"screenshots:web": "node scripts/capture-local-screenshots.mjs",
 		"assets:index": "node ../copa-assets/scripts/build-asset-index.mjs",
 		"assets:upload": "node ../copa-assets/scripts/upload-to-cloudinary.mjs"
