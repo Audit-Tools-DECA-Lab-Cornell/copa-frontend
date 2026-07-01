@@ -8,6 +8,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import type { CSSProperties } from "react";
 
 import { getRequestLanguageState } from "@/i18n/server-locale";
+import { requestRequiresAnalyticsConsent } from "@/lib/analytics/server-region";
 import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
 
 import { Providers } from "./providers";
@@ -51,6 +52,7 @@ export default async function RootLayout({
 }>) {
 	const { locale, preference } = await getRequestLanguageState();
 	const messages = await getMessages();
+	const analyticsRequiresConsent = await requestRequiresAnalyticsConsent();
 
 	return (
 		<html
@@ -62,7 +64,10 @@ export default async function RootLayout({
 			style={initialDesignSystemStyle}>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
 				<NextIntlClientProvider locale={locale} messages={messages}>
-					<Providers initialLanguagePreference={preference} initialResolvedLanguage={locale}>
+					<Providers
+						initialLanguagePreference={preference}
+						initialResolvedLanguage={locale}
+						analyticsRequiresConsent={analyticsRequiresConsent}>
 						{children}
 					</Providers>
 				</NextIntlClientProvider>

@@ -3,6 +3,12 @@
 		"title": "COPA Tool",
 		"description": "Tool zur umfassenden Prüfung von Outdoor-Playspaces (COPA) - strukturierte Audits zu Spielwert und Nutzbarkeit."
 	},
+	"cookieConsent": {
+		"title": "Helfen Sie uns, das COPA Tool zu verbessern",
+		"message": "Wir nutzen Analysen, um zu verstehen, wie das Tool verwendet wird, und es so zu verbessern. Es werden keine personenbezogenen Daten verkauft oder weitergegeben.",
+		"accept": "Akzeptieren",
+		"decline": "Ablehnen"
+	},
 	"common": {
 		"exportJobs": {
 			"eyebrow": "Export",

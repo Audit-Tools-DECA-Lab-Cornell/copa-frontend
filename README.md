@@ -117,6 +117,22 @@ NEXT_PUBLIC_API_BASE_URL="http://127.0.0.1:8000"
 
 If not set, the frontend defaults to `http://127.0.0.1:8000`.
 
+Analytics is optional and controlled by two variables. Both tools only load in production builds — never in local dev or previews.
+
+```bash
+NEXT_PUBLIC_CLARITY_PROJECT_ID="your-clarity-project-id"   # Microsoft Clarity (heatmaps + session replay)
+NEXT_PUBLIC_GA_MEASUREMENT_ID="G-XXXXXXXXXX"               # Google Analytics 4 (gtag.js)
+```
+
+When a variable is unset, that tool never loads.
+
+**Region-aware consent.** The app determines the visitor's region on the server from the edge geo header (`x-vercel-ip-country`, EEA/UK/CH treated as consent-required):
+
+- **Consent-required regions (EU/EEA, UK, Switzerland):** a consent banner is shown; nothing tracks until the visitor accepts. Clarity waits for acceptance; GA loads under Google **Consent Mode v2** with consent defaulted to `denied` (cookieless pings only) until the visitor accepts.
+- **Everywhere else:** analytics runs by default and no banner is shown, unless the visitor explicitly declines.
+
+The consent region set lives in [`src/lib/analytics/regions.ts`](src/lib/analytics/regions.ts). When no geo header is present, the app defaults to the stricter consent-required behavior.
+
 ### Authentication (current scaffold)
 
 This repo currently uses a **frontend-only demo login** that sets cookies in the browser to simulate an authenticated session.

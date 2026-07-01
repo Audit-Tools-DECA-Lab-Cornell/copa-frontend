@@ -3,6 +3,12 @@
 		"title": "COPA Tool",
 		"description": "Comprehensive Outdoor Playspace Audit (COPA) Tool - structured outdoor playspace audits covering play value and usability."
 	},
+	"cookieConsent": {
+		"title": "Help us improve COPA Tool",
+		"message": "We use analytics to understand how the tool is used so we can make it better. No personal data is sold or shared.",
+		"accept": "Accept",
+		"decline": "Decline"
+	},
 	"common": {
 		"exportJobs": {
 			"eyebrow": "Export",
