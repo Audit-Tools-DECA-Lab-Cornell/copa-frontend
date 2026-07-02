@@ -327,8 +327,7 @@ export function PlaceSheet({
 					signal: controller.signal
 				});
 				const data = (await response.json()) as
-					| { message?: string; suggestions?: AddressSuggestion[] }
-					| undefined;
+					{ message?: string; suggestions?: AddressSuggestion[] } | undefined;
 				if (!response.ok) {
 					setAddressLookupError(data?.message ?? "Address search failed.");
 					setAddressSuggestions([]);

@@ -1,6 +1,6 @@
 # CLAUDE - Frontend quick reference
 
-Next.js 15 dashboard for COPA / Playspace (admin, manager, auditor). Part of the workspace layout under `playspace/`; the shared backend lives at `../../audit-tools-backend/`.
+Next.js 16 dashboard for COPA / Playspace (admin, manager, auditor). Part of the workspace layout under `playspace/`; the shared backend lives at `../../audit-tools-backend/`.
 
 ## Commands
 
@@ -35,7 +35,7 @@ Cursor mirror: `.cursor/rules/` (same filenames - keep both in sync).
 - `src/lib/api/playspace.ts` - API client
 - `src/lib/api/playspace-types.ts` - shared API type definitions
 - `src/lib/api/playspace-server.ts` - server-side API client
-- `middleware.ts` - role guards
+- `proxy.ts` - role guards
 - `messages/en.json` + `messages/de.json` - i18n (both required)
 - `src/lib/export/**` - PDF/Excel pipeline
 - `src/components/dashboard/**` - shared tables, reports, filters, instrument editor

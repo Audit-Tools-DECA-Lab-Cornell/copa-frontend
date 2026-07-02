@@ -327,9 +327,7 @@ export default function AdminRawDataPage() {
 
 	// ── Preview queries (each enabled only for its active tab) ────────────────
 	type PreviewResult =
-		| PaginatedResponse<AdminProjectRow>
-		| PaginatedResponse<AdminPlaceRow>
-		| PaginatedResponse<AdminAuditRow>;
+		PaginatedResponse<AdminProjectRow> | PaginatedResponse<AdminPlaceRow> | PaginatedResponse<AdminAuditRow>;
 
 	const previewQuery = useQuery<PreviewResult>({
 		queryKey: [

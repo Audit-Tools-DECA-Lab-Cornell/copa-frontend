@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cacheLife } from "next/cache";
 import { notFound } from "next/navigation";
 import { createElement } from "react";
 
@@ -8,19 +9,13 @@ import { getRotationConcept } from "@/lib/landing/rotation";
  * Public homepage.
  *
  * The landing page rotates through the COPA concept pages so each gets fair,
- * peak-hour exposure (see lib/landing/rotation). The page is statically rendered
- * and regenerated every two hours via ISR, so the rotation costs no client-side
- * JavaScript - the concept is chosen at render/regeneration time.
+ * peak-hour exposure (see lib/landing/rotation). The page is cached, so the
+ * rotation costs no client-side JavaScript - the concept is chosen at
+ * render/revalidation time and frozen for the life of the cache entry.
  *
- * Authenticated visitors are redirected to their dashboard by middleware before
- * this static page is served, so no per-request session read happens here.
+ * Authenticated visitors are redirected to their dashboard by the proxy before
+ * this cached page is served, so no per-request session read happens here.
  */
-
-// The root layout reads the request locale, which would otherwise render every
-// route dynamically. The landing pages use no translations, so we opt the
-// homepage back into static rendering; `revalidate` then drives the rotation.
-export const dynamic = "force-static";
-export const revalidate = 7200; // 2 hours - matches the rotation slot length.
 
 export const metadata: Metadata = {
 	title: "COPA | Comprehensive Outdoor Playspace Audit Tool",
@@ -38,7 +33,12 @@ export const metadata: Metadata = {
 	}
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+	"use cache";
+	// Matches the previous 2-hour ISR cadence: the rotation slug is chosen once
+	// per cache entry and refreshed on the background revalidation pass.
+	cacheLife({ stale: 300, revalidate: 7200, expire: 86400 });
+
 	const { Component: selected } = getRotationConcept();
 
 	if (!selected) {

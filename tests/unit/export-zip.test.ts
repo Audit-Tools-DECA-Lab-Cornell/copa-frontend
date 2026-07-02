@@ -28,8 +28,8 @@ test("slugifyPath slugifies each segment and keeps the tree", () => {
  * Two files written to the same path must not overwrite each other; the second
  * gets a numeric suffix inserted before the extension.
  */
-test("ExportZipBuilder de-duplicates colliding file paths and preserves extensions", () => {
-	const zip = new ExportZipBuilder();
+test("ExportZipBuilder de-duplicates colliding file paths and preserves extensions", async () => {
+	const zip = await ExportZipBuilder.create();
 	// Byte content (Uint8Array) keeps this deterministic under the Node test
 	// runner; production passes Blobs from the generators.
 	const first = zip.addFile("audits/Report One.pdf", new Uint8Array([1]));
@@ -54,7 +54,7 @@ test("slugifyFileName preserves common generated export extensions", () => {
 });
 
 test("ExportZipBuilder writes archive entries with dot extensions", async () => {
-	const zip = new ExportZipBuilder();
+	const zip = await ExportZipBuilder.create();
 	zip.addJson("manifest.json", { ok: true });
 	zip.addFile("index.xlsx", new Uint8Array([1]));
 	zip.addFile("audits/pvua-AUD-001.pdf", new Uint8Array([2]));
@@ -73,8 +73,8 @@ test("ExportZipBuilder writes archive entries with dot extensions", async () => 
 });
 
 /** Partial failures are recorded, never thrown, so one bad entity can't abort the archive. */
-test("ExportZipBuilder records partial failures", () => {
-	const zip = new ExportZipBuilder();
+test("ExportZipBuilder records partial failures", async () => {
+	const zip = await ExportZipBuilder.create();
 	assert.equal(zip.partialFailures.length, 0);
 	zip.recordFailure({ id: "aud-1", kind: "audit", reason: "not submitted" });
 	assert.equal(zip.partialFailures.length, 1);

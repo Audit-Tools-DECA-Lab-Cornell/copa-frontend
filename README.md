@@ -6,7 +6,7 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 
 ### Tech stack
 
-- **Framework**: Next.js 15 (App Router) + TypeScript
+- **Framework**: Next.js 16 (App Router) + TypeScript
 - **Styling**: Tailwind CSS
 - **UI**: shadcn/ui
 - **Data**: TanStack Query (React Query) + Axios
@@ -142,7 +142,7 @@ This repo currently uses a **frontend-only demo login** that sets cookies in the
     - `playspace_access_token`: bearer token (demo-generated for now)
     - `playspace_auditor_code`: auditor-only identifier
 
-The route guard is implemented in `middleware.ts` using those cookies:
+The route guard is implemented in `proxy.ts` using those cookies:
 
 - `/manager/`\*\* requires `playspace_role="manager"`
 - `/auditor/**` requires `playspace_role="auditor"`

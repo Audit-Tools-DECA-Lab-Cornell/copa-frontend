@@ -10,7 +10,7 @@
  *   - progress is reported during the (potentially large) compression step
  */
 
-import JSZip from "jszip";
+import type JSZip from "jszip";
 
 /** A failure encountered while generating one entity's files. */
 export interface ExportFailure {
@@ -103,9 +103,22 @@ export function slugifyPath(path: string): string {
 }
 
 export class ExportZipBuilder {
-	private readonly zip = new JSZip();
+	private readonly zip: JSZip;
 	private readonly usedPaths = new Set<string>();
 	private readonly failures: ExportFailure[] = [];
+
+	private constructor(zip: JSZip) {
+		this.zip = zip;
+	}
+
+	/**
+	 * Creates a builder, importing `jszip` (98 KB) on demand so it stays out of
+	 * the initial bundle - it only loads when an export actually runs.
+	 */
+	static async create(): Promise<ExportZipBuilder> {
+		const { default: JSZip } = await import("jszip");
+		return new ExportZipBuilder(new JSZip());
+	}
 
 	/**
 	 * Adds a file at the given (slugified) path. If the path is already taken,

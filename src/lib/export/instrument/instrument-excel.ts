@@ -83,12 +83,7 @@ type StyledCell = {
 };
 
 type InstrumentWorkbookRowKind =
-	| "header"
-	| "section_title"
-	| "section_description"
-	| "section_instruction"
-	| "section_notes_prompt"
-	| "question";
+	"header" | "section_title" | "section_description" | "section_instruction" | "section_notes_prompt" | "question";
 
 type InstrumentWorkbookRow = {
 	readonly kind: InstrumentWorkbookRowKind;

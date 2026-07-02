@@ -153,9 +153,15 @@ export async function getServerAudit(auditId: string): Promise<AuditSession> {
 /**
  * Fetch a localized instrument definition on the server with Next.js data
  * caching. The instrument is essentially read-only between deploys; tagged
- * caching means subsequent server renders read from the in-memory cache instead
- * of hitting FastAPI. Invalidate via `revalidateInstrument(key, lang)` or
+ * caching means subsequent server renders read from the cache instead of hitting
+ * FastAPI. Invalidate via `revalidateInstrument(key, lang)` or
  * `POST /api/internal/revalidate-instrument`.
+ *
+ * This intentionally uses the `fetch` Data Cache (`cache: "force-cache"` +
+ * `next.tags`/`revalidate`) rather than the `'use cache'` directive. The request
+ * carries the caller's bearer token (`fetchServerJson` reads the auth cookie),
+ * and `cookies()` cannot be read inside `'use cache'`; the Data Cache layer
+ * coexists with Cache Components and keeps the tag-based invalidation working.
  */
 export async function getServerInstrument(instrumentKey: string, lang: string = "en"): Promise<PlayspaceInstrument> {
 	const query = new URLSearchParams({ lang });
@@ -217,6 +223,9 @@ export async function getServerAuditorAssignedPlaces(
  */
 export function revalidateInstrument(instrumentKey: string, lang: string = "en"): string {
 	const tag = buildInstrumentCacheTag(instrumentKey, lang);
-	revalidateTag(tag);
+	// The second argument is the cacheLife profile used for the stale-while-revalidate
+	// window; "max" keeps the previous behavior of serving the cached instrument
+	// until the refreshed payload lands.
+	revalidateTag(tag, "max");
 	return tag;
 }

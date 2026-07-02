@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
+	reactCompiler: true,
+	cacheComponents: true,
 	experimental: {
 		optimizePackageImports: ["lucide-react", "radix-ui", "@tanstack/react-query", "@tanstack/react-table"]
 	},

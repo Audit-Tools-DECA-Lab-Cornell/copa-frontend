@@ -43,7 +43,7 @@ function dashboardPathFor(auth: ReturnType<typeof getAuthState>): string {
 	return auth.nextStep === "DASHBOARD" ? "/auditor/dashboard" : "/auditor/onboarding";
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
 	const pathname = request.nextUrl.pathname;
 	const auth = getAuthState(request);
 

@@ -22,8 +22,6 @@
  * distinct combined place reports go under `reports/combined/`.
  */
 
-import * as XLSX from "xlsx";
-
 import { mergeAuditSessions } from "@/components/dashboard/place-report-merge";
 import { type AuditSession, playspaceApi, type SavedPlaceReportEntry } from "@/lib/api/playspace";
 
@@ -109,8 +107,11 @@ function dataExtension(): string {
 	return "xlsx";
 }
 
-/** Builds a multi-sheet XLSX index file blob. */
-function buildIndexBlob(sheets: readonly IndexSheet[]): Blob {
+/** Builds a multi-sheet XLSX index file blob. `xlsx` (107 KB) is imported on
+ * demand so it stays out of the initial bundle - it only loads when an export
+ * actually runs. */
+async function buildIndexBlob(sheets: readonly IndexSheet[]): Promise<Blob> {
+	const XLSX = await import("xlsx");
 	const workbook = XLSX.utils.book_new();
 	const used = new Set<string>();
 	for (const sheet of sheets) {
@@ -271,7 +272,7 @@ export async function exportAuditsZip(args: {
 }): Promise<ExportZipResult> {
 	const { rows, indexSheets, ctx } = args;
 	const exportedAt = new Date().toISOString();
-	const zip = new ExportZipBuilder();
+	const zip = await ExportZipBuilder.create();
 	const submittedCount = rows.filter(r => r.status === "SUBMITTED").length;
 
 	ctx.onProgress?.({ phase: "preparing", current: 0, total: submittedCount, percent: 0 });
@@ -279,7 +280,7 @@ export async function exportAuditsZip(args: {
 	const progress = { done: 0, total: submittedCount };
 	const auditsWritten = await writeAuditFiles(zip, rows, "", ctx, exportedAt, progress);
 
-	zip.addFile(`index.${dataExtension()}`, buildIndexBlob(indexSheets));
+	zip.addFile(`index.${dataExtension()}`, await buildIndexBlob(indexSheets));
 
 	finalizeManifest(zip, ctx, exportedAt, { projects: 0, places: 0, audits: auditsWritten, combinedReports: 0 });
 	return compress(zip, ctx, { auditCount: auditsWritten, combinedReportCount: 0 });
@@ -329,7 +330,7 @@ async function exportPlaceTree(args: {
 }): Promise<ExportZipResult> {
 	const { places, audits, indexSheets, ctx, withProjectLevel } = args;
 	const exportedAt = new Date().toISOString();
-	const zip = new ExportZipBuilder();
+	const zip = await ExportZipBuilder.create();
 
 	const auditsByPlace = new Map<string, AuditExportRow[]>();
 	for (const audit of audits) {
@@ -355,11 +356,11 @@ async function exportPlaceTree(args: {
 		// Per-place index listing this place's audits.
 		zip.addFile(
 			`${folderPrefix}index.${dataExtension()}`,
-			buildIndexBlob([{ sheetName: "Audits", records: placeAudits.map(rowToRecord) }])
+			await buildIndexBlob([{ sheetName: "Audits", records: placeAudits.map(rowToRecord) }])
 		);
 	}
 
-	zip.addFile(`index.${dataExtension()}`, buildIndexBlob(indexSheets));
+	zip.addFile(`index.${dataExtension()}`, await buildIndexBlob(indexSheets));
 
 	finalizeManifest(zip, ctx, exportedAt, {
 		projects: args.projectCount ?? 0,

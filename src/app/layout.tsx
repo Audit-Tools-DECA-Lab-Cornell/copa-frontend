@@ -2,31 +2,51 @@ import "@fontsource/opendyslexic";
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Geist, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations } from "next-intl/server";
+import localFont from "next/font/local";
 import type { CSSProperties } from "react";
+import { Suspense } from "react";
 
-import { getRequestLanguageState } from "@/i18n/server-locale";
-import { requestRequiresAnalyticsConsent } from "@/lib/analytics/server-region";
 import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
 
-import { Providers } from "./providers";
+import enMessages from "../../messages/en.json";
+import { RequestProviders } from "./request-providers";
 
-const bodyFont = Geist({
+const bodyFont = localFont({
 	variable: "--font-body",
-	subsets: ["latin"]
+	display: "swap",
+	src: [
+		{ path: "./fonts/Geist/Geist-VariableFont_wght.ttf", weight: "100 900", style: "normal" },
+		{ path: "./fonts/Geist/Geist-Italic-VariableFont_wght.ttf", weight: "100 900", style: "italic" }
+	]
 });
 
-const headingFont = Space_Grotesk({
+const headingFont = localFont({
 	variable: "--font-heading",
-	subsets: ["latin"],
-	weight: ["500", "700"]
+	display: "swap",
+	src: [
+		{
+			path: "./fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf",
+			weight: "300 700",
+			style: "normal"
+		}
+	]
 });
 
-const monoFont = JetBrains_Mono({
+const monoFont = localFont({
 	variable: "--font-code",
-	subsets: ["latin"]
+	display: "swap",
+	src: [
+		{
+			path: "./fonts/JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf",
+			weight: "100 800",
+			style: "normal"
+		},
+		{
+			path: "./fonts/JetBrains_Mono/JetBrainsMono-Italic-VariableFont_wght.ttf",
+			weight: "100 800",
+			style: "italic"
+		}
+	]
 });
 
 const initialDesignSystemStyle = getDesignSystemCssVariables({
@@ -35,42 +55,44 @@ const initialDesignSystemStyle = getDesignSystemCssVariables({
 	fontScale: DESIGN_SYSTEM.fontScale.default
 }) as CSSProperties;
 
-export async function generateMetadata(): Promise<Metadata> {
-	const t = await getTranslations("metadata");
+/**
+ * Root metadata is static default-locale (English) content so the document shell
+ * prerenders without reading request state. Localized, request-scoped metadata
+ * (if any) belongs on the individual pages that need it.
+ */
+export function generateMetadata(): Metadata {
 	const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
 	return {
-		title: t("title"),
-		description: t("description"),
+		title: enMessages.metadata.title,
+		description: enMessages.metadata.description,
 		verification: { google: googleSiteVerification }
 	};
 }
 
-export default async function RootLayout({
+export default function RootLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { locale, preference } = await getRequestLanguageState();
-	const messages = await getMessages();
-	const analyticsRequiresConsent = await requestRequiresAnalyticsConsent();
-
+	// The document is a static `en` shell: the html/body wrapper, fonts, and
+	// design-system tokens prerender with no request-time reads, so every route
+	// gets an instant static shell (Partial Prerendering). The request-scoped
+	// locale, messages, and analytics-consent region are resolved in
+	// `RequestProviders`, which streams in behind the Suspense boundary. The
+	// client `PreferencesProvider` corrects `<html lang>` once it resolves the
+	// visitor's real locale.
 	return (
 		<html
-			lang={locale}
+			lang="en"
 			suppressHydrationWarning
 			className={DESIGN_SYSTEM.defaultTheme === "dark" ? "dark" : undefined}
 			data-contrast={DESIGN_SYSTEM.defaultContrast}
 			data-dyslexic-font="false"
 			style={initialDesignSystemStyle}>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
-				<NextIntlClientProvider locale={locale} messages={messages}>
-					<Providers
-						initialLanguagePreference={preference}
-						initialResolvedLanguage={locale}
-						analyticsRequiresConsent={analyticsRequiresConsent}>
-						{children}
-					</Providers>
-				</NextIntlClientProvider>
+				<Suspense fallback={<div className="min-h-dvh bg-background" aria-hidden />}>
+					<RequestProviders>{children}</RequestProviders>
+				</Suspense>
 			</body>
 		</html>
 	);

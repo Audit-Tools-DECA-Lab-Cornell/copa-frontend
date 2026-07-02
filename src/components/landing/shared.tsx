@@ -20,6 +20,7 @@ import Link from "next/link";
 
 import { MobileNav } from "@/components/landing/mobile-nav";
 import { Button } from "@/components/ui/button";
+import { getCurrentYear } from "@/lib/landing/current-year";
 import { cn } from "@/lib/utils";
 
 export const MARKETING_ROUTES = {
@@ -227,9 +228,8 @@ export function LandingHeader({
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 /** Shared marketing footer. */
-export function LandingFooter() {
-	const year = new Date().getFullYear();
-
+export async function LandingFooter() {
+	const year = await getCurrentYear();
 	return (
 		<footer className="border-t-2 border-edge/50 bg-card/70">
 			<div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
