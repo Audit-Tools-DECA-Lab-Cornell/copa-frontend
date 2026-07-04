@@ -15,8 +15,8 @@ const bodyFont = localFont({
 	variable: "--font-body",
 	display: "swap",
 	src: [
-		{ path: "./fonts/Geist/Geist-VariableFont_wght.ttf", weight: "100 900", style: "normal" },
-		{ path: "./fonts/Geist/Geist-Italic-VariableFont_wght.ttf", weight: "100 900", style: "italic" }
+		{ path: "./fonts/Geist/Geist-VariableFont_wght.woff2", weight: "100 900", style: "normal" },
+		{ path: "./fonts/Geist/Geist-Italic-VariableFont_wght.woff2", weight: "100 900", style: "italic" }
 	]
 });
 
@@ -25,7 +25,7 @@ const headingFont = localFont({
 	display: "swap",
 	src: [
 		{
-			path: "./fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf",
+			path: "./fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.woff2",
 			weight: "300 700",
 			style: "normal"
 		}
@@ -37,12 +37,12 @@ const monoFont = localFont({
 	display: "swap",
 	src: [
 		{
-			path: "./fonts/JetBrains_Mono/JetBrainsMono-VariableFont_wght.ttf",
+			path: "./fonts/JetBrains_Mono/JetBrainsMono-VariableFont_wght.woff2",
 			weight: "100 800",
 			style: "normal"
 		},
 		{
-			path: "./fonts/JetBrains_Mono/JetBrainsMono-Italic-VariableFont_wght.ttf",
+			path: "./fonts/JetBrains_Mono/JetBrainsMono-Italic-VariableFont_wght.woff2",
 			weight: "100 800",
 			style: "italic"
 		}
