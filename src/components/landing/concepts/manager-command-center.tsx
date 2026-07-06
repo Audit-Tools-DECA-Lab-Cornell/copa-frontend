@@ -42,10 +42,14 @@ import {
 } from "@/components/landing/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { screenshotUrl } from "@/lib/asset-url";
+import assetIndex from "@/data/asset-index.json";
+import { createScreenshotUrl } from "@/lib/asset-url";
+import type { AssetIndex } from "@/lib/cloudinary-images";
 import { cn } from "@/lib/utils";
 
 // ─── Asset paths ──────────────────────────────────────────────────────────────
+
+const screenshotUrl = createScreenshotUrl(assetIndex as AssetIndex);
 
 const SHOT = {
 	places: screenshotUrl("/screenshots/Framed/manager/places/01-overview/01.png"),

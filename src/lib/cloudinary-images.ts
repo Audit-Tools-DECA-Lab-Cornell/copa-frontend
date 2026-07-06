@@ -1,18 +1,45 @@
 // Cloudinary delivery URL builder and shared asset types.
-// Cloud name comes from NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME.
+// Originals stay unchanged in Cloudinary; resizing, optimization, and optional upscaling happen at delivery time.
 
 export type CloudinaryVariant = "thumbnail" | "card" | "full";
 
-// Source screenshots are very high-resolution (web framed shots up to ~4340px
-// wide). The `full` variant feeds the landing/showcase pages, which render in
-// slots up to ~960px CSS - ~2880px on a 3x display - so it is sized to stay
-// crisp on retina rather than being downscaled below display needs. q_auto:good
-// keeps UI text and sharp edges clean (plain q_auto over-compresses them).
-const VARIANT_TRANSFORMS: Record<CloudinaryVariant, string> = {
-	thumbnail: "w_200,c_fill,f_auto,q_auto",
-	card: "w_480,c_fill,f_auto,q_auto",
-	full: "w_2880,f_auto,q_auto:good"
+type CloudinaryCropMode = "limit" | "scale" | "fit" | "fill" | "thumb" | "pad";
+type CloudinaryUpscaleMode = "auto" | "always" | "never";
+
+type CloudinaryVariantConfig = {
+	width: number;
+	crop: CloudinaryCropMode;
+	quality: "auto" | "auto:best" | "auto:good" | "auto:eco" | "auto:low";
+	dprAuto: boolean;
+	expectedDpr: number;
 };
+
+const VARIANT_CONFIGS: Record<CloudinaryVariant, CloudinaryVariantConfig> = {
+	thumbnail: {
+		width: 200,
+		crop: "fill",
+		quality: "auto",
+		dprAuto: true,
+		expectedDpr: 2
+	},
+	card: {
+		width: 480,
+		crop: "fill",
+		quality: "auto",
+		dprAuto: true,
+		expectedDpr: 2
+	},
+	full: {
+		width: 960,
+		crop: "limit",
+		quality: "auto:good",
+		dprAuto: true,
+		expectedDpr: 3
+	}
+};
+
+const CLOUDINARY_UPSCALE_MAX_INPUT_PIXELS = 4_200_000;
+const CLOUDINARY_UPSCALE_FACTOR = 4;
 
 export interface AssetEntry {
 	id: string;
@@ -26,9 +53,17 @@ export interface AssetEntry {
 	slug: string;
 	section: string;
 	route: string | null;
-	localPath: string; // path relative to assets/ root
+	localPath: string;
 	cloudinaryPublicId: string | null;
+	cloudinaryVersion?: number | string | null;
+	cloudinarySecureUrl?: string | null;
 	uploadedAt: string | null;
+	width?: number | null;
+	height?: number | null;
+	aspectRatio?: number | null;
+	bytes?: number | null;
+	format?: string | null;
+	sha256?: string | null;
 	tags: string[];
 }
 
@@ -46,21 +81,155 @@ export interface AssetIndex {
 	assets: AssetEntry[];
 }
 
-// https://res.cloudinary.com/{cloud}/{transforms}/{public_id}
-export function buildCloudinaryUrl(publicId: string, variant: CloudinaryVariant = "card"): string {
-	const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-	if (!cloud) return "";
-	return `https://res.cloudinary.com/${cloud}/image/upload/${VARIANT_TRANSFORMS[variant]}/${publicId}`;
+export type BuildCloudinaryUrlOptions = {
+	width?: number;
+	height?: number;
+	crop?: CloudinaryCropMode;
+	quality?: "auto" | "auto:best" | "auto:good" | "auto:eco" | "auto:low";
+	format?: "auto" | "avif" | "webp" | "png" | "jpg";
+	dprAuto?: boolean;
+	expectedDpr?: number;
+	upscale?: CloudinaryUpscaleMode;
+	gravity?: string;
+	background?: string;
+	extraTransformations?: string[];
+};
+
+function getCloudinaryCloudName(): string {
+	return process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
 }
 
-// Returns a Cloudinary URL only once the asset is confirmed on Cloudinary
-// (uploadedAt is set by the upload script). The public_id is pre-computed for
-// every asset, so gating on uploadedAt is what distinguishes a live image from
-// one that has not been pushed yet - otherwise pending cards would request a
-// public_id that does not exist on Cloudinary and render as a broken image.
-export function getAssetDisplayUrl(asset: AssetEntry, variant: CloudinaryVariant = "card"): string | null {
-	if (asset.uploadedAt && asset.cloudinaryPublicId) return buildCloudinaryUrl(asset.cloudinaryPublicId, variant);
-	return null;
+function encodePublicId(publicId: string): string {
+	return publicId
+		.split("/")
+		.map(part => encodeURIComponent(part))
+		.join("/");
+}
+
+function cleanNumber(value: number): number {
+	return Math.max(1, Math.round(value));
+}
+
+function getPublicId(input: string | AssetEntry): string | null {
+	return typeof input === "string" ? input : input.cloudinaryPublicId;
+}
+
+function canUseCloudinaryUpscale(asset: AssetEntry | null): boolean {
+	if (!asset?.width || !asset.height) return false;
+	return asset.width * asset.height < CLOUDINARY_UPSCALE_MAX_INPUT_PIXELS;
+}
+
+function shouldApplyUpscale(asset: AssetEntry | null, options: RequiredVariantOptions): boolean {
+	if (options.upscale === "never") return false;
+	if (!canUseCloudinaryUpscale(asset)) return false;
+	if (options.upscale === "always") return true;
+
+	const sourceWidth = asset?.width ?? 0;
+	const sourceHeight = asset?.height ?? 0;
+	const expectedDpr = Math.max(1, options.expectedDpr);
+	const requestedWidth = cleanNumber(options.width * expectedDpr);
+	const requestedHeight = options.height ? cleanNumber(options.height * expectedDpr) : null;
+
+	return requestedWidth > sourceWidth || (requestedHeight !== null && requestedHeight > sourceHeight);
+}
+
+function capUpscaledDimension(requested: number, source: number | null | undefined): number {
+	if (!source) return cleanNumber(requested);
+	return cleanNumber(Math.min(requested, source * CLOUDINARY_UPSCALE_FACTOR));
+}
+
+type RequiredVariantOptions = {
+	width: number;
+	height?: number;
+	crop: CloudinaryCropMode;
+	quality: "auto" | "auto:best" | "auto:good" | "auto:eco" | "auto:low";
+	format: "auto" | "avif" | "webp" | "png" | "jpg";
+	dprAuto: boolean;
+	expectedDpr: number;
+	upscale: CloudinaryUpscaleMode;
+	gravity?: string;
+	background?: string;
+	extraTransformations: string[];
+};
+
+function resolveOptions(variant: CloudinaryVariant, options: BuildCloudinaryUrlOptions): RequiredVariantOptions {
+	const config = VARIANT_CONFIGS[variant];
+
+	return {
+		width: options.width ?? config.width,
+		height: options.height,
+		crop: options.crop ?? config.crop,
+		quality: options.quality ?? config.quality,
+		format: options.format ?? "auto",
+		dprAuto: options.dprAuto ?? config.dprAuto,
+		expectedDpr: options.expectedDpr ?? config.expectedDpr,
+		upscale: options.upscale ?? "auto",
+		gravity: options.gravity,
+		background: options.background,
+		extraTransformations: options.extraTransformations ?? []
+	};
+}
+
+function buildTransformation(
+	asset: AssetEntry | null,
+	variant: CloudinaryVariant,
+	options: BuildCloudinaryUrlOptions
+): string {
+	const resolved = resolveOptions(variant, options);
+	const applyUpscale = shouldApplyUpscale(asset, resolved);
+
+	const width = applyUpscale ? capUpscaledDimension(resolved.width, asset?.width) : cleanNumber(resolved.width);
+	const height = resolved.height
+		? applyUpscale
+			? capUpscaledDimension(resolved.height, asset?.height)
+			: cleanNumber(resolved.height)
+		: null;
+
+	const resizeParts = [`c_${resolved.crop}`, `w_${width}`];
+
+	if (height) resizeParts.push(`h_${height}`);
+	if (resolved.gravity) resizeParts.push(`g_${resolved.gravity}`);
+	if (resolved.background) resizeParts.push(`b_${resolved.background}`);
+	if (resolved.dprAuto) resizeParts.push("dpr_auto");
+
+	const transformations: string[] = [];
+
+	if (applyUpscale) {
+		transformations.push("e_upscale");
+	}
+
+	transformations.push(resizeParts.join(","));
+	transformations.push(...resolved.extraTransformations);
+	transformations.push(`f_${resolved.format},q_${resolved.quality}`);
+
+	return transformations.join("/");
+}
+
+export function buildCloudinaryUrl(
+	input: string | AssetEntry,
+	variant: CloudinaryVariant = "card",
+	options: BuildCloudinaryUrlOptions = {}
+): string {
+	const cloud = getCloudinaryCloudName();
+	const publicId = getPublicId(input);
+
+	if (!cloud || !publicId) return "";
+
+	const asset = typeof input === "string" ? null : input;
+	const transformation = buildTransformation(asset, variant, options);
+	const version = asset?.cloudinaryVersion ? `/v${asset.cloudinaryVersion}` : "";
+	const encodedPublicId = encodePublicId(publicId);
+
+	return `https://res.cloudinary.com/${cloud}/image/upload/${transformation}${version}/${encodedPublicId}`;
+}
+
+export function getAssetDisplayUrl(
+	asset: AssetEntry,
+	variant: CloudinaryVariant = "card",
+	options: BuildCloudinaryUrlOptions = {}
+): string | null {
+	if (!asset.uploadedAt || !asset.cloudinaryPublicId) return null;
+	return buildCloudinaryUrl(asset, variant, options);
 }
 
 export function getDeviceDimensions(device: AssetEntry["device"]): { width: number; height: number } {

@@ -1,19 +1,51 @@
-import { buildCloudinaryUrl, type CloudinaryVariant } from "@/lib/cloudinary-images";
+import { buildCloudinaryUrl, getAssetDisplayUrl } from "@/lib/cloudinary-images";
+import { type AssetIndex, type BuildCloudinaryUrlOptions, type CloudinaryVariant } from "@/lib/cloudinary-images";
 
-// Converts a local public/ reference to a Cloudinary delivery URL.
-//   /screenshots/Framed/{path}.png → web/framed/{path}
-//   /marketing/{path}.png          → web/marketing/{path}
-// Both paths are indexed in assets/web/ and uploaded via assets/scripts/upload-to-cloudinary.mjs,
-// so the landing pages deliver every product render from the CDN rather than from
-// the local public/ folder. Anything that does not match is returned unchanged.
-export function screenshotUrl(localPath: string, variant: CloudinaryVariant = "full"): string {
+function publicIdFromLocalAssetPath(localPath: string): string | null {
 	const framedMatch = localPath.match(/^\/screenshots\/Framed\/(.+)\.(?:png|jpg|jpeg|webp)$/i);
 	if (framedMatch) {
-		return buildCloudinaryUrl(`web/framed/${framedMatch[1]}`, variant);
+		return `web/framed/${framedMatch[1]}`;
 	}
+
 	const marketingMatch = localPath.match(/^\/marketing\/(.+)\.(?:png|jpg|jpeg|webp)$/i);
 	if (marketingMatch) {
-		return buildCloudinaryUrl(`web/marketing/${marketingMatch[1]}`, variant);
+		return `web/marketing/${marketingMatch[1]}`;
 	}
-	return localPath;
+
+	return null;
+}
+
+function findAssetByPublicId(assetIndex: AssetIndex | undefined, publicId: string) {
+	return assetIndex?.assets.find(asset => asset.cloudinaryPublicId === publicId) ?? null;
+}
+
+// Converts a local public/ reference to a Cloudinary delivery URL.
+// Pass assetIndex when available so the URL builder can use width/height metadata for automatic upscaling.
+export function screenshotUrl(
+	localPath: string,
+	variant: CloudinaryVariant = "full",
+	options: BuildCloudinaryUrlOptions & { assetIndex?: AssetIndex } = {}
+): string {
+	const publicId = publicIdFromLocalAssetPath(localPath);
+	if (!publicId) return localPath;
+
+	const asset = findAssetByPublicId(options.assetIndex, publicId);
+	if (asset) {
+		return getAssetDisplayUrl(asset, variant, options) ?? localPath;
+	}
+
+	return buildCloudinaryUrl(publicId, variant, options) || localPath;
+}
+
+export function createScreenshotUrl(assetIndex: AssetIndex) {
+	return (
+		localPath: string,
+		variant: CloudinaryVariant = "full",
+		options: BuildCloudinaryUrlOptions = {}
+	): string => {
+		return screenshotUrl(localPath, variant, {
+			...options,
+			assetIndex
+		});
+	};
 }

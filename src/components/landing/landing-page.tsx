@@ -55,14 +55,17 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { screenshotUrl } from "@/lib/asset-url";
+import assetIndex from "@/data/asset-index.json";
+import { createScreenshotUrl } from "@/lib/asset-url";
 import { type PvScaleKey, SCALE_ACCENT_BAR_CLASS_NAMES } from "@/lib/audit/scale-colors";
+import type { AssetIndex } from "@/lib/cloudinary-images";
 import { cn } from "@/lib/utils";
 
 // ─── Route constants ──────────────────────────────────────────────────────────
 
 const SIGN_UP_PATH = "/signup";
 const SIGN_IN_PATH = "/login";
+const screenshotUrl = createScreenshotUrl(assetIndex as AssetIndex);
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
