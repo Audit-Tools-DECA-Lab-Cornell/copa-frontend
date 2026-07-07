@@ -959,6 +959,7 @@
 				"questions": "Fragen",
 				"scales": "Skalen",
 				"preAudit": "Vor-Audit-Fragen",
+				"preAuditCount": "{count, plural, one {# Frage konfiguriert} other {# Fragen konfiguriert}}",
 				"preamble": "Einleitung",
 				"executionModes": "Ausführungsmodi",
 				"languages": "Sprachen",

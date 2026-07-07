@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { SectionHeader } from "@/components/dashboard/section-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { ScaleDefinition, ScaleKey } from "@/types/audit";
@@ -36,15 +37,18 @@ export function ScaleGuidanceEditor({
 
 	return (
 		<div className="space-y-4">
-			<div className="flex items-center justify-between">
-				<h3 className="text-lg font-semibold">{t("scaleGuidance")}</h3>
-				{!translationMode && (
-					<Button onClick={addScale}>
-						<Plus className="mr-1.5 h-4 w-4" />
-						{t("addScale")}
-					</Button>
-				)}
-			</div>
+			<SectionHeader
+				as="h3"
+				title={t("scaleGuidance")}
+				actions={
+					!translationMode ? (
+						<Button onClick={addScale}>
+							<Plus className="mr-1.5 h-4 w-4" />
+							{t("addScale")}
+						</Button>
+					) : undefined
+				}
+			/>
 
 			{/*
 			 * Previously `lg:grid-cols-2` placed two scale cards side by side.

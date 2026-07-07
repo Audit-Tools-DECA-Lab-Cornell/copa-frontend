@@ -9,11 +9,10 @@ const badgeVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "border-0 bg-solid-primary text-solid-primary-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.18)]",
-				secondary:
-					"border-0 bg-solid-neutral text-solid-neutral-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.18)]",
+				default: "border-0 bg-solid-primary text-solid-primary-text shadow-badge",
+				secondary: "border-0 bg-solid-neutral text-solid-neutral-text shadow-badge",
 				destructive:
-					"border-0 bg-solid-danger text-solid-danger-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.18)] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+					"border-0 bg-solid-danger text-solid-danger-text shadow-badge focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
 				outline:
 					"border-action-outline-border bg-transparent text-text-secondary [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
 				ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
