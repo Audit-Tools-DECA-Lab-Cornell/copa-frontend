@@ -45,13 +45,13 @@ export function SectionHeader({
 				variant === "ruled" && "border-b-2 border-edge/60 pb-3",
 				className
 			)}>
-			<div className={cn("space-y-1", variant === "accent" && "border-l-[3px] border-primary pl-3")}>
+			<div className={cn("space-y-1", variant === "accent" && "border-l-tick border-primary pl-3")}>
 				{eyebrow ? (
-					<p className="text-(length:--eyebrow-size) font-semibold tracking-(--eyebrow-tracking) text-text-secondary uppercase">
+					<p className="text-(length:--eyebrow-size) font-(--eyebrow-weight) tracking-(--eyebrow-tracking) text-text-secondary uppercase">
 						{eyebrow}
 					</p>
 				) : null}
-				<Heading className="text-(length:--section-title-size) leading-(--section-title-line-height) font-semibold tracking-(--section-title-tracking) text-balance text-foreground md:text-(length:--section-title-size-lg)">
+				<Heading className="text-(length:--section-title-size) leading-(--section-title-line-height) font-(--section-title-weight) tracking-(--section-title-tracking) text-balance text-foreground md:text-(length:--section-title-size-lg)">
 					{title}
 				</Heading>
 				{description ? (

@@ -8,6 +8,9 @@ const config = {
 				card: "8px",
 				pill: "14px"
 			},
+			borderWidth: {
+				tick: "3px"
+			},
 			boxShadow: {
 				accent: "0 0 14px rgba(197, 138, 92, 0.12)",
 				badge: "inset 0 1px 2px rgba(0,0,0,0.18)",

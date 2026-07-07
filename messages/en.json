@@ -977,6 +977,7 @@
 				"questions": "Questions",
 				"scales": "Scales",
 				"preAudit": "Pre-Audit Questions",
+				"preAuditCount": "{count, plural, one {# question configured} other {# questions configured}}",
 				"preamble": "Preamble",
 				"executionModes": "Execution Modes",
 				"languages": "Languages",

@@ -71,7 +71,7 @@ export function DashboardHeader({
 							</p>
 						) : null}
 						<div className="space-y-1.5">
-							<h1 className="text-(length:--page-title-size) leading-(--page-title-line-height) font-semibold tracking-(--page-title-tracking) text-balance text-background md:text-(length:--page-title-size-lg)">
+							<h1 className="text-(length:--page-title-size) leading-(--page-title-line-height) font-(--page-title-weight) tracking-(--page-title-tracking) text-balance text-background md:text-(length:--page-title-size-lg)">
 								{title}
 							</h1>
 							<p className="max-w-4xl text-sm leading-6 text-background/70 md:text-base">{description}</p>

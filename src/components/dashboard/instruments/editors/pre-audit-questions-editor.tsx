@@ -277,7 +277,7 @@ export function PreAuditQuestionsEditor({
 			<SectionHeader
 				as="h3"
 				title={t("preAudit")}
-				description={`${questions.length} ${questions.length === 1 ? "question" : "questions"} configured`}
+				description={t("preAuditCount", { count: questions.length })}
 				actions={
 					!translationMode ? (
 						<Button onClick={addQuestion} size="sm" className="gap-1.5">

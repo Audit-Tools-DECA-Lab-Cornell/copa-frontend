@@ -103,7 +103,7 @@ Four tiers, from app chrome down to card level. Hierarchy comes from structure a
 | --- | --- | --- |
 | 1. Nav / top bar | `AppShell` header (`src/components/app/app-shell.tsx`) | Sticky, `border-b-2 border-edge`, `bg-background/90` + blur, `shadow-topbar`. Brand identity (icon + product name + role badge) lives in the sidebar, keeping the top bar quiet. |
 | 2. Page header | `DashboardHeader` (`src/components/dashboard/dashboard-header.tsx`) | The signature element: inverted block (`bg-foreground` + `text-background`), `rounded-card`, `shadow-header-block`, page-title tokens, optional uppercase eyebrow, description, action slot, breadcrumbs above. **Manager/admin pages must use this — never a plain `bg-card` shell.** One per screen. |
-| 3. Section header | `SectionHeader` (`src/components/dashboard/section-header.tsx`) | Shared header for content groups on the canvas. Section-title tokens (same as `CardTitle`), optional eyebrow/description/actions, real `h2`/`h3` via `as`. Variants: `default`, `ruled` (hard `border-b-2 border-edge/60` rule), `accent` (3px terracotta left tick — at most one per screen). |
+| 3. Section header | `SectionHeader` (`src/components/dashboard/section-header.tsx`) | Shared header for content groups on the canvas. Section-title tokens (same as `CardTitle`), optional eyebrow/description/actions, real `h2`/`h3` via `as`. Variants: `default`, `ruled` (hard `border-b-2 border-edge/60` rule), `accent` (terracotta left tick via the `border-l-tick` width token — at most one per screen). |
 | 4. Card header | `CardHeader` + `CardTitle` (`src/components/ui/card.tsx`) | Section-title tokens inside cards; owns the `border-b` separator above tables. |
 
 Usage rules:
