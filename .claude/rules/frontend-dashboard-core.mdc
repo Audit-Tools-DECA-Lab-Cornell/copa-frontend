@@ -13,6 +13,7 @@ alwaysApply: true
 - Every user-visible string belongs in i18n (`messages/en.json` + `messages/de.json`), written from the reader's role and task. No internal model names, backend field names, or implementation jargon in the UI.
 - Path alias `@/*` → `./src/*`. Prefer TanStack Query + existing API helpers over new fetch wrappers.
 - Manager/admin dashboard page headers use inverted contrast (`bg-foreground` + `text-background`), not a plain `bg-card` shell.
+- Header hierarchy: `DashboardHeader` (page `h1`, inverted block) → `SectionHeader` (`src/components/dashboard/section-header.tsx`, `h2`/`h3` content groups, `default`/`ruled`/`accent` variants) → `CardTitle` (inside cards). Do not hand-roll section heading rows — use `SectionHeader` with the `actions` slot. Brand reference: `docs/brand-kit.md`.
 - Admin exports and raw-data views must never expose auditor PII — auditor code only, no names or contact details.
 - Contract or role-gated flow changes ship with matching Playwright specs under `tests/e2e/`; coordinate with `qa-e2e-regression` when the backend boundary moves.
 - Default git branch is `master` (there is no `main` on GitHub for this repo).

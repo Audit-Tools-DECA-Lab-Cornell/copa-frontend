@@ -389,7 +389,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 				</aside>
 
 				<div className="min-w-0">
-					<header className="sticky top-0 z-10 border-b-2 border-edge bg-background/90 shadow-[0_2px_8px_rgba(0,0,0,0.08)] backdrop-blur">
+					<header className="sticky top-0 z-10 border-b-2 border-edge bg-background/90 shadow-topbar backdrop-blur">
 						<div className="flex h-16 items-center gap-3 px-4 md:px-6">
 							<Sheet>
 								<SheetTrigger asChild>

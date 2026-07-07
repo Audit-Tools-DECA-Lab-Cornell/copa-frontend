@@ -88,6 +88,13 @@ export const DESIGN_SYSTEM = {
 		"4xl": "16px"
 	},
 	typography: {
+		pageTitle: {
+			size: "1.875rem",
+			sizeDesktop: "2.25rem",
+			lineHeight: "1.25",
+			tracking: "-0.025em",
+			weight: "600"
+		},
 		sectionTitle: {
 			size: "1.25rem",
 			sizeDesktop: "1.375rem",
@@ -438,6 +445,11 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--table-row-hover": palette.tableRowHover,
 		"--stat-accent-neutral": palette.statAccentNeutral,
 		"--stat-accent-info": palette.accentSlate,
+		"--page-title-size": DESIGN_SYSTEM.typography.pageTitle.size,
+		"--page-title-size-lg": DESIGN_SYSTEM.typography.pageTitle.sizeDesktop,
+		"--page-title-line-height": DESIGN_SYSTEM.typography.pageTitle.lineHeight,
+		"--page-title-tracking": DESIGN_SYSTEM.typography.pageTitle.tracking,
+		"--page-title-weight": DESIGN_SYSTEM.typography.pageTitle.weight,
 		"--section-title-size": DESIGN_SYSTEM.typography.sectionTitle.size,
 		"--section-title-size-lg": DESIGN_SYSTEM.typography.sectionTitle.sizeDesktop,
 		"--section-title-line-height": DESIGN_SYSTEM.typography.sectionTitle.lineHeight,

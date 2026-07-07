@@ -2,6 +2,7 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { SectionHeader } from "@/components/dashboard/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -273,21 +274,19 @@ export function PreAuditQuestionsEditor({
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div>
-					<h3 className="text-lg font-semibold tracking-tight">{t("preAudit")}</h3>
-					<p className="text-sm text-muted-foreground mt-0.5">
-						{questions.length} {questions.length === 1 ? "question" : "questions"} configured
-					</p>
-				</div>
-				{!translationMode && (
-					<Button onClick={addQuestion} size="sm" className="gap-1.5">
-						<Plus className="h-4 w-4" />
-						{t("addQuestion")}
-					</Button>
-				)}
-			</div>
+			<SectionHeader
+				as="h3"
+				title={t("preAudit")}
+				description={`${questions.length} ${questions.length === 1 ? "question" : "questions"} configured`}
+				actions={
+					!translationMode ? (
+						<Button onClick={addQuestion} size="sm" className="gap-1.5">
+							<Plus className="h-4 w-4" />
+							{t("addQuestion")}
+						</Button>
+					) : undefined
+				}
+			/>
 
 			{/* Empty state */}
 			{questions.length === 0 && (

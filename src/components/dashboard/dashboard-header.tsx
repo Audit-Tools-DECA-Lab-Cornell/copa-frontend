@@ -62,7 +62,7 @@ export function DashboardHeader({
 			) : (
 				<div className="h-5" />
 			)}
-			<div className="flex flex-col gap-4 rounded-card border-0 bg-foreground p-6 text-foreground shadow-[0_6px_0_rgba(0,0,0,0.22),0_12px_28px_rgba(0,0,0,0.18)] md:p-7">
+			<div className="flex flex-col gap-4 rounded-card border-0 bg-foreground p-6 text-foreground shadow-header-block md:p-7">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="space-y-2">
 						{eyebrow ? (
@@ -71,7 +71,7 @@ export function DashboardHeader({
 							</p>
 						) : null}
 						<div className="space-y-1.5">
-							<h1 className="text-3xl font-semibold leading-tight text-balance text-background md:text-4xl">
+							<h1 className="text-(length:--page-title-size) leading-(--page-title-line-height) font-semibold tracking-(--page-title-tracking) text-balance text-background md:text-(length:--page-title-size-lg)">
 								{title}
 							</h1>
 							<p className="max-w-4xl text-sm leading-6 text-background/70 md:text-base">{description}</p>

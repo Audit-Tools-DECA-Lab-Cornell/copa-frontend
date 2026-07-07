@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { SectionHeader } from "@/components/dashboard/section-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,15 +46,18 @@ export function SectionEditorList({
 
 	return (
 		<div className="space-y-4">
-			<div className="flex items-center justify-between">
-				<h3 className="text-lg font-semibold">{t("sections")}</h3>
-				{!translationMode && (
-					<Button onClick={addSection}>
-						<Plus className="mr-1.5 h-4 w-4" />
-						{t("addSection")}
-					</Button>
-				)}
-			</div>
+			<SectionHeader
+				as="h3"
+				title={t("sections")}
+				actions={
+					!translationMode ? (
+						<Button onClick={addSection}>
+							<Plus className="mr-1.5 h-4 w-4" />
+							{t("addSection")}
+						</Button>
+					) : undefined
+				}
+			/>
 
 			<Accordion type="single" collapsible className="w-full">
 				{sections.map((section, sIdx) => (
