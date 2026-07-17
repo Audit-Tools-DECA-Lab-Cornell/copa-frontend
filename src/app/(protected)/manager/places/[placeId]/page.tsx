@@ -218,7 +218,7 @@ export default function ManagerPlaceDetailPage() {
 			) : null}
 
 			{/* ── KPI stats ── */}
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
 					title={t("stats.totalAudits.title")}
 					value={String(history.total_audits)}
