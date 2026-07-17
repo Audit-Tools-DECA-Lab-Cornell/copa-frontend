@@ -237,12 +237,6 @@ export default function ManagerPlaceDetailPage() {
 					tone="warning"
 				/>
 				<StatCard
-					title="Overall PV/U"
-					value={formatScorePairLabel(history.overall_scores, formatT)}
-					helper={t("stats.meanScore.helper")}
-					tone="violet"
-				/>
-				<StatCard
 					title={t("stats.latestSubmitted.title")}
 					value={
 						history.latest_submitted_at
@@ -322,20 +316,20 @@ export default function ManagerPlaceDetailPage() {
 				initialValues={
 					placeQuery.data
 						? {
-								name: placeQuery.data.name,
-								address: placeQuery.data.address,
-								city: placeQuery.data.city,
-								province: placeQuery.data.province,
-								country: placeQuery.data.country,
-								postalCode: placeQuery.data.postal_code,
-								placeType: placeQuery.data.place_type,
-								latitude: placeQuery.data.lat,
-								longitude: placeQuery.data.lng,
-								startDate: placeQuery.data.start_date,
-								endDate: placeQuery.data.end_date,
-								estimatedAuditors: placeQuery.data.est_auditors,
-								auditorDescription: placeQuery.data.auditor_description
-							}
+							name: placeQuery.data.name,
+							address: placeQuery.data.address,
+							city: placeQuery.data.city,
+							province: placeQuery.data.province,
+							country: placeQuery.data.country,
+							postalCode: placeQuery.data.postal_code,
+							placeType: placeQuery.data.place_type,
+							latitude: placeQuery.data.lat,
+							longitude: placeQuery.data.lng,
+							startDate: placeQuery.data.start_date,
+							endDate: placeQuery.data.end_date,
+							estimatedAuditors: placeQuery.data.est_auditors,
+							auditorDescription: placeQuery.data.auditor_description
+						}
 						: undefined
 				}
 				isPending={updatePlaceMutation.isPending}
