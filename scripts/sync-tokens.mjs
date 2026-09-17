@@ -75,9 +75,20 @@ ${scaleEntries}
 }
 
 const tokens = JSON.parse(readFileSync(TOKENS, "utf8"));
+const expected = checksum(tokens);
 const output = render(tokens);
 
 if (CHECK) {
+	// The stamp is what copa-mobile trusts. If it drifted from the payload here,
+	// every vendored copy taken since is suspect, so fail before anything else.
+	if (tokens.meta?.checksum !== expected) {
+		console.error(
+			"tokens:check - brand/tokens.json meta.checksum is missing or stale " +
+				`(stamped ${tokens.meta?.checksum ?? "none"}, payload ${expected}). Run \`pnpm tokens:build\`.`
+		);
+		process.exit(1);
+	}
+
 	let current = "";
 	try {
 		current = readFileSync(TARGET, "utf8");
@@ -91,8 +102,13 @@ if (CHECK) {
 		);
 		process.exit(1);
 	}
-	console.log(`tokens:check - up to date (brand/tokens.json checksum ${checksum(tokens)}).`);
+	console.log(`tokens:check - up to date (brand/tokens.json checksum ${expected}).`);
 } else {
+	if (tokens.meta?.checksum !== expected) {
+		tokens.meta = { ...tokens.meta, checksum: expected };
+		writeFileSync(TOKENS, JSON.stringify(tokens, null, "\t") + "\n");
+		console.log(`tokens:build - stamped brand/tokens.json meta.checksum ${expected}.`);
+	}
 	writeFileSync(TARGET, output);
-	console.log(`tokens:build - wrote src/lib/design-system.generated.ts (checksum ${checksum(tokens)}).`);
+	console.log(`tokens:build - wrote src/lib/design-system.generated.ts (checksum ${expected}).`);
 }

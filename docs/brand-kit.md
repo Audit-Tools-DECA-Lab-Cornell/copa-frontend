@@ -21,6 +21,18 @@ All colors live in **`brand/tokens.json`** - the canonical source for this repo 
 
 **Never hard-code hex values in components, and never edit a `*.generated.ts` file** - edit `brand/tokens.json` and regenerate. `pnpm tokens:check` enforces this in CI. Cross-client divergences that predate the pipeline are declared under `knownDrift` in the token file rather than left implicit.
 
+### Ownership across the two repos
+
+This repo **owns** `brand/tokens.json`. `pnpm tokens:build` stamps `meta.checksum` with a hash of the token payload; copa-mobile vendors the stamped file and refuses to build or pass CI when the stamp disagrees with the copy's contents. So colour can only change here, and a local edit on the mobile side is a hard failure rather than a silent divergence.
+
+To change a colour: edit `brand/tokens.json`, run `pnpm tokens:build`, then copy the stamped file into copa-mobile and run its `tokens:build`. Three layers back this up:
+
+| Check | Catches |
+| --- | --- |
+| `pnpm tokens:check` (both repos) | generated files stale or hand-edited; a stamp that disagrees with the payload |
+| copa-mobile `tokens:check` | a vendored copy edited in the mobile repo |
+| copa-mobile `verify-token-sync.mjs` | a vendored copy that is merely out of date (needs `TOKENS_SYNC_TOKEN`) |
+
 ### Surfaces & text (semantic roles)
 
 | Role | Token / utility | Light (standard) | Dark (standard) |
