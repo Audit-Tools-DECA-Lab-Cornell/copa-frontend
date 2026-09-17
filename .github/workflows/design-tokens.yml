@@ -1,0 +1,49 @@
+name: Design Tokens
+
+on:
+    pull_request:
+    push:
+        branches:
+            - master
+
+concurrency:
+    group: design-tokens-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    tokens:
+        name: Token Drift Gate
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            # Fails if design-system.generated.ts was hand-edited, or if someone
+            # changed brand/tokens.json without regenerating. This is the check
+            # that keeps colour definable in exactly one place.
+            - name: Verify generated tokens are current
+              run: pnpm tokens:check
+
+            - name: Typecheck
+              run: pnpm exec tsc --noEmit
+
+            - name: Design token tests
+              run: pnpm exec tsx --test tests/unit/design-tokens.test.ts

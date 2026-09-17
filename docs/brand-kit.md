@@ -17,7 +17,9 @@ What it means in practice:
 
 ## 2. Color tokens
 
-All colors live in `DESIGN_SYSTEM.palettes` (`src/lib/design-system.ts`) in four modes: `light`/`dark` × `standard`/`high` contrast. They are emitted as CSS custom properties and mapped to Tailwind utilities in `src/app/globals.css`. **Never hard-code hex values in components.**
+All colors live in **`brand/tokens.json`** - the canonical source for this repo *and* for copa-mobile. `pnpm tokens:build` generates `src/lib/design-system.generated.ts` from it, which `DESIGN_SYSTEM.palettes` consumes in four modes: `light`/`dark` × `standard`/`high` contrast. They are emitted as CSS custom properties and mapped to Tailwind utilities in `src/app/globals.css`.
+
+**Never hard-code hex values in components, and never edit a `*.generated.ts` file** - edit `brand/tokens.json` and regenerate. `pnpm tokens:check` enforces this in CI. Cross-client divergences that predate the pipeline are declared under `knownDrift` in the token file rather than left implicit.
 
 ### Surfaces & text (semantic roles)
 

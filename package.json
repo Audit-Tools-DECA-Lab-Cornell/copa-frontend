@@ -9,6 +9,8 @@
 		"start": "next start",
 		"lint": "eslint",
 		"lint:fix": "eslint . --fix",
+		"tokens:build": "node scripts/sync-tokens.mjs",
+		"tokens:check": "node scripts/sync-tokens.mjs --check",
 		"test:unit": "tsx --test \"tests/unit/**/*.test.ts\"",
 		"test:contract": "node ./scripts/verify_audit_contract.mjs",
 		"format": "pnpm run lint:fix && prettier --write .",

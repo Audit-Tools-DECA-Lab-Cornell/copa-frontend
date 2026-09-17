@@ -5,17 +5,19 @@
  * Used by dashboard badges, landing page, report views, PDF, and Excel exports.
  */
 
+import { GENERATED_SCALE_ACCENTS } from "@/lib/design-system.generated";
+
 export const PV_SCALE_KEYS = ["provision", "variety", "challenge", "sociability"] as const;
 
 export type PvScaleKey = (typeof PV_SCALE_KEYS)[number];
 
-/** Canonical accent hex colours for each PV scale. */
-export const SCALE_ACCENT_COLORS: Record<PvScaleKey, string> = {
-	provision: "#566E3D",
-	variety: "#D2691E",
-	challenge: "#B45309",
-	sociability: "#754170"
-};
+/**
+ * Canonical accent hex colours for each PV scale.
+ *
+ * Values come from `brand/tokens.json` via the generated module - the same
+ * source copa-mobile reads, so a scale cannot drift between the two clients.
+ */
+export const SCALE_ACCENT_COLORS: Record<PvScaleKey, string> = GENERATED_SCALE_ACCENTS;
 
 /**
  * Soft fills are blended from each accent toward white so column backgrounds
