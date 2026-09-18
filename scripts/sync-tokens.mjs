@@ -203,7 +203,16 @@ function validate(tokens) {
 	}
 
 	// Groups added in phase 2. `_note` keys carry prose, not colour, so they are skipped.
-	for (const group of ["feedback", "reportSource", "mapPlaceholder", "exportDocument", "nativeSplash", "landing", "mobileSurface", "uploadWidget"]) {
+	for (const group of [
+		"feedback",
+		"reportSource",
+		"mapPlaceholder",
+		"exportDocument",
+		"nativeSplash",
+		"landing",
+		"mobileSurface",
+		"uploadWidget"
+	]) {
 		for (const [token, value] of Object.entries(tokens[group] ?? {})) {
 			if (token.startsWith("_")) continue;
 			check(`${group}.${token}`, value);
