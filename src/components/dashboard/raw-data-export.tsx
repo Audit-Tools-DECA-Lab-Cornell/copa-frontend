@@ -9,6 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { withAlpha } from "@/lib/audit/scale-colors";
+import { GENERATED_FEEDBACK_COLORS } from "@/lib/design-system.generated";
 
 // ── Shared export types ─────────────────────────────────────────────────────────
 
@@ -183,9 +185,9 @@ export function CollectionNamespaceBar({
 						<span
 							className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold tabular-nums"
 							style={{
-								background: "rgba(0, 168, 90, 0.10)",
-								color: "#00a85a",
-								border: "1px solid rgba(0, 168, 90, 0.28)"
+								background: withAlpha(GENERATED_FEEDBACK_COLORS.progressSuccess, 0.1),
+								color: GENERATED_FEEDBACK_COLORS.progressSuccess,
+								border: `1px solid ${withAlpha(GENERATED_FEEDBACK_COLORS.progressSuccess, 0.28)}`
 							}}>
 							<CheckIcon className="size-2.5" aria-hidden="true" />
 							{selectedLabel ?? `${selectedCount.toLocaleString()} selected`}
@@ -240,17 +242,17 @@ export function SelectionBar({
 		<div
 			className="flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm"
 			style={{
-				background: "rgba(0, 168, 90, 0.07)",
-				borderColor: "rgba(0, 168, 90, 0.25)"
+				background: withAlpha(GENERATED_FEEDBACK_COLORS.progressSuccess, 0.07),
+				borderColor: withAlpha(GENERATED_FEEDBACK_COLORS.progressSuccess, 0.25)
 			}}>
 			<div className="flex items-center gap-2">
 				<span
 					className="flex size-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums"
-					style={{ background: "#00a85a", color: "#fff" }}
+					style={{ background: GENERATED_FEEDBACK_COLORS.progressSuccess, color: "#ffffff" }}
 					aria-hidden="true">
 					{selectedCount > 99 ? "99+" : selectedCount}
 				</span>
-				<span className="font-medium" style={{ color: "#007a40" }}>
+				<span className="font-medium" style={{ color: GENERATED_FEEDBACK_COLORS.progressSuccessStrong }}>
 					{`${selectedCount.toLocaleString()} ${labels.selectedText}`}
 				</span>
 			</div>
@@ -260,10 +262,16 @@ export function SelectionBar({
 					size="sm"
 					disabled={isExporting}
 					className="h-8 gap-1.5 text-white"
-					style={{ background: "#00a85a" }}
+					style={{ background: GENERATED_FEEDBACK_COLORS.progressSuccess }}
 					onClick={onExportSelected}
-					onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = "#008f4c")}
-					onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = "#00a85a")}>
+					onMouseEnter={e =>
+						((e.currentTarget as HTMLButtonElement).style.background =
+							GENERATED_FEEDBACK_COLORS.progressSuccessHover)
+					}
+					onMouseLeave={e =>
+						((e.currentTarget as HTMLButtonElement).style.background =
+							GENERATED_FEEDBACK_COLORS.progressSuccess)
+					}>
 					{isExporting ? (
 						<Loader2Icon className="size-3.5 animate-spin" aria-hidden="true" />
 					) : (

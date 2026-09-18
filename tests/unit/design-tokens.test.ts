@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { SCALE_ACCENT_COLORS } from "@/lib/audit/scale-colors";
+import { REPORT_SOURCE_STYLES } from "@/lib/audit/report-source-sessions";
+import { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS, withAlpha } from "@/lib/audit/scale-colors";
 import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
+import {
+	GENERATED_FEEDBACK_COLORS,
+	GENERATED_MAP_PLACEHOLDER_COLORS,
+	GENERATED_REPORT_SOURCE_COLORS
+} from "@/lib/design-system.generated";
 
 import baseline from "../fixtures/design-tokens-baseline.json" with { type: "json" };
 
@@ -62,4 +68,55 @@ test("css custom properties resolve for every mode without holes", () => {
 			assert.equal(variables["--foreground"], baseline.palettes[theme][contrast].textPrimary);
 		}
 	}
+});
+
+/**
+ * Phase 2 moved colour literals that were scattered across components into
+ * `brand/tokens.json`. Like phase 1, it is meant to be a no-op: the tokens must
+ * still resolve to exactly the values those components hard-coded, so the only
+ * thing that changed is where the value lives.
+ *
+ * The literals below are transcribed from the pre-phase-2 source. They are
+ * expected to change in phase 3 - deliberately, in the same commit as the tokens.
+ */
+test("phase 2 tokens preserve the literals they replaced", () => {
+	assert.deepEqual(CONSTRUCT_ACCENT_COLORS, { playValue: "#2E7D78", usability: "#C7972F" });
+
+	assert.deepEqual(GENERATED_FEEDBACK_COLORS, {
+		progressSuccess: "#00a85a",
+		progressSuccessHover: "#008f4c",
+		progressSuccessStrong: "#007a40",
+		progressWarning: "#b45309"
+	});
+
+	assert.deepEqual(GENERATED_REPORT_SOURCE_COLORS, { auditTint: "#FEF3C7", surveyTint: "#DBEAFE" });
+
+	assert.deepEqual(GENERATED_MAP_PLACEHOLDER_COLORS, {
+		surface: "#f8fafc",
+		panel: "#eef2ff",
+		panelBorder: "#c7d2fe",
+		title: "#3730a3",
+		body: "#475569"
+	});
+});
+
+/** The PDF export fills source rows from these, so the tuples must not shift. */
+test("report source rgb tuples still match the literals the PDF export used", () => {
+	assert.deepEqual([...REPORT_SOURCE_STYLES.audit.rgb], [254, 243, 199]);
+	assert.deepEqual([...REPORT_SOURCE_STYLES.survey.rgb], [219, 234, 254]);
+});
+
+/**
+ * Translucent fills derive from the same token as their solid counterpart.
+ * These are the exact strings the components used to inline; a change here is a
+ * rendered change, not a refactor.
+ */
+test("withAlpha reproduces the inlined rgba strings", () => {
+	const success = GENERATED_FEEDBACK_COLORS.progressSuccess;
+	assert.equal(withAlpha(success, 0.07), "rgba(0, 168, 90, 0.07)");
+	assert.equal(withAlpha(success, 0.1), "rgba(0, 168, 90, 0.1)");
+	assert.equal(withAlpha(success, 0.12), "rgba(0, 168, 90, 0.12)");
+	assert.equal(withAlpha(success, 0.25), "rgba(0, 168, 90, 0.25)");
+	assert.equal(withAlpha(success, 0.28), "rgba(0, 168, 90, 0.28)");
+	assert.equal(withAlpha(GENERATED_FEEDBACK_COLORS.progressWarning, 0.12), "rgba(180, 83, 9, 0.12)");
 });

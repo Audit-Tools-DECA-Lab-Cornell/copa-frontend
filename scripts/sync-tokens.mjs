@@ -51,6 +51,10 @@ function render(tokens) {
 	const ordered = ["provision", "variety", "challenge", "sociability"];
 	const scaleEntries = entries(Object.fromEntries(ordered.filter(k => k in scales).map(k => [k, scales[k]])), 1);
 
+	/** Serialise a token group, dropping the `_note` prose key. */
+	const group = name =>
+		entries(Object.fromEntries(Object.entries(tokens[name] ?? {}).filter(([key]) => !key.startsWith("_"))), 1);
+
 	return `/**
  * GENERATED FILE - DO NOT EDIT.
  *
@@ -70,6 +74,26 @@ ${modes.join(",\n")}
 /** Canonical PV scale accents for this platform, resolved from brand/tokens.json. */
 export const GENERATED_SCALE_ACCENTS = {
 ${scaleEntries}
+} as const;
+
+/** Headline construct accents (Play Value / Usability), shared verbatim with copa-mobile. */
+export const GENERATED_CONSTRUCT_ACCENTS = {
+${entries(tokens.scales?.constructs ?? {}, 1)}
+} as const;
+
+/** Export/download flow status colours. See knownDrift - these duplicate the status tokens. */
+export const GENERATED_FEEDBACK_COLORS = {
+${group("feedback")}
+} as const;
+
+/** Row tints distinguishing Place Audit from Place Survey rows in combined reports. */
+export const GENERATED_REPORT_SOURCE_COLORS = {
+${group("reportSource")}
+} as const;
+
+/** Inlined into the server-rendered static-map placeholder SVG, which cannot read CSS variables. */
+export const GENERATED_MAP_PLACEHOLDER_COLORS = {
+${group("mapPlaceholder")}
 } as const;
 `;
 }
@@ -166,6 +190,14 @@ function validate(tokens) {
 	}
 	for (const [token, value] of Object.entries(tokens.scales?.constructs ?? {})) {
 		check(`scales.constructs.${token}`, value);
+	}
+
+	// Groups added in phase 2. `_note` keys carry prose, not colour, so they are skipped.
+	for (const group of ["feedback", "reportSource", "mapPlaceholder"]) {
+		for (const [token, value] of Object.entries(tokens[group] ?? {})) {
+			if (token.startsWith("_")) continue;
+			check(`${group}.${token}`, value);
+		}
 	}
 
 	if (errors.length > 0) {

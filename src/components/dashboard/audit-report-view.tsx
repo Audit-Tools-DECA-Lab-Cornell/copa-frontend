@@ -68,7 +68,7 @@ import {
 	readSpaceAuditQuestionValues,
 	resolveSpaceAuditDisplayValues
 } from "@/lib/export/audit/format-utils";
-import { SCALE_ACCENT_COLORS } from "@/lib/export/audit/types";
+import { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS } from "@/lib/export/audit/types";
 import { cn } from "@/lib/utils";
 import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
 import type { SociabilityDimensionKey } from "@/types/sociability";
@@ -342,8 +342,8 @@ const BAR_COLORS: Record<MetricKey, string> = {
 	sociability_play_alone: SCALE_ACCENT_COLORS.sociability,
 	sociability_small_group: SCALE_ACCENT_COLORS.sociability,
 	sociability_large_group: SCALE_ACCENT_COLORS.sociability,
-	play_value: "#2E7D78",
-	usability: "#C7972F"
+	play_value: CONSTRUCT_ACCENT_COLORS.playValue,
+	usability: CONSTRUCT_ACCENT_COLORS.usability
 };
 
 // Percentage cutoffs where the legacy bar color used to change. Now rendered as

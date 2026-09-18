@@ -5,7 +5,7 @@
  * Used by dashboard badges, landing page, report views, PDF, and Excel exports.
  */
 
-import { GENERATED_SCALE_ACCENTS } from "@/lib/design-system.generated";
+import { GENERATED_CONSTRUCT_ACCENTS, GENERATED_SCALE_ACCENTS } from "@/lib/design-system.generated";
 
 export const PV_SCALE_KEYS = ["provision", "variety", "challenge", "sociability"] as const;
 
@@ -18,6 +18,16 @@ export type PvScaleKey = (typeof PV_SCALE_KEYS)[number];
  * source copa-mobile reads, so a scale cannot drift between the two clients.
  */
 export const SCALE_ACCENT_COLORS: Record<PvScaleKey, string> = GENERATED_SCALE_ACCENTS;
+
+/**
+ * Headline construct colours (Play Value / Usability) - co-equal peers, distinct
+ * from the four scale colours.
+ *
+ * Shared verbatim with copa-mobile through `brand/tokens.json`. Before the token
+ * pipeline each client inlined these separately, which is how the scale colours
+ * drifted apart in the first place.
+ */
+export const CONSTRUCT_ACCENT_COLORS: Record<"playValue" | "usability", string> = GENERATED_CONSTRUCT_ACCENTS;
 
 /**
  * Soft fills are blended from each accent toward white so column backgrounds
@@ -127,6 +137,17 @@ export function getPvScaleCssVariables(): Record<string, string> {
 /** Converts `#RRGGBB` to an RGB tuple for PDF/jsPDF consumers. */
 export function hexToRgb(hex: string): [number, number, number] {
 	return parseHexColor(hex);
+}
+
+/**
+ * Builds an `rgba(...)` string from a hex token and an alpha.
+ *
+ * Lets a translucent fill derive from the same token as its solid counterpart
+ * rather than repeating the channel numbers, so a token change carries to both.
+ */
+export function withAlpha(hex: string, alpha: number): string {
+	const [red, green, blue] = parseHexColor(hex);
+	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
 /** Strips `#` for XLSX `rgb` style fields. */

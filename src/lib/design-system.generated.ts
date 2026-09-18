@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE - DO NOT EDIT.
  *
- * Source:      brand/tokens.json (checksum f73b24a4ccaadac5)
+ * Source:      brand/tokens.json (checksum 5eecda8d5ace97dd)
  * Regenerate:  pnpm tokens:build
  * Verify:      pnpm tokens:check
  *
@@ -223,4 +223,33 @@ export const GENERATED_SCALE_ACCENTS = {
 	variety: "#D2691E",
 	challenge: "#B45309",
 	sociability: "#754170"
+} as const;
+
+/** Headline construct accents (Play Value / Usability), shared verbatim with copa-mobile. */
+export const GENERATED_CONSTRUCT_ACCENTS = {
+	playValue: "#2E7D78",
+	usability: "#C7972F"
+} as const;
+
+/** Export/download flow status colours. See knownDrift - these duplicate the status tokens. */
+export const GENERATED_FEEDBACK_COLORS = {
+	progressSuccess: "#00a85a",
+	progressSuccessHover: "#008f4c",
+	progressSuccessStrong: "#007a40",
+	progressWarning: "#b45309"
+} as const;
+
+/** Row tints distinguishing Place Audit from Place Survey rows in combined reports. */
+export const GENERATED_REPORT_SOURCE_COLORS = {
+	auditTint: "#FEF3C7",
+	surveyTint: "#DBEAFE"
+} as const;
+
+/** Inlined into the server-rendered static-map placeholder SVG, which cannot read CSS variables. */
+export const GENERATED_MAP_PLACEHOLDER_COLORS = {
+	surface: "#f8fafc",
+	panel: "#eef2ff",
+	panelBorder: "#c7d2fe",
+	title: "#3730a3",
+	body: "#475569"
 } as const;

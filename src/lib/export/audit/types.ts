@@ -113,7 +113,7 @@ export function resolveExportPalette(appearance?: AuditExportAppearance): WebExp
 }
 
 export type { PvScaleKey } from "@/lib/audit/scale-colors";
-export { SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
+export { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
 
 /**
  * Returns the soft (background) colour for each PV scale column.

@@ -4,6 +4,8 @@ import crypto from "node:crypto";
 
 import { NextRequest } from "next/server";
 
+import { GENERATED_MAP_PLACEHOLDER_COLORS } from "@/lib/design-system.generated";
+
 const STATIC_MAPS_API_URL = "https://maps.googleapis.com/maps/api/staticmap";
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 220;
@@ -43,12 +45,12 @@ function buildSvgPlaceholder(message: string): Response {
 	const sanitizedMessage = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440">
-	<rect width="1200" height="440" fill="#f8fafc" />
-	<rect x="20" y="20" width="1160" height="400" rx="24" fill="#eef2ff" stroke="#c7d2fe" />
-	<text x="600" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#3730a3">
+	<rect width="1200" height="440" fill="${GENERATED_MAP_PLACEHOLDER_COLORS.surface}" />
+	<rect x="20" y="20" width="1160" height="400" rx="24" fill="${GENERATED_MAP_PLACEHOLDER_COLORS.panel}" stroke="${GENERATED_MAP_PLACEHOLDER_COLORS.panelBorder}" />
+	<text x="600" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="${GENERATED_MAP_PLACEHOLDER_COLORS.title}">
 		Map preview unavailable
 	</text>
-	<text x="600" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#475569">
+	<text x="600" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="${GENERATED_MAP_PLACEHOLDER_COLORS.body}">
 		${sanitizedMessage}
 	</text>
 </svg>`.trim();

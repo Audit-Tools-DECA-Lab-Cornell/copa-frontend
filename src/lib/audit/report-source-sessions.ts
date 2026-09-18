@@ -1,4 +1,6 @@
 import type { AuditSession as SourceAuditSession } from "@/lib/api/playspace-types";
+import { hexToRgb } from "@/lib/audit/scale-colors";
+import { GENERATED_REPORT_SOURCE_COLORS } from "@/lib/design-system.generated";
 import type { AuditSession as ExportAuditSession } from "@/types/audit";
 
 /**
@@ -23,20 +25,24 @@ export interface CombinedReportSession {
 }
 
 /**
- * Shared copy and colors for source-aware combined report rendering.
+ * Shared copy and colours for source-aware combined report rendering.
+ *
+ * Only the PDF export consumes these (`rgb` for row fills, `label` for notes).
+ * A `cssClassName` field carrying Tailwind palette classes used to sit here with
+ * no readers at all - and its survey class (sky-100) disagreed with the hex
+ * below (blue-100), so the two would have rendered differently had anything used
+ * it. Removed in phase 2 rather than carried forward.
  */
 export const REPORT_SOURCE_STYLES = {
 	audit: {
 		label: "source: Place Audit",
-		hex: "#FEF3C7",
-		rgb: [254, 243, 199] as const,
-		cssClassName: "bg-amber-100/80 dark:bg-amber-950/25"
+		hex: GENERATED_REPORT_SOURCE_COLORS.auditTint,
+		rgb: hexToRgb(GENERATED_REPORT_SOURCE_COLORS.auditTint)
 	},
 	survey: {
 		label: "source: Place Survey",
-		hex: "#DBEAFE",
-		rgb: [219, 234, 254] as const,
-		cssClassName: "bg-sky-100/80 dark:bg-sky-950/30"
+		hex: GENERATED_REPORT_SOURCE_COLORS.surveyTint,
+		rgb: hexToRgb(GENERATED_REPORT_SOURCE_COLORS.surveyTint)
 	}
 } as const;
 

@@ -6,6 +6,8 @@ import * as React from "react";
 
 import { triggerBlobDownload } from "@/components/dashboard/raw-data-export";
 import { playspaceApi } from "@/lib/api/playspace";
+import { withAlpha } from "@/lib/audit/scale-colors";
+import { GENERATED_FEEDBACK_COLORS } from "@/lib/design-system.generated";
 import type { AuditExportDataFormat } from "@/lib/export/audit";
 import { estimateRawDataExport } from "@/lib/export/export-estimator";
 import type { ExportProgress, ExportZipResult } from "@/lib/export/raw-data-zip";
@@ -200,7 +202,10 @@ function ExportJobsIndicator() {
 			{jobs.slice(0, 4).map(job => {
 				// A status-coloured left accent bar plus a chunky raised shadow make the
 				// card read clearly against the warm page background.
-				const accent = job.status === "running" ? "#00a85a" : job.status === "done" ? "#00a85a" : "#b45309";
+				const accent =
+					job.status === "running" || job.status === "done"
+						? GENERATED_FEEDBACK_COLORS.progressSuccess
+						: GENERATED_FEEDBACK_COLORS.progressWarning;
 				return (
 					<div
 						key={job.id}
@@ -213,20 +218,29 @@ function ExportJobsIndicator() {
 									style={{
 										background:
 											job.status === "error" || job.status === "interrupted"
-												? "rgba(180, 83, 9, 0.12)"
-												: "rgba(0, 168, 90, 0.12)"
+												? withAlpha(GENERATED_FEEDBACK_COLORS.progressWarning, 0.12)
+												: withAlpha(GENERATED_FEEDBACK_COLORS.progressSuccess, 0.12)
 									}}>
 									{job.status === "running" && (
 										<Loader2Icon
-											className="size-4 animate-spin text-[#00a85a]"
+											className="size-4 animate-spin"
+											style={{ color: GENERATED_FEEDBACK_COLORS.progressSuccess }}
 											aria-hidden="true"
 										/>
 									)}
 									{job.status === "done" && (
-										<CheckCircle2Icon className="size-4 text-[#00a85a]" aria-hidden="true" />
+										<CheckCircle2Icon
+											className="size-4"
+											style={{ color: GENERATED_FEEDBACK_COLORS.progressSuccess }}
+											aria-hidden="true"
+										/>
 									)}
 									{(job.status === "error" || job.status === "interrupted") && (
-										<TriangleAlertIcon className="size-4 text-amber-700" aria-hidden="true" />
+										<TriangleAlertIcon
+											className="size-4"
+											style={{ color: GENERATED_FEEDBACK_COLORS.progressWarning }}
+											aria-hidden="true"
+										/>
 									)}
 								</span>
 								<div className="min-w-0">
@@ -250,7 +264,9 @@ function ExportJobsIndicator() {
 						<p className="mt-2 text-xs text-muted-foreground">
 							{job.status === "running" && <ExportJobProgressText progress={job.progress} t={t} />}
 							{job.status === "done" && (
-								<span className="inline-flex items-center gap-1 font-medium text-[#007a40]">
+								<span
+									className="inline-flex items-center gap-1 font-medium"
+									style={{ color: GENERATED_FEEDBACK_COLORS.progressSuccessStrong }}>
 									<DownloadIcon className="size-3" aria-hidden="true" />
 									{t("downloaded")}
 								</span>
@@ -263,7 +279,10 @@ function ExportJobsIndicator() {
 							<div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-muted">
 								<div
 									className="h-full rounded-full transition-all"
-									style={{ width: `${runningPercent(job.progress)}%`, background: "#00a85a" }}
+									style={{
+										width: `${runningPercent(job.progress)}%`,
+										background: GENERATED_FEEDBACK_COLORS.progressSuccess
+									}}
 								/>
 							</div>
 						)}
