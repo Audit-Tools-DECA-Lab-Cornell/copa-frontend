@@ -675,7 +675,7 @@ function CtaBand() {
 
 export function PortfolioAtScalePage() {
 	return (
-		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(75,85,99,0.12),transparent_35%),linear-gradient(180deg,rgba(148,163,184,0.08),transparent_24%),hsl(var(--background))] text-foreground">
+		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,var(--landing-texture-warm),transparent_35%),linear-gradient(180deg,var(--landing-texture-cool),transparent_24%),hsl(var(--background))] text-foreground">
 			<LandingHeader links={NAV} ctaLabel="Talk about a partnership" ctaHref={MARKETING_ROUTES.signIn} />
 			<main>
 				<Hero />

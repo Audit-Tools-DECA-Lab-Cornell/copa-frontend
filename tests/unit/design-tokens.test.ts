@@ -6,6 +6,7 @@ import { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS, withAlpha } from "@/lib/a
 import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
 import {
 	GENERATED_FEEDBACK_COLORS,
+	GENERATED_LANDING_COLORS,
 	GENERATED_MAP_PLACEHOLDER_COLORS,
 	GENERATED_REPORT_SOURCE_COLORS
 } from "@/lib/design-system.generated";
@@ -91,6 +92,15 @@ test("phase 2 tokens preserve the literals they replaced", () => {
 
 	assert.deepEqual(GENERATED_REPORT_SOURCE_COLORS, { auditTint: "#FEF3C7", surveyTint: "#DBEAFE" });
 
+	assert.deepEqual(GENERATED_LANDING_COLORS, {
+		textureWarm: "rgba(75, 85, 99, 0.12)",
+		textureCool: "rgba(148, 163, 184, 0.08)",
+		heroShadowSoft: "rgba(15, 23, 42, 0.22)",
+		heroShadowMedium: "rgba(15, 23, 42, 0.26)",
+		heroShadowStrong: "rgba(15, 23, 42, 0.3)",
+		heroShadowDeep: "rgba(15, 23, 42, 0.32)"
+	});
+
 	assert.deepEqual(GENERATED_MAP_PLACEHOLDER_COLORS, {
 		surface: "#f8fafc",
 		panel: "#eef2ff",
@@ -119,4 +129,22 @@ test("withAlpha reproduces the inlined rgba strings", () => {
 	assert.equal(withAlpha(success, 0.25), "rgba(0, 168, 90, 0.25)");
 	assert.equal(withAlpha(success, 0.28), "rgba(0, 168, 90, 0.28)");
 	assert.equal(withAlpha(GENERATED_FEEDBACK_COLORS.progressWarning, 0.12), "rgba(180, 83, 9, 0.12)");
+});
+
+/**
+ * The landing tints live inside Tailwind arbitrary-value class strings, which
+ * cannot take a JS constant - they reference `var(--landing-*)`. If those custom
+ * properties stop being emitted the classes silently resolve to nothing, so the
+ * wash and hero shadows would just disappear with no error anywhere.
+ */
+test("landing custom properties are emitted for every mode", () => {
+	for (const theme of THEMES) {
+		for (const contrast of CONTRASTS) {
+			const variables = getDesignSystemCssVariables({ theme, contrast });
+			assert.equal(variables["--landing-texture-warm"], GENERATED_LANDING_COLORS.textureWarm);
+			assert.equal(variables["--landing-texture-cool"], GENERATED_LANDING_COLORS.textureCool);
+			assert.equal(variables["--landing-hero-shadow-soft"], GENERATED_LANDING_COLORS.heroShadowSoft);
+			assert.equal(variables["--landing-hero-shadow-deep"], GENERATED_LANDING_COLORS.heroShadowDeep);
+		}
+	}
 });

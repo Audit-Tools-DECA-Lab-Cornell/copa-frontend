@@ -7,7 +7,7 @@
  */
 
 import { getPvScaleCssVariables } from "@/lib/audit/scale-colors";
-import { GENERATED_PALETTES } from "@/lib/design-system.generated";
+import { GENERATED_LANDING_COLORS, GENERATED_PALETTES } from "@/lib/design-system.generated";
 
 export type DesignSystemThemeMode = "light" | "dark";
 export type DesignSystemContrastMode = "standard" | "high";
@@ -272,7 +272,15 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--solid-draft": palette.solidDraft,
 		"--solid-draft-text": palette.solidDraftText,
 		"--solid-orphan": palette.solidOrphan,
-		"--solid-orphan-text": palette.solidOrphanText
+		"--solid-orphan-text": palette.solidOrphanText,
+		// Public marketing/resources pages. Theme-independent: these composite over
+		// whatever surface is beneath them, so both themes get the same values.
+		"--landing-texture-warm": GENERATED_LANDING_COLORS.textureWarm,
+		"--landing-texture-cool": GENERATED_LANDING_COLORS.textureCool,
+		"--landing-hero-shadow-soft": GENERATED_LANDING_COLORS.heroShadowSoft,
+		"--landing-hero-shadow-medium": GENERATED_LANDING_COLORS.heroShadowMedium,
+		"--landing-hero-shadow-strong": GENERATED_LANDING_COLORS.heroShadowStrong,
+		"--landing-hero-shadow-deep": GENERATED_LANDING_COLORS.heroShadowDeep
 	};
 }
 

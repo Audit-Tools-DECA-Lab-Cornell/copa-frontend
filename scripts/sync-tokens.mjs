@@ -95,6 +95,11 @@ ${group("reportSource")}
 export const GENERATED_MAP_PLACEHOLDER_COLORS = {
 ${group("mapPlaceholder")}
 } as const;
+
+/** Decorative wash and hero scrims on the public pages, emitted as CSS custom properties. */
+export const GENERATED_LANDING_COLORS = {
+${group("landing")}
+} as const;
 `;
 }
 
@@ -193,7 +198,7 @@ function validate(tokens) {
 	}
 
 	// Groups added in phase 2. `_note` keys carry prose, not colour, so they are skipped.
-	for (const group of ["feedback", "reportSource", "mapPlaceholder", "exportDocument", "nativeSplash"]) {
+	for (const group of ["feedback", "reportSource", "mapPlaceholder", "exportDocument", "nativeSplash", "landing"]) {
 		for (const [token, value] of Object.entries(tokens[group] ?? {})) {
 			if (token.startsWith("_")) continue;
 			check(`${group}.${token}`, value);

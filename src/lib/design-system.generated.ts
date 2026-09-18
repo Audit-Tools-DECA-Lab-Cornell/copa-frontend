@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE - DO NOT EDIT.
  *
- * Source:      brand/tokens.json (checksum f2e1fb89252141cf)
+ * Source:      brand/tokens.json (checksum 7f74a8f67b9b20fd)
  * Regenerate:  pnpm tokens:build
  * Verify:      pnpm tokens:check
  *
@@ -252,4 +252,14 @@ export const GENERATED_MAP_PLACEHOLDER_COLORS = {
 	panelBorder: "#c7d2fe",
 	title: "#3730a3",
 	body: "#475569"
+} as const;
+
+/** Decorative wash and hero scrims on the public pages, emitted as CSS custom properties. */
+export const GENERATED_LANDING_COLORS = {
+	textureWarm: "rgba(75, 85, 99, 0.12)",
+	textureCool: "rgba(148, 163, 184, 0.08)",
+	heroShadowSoft: "rgba(15, 23, 42, 0.22)",
+	heroShadowMedium: "rgba(15, 23, 42, 0.26)",
+	heroShadowStrong: "rgba(15, 23, 42, 0.3)",
+	heroShadowDeep: "rgba(15, 23, 42, 0.32)"
 } as const;

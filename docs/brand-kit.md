@@ -32,6 +32,24 @@ To change a colour: edit `brand/tokens.json`, run `pnpm tokens:build`, then copy
 | `pnpm tokens:check` (both repos) | generated files stale or hand-edited; a stamp that disagrees with the payload |
 | copa-mobile `tokens:check` | a vendored copy edited in the mobile repo |
 | copa-mobile `verify-token-sync.mjs` | a vendored copy that is merely out of date (needs `TOKENS_SYNC_TOKEN`) |
+| `eslint` (`no-restricted-syntax`) | a hard-coded colour reaching a component under `src/**` |
+
+### What the lint rule allows
+
+Hue-neutral compositing values stay inline: pure black and white at any alpha
+(shadows, scrims, overlays) render correctly over any palette, so tokenising them
+would be churn. Three files are exempt by design:
+
+| File | Why |
+| --- | --- |
+| `src/lib/design-system.generated.ts` | Generated from the token file - the values are the point |
+| `src/app/global-error.tsx` | Renders when the app has failed, so it must not depend on the token pipeline or on any stylesheet having loaded |
+| `src/components/dashboard/raw-json.tsx` | A JSON syntax highlighter; its palette is an editor theme (string / number / key / punctuation), deliberately independent of brand colour |
+
+Colours that sit inside Tailwind arbitrary-value class strings (`bg-[radial-gradient(...)]`,
+`filter-[drop-shadow(...)]`) cannot take a JS constant. Those are emitted as CSS
+custom properties from the token file and referenced with `var(--...)` - see the
+`landing` group.
 
 ### Surfaces & text (semantic roles)
 
