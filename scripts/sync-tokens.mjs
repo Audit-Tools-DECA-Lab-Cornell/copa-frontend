@@ -100,6 +100,11 @@ ${group("mapPlaceholder")}
 export const GENERATED_LANDING_COLORS = {
 ${group("landing")}
 } as const;
+
+/** Cloudinary upload widget frame overlay - the widget takes a plain colour string. */
+export const GENERATED_UPLOAD_WIDGET_COLORS = {
+${group("uploadWidget")}
+} as const;
 `;
 }
 
@@ -198,7 +203,7 @@ function validate(tokens) {
 	}
 
 	// Groups added in phase 2. `_note` keys carry prose, not colour, so they are skipped.
-	for (const group of ["feedback", "reportSource", "mapPlaceholder", "exportDocument", "nativeSplash", "landing"]) {
+	for (const group of ["feedback", "reportSource", "mapPlaceholder", "exportDocument", "nativeSplash", "landing", "mobileSurface", "uploadWidget"]) {
 		for (const [token, value] of Object.entries(tokens[group] ?? {})) {
 			if (token.startsWith("_")) continue;
 			check(`${group}.${token}`, value);

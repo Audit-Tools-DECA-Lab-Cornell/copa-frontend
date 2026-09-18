@@ -66,6 +66,15 @@ const eslintConfig = defineConfig([
 					selector: "Literal[value=/rgba?\\(\\s*(?!0\\s*,\\s*0\\s*,\\s*0|255\\s*,\\s*255\\s*,\\s*255)\\d/]",
 					message:
 						"Hard-coded colour. Add it to brand/tokens.json and derive translucent fills with withAlpha() from @/lib/audit/scale-colors."
+				},
+				// Template literals are a separate AST node. A colour written in
+				// backticks - `rgba(30,30,30, 0.4)` in the upload widget - slipped past
+				// the Literal selectors above until this was added.
+				{
+					selector:
+						"TemplateElement[value.raw=/#(?!fff\\b|ffffff\\b|FFF\\b|FFFFFF\\b|000\\b|000000\\b)[0-9a-fA-F]{3,8}\\b|rgba?\\(\\s*(?!0\\s*,\\s*0\\s*,\\s*0|255\\s*,\\s*255\\s*,\\s*255)\\d/]",
+					message:
+						"Hard-coded colour in a template literal. Add it to brand/tokens.json and interpolate the token instead."
 				}
 			]
 		}

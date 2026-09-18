@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE - DO NOT EDIT.
  *
- * Source:      brand/tokens.json (checksum 7f74a8f67b9b20fd)
+ * Source:      brand/tokens.json (checksum 2a6888bfb75725f2)
  * Regenerate:  pnpm tokens:build
  * Verify:      pnpm tokens:check
  *
@@ -262,4 +262,9 @@ export const GENERATED_LANDING_COLORS = {
 	heroShadowMedium: "rgba(15, 23, 42, 0.26)",
 	heroShadowStrong: "rgba(15, 23, 42, 0.3)",
 	heroShadowDeep: "rgba(15, 23, 42, 0.32)"
+} as const;
+
+/** Cloudinary upload widget frame overlay - the widget takes a plain colour string. */
+export const GENERATED_UPLOAD_WIDGET_COLORS = {
+	frameOverlay: "rgba(30, 30, 30, 0.4)"
 } as const;
