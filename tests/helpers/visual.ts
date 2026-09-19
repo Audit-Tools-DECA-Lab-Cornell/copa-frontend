@@ -4,7 +4,7 @@ import path from "node:path";
 import percySnapshot from "@percy/playwright";
 import { type APIRequestContext, type Page, type Response } from "@playwright/test";
 
-import { type BrowserSessionRole, createBrowserSessionSeed } from "./api";
+import { type BrowserSessionRole, createBrowserSessionSeed, getApiBaseUrl } from "./api";
 import { seedBrowserSession } from "./session";
 
 /**
@@ -109,6 +109,63 @@ export function assertRouteExists(response: Response | null, route: string): voi
 }
 
 /**
+ * Record every origin the page calls the Playspace API on.
+ *
+ * Comparing the two base-URL variables only catches a conflict this process can
+ * see. `reuseExistingServer` means an already-running dev server is reused with
+ * the environment it was started in, which no variable here reflects - the trap
+ * being that the run then seeds fixtures on one backend while the browser reads
+ * another, and most readiness gates still pass because the error branch renders
+ * `main` too. Watching the requests the browser actually makes is the only check
+ * that sees through a reused server.
+ */
+function trackPlayspaceApiOrigins(page: Page): ReadonlySet<string> {
+	const origins = new Set<string>();
+	page.on("request", request => {
+		const url = request.url();
+		if (!url.includes("/playspace/")) {
+			return;
+		}
+		try {
+			origins.add(new URL(url).origin);
+		} catch {
+			// A request URL that does not parse tells us nothing about the backend.
+		}
+	});
+	return origins;
+}
+
+function assertApiOriginsMatchSeeding(origins: ReadonlySet<string>, route: string): void {
+	let expected: string;
+	try {
+		expected = new URL(getApiBaseUrl()).origin;
+	} catch {
+		return;
+	}
+
+	const unexpected = [...origins].filter(origin => origin !== expected);
+	if (unexpected.length === 0) {
+		return;
+	}
+
+	throw new Error(
+		[
+			`The browser called the Playspace API on a different backend than this run seeds (${route}):`,
+			"",
+			`  seeding (this process): ${expected}`,
+			`  app (browser):          ${unexpected.join(", ")}`,
+			"",
+			"The seeded ids do not exist on the backend the pages read, so they render their",
+			"error state. Most readiness gates only wait for `main`, which that state renders",
+			"too, so the run would otherwise capture broken screenshots and still pass.",
+			"",
+			"An already-running dev server is reused with the environment it was started in,",
+			"so restart it after changing E2E_API_BASE_URL or NEXT_PUBLIC_API_BASE_URL."
+		].join("\n")
+	);
+}
+
+/**
  * Boots a protected route into a deterministic visual state using the
  * repository's cookie-backed auth model instead of replaying the login UI.
  */
@@ -119,6 +176,7 @@ export async function prepareVisualPage(
 ): Promise<void> {
 	await page.setViewportSize(VISUAL_VIEWPORT);
 
+	const apiOrigins = trackPlayspaceApiOrigins(page);
 	const session = await createBrowserSessionSeed(request, options.role);
 	await seedBrowserSession(page.context(), session);
 
@@ -131,12 +189,19 @@ export async function prepareVisualPage(
 	try {
 		await options.waitFor(page);
 	} catch (error) {
+		// A page reading the wrong backend fails its readiness gate on whatever it
+		// renders instead, so name that cause ahead of the symptom.
+		assertApiOriginsMatchSeeding(apiOrigins, options.route);
 		const recovered = await retryTransientLoadState(page);
 		if (!recovered) {
 			throw error;
 		}
 		await options.waitFor(page);
 	}
+
+	// A page can also reach its gate while a later query quietly failed, so check
+	// again once the state is settled.
+	assertApiOriginsMatchSeeding(apiOrigins, options.route);
 }
 
 /**

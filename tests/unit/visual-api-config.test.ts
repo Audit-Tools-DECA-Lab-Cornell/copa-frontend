@@ -61,3 +61,42 @@ test("an absent app or seeding URL is not a conflict", () => {
 	withEnv(undefined, undefined, () => assertApiBaseUrlsAgree());
 	withEnv(SEEDING, "   ", () => assertApiBaseUrlsAgree());
 });
+
+/**
+ * A conflict has to mean "different backend", not "different spelling": aborting
+ * a correctly configured run is as costly as missing a misconfigured one.
+ */
+test("spellings of the same backend are not a conflict", () => {
+	const equivalent: ReadonlyArray<readonly [string, string]> = [
+		["https://api.example.com", "https://api.example.com:443"],
+		["http://api.example.com", "http://api.example.com:80"],
+		["https://API.Example.com", "https://api.example.com"],
+		["https://api.example.com/base/", "https://api.example.com/base"]
+	];
+
+	for (const [seeding, app] of equivalent) {
+		withEnv(seeding, app, () =>
+			assert.doesNotThrow(assertApiBaseUrlsAgree, `${seeding} and ${app} address the same backend`)
+		);
+	}
+});
+
+test("a genuinely different host, port or path prefix is still a conflict", () => {
+	const different: ReadonlyArray<readonly [string, string]> = [
+		["https://api.example.com", "https://other.example.com"],
+		["https://api.example.com", "https://api.example.com:8443"],
+		["https://api.example.com/base", "https://api.example.com/other"],
+		["https://api.example.com", "http://api.example.com"]
+	];
+
+	for (const [seeding, app] of different) {
+		withEnv(seeding, app, () =>
+			assert.throws(assertApiBaseUrlsAgree, `${seeding} and ${app} are different backends`)
+		);
+	}
+});
+
+test("an unparseable base URL falls back to exact comparison", () => {
+	withEnv("not a url", "not a url", () => assert.doesNotThrow(assertApiBaseUrlsAgree));
+	withEnv("not a url", "https://api.example.com", () => assert.throws(assertApiBaseUrlsAgree));
+});

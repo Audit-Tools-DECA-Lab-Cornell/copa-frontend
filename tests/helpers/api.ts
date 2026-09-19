@@ -66,6 +66,23 @@ export function apiUnreachableMessage(baseUrl: string, detail: string): string {
 }
 
 /**
+ * Reduce a base URL to what actually decides the backend, so spellings that
+ * address the same host are not reported as a conflict: an explicit default
+ * port, a differently-cased host, and a trailing slash all normalize away.
+ * `URL` handles the first two; anything it cannot parse falls back to the raw
+ * string, which then only matches an identical one.
+ */
+function canonicalizeApiBaseUrl(value: string): string {
+	const withoutTrailingSlash = value.replace(/\/+$/, "");
+	try {
+		const url = new URL(withoutTrailingSlash);
+		return `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
+	} catch {
+		return withoutTrailingSlash;
+	}
+}
+
+/**
  * The visual run drives two API clients that must reach the same backend: this
  * process seeds fixtures through `E2E_API_BASE_URL`, while the browser app reads
  * `NEXT_PUBLIC_API_BASE_URL`. When they disagree the seeded ids resolve against
@@ -77,11 +94,10 @@ export function apiUnreachableMessage(baseUrl: string, detail: string): string {
  * Playwright config hands the seeding URL to the dev server it starts.
  */
 export function assertApiBaseUrlsAgree(): void {
-	const stripSlash = (value: string) => value.replace(/\/+$/, "");
 	const seedingUrl = process.env.E2E_API_BASE_URL?.trim();
 	const appUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
 
-	if (!seedingUrl || !appUrl || stripSlash(seedingUrl) === stripSlash(appUrl)) {
+	if (!seedingUrl || !appUrl || canonicalizeApiBaseUrl(seedingUrl) === canonicalizeApiBaseUrl(appUrl)) {
 		return;
 	}
 
