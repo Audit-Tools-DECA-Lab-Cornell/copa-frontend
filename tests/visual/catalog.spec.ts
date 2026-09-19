@@ -4,6 +4,7 @@ import path from "node:path";
 import { type APIRequestContext, expect, test } from "@playwright/test";
 
 import {
+	assertRouteExists,
 	captureViewportScrollFrames,
 	isLocalScreenshotCaptureEnabled,
 	prepareVisualPage,
@@ -50,9 +51,10 @@ async function navigateUnauthenticated(
 ): Promise<void> {
 	await page.context().clearCookies();
 	await page.setViewportSize({ ...VISUAL_VIEWPORT });
-	await page.goto(new URL(route, process.env.E2E_BASE_URL ?? "http://localhost:3000").toString(), {
+	const response = await page.goto(new URL(route, process.env.E2E_BASE_URL ?? "http://localhost:3000").toString(), {
 		waitUntil: "domcontentloaded"
 	});
+	assertRouteExists(response, route);
 	await page.waitForLoadState("networkidle").catch(() => undefined);
 }
 

@@ -121,12 +121,6 @@ export const adminTargets: readonly CaptureTarget[] = [
 	},
 	{
 		role: "admin",
-		route: () => "/admin/system",
-		segments: ["admin", "system"],
-		states: [{ name: "overview", label: "Admin System" }]
-	},
-	{
-		role: "admin",
 		route: () => "/settings",
 		segments: ["admin", "settings"],
 		states: [

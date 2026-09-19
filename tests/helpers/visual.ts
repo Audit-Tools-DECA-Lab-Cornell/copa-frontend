@@ -2,7 +2,7 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 import percySnapshot from "@percy/playwright";
-import { type APIRequestContext, type Page } from "@playwright/test";
+import { type APIRequestContext, type Page, type Response } from "@playwright/test";
 
 import { type BrowserSessionRole, createBrowserSessionSeed } from "./api";
 import { seedBrowserSession } from "./session";
@@ -97,6 +97,18 @@ async function retryTransientLoadState(page: Page): Promise<boolean> {
 }
 
 /**
+ * A route the catalog still lists but the app no longer serves renders the root
+ * not-found page, which has no `<main>`, so the readiness check would spend its
+ * full timeout before failing on a symptom. Fail on the status instead, naming
+ * the dead route.
+ */
+export function assertRouteExists(response: Response | null, route: string): void {
+	if (response?.status() === 404) {
+		throw new Error(`Visual route "${route}" returned 404 - the page no longer exists; update the catalog.`);
+	}
+}
+
+/**
  * Boots a protected route into a deterministic visual state using the
  * repository's cookie-backed auth model instead of replaying the login UI.
  */
@@ -110,9 +122,10 @@ export async function prepareVisualPage(
 	const session = await createBrowserSessionSeed(request, options.role);
 	await seedBrowserSession(page.context(), session);
 
-	await page.goto(getSnapshotTargetUrl(options.route), {
+	const response = await page.goto(getSnapshotTargetUrl(options.route), {
 		waitUntil: "domcontentloaded"
 	});
+	assertRouteExists(response, options.route);
 	await stabilizeVisualState(page);
 
 	try {
