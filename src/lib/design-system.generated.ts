@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE - DO NOT EDIT.
  *
- * Source:      brand/tokens.json (checksum 9129e2134b55b2e8)
+ * Source:      brand/tokens.json (checksum 766198809a6ad314)
  * Regenerate:  pnpm tokens:build
  * Verify:      pnpm tokens:check
  *
@@ -252,14 +252,6 @@ export const GENERATED_CONSTRUCT_ACCENTS = {
 	usability: "#985952"
 } as const;
 
-/** Export/download flow status colours. See knownDrift - these duplicate the status tokens. */
-export const GENERATED_FEEDBACK_COLORS = {
-	progressSuccess: "#0F6B45",
-	progressSuccessHover: "#0C5637",
-	progressSuccessStrong: "#094529",
-	progressWarning: "#8A5A00"
-} as const;
-
 /** Row tints distinguishing Place Audit from Place Survey rows in combined reports. */
 export const GENERATED_REPORT_SOURCE_COLORS = {
 	auditTint: "#FEF3C7",
@@ -307,6 +299,13 @@ export const GENERATED_CODE_VIEWER_COLORS = {
 	chromeDanger: "rgba(240, 140, 126, 0.8)",
 	shadowRing: "rgba(169, 214, 229, 0.02)",
 	shadowDrop: "rgba(0, 0, 0, 0.35)"
+} as const;
+
+/** Badges on a scrim over an arbitrary image. Always dark - neither half follows the theme. */
+export const GENERATED_OVERLAY_BADGE_COLORS = {
+	scrim: "rgba(0, 0, 0, 0.75)",
+	text: "#FFFFFF",
+	textPending: "#E0A93C"
 } as const;
 
 /** Cloudinary upload widget frame overlay - the widget takes a plain colour string. */

@@ -139,17 +139,6 @@ export function hexToRgb(hex: string): [number, number, number] {
 	return parseHexColor(hex);
 }
 
-/**
- * Builds an `rgba(...)` string from a hex token and an alpha.
- *
- * Lets a translucent fill derive from the same token as its solid counterpart
- * rather than repeating the channel numbers, so a token change carries to both.
- */
-export function withAlpha(hex: string, alpha: number): string {
-	const [red, green, blue] = parseHexColor(hex);
-	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-}
-
 /** Strips `#` for XLSX `rgb` style fields. */
 export function hexToXlsxRgb(hex: string): string {
 	return hex.replace("#", "").trim().toUpperCase();

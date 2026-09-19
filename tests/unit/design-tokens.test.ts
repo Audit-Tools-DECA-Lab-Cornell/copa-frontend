@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { REPORT_SOURCE_STYLES } from "@/lib/audit/report-source-sessions";
-import { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS, withAlpha } from "@/lib/audit/scale-colors";
+import { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS } from "@/lib/audit/scale-colors";
 import {
 	DESIGN_SYSTEM,
 	getDesignSystemCssVariables,
@@ -11,9 +11,10 @@ import {
 	PREFERENCES_STORAGE_KEY
 } from "@/lib/design-system";
 import {
-	GENERATED_FEEDBACK_COLORS,
+	GENERATED_CODE_VIEWER_COLORS,
 	GENERATED_LANDING_COLORS,
 	GENERATED_MAP_PLACEHOLDER_COLORS,
+	GENERATED_OVERLAY_BADGE_COLORS,
 	GENERATED_REPORT_SOURCE_COLORS
 } from "@/lib/design-system.generated";
 
@@ -242,9 +243,9 @@ test("chart accents resolve to the committed values", () => {
 /** Auxiliary groups still resolve through the token file rather than a stray literal. */
 test("phase 2 groups still resolve from the tokens", () => {
 	for (const group of [
-		GENERATED_FEEDBACK_COLORS,
 		GENERATED_REPORT_SOURCE_COLORS,
 		GENERATED_LANDING_COLORS,
+		GENERATED_OVERLAY_BADGE_COLORS,
 		GENERATED_MAP_PLACEHOLDER_COLORS
 	]) {
 		for (const [key, value] of Object.entries(group)) {
@@ -265,23 +266,6 @@ test("report source rgb tuples track their tokens", () => {
 	assert.deepEqual([...REPORT_SOURCE_STYLES.survey.rgb], channels(GENERATED_REPORT_SOURCE_COLORS.surveyTint));
 	assert.equal(REPORT_SOURCE_STYLES.audit.hex, GENERATED_REPORT_SOURCE_COLORS.auditTint);
 	assert.equal(REPORT_SOURCE_STYLES.survey.hex, GENERATED_REPORT_SOURCE_COLORS.surveyTint);
-});
-
-/**
- * Translucent fills derive from the same token as their solid counterpart, so a
- * tint can never drift away from the colour it is meant to be a tint of.
- */
-test("withAlpha tints the token it is given", () => {
-	const success = GENERATED_FEEDBACK_COLORS.progressSuccess;
-	const [red, green, blue] = [1, 3, 5].map(offset => Number.parseInt(success.slice(offset, offset + 2), 16));
-
-	for (const alpha of [0.07, 0.1, 0.12, 0.25, 0.28]) {
-		assert.equal(withAlpha(success, alpha), `rgba(${red}, ${green}, ${blue}, ${alpha})`);
-	}
-
-	const warning = GENERATED_FEEDBACK_COLORS.progressWarning;
-	const warningChannels = [1, 3, 5].map(offset => Number.parseInt(warning.slice(offset, offset + 2), 16));
-	assert.equal(withAlpha(warning, 0.12), `rgba(${warningChannels.join(", ")}, 0.12)`);
 });
 
 /**
@@ -346,7 +330,14 @@ function describe_bootstrap(): void {
 				getItem: (key: string) =>
 					key === PREFERENCES_STORAGE_KEY && stored !== undefined ? JSON.stringify(stored) : null
 			},
-			window: { matchMedia: () => ({ matches: systemPrefersLight }) }
+			// Answers per media feature, not one answer for every query. A stub that
+			// ignores the feature string cannot see the script and getSystemTheme()
+			// querying opposite features, which is exactly how that slipped through.
+			window: {
+				matchMedia: (query: string) => ({
+					matches: query.includes("dark") ? !systemPrefersLight : systemPrefersLight
+				})
+			}
 		};
 
 		new Function("document", "localStorage", "window", getThemeBootstrapScript())(
@@ -377,6 +368,34 @@ function describe_bootstrap(): void {
 		assert.equal(run(undefined, true).dark, false);
 	});
 
+	/**
+	 * The script and `getSystemTheme()` must resolve the same way, including where neither
+	 * query matches - a UA without `prefers-color-scheme`, or a webview whose `matchMedia`
+	 * answers false for everything. They queried opposite features and so disagreed there.
+	 */
+	test("bootstrap agrees with getSystemTheme() when no media query matches", () => {
+		const classes = new Set<string>();
+		const root = {
+			classList: {
+				toggle: (name: string, on: boolean) => {
+					if (on) classes.add(name);
+					else classes.delete(name);
+				}
+			},
+			dataset: {} as Record<string, string>,
+			style: { setProperty: () => undefined }
+		};
+
+		new Function("document", "localStorage", "window", getThemeBootstrapScript())(
+			{ documentElement: root },
+			{ getItem: () => null },
+			{ matchMedia: () => ({ matches: false }) }
+		);
+
+		// getSystemTheme() reads `(prefers-color-scheme: dark)`; unmatched means light.
+		assert.equal(classes.has("dark"), false, "script resolved dark where getSystemTheme() resolves light");
+	});
+
 	test("bootstrap follows an explicit stored theme over the system preference", () => {
 		assert.equal(run(complete({ themeMode: "dark" }), true).dark, true);
 		assert.equal(run(complete({ themeMode: "light" }), false).dark, false);
@@ -405,6 +424,27 @@ function describe_bootstrap(): void {
 		assert.equal(run(complete({ themeMode: "light" }), false).dark, false);
 	});
 
+	/**
+	 * `preferencesSchema` also constrains two fields to enums and `fontScale` to
+	 * 0.85-1.3, and falls back to the whole default blob when any of those fails. A
+	 * script that only type-checked would apply a stale out-of-range scale and an
+	 * invalid enum, then be overruled a render later - both theme and font size jumping.
+	 */
+	test("bootstrap enforces the schema's enums and font-scale range", () => {
+		const outOfRange = run(complete({ themeMode: "dark", fontScale: 5 }), true);
+		assert.equal(outOfRange.dark, false, "an out-of-range fontScale must invalidate the whole blob");
+		assert.equal(outOfRange.fontScale, null, "no font scale should be applied from a rejected blob");
+
+		const badLanguage = run(complete({ highContrast: true, languagePreference: "klingon" }), true);
+		assert.equal(badLanguage.contrast, "standard", "an invalid languagePreference must invalidate the blob");
+
+		const badMode = run(complete({ themeMode: "sepia" }), true);
+		assert.equal(badMode.dark, false, "an invalid themeMode must fall back to the system preference");
+
+		const atBounds = run(complete({ themeMode: "dark", fontScale: DESIGN_SYSTEM.fontScale.max }), true);
+		assert.equal(atBounds.fontScale, String(DESIGN_SYSTEM.fontScale.max), "the range bounds are inclusive");
+	});
+
 	test("bootstrap survives unreadable storage", () => {
 		assert.doesNotThrow(() => run(null, false));
 		assert.equal(run("not json at all", false).contrast, "standard");
@@ -431,4 +471,55 @@ function describe_bootstrap(): void {
 			}
 		}
 	});
+}
+
+/**
+ * The gap that let `feedback.*` regress to 1.38:1 in dark mode.
+ *
+ * The per-mode floors above iterate `DESIGN_SYSTEM.palettes`, so a flat, theme-independent
+ * group rendered over a theme-dependent surface falls outside "every pair in all four
+ * modes" by construction - the suite asserted only that the group was non-empty. The rule
+ * that replaces it: a colour is either theme-dependent on both sides, or theme-independent
+ * on both sides. Mixing the two is the bug, in either direction.
+ */
+test("no flat token group is rendered over a theme-dependent surface", () => {
+	// Groups that legitimately stay flat, each with the fixed surface it paints on.
+	// Adding a group here is a claim that its surface does not follow the theme either.
+	const flatGroups: Readonly<Record<string, { readonly surface: string; readonly colours: Record<string, string> }>> =
+		{
+			// The code pane is always dark; its own surface token is the ground.
+			codeViewer: { surface: GENERATED_CODE_VIEWER_COLORS.surface, colours: GENERATED_CODE_VIEWER_COLORS },
+			// Badges on a scrim over an arbitrary image. Worst case is a white photograph
+			// beneath the scrim, which is what this composites.
+			overlayBadge: {
+				surface: compositeOverWhite(GENERATED_OVERLAY_BADGE_COLORS.scrim),
+				colours: GENERATED_OVERLAY_BADGE_COLORS
+			}
+		};
+
+	const textTokens: Readonly<Record<string, readonly string[]>> = {
+		codeViewer: ["textPrimary", "textSecondary", "textMuted", "punctuation", "key", "string", "number", "boolean"],
+		overlayBadge: ["text", "textPending"]
+	};
+
+	for (const [name, group] of Object.entries(flatGroups)) {
+		for (const token of textTokens[name] ?? []) {
+			const value = group.colours[token];
+			assert.ok(value, `${name}.${token} is missing`);
+			const ratio = contrastRatio(value, group.surface);
+			assert.ok(
+				ratio >= CONTRAST_FLOOR,
+				`${name}.${token} is ${ratio.toFixed(2)}:1 on its own fixed surface, below ${CONTRAST_FLOOR}:1`
+			);
+		}
+	}
+});
+
+/** Composites an `rgba(r, g, b, a)` scrim over white - the worst ground it can sit on. */
+function compositeOverWhite(scrim: string): string {
+	const parts = scrim.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)/);
+	assert.ok(parts, `could not parse scrim ${scrim}`);
+	const alpha = parts[4] === undefined ? 1 : Number(parts[4]);
+	const channels = [1, 2, 3].map(index => Math.round(Number(parts[index]) * alpha + 255 * (1 - alpha)));
+	return `#${channels.map(channel => channel.toString(16).padStart(2, "0")).join("")}`;
 }

@@ -6,11 +6,13 @@
  * names or editing multiple CSS files.
  */
 
+import { LANGUAGE_PREFERENCES } from "@/i18n/config";
 import { getPvScaleCssVariables } from "@/lib/audit/scale-colors";
 import {
 	GENERATED_CODE_VIEWER_COLORS,
 	GENERATED_DEFAULTS,
 	GENERATED_LANDING_COLORS,
+	GENERATED_OVERLAY_BADGE_COLORS,
 	GENERATED_PALETTES
 } from "@/lib/design-system.generated";
 
@@ -304,21 +306,33 @@ function getPaletteCssVariables(palette: DesignSystemPalette): Record<string, st
  * then rejects produces exactly the flash it exists to prevent.
  */
 export function getThemeBootstrapScript(): string {
+	const modes = JSON.stringify(["system", "light", "dark"]);
+	const languages = JSON.stringify([...LANGUAGE_PREFERENCES]);
+
 	return `(function(){try{
 var root=document.documentElement;
 var stored=null;
 try{stored=JSON.parse(localStorage.getItem(${JSON.stringify(PREFERENCES_STORAGE_KEY)})||"null")}catch(e){}
-// PreferencesProvider validates the stored blob with a schema that requires every
-// field and falls back to the defaults as a whole if any is missing. Mirror that
-// all-or-nothing rule here: trusting a partial blob that the provider will then
-// reject is exactly the disagreement that produces the flash this script prevents.
-if(!stored||typeof stored.themeMode!=="string"||typeof stored.languagePreference!=="string"||typeof stored.fontScale!=="number"||typeof stored.highContrast!=="boolean"||typeof stored.dyslexicFont!=="boolean"){stored=null}
+// PreferencesProvider validates the blob against a schema that requires every field,
+// constrains two of them to enums and one to a range, and falls back to the defaults as
+// a WHOLE if any check fails. Every one of those is mirrored here: a blob this script
+// trusts but the provider rejects produces exactly the flash it exists to prevent, and
+// type checks alone let an out-of-range fontScale - what a blob written under an older
+// min/max looks like - through.
+if(!stored
+||${modes}.indexOf(stored.themeMode)<0
+||${languages}.indexOf(stored.languagePreference)<0
+||typeof stored.fontScale!=="number"||!(stored.fontScale>=${DESIGN_SYSTEM.fontScale.min}&&stored.fontScale<=${DESIGN_SYSTEM.fontScale.max})
+||typeof stored.highContrast!=="boolean"
+||typeof stored.dyslexicFont!=="boolean"){stored=null}
 var mode=stored&&stored.themeMode;
-if(mode!=="light"&&mode!=="dark"){mode=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}
+// Queries the same media feature as getSystemTheme(), so the two agree even where
+// neither query matches - an embedded webview whose matchMedia stub answers false.
+if(mode!=="light"&&mode!=="dark"){mode=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}
 root.classList.toggle("dark",mode==="dark");
 root.dataset.contrast=stored&&stored.highContrast?"high":"standard";
 root.dataset.dyslexicFont=stored&&stored.dyslexicFont?"true":"false";
-if(stored&&typeof stored.fontScale==="number"){root.style.setProperty("--app-font-scale",String(stored.fontScale))}
+if(stored){root.style.setProperty("--app-font-scale",String(stored.fontScale))}
 }catch(e){}})();`;
 }
 
@@ -389,7 +403,11 @@ export function getShellCssVariables(input: Readonly<DesignSystemVariableInput>)
 		"--code-chrome-success": GENERATED_CODE_VIEWER_COLORS.chromeSuccess,
 		"--code-chrome-danger": GENERATED_CODE_VIEWER_COLORS.chromeDanger,
 		"--code-shadow-ring": GENERATED_CODE_VIEWER_COLORS.shadowRing,
-		"--code-shadow-drop": GENERATED_CODE_VIEWER_COLORS.shadowDrop
+		"--code-shadow-drop": GENERATED_CODE_VIEWER_COLORS.shadowDrop,
+		// Badges over an arbitrary image. Always dark, for the same reason the code pane is.
+		"--overlay-badge-scrim": GENERATED_OVERLAY_BADGE_COLORS.scrim,
+		"--overlay-badge-text": GENERATED_OVERLAY_BADGE_COLORS.text,
+		"--overlay-badge-text-pending": GENERATED_OVERLAY_BADGE_COLORS.textPending
 	};
 }
 

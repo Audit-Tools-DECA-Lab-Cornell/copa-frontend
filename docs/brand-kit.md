@@ -59,7 +59,7 @@ To change a colour: edit `brand/tokens.json`, run `pnpm tokens:build` and `pnpm 
 
 Hue-neutral compositing values stay inline: pure black and white at any alpha
 (shadows, scrims, overlays) render correctly over any palette, so tokenising them
-would be churn. Three files are exempt by design:
+would be churn. Two files are exempt by design:
 
 | File | Why |
 | --- | --- |

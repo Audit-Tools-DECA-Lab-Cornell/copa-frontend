@@ -146,12 +146,12 @@ function AssetCard({ asset }: Readonly<{ asset: AssetEntry }>) {
 					{/* delivery / status badge */}
 					<div className="pointer-events-none absolute bottom-2 right-2">
 						{asset.uploadedAt ? (
-							<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+							<span className="flex items-center gap-1 rounded-full bg-overlay-badge-scrim px-2 py-0.5 text-[10px] font-medium text-overlay-badge-text backdrop-blur-sm">
 								<Cloud className="size-3" />
 								{t("card.uploadedBadge")}
 							</span>
 						) : (
-							<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-status-warning backdrop-blur-sm">
+							<span className="flex items-center gap-1 rounded-full bg-overlay-badge-scrim px-2 py-0.5 text-[10px] font-medium text-overlay-badge-text-pending backdrop-blur-sm">
 								<Clock className="size-3" />
 								{t("card.pendingBadge")}
 							</span>

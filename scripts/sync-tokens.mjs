@@ -94,11 +94,6 @@ export const GENERATED_CONSTRUCT_ACCENTS = {
 ${entries(tokens.scales?.constructs ?? {}, 1)}
 } as const;
 
-/** Export/download flow status colours. See knownDrift - these duplicate the status tokens. */
-export const GENERATED_FEEDBACK_COLORS = {
-${group("feedback")}
-} as const;
-
 /** Row tints distinguishing Place Audit from Place Survey rows in combined reports. */
 export const GENERATED_REPORT_SOURCE_COLORS = {
 ${group("reportSource")}
@@ -117,6 +112,11 @@ ${group("landing")}
 /** Always-dark code pane for the raw-JSON inspector. Does not follow the app theme. */
 export const GENERATED_CODE_VIEWER_COLORS = {
 ${group("codeViewer")}
+} as const;
+
+/** Badges on a scrim over an arbitrary image. Always dark - neither half follows the theme. */
+export const GENERATED_OVERLAY_BADGE_COLORS = {
+${group("overlayBadge")}
 } as const;
 
 /** Cloudinary upload widget frame overlay - the widget takes a plain colour string. */
@@ -145,7 +145,15 @@ const FUNCTIONAL = /^(rgb|rgba|hsl|hsla)\(([^()]*)\)$/;
  * throw at render time, inside the PDF and export paths - exactly where a
  * failure is least visible.
  */
-const HEX_ONLY_GROUPS = new Set(["feedback", "reportSource", "exportDocument", "nativeSplash"]);
+const HEX_ONLY_GROUPS = new Set(["reportSource", "exportDocument", "nativeSplash"]);
+
+/**
+ * Exactly six digits. The general HEX matcher above also admits 3-, 4- and 8-digit
+ * forms, which are valid CSS but not valid input to the consumers of the groups in
+ * HEX_ONLY_GROUPS: parseHexColor throws on anything but six, and the XLSX writer
+ * silently produces a wrong fill from eight.
+ */
+const HEX6 = /^#[0-9a-fA-F]{6}$/;
 
 /** @returns An error string when `value` is not a usable CSS colour, else null. */
 function colorError(value) {
@@ -182,9 +190,9 @@ function validate(tokens) {
 	const check = (path, value, hexOnly = false) => {
 		const error = colorError(value);
 		if (error) errors.push(`${path}: ${JSON.stringify(value)} - ${error}`);
-		else if (hexOnly && !HEX.test(value.trim())) {
+		else if (hexOnly && !HEX6.test(value.trim())) {
 			errors.push(
-				`${path}: ${JSON.stringify(value)} - must be a hex colour; this group is parsed as hex by its consumers, not handed to CSS`
+				`${path}: ${JSON.stringify(value)} - must be a six-digit hex colour; this group is parsed as hex by its consumers, not handed to CSS`
 			);
 		}
 	};
@@ -254,11 +262,11 @@ function validate(tokens) {
 
 	// Flat groups. `_note` keys carry prose, not colour, so they are skipped.
 	for (const group of [
-		"feedback",
 		"reportSource",
 		"mapPlaceholder",
 		"exportDocument",
 		"codeViewer",
+		"overlayBadge",
 		"nativeSplash",
 		"landing",
 		"mobileSurface",
