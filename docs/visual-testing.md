@@ -46,8 +46,8 @@ pnpm exec playwright install chromium
 Set the API target for the seeded/shared Playspace backend:
 
 ```bash
-export NEXT_PUBLIC_API_BASE_URL="https://your-seeded-api.example.com"
-export E2E_API_BASE_URL="https://your-seeded-api.example.com"
+export NEXT_PUBLIC_API_BASE_URL="https://audit-tools-backend-o3bo.onrender.com"
+export E2E_API_BASE_URL="https://audit-tools-backend-o3bo.onrender.com"
 ```
 
 Run the visual suite without Percy:
