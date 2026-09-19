@@ -11,7 +11,7 @@ export const adminTargets: readonly CaptureTarget[] = [
 		role: "admin",
 		route: () => "/admin/dashboard",
 		segments: ["admin", "dashboard"],
-		states: [{ name: "overview", label: "Admin Dashboard" }, ...dashboardChromeStates]
+		states: [{ name: "overview", label: "Admin Dashboard" }, ...dashboardChromeStates("Admin Dashboard")]
 	},
 	{
 		role: "admin",
@@ -118,12 +118,6 @@ export const adminTargets: readonly CaptureTarget[] = [
 		// Version history is an inline panel on this page, not a dialog, so the
 		// overview scroll frames already capture it.
 		states: [{ name: "overview", label: "Admin Instruments" }]
-	},
-	{
-		role: "admin",
-		route: () => "/admin/system",
-		segments: ["admin", "system"],
-		states: [{ name: "overview", label: "Admin System" }]
 	},
 	{
 		role: "admin",

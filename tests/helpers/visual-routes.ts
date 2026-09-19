@@ -371,12 +371,6 @@ export async function buildSeededVisualRoutes(request: APIRequestContext): Promi
 		},
 		{
 			role: "admin",
-			route: "/admin/system",
-			label: "Admin System",
-			screenshotPath: ["web", "admin", "system", "overview.png"]
-		},
-		{
-			role: "admin",
 			route: "/settings",
 			label: "Admin Settings",
 			screenshotPath: ["web", "admin", "settings", "overview.png"]
