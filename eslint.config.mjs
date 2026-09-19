@@ -61,10 +61,7 @@ const eslintConfig = defineConfig([
 			"src/lib/design-system.generated.ts",
 			// Renders when the app itself has failed, so it must not depend on the
 			// token pipeline or on any stylesheet having loaded.
-			"src/app/global-error.tsx",
-			// A JSON syntax highlighter. Its palette is an editor theme (string,
-			// number, key, punctuation), deliberately independent of brand colour.
-			"src/components/dashboard/raw-json.tsx"
+			"src/app/global-error.tsx"
 		],
 		rules: {
 			"no-restricted-syntax": [

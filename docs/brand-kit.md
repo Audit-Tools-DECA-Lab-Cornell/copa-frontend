@@ -2,18 +2,38 @@
 
 Source of truth for COPA / Playspace visual identity across the web dashboard (this repo) and, later, the Expo mobile app. Every value in this document is backed by a token in `src/lib/design-system.ts` or `tailwind.config.ts` — components must consume tokens, never raw values.
 
-## 1. Brand identity: Warm Brutalism
+## 1. Brand identity: Coastal Blues
 
-COPA audits real playgrounds and turns fieldwork into evidence. The visual language reflects that: **warm, paper-like surfaces** (clipboards, kraft paper, outdoor materials) carrying **solid, unambiguous ink blocks** (stamps, printed labels, hard edges). We call this direction **Warm Brutalism**.
+COPA audits real playgrounds and turns fieldwork into evidence. The visual language
+reflects the artefact the work produces: **a clean report page** carrying **solid,
+unambiguous ink blocks** (stamps, printed labels, hard edges). We call this direction
+**Coastal Blues**.
 
 What it means in practice:
 
-- **Warm neutrals, not gray.** Canvas and surfaces are warm creams (light) and deep espresso browns (dark) — never blue-gray or pure white/black outside high-contrast mode.
-- **Solid blocks, hard edges.** Primary actions, badges, and page headers are solid fills with a hard offset "edge" shadow (`0 2px 0 <edge-color>`), so they read as physical blocks embedded in the surface. Pressing a button visibly sinks it.
-- **Inverted page headers.** The page header is the one deliberately loud element per screen: an ink-colored block (`bg-foreground` + `text-background`) with a hard drop edge. Everything else stays quiet.
-- **One accent carries the system.** Terracotta is the primary accent; moss, slate, and violet are supporting accents used sparingly (status, charts, categorical color).
-- **No wordmark-only lockups.** Brand presence is the icon (`/icon.png`) plus the product name set in the heading face — never a standalone decorative wordmark.
-- **Minimal, professional, accessible.** WCAG-aware contrast in both themes, a dedicated high-contrast mode, dyslexic-font support, and font scaling (0.85–1.3×) are part of the brand, not add-ons.
+- **Paper canvas, ink text.** The dashboard reads like the report it generates: a
+  near-white canvas, near-black body copy. Blue carries the brand as an accent - it
+  does not tint the background or the body text, and the page does not read as "a blue
+  app". Dark mode inverts to a deep blue-black, not a neutral gray.
+- **One deep navy carries the system.** `#01497C` is the primary accent; moss, steel
+  blue and indigo are supporting accents used sparingly (status, charts, categorical
+  colour). Amber is reserved for warnings and stays amber in every mode.
+- **Solid blocks, hard edges.** Primary actions, badges, and page headers are solid
+  fills with a hard offset "edge" shadow (`0 2px 0 <edge-color>`), so they read as
+  physical blocks embedded in the surface. Pressing a button visibly sinks it.
+- **Inverted page headers.** The page header is the one deliberately loud element per
+  screen: an ink-colored block (`bg-foreground` + `text-background`) with a hard drop
+  edge. Everything else stays quiet.
+- **Colour is never the only channel.** Status carries a label or icon; the audit
+  report's bars are labelled and in fixed order. The categorical palette is still held
+  to a colour-vision floor on top of that, because redundancy is the mitigation and not
+  an excuse.
+- **No wordmark-only lockups.** Brand presence is the icon (`/icon.png`) plus the
+  product name set in the heading face - never a standalone decorative wordmark.
+- **Minimal, professional, accessible.** WCAG-aware contrast in both themes, a
+  dedicated high-contrast mode, dyslexic-font support, and font scaling (0.85-1.3x) are
+  part of the brand, not add-ons. The contrast floors are enforced by tests, not by
+  review - see *Accessibility rules* below.
 
 ## 2. Color tokens
 
@@ -25,16 +45,17 @@ All colors live in **`brand/tokens.json`** - the canonical source for this repo 
 
 This repo **owns** `brand/tokens.json`. `pnpm tokens:build` stamps `meta.checksum` with a hash of the token payload; copa-mobile vendors the stamped file and refuses to build or pass CI when the stamp disagrees with the copy's contents. So colour can only change here, and a local edit on the mobile side is a hard failure rather than a silent divergence.
 
-To change a colour: edit `brand/tokens.json`, run `pnpm tokens:build`, then copy the stamped file into copa-mobile and run its `tokens:build`. Three layers back this up:
+To change a colour: edit `brand/tokens.json`, run `pnpm tokens:build` and `pnpm docs:build`, then copy the stamped file into copa-mobile and run its `tokens:build` and `node scripts/build-token-baseline.mjs`. Five layers back this up:
 
 | Check | Catches |
 | --- | --- |
 | `pnpm tokens:check` (both repos) | generated files stale or hand-edited; a stamp that disagrees with the payload |
 | copa-mobile `tokens:check` | a vendored copy edited in the mobile repo |
 | copa-mobile `verify-token-sync.mjs` | a vendored copy that is merely out of date (needs `TOKENS_SYNC_TOKEN`) |
-| `eslint` (`no-restricted-syntax`) | a hard-coded colour reaching a component under `src/**` |
+| `eslint` (`no-restricted-syntax`) | a hard-coded colour, or a raw Tailwind palette class, reaching a component under `src/**` |
+| `pnpm docs:check` | the colour tables in this document drifting from the token file |
 
-### What the lint rule allows
+### What the lint rules allow
 
 Hue-neutral compositing values stay inline: pure black and white at any alpha
 (shadows, scrims, overlays) render correctly over any palette, so tokenising them
@@ -44,47 +65,94 @@ would be churn. Three files are exempt by design:
 | --- | --- |
 | `src/lib/design-system.generated.ts` | Generated from the token file - the values are the point |
 | `src/app/global-error.tsx` | Renders when the app has failed, so it must not depend on the token pipeline or on any stylesheet having loaded |
-| `src/components/dashboard/raw-json.tsx` | A JSON syntax highlighter; its palette is an editor theme (string / number / key / punctuation), deliberately independent of brand colour |
+
+The raw-JSON inspector used to be a third exemption. It is a deliberately always-dark
+code pane, so it cannot read the theme custom properties - but that is a reason for it
+to have its own token group, not a reason to hand-write hex. It reads the `codeViewer`
+group now, and the exemption is gone.
 
 Colours that sit inside Tailwind arbitrary-value class strings (`bg-[radial-gradient(...)]`,
 `filter-[drop-shadow(...)]`) cannot take a JS constant. Those are emitted as CSS
 custom properties from the token file and referenced with `var(--...)` - see the
 `landing` group.
 
+Tailwind's own palette classes (`text-amber-600`, `bg-zinc-950`) are banned outright.
+They are the worse leak of the two, because `text-amber-600 dark:text-amber-400` *looks*
+theme-aware while ignoring the contrast mode entirely - high-contrast users kept getting
+exactly the same pale amber. The token classes resolve per theme **and** per contrast, and
+need no `dark:` variant.
+
+<!-- generated:colour-tables -->
+
 ### Surfaces & text (semantic roles)
 
 | Role | Token / utility | Light (standard) | Dark (standard) |
 | --- | --- | --- | --- |
-| App canvas | `bg-background` (`--canvas`) | `#f5ede3` | `#18140f` |
-| Card surface | `bg-card` (`--surface`) | `#fdf6ee` | `#211c17` |
-| Raised surface (popovers) | `bg-surface-raised` | `#fffcf8` | `#29231d` |
-| Sunken surface (wells, inputs) | `bg-surface-sunken` | `#e9ddd1` | `#130f0b` |
-| Primary text | `text-foreground` (`--text-primary`) | `#2f2722` | `#ebe3d7` |
-| Secondary text | `text-text-secondary` | `#5a4f45` | `#d2c7b8` |
-| Muted text | `text-muted-foreground` | `#7a6f64` | `#a89c8f` |
-| Structural edge | `border-edge` (use `/40`–`/60` opacity) | `#d1c5bb` | `#4a433e` |
-| Focus ring | `ring-ring` (`--focus`) | `#b77446` | `#d0a177` |
+| App canvas | `bg-background` (`--canvas`) | `#F7F9FB` | `#0E1419` |
+| Card surface | `bg-card` (`--surface`) | `#FFFFFF` | `#161D24` |
+| Raised surface (popovers) | `bg-surface-raised` | `#FFFFFF` | `#1D262E` |
+| Sunken surface (wells, inputs) | `bg-surface-sunken` | `#EDF1F5` | `#0A0F13` |
+| Primary text | `text-foreground` (`--text-primary`) | `#14181D` | `#E8EDF2` |
+| Secondary text | `text-text-secondary` | `#3A424B` | `#C3CCD6` |
+| Muted text | `text-muted-foreground` | `#5C6773` | `#94A1AE` |
+| Structural edge | `border-edge` (use `/40`–`/60` opacity) | `#D6DCE2` | `#2E3942` |
+| Input border | `border-input-border` | `#7E8A96` | `#627180` |
+| Focus ring | `ring-ring` (`--focus`) | `#01497C` | `#61A5C2` |
+
+Text contrast in the standard palettes, against the surface each role sits on:
+
+| Role | Light | Dark |
+| --- | --- | --- |
+| `--text-primary` | 17.82:1 | 14.43:1 |
+| `--text-secondary` | 10.19:1 | 10.47:1 |
+| `--text-muted` | 5.76:1 | 6.45:1 |
 
 ### Accents
 
-| Accent | Token | Value (both themes, standard) | Use |
-| --- | --- | --- | --- |
-| Terracotta (primary) | `--accent-terracotta` / `bg-primary` | `#c58a5c` | Primary accent, focus, selection, section-header accent tick |
-| Moss | `--accent-moss` | `#6f9a7f` | Success-adjacent, categorical |
-| Slate | `--accent-slate` | `#7b90b8` | Info, categorical |
-| Violet | `--accent-violet` | `#9b86b2` | Categorical, stat tones |
+| Accent | Token | Light | Dark | Use |
+| --- | --- | --- | --- | --- |
+| Deep navy (primary) | `--accent-terracotta` / `bg-primary` | `#01497C` | `#61A5C2` | Primary accent, focus, selection, section-header accent tick |
+| Moss | `--accent-moss` | `#0F6B45` | `#5FBF98` | Success-adjacent, categorical |
+| Steel blue | `--accent-slate` | `#297596` | `#89C2D9` | Info, categorical; paired `-surface`/`-border` for soft badges |
+| Indigo | `--accent-violet` | `#5B4C8A` | `#B3A3D9` | Categorical, stat tones; paired `-surface`/`-border` |
+
+### Categorical colour (audit report bars)
+
+All six render side by side in one chart, so they carry two requirements at once:
+each readable on the report's white page, and no two collapsing into each other for a
+colour-blind reader. Both floors are asserted in `tests/unit/design-tokens.test.ts`.
+
+| Bar | Value | On white |
+| --- | --- | --- |
+| Provision | `#0A4A31` | 10.31:1 |
+| Variety | `#C2410C` | 5.18:1 |
+| Challenge | `#26708F` | 5.53:1 |
+| Sociability | `#7C3560` | 8.28:1 |
+| Play Value (construct total) | `#4A3F99` | 8.53:1 |
+| Usability (construct total) | `#985952` | 5.40:1 |
+
+<!-- /generated:colour-tables -->
 
 ### Status colors
 
 `--status-success/warning/danger/pending/in-progress`, each with paired `-surface` and `-border` tokens for soft badges. Status meaning must never be conveyed by color alone — pair with a label or icon.
 
-### Solid blocks (Warm Brutalism controls)
+### Solid blocks
 
-`--solid-primary/neutral/danger/draft/orphan` with matching `-edge` (hard shadow color) and `-text` tokens. These drive the default/secondary/destructive button variants, `bru-*` classes, badges, and active nav items. The deep-green `solid-primary` (`#2d5c3e`) is the action color; terracotta stays an accent, not a button fill.
+`--solid-primary/neutral/danger/draft/orphan` with matching `-edge` (hard shadow color) and `-text` tokens. These drive the default/secondary/destructive button variants, `bru-*` classes, badges, and active nav items. `solid-primary` is the action color and `--accent-terracotta` is the accent; the two share the deep navy in the light palettes, so an accent tick and a button fill read as the same brand colour rather than two.
 
 ### Accessibility rules
 
 - Body text on its surface must meet **WCAG AA 4.5:1**; large headings 3:1. The high-contrast palettes exist for users who need more — never "fix" a standard-palette contrast problem by telling users to switch modes.
+- These are enforced, not reviewed. `tests/unit/design-tokens.test.ts` asserts that every
+  text role clears 4.5:1 on each of its own surfaces in all four modes, that every status
+  and accent colour clears it too, that filled blocks carry a legible label, and that
+  interactive borders clear WCAG 1.4.11's 3:1. A palette change that breaks any of those
+  fails CI rather than shipping.
+- The six audit-report bars additionally hold a colour-vision floor: no two may come
+  closer than 34.5 in a deuteranope or protanope simulation, which is where the
+  pre-migration palette failed (it put two oranges side by side). Nothing there may be
+  weaker than 4.5:1 on white.
 - Test dark mode contrast independently; do not assume light-mode pairs hold.
 - Focus states: visible ring (`ring-2 ring-ring ring-offset-2`) on all interactive elements — never remove focus styles.
 
@@ -123,7 +191,7 @@ Type scale (token-driven; respects `--app-font-scale`):
 | `shadow-solid-primary/neutral/danger` | Solid-block buttons/badges (hard 2px edge + inner highlight) |
 | `shadow-press` / `shadow-solid-press` | Pressed (sunken) states |
 | `shadow-lift` | Overlays that float (dialogs, drag) |
-| `shadow-accent` | Rare terracotta glow highlight |
+| `shadow-accent` | Rare accent glow highlight |
 
 - **Motion:** fast and physical. Buttons press in 80ms (`translate-y-[2px]` + inset shadow); fields transition 200ms with `ease-field` (`cubic-bezier(0.2, 0.8, 0.2, 1)`). No decorative animation.
 
@@ -135,7 +203,7 @@ Four tiers, from app chrome down to card level. Hierarchy comes from structure a
 | --- | --- | --- |
 | 1. Nav / top bar | `AppShell` header (`src/components/app/app-shell.tsx`) | Sticky, `border-b-2 border-edge`, `bg-background/90` + blur, `shadow-topbar`. Brand identity (icon + product name + role badge) lives in the sidebar, keeping the top bar quiet. |
 | 2. Page header | `DashboardHeader` (`src/components/dashboard/dashboard-header.tsx`) | The signature element: inverted block (`bg-foreground` + `text-background`), `rounded-card`, `shadow-header-block`, page-title tokens, optional uppercase eyebrow, description, action slot, breadcrumbs above. **Manager/admin pages must use this — never a plain `bg-card` shell.** One per screen. |
-| 3. Section header | `SectionHeader` (`src/components/dashboard/section-header.tsx`) | Shared header for content groups on the canvas. Section-title tokens (same as `CardTitle`), optional eyebrow/description/actions, real `h2`/`h3` via `as`. Variants: `default`, `ruled` (hard `border-b-2 border-edge/60` rule), `accent` (terracotta left tick via the `border-l-tick` width token — at most one per screen). |
+| 3. Section header | `SectionHeader` (`src/components/dashboard/section-header.tsx`) | Shared header for content groups on the canvas. Section-title tokens (same as `CardTitle`), optional eyebrow/description/actions, real `h2`/`h3` via `as`. Variants: `default`, `ruled` (hard `border-b-2 border-edge/60` rule), `accent` (accent-coloured left tick via the `border-l-tick` width token — at most one per screen). |
 | 4. Card header | `CardHeader` + `CardTitle` (`src/components/ui/card.tsx`) | Section-title tokens inside cards; owns the `border-b` separator above tables. |
 
 Usage rules:

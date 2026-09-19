@@ -11,6 +11,8 @@
 		"lint:fix": "eslint . --fix",
 		"tokens:build": "node scripts/sync-tokens.mjs",
 		"tokens:check": "node scripts/sync-tokens.mjs --check",
+		"docs:build": "node scripts/build-brand-kit.mjs",
+		"docs:check": "node scripts/build-brand-kit.mjs --check",
 		"test:unit": "tsx --test \"tests/unit/**/*.test.ts\"",
 		"test:contract": "node ./scripts/verify_audit_contract.mjs",
 		"format": "pnpm run lint:fix && prettier --write .",
