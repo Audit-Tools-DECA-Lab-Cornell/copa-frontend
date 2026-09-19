@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { assertApiBasesMatchSeeding, trackPlayspaceApiBases } from "../helpers/visual";
+import { assertApiRequestsMatchSeeding, trackPlayspaceApiRequests } from "../helpers/visual";
 import { openDialog, StateUnavailableError } from "./catalog/steps";
 
 /**
@@ -50,30 +50,78 @@ const API_BASE = "https://api.example.com/v1";
 for (const browserBase of ["https://other.example.com/v1", "https://api.example.com/v2"]) {
 	test(`API guard rejects browser requests to ${browserBase}`, async ({ page }) => {
 		await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
-		const bases = trackPlayspaceApiBases(page);
+		const requests = trackPlayspaceApiRequests(page);
 		await page.goto("https://app.example.com");
 		await page.evaluate(url => fetch(url), `${browserBase}/playspace/manager/projects`);
 
-		expect(() => assertApiBasesMatchSeeding(bases, "/manager/projects", API_BASE)).toThrow(/different backend/);
+		expect(() => assertApiRequestsMatchSeeding(requests, "/manager/projects", API_BASE)).toThrow(
+			/different backend/
+		);
 	});
 }
 
 test("API guard accepts the configured prefix with a canonical host and port", async ({ page }) => {
 	await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
-	const bases = trackPlayspaceApiBases(page);
+	const requests = trackPlayspaceApiRequests(page);
 	await page.goto("https://app.example.com");
 	await page.evaluate(url => fetch(url), `${API_BASE}/playspace/manager/projects`);
 
 	expect(() =>
-		assertApiBasesMatchSeeding(bases, "/manager/projects", "https://API.example.com:443/v1/")
+		assertApiRequestsMatchSeeding(requests, "/manager/projects", "https://API.example.com:443/v1/")
 	).not.toThrow();
 });
 
 test("API guard ignores document routes and Playspace paths in query strings", async ({ page }) => {
 	await page.route("**/*", route => route.fulfill({ body: "<main>Ready</main>", contentType: "text/html" }));
-	const bases = trackPlayspaceApiBases(page);
+	const requests = trackPlayspaceApiRequests(page);
 	await page.goto("https://app.example.com/playspace/help");
 	await page.evaluate(() => fetch("https://app.example.com/search?next=/playspace/manager/projects"));
 
-	expect(() => assertApiBasesMatchSeeding(bases, "/manager/projects", API_BASE)).not.toThrow();
+	expect(() => assertApiRequestsMatchSeeding(requests, "/manager/projects", API_BASE)).not.toThrow();
+});
+
+/**
+ * `/playspace/` is not a reliable marker to split a request URL on. It can
+ * appear in the configured base and again in the endpoint, so splitting at the
+ * first occurrence rejects a backend served under a /playspace prefix, and
+ * splitting at the last one rejects an endpoint that repeats the segment.
+ * Anchoring on the expected base avoids the choice entirely - these two cases
+ * fail under one heuristic each.
+ */
+test("API guard accepts a backend served under a /playspace prefix", async ({ page }) => {
+	const prefixedBase = "https://api.example.com/playspace/v1";
+	await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
+	const requests = trackPlayspaceApiRequests(page);
+	await page.goto("https://app.example.com");
+	await page.evaluate(url => fetch(url), `${prefixedBase}/playspace/manager/projects`);
+
+	expect(() => assertApiRequestsMatchSeeding(requests, "/manager/projects", prefixedBase)).not.toThrow();
+});
+
+test("API guard accepts an endpoint that repeats the /playspace/ segment", async ({ page }) => {
+	const plainBase = "https://api.example.com";
+	await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
+	const requests = trackPlayspaceApiRequests(page);
+	await page.goto("https://app.example.com");
+	await page.evaluate(url => fetch(url), `${plainBase}/playspace/a/playspace/b`);
+
+	expect(() => assertApiRequestsMatchSeeding(requests, "/manager/projects", plainBase)).not.toThrow();
+});
+
+test("API guard still rejects a host that merely starts with the seeded one", async ({ page }) => {
+	await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
+	const requests = trackPlayspaceApiRequests(page);
+	await page.goto("https://app.example.com");
+	await page.evaluate(url => fetch(url), `${API_BASE}-staging/playspace/manager/projects`);
+
+	expect(() => assertApiRequestsMatchSeeding(requests, "/manager/projects", API_BASE)).toThrow(/different backend/);
+});
+
+test("API guard accepts a call to the bare Playspace root", async ({ page }) => {
+	await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
+	const requests = trackPlayspaceApiRequests(page);
+	await page.goto("https://app.example.com");
+	await page.evaluate(url => fetch(url), `${API_BASE}/playspace/`);
+
+	expect(() => assertApiRequestsMatchSeeding(requests, "/manager/projects", API_BASE)).not.toThrow();
 });

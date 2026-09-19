@@ -108,36 +108,61 @@ export function assertRouteExists(response: Response | null, route: string): voi
 	}
 }
 
-/** Observe API base URLs, including path prefixes, even on a reused dev server. */
-export function trackPlayspaceApiBases(page: Page): ReadonlySet<string> {
-	const bases = new Set<string>();
+/** Origin plus path, with any trailing slashes dropped, for a stable comparison. */
+function normalizeUrl(value: string): string {
+	const url = new URL(value);
+	return `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
+}
+
+/**
+ * Observe the Playspace API requests the browser makes, even on a reused dev
+ * server whose environment this process cannot see.
+ *
+ * The full URL is kept rather than a base parsed out of it. `/playspace/` is
+ * not a reliable marker to split on: it can appear in the configured base
+ * (a backend served under a /playspace prefix) and again in the endpoint, so
+ * neither the first nor the last occurrence identifies the boundary. Which
+ * backend a request went to is decided against the expected base below.
+ */
+export function trackPlayspaceApiRequests(page: Page): ReadonlySet<string> {
+	const requestUrls = new Set<string>();
 	page.on("request", request => {
 		if (request.resourceType() !== "fetch" && request.resourceType() !== "xhr") {
 			return;
 		}
-		const url = new URL(request.url());
-		const apiPathIndex = url.pathname.indexOf("/playspace/");
-		if (apiPathIndex !== -1) {
-			bases.add(`${url.origin}${url.pathname.slice(0, apiPathIndex).replace(/\/+$/, "")}`);
+		try {
+			const url = new URL(request.url());
+			// The path only - a `/playspace/` inside a query string is not a call.
+			if (url.pathname.includes("/playspace/")) {
+				requestUrls.add(request.url());
+			}
+		} catch {
+			// A request URL that does not parse tells us nothing about the backend.
 		}
 	});
-	return bases;
+	return requestUrls;
 }
 
-export function assertApiBasesMatchSeeding(
-	bases: ReadonlySet<string>,
+export function assertApiRequestsMatchSeeding(
+	requestUrls: ReadonlySet<string>,
 	route: string,
 	seedingUrl = getApiBaseUrl()
 ): void {
 	let expected: string;
 	try {
-		const url = new URL(seedingUrl);
-		expected = `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
+		expected = normalizeUrl(seedingUrl);
 	} catch {
 		return;
 	}
 
-	const unexpected = [...bases].filter(base => base !== expected);
+	// A request belongs to the seeded backend exactly when it is addressed to it,
+	// which needs no guess about where the base ends and the endpoint begins. The
+	// request path keeps its trailing slash so a call to the bare `/playspace/`
+	// root still matches the prefix.
+	const unexpected = [...requestUrls].filter(requestUrl => {
+		const url = new URL(requestUrl);
+		return !`${url.origin}${url.pathname}`.startsWith(`${expected}/playspace/`);
+	});
 	if (unexpected.length === 0) {
 		return;
 	}
@@ -147,7 +172,7 @@ export function assertApiBasesMatchSeeding(
 			`The browser called the Playspace API on a different backend than this run seeds (${route}):`,
 			"",
 			`  seeding (this process): ${expected}`,
-			`  app (browser):          ${unexpected.join(", ")}`,
+			`  app (browser):          ${unexpected.join("\n                          ")}`,
 			"",
 			"The seeded ids do not exist on the backend the pages read, so they render their",
 			"error state. Most readiness gates only wait for `main`, which that state renders",
@@ -170,7 +195,7 @@ export async function prepareVisualPage(
 ): Promise<void> {
 	await page.setViewportSize(VISUAL_VIEWPORT);
 
-	const apiBases = trackPlayspaceApiBases(page);
+	const apiRequests = trackPlayspaceApiRequests(page);
 	const session = await createBrowserSessionSeed(request, options.role);
 	await seedBrowserSession(page.context(), session);
 
@@ -185,7 +210,7 @@ export async function prepareVisualPage(
 	} catch (error) {
 		// A page reading the wrong backend fails its readiness gate on whatever it
 		// renders instead, so name that cause ahead of the symptom.
-		assertApiBasesMatchSeeding(apiBases, options.route);
+		assertApiRequestsMatchSeeding(apiRequests, options.route);
 		const recovered = await retryTransientLoadState(page);
 		if (!recovered) {
 			throw error;
@@ -195,7 +220,7 @@ export async function prepareVisualPage(
 
 	// A page can also reach its gate while a later query quietly failed, so check
 	// again once the state is settled.
-	assertApiBasesMatchSeeding(apiBases, options.route);
+	assertApiRequestsMatchSeeding(apiRequests, options.route);
 }
 
 /**
