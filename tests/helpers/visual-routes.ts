@@ -3,7 +3,7 @@ import { expect } from "@playwright/test";
 
 import { e2eIds } from "../fixtures/ids";
 import type { BrowserSessionRole } from "./api";
-import { bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "./api";
+import { apiUnreachableMessage, bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "./api";
 
 export type VisualRouteRole = BrowserSessionRole;
 
@@ -152,7 +152,30 @@ async function fetchManagerAuditorId(request: APIRequestContext): Promise<string
 	return payload[0]?.id ?? null;
 }
 
+/**
+ * Fails the run with the base URL and the remedy before any seeding is attempted.
+ *
+ * Without this, an unset or wrong `E2E_API_BASE_URL` reaches the login call first and
+ * every spec in the catalog reports the same bare `{"detail":"Not Found"}` - dozens of
+ * identical failures that name neither the URL that was called nor the variable to set.
+ */
+async function assertPlayspaceApiReachable(request: APIRequestContext): Promise<void> {
+	const baseUrl = getApiBaseUrl();
+	let detail: string;
+	try {
+		const response = await request.get(`${baseUrl}/health`, { timeout: 30_000 });
+		if (response.ok()) {
+			return;
+		}
+		detail = `GET /health returned HTTP ${response.status()}`;
+	} catch (error) {
+		detail = error instanceof Error ? error.message.split("\n")[0] : String(error);
+	}
+	throw new Error(apiUnreachableMessage(baseUrl, detail));
+}
+
 export async function buildSeededVisualRoutes(request: APIRequestContext): Promise<SeededVisualRoutes> {
+	await assertPlayspaceApiReachable(request);
 	const [managerAuditId, auditorData, auditorProfileId, combinedSources] = await Promise.all([
 		fetchManagerAuditId(request),
 		fetchAuditorSeedData(request),
