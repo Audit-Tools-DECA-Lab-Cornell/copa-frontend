@@ -108,42 +108,36 @@ export function assertRouteExists(response: Response | null, route: string): voi
 	}
 }
 
-/**
- * Record every origin the page calls the Playspace API on.
- *
- * Comparing the two base-URL variables only catches a conflict this process can
- * see. `reuseExistingServer` means an already-running dev server is reused with
- * the environment it was started in, which no variable here reflects - the trap
- * being that the run then seeds fixtures on one backend while the browser reads
- * another, and most readiness gates still pass because the error branch renders
- * `main` too. Watching the requests the browser actually makes is the only check
- * that sees through a reused server.
- */
-function trackPlayspaceApiOrigins(page: Page): ReadonlySet<string> {
-	const origins = new Set<string>();
+/** Observe API base URLs, including path prefixes, even on a reused dev server. */
+export function trackPlayspaceApiBases(page: Page): ReadonlySet<string> {
+	const bases = new Set<string>();
 	page.on("request", request => {
-		const url = request.url();
-		if (!url.includes("/playspace/")) {
+		if (request.resourceType() !== "fetch" && request.resourceType() !== "xhr") {
 			return;
 		}
-		try {
-			origins.add(new URL(url).origin);
-		} catch {
-			// A request URL that does not parse tells us nothing about the backend.
+		const url = new URL(request.url());
+		const apiPathIndex = url.pathname.indexOf("/playspace/");
+		if (apiPathIndex !== -1) {
+			bases.add(`${url.origin}${url.pathname.slice(0, apiPathIndex).replace(/\/+$/, "")}`);
 		}
 	});
-	return origins;
+	return bases;
 }
 
-function assertApiOriginsMatchSeeding(origins: ReadonlySet<string>, route: string): void {
+export function assertApiBasesMatchSeeding(
+	bases: ReadonlySet<string>,
+	route: string,
+	seedingUrl = getApiBaseUrl()
+): void {
 	let expected: string;
 	try {
-		expected = new URL(getApiBaseUrl()).origin;
+		const url = new URL(seedingUrl);
+		expected = `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
 	} catch {
 		return;
 	}
 
-	const unexpected = [...origins].filter(origin => origin !== expected);
+	const unexpected = [...bases].filter(base => base !== expected);
 	if (unexpected.length === 0) {
 		return;
 	}
@@ -176,7 +170,7 @@ export async function prepareVisualPage(
 ): Promise<void> {
 	await page.setViewportSize(VISUAL_VIEWPORT);
 
-	const apiOrigins = trackPlayspaceApiOrigins(page);
+	const apiBases = trackPlayspaceApiBases(page);
 	const session = await createBrowserSessionSeed(request, options.role);
 	await seedBrowserSession(page.context(), session);
 
@@ -191,7 +185,7 @@ export async function prepareVisualPage(
 	} catch (error) {
 		// A page reading the wrong backend fails its readiness gate on whatever it
 		// renders instead, so name that cause ahead of the symptom.
-		assertApiOriginsMatchSeeding(apiOrigins, options.route);
+		assertApiBasesMatchSeeding(apiBases, options.route);
 		const recovered = await retryTransientLoadState(page);
 		if (!recovered) {
 			throw error;
@@ -201,7 +195,7 @@ export async function prepareVisualPage(
 
 	// A page can also reach its gate while a later query quietly failed, so check
 	// again once the state is settled.
-	assertApiOriginsMatchSeeding(apiOrigins, options.route);
+	assertApiBasesMatchSeeding(apiBases, options.route);
 }
 
 /**

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { assertApiBasesMatchSeeding, trackPlayspaceApiBases } from "../helpers/visual";
 import { openDialog, StateUnavailableError } from "./catalog/steps";
 
 /**
@@ -42,4 +43,37 @@ test("openDialog waits for a trigger that renders after the page gate", async ({
 test("openDialog still reports a genuinely absent trigger as unavailable", async ({ page }) => {
 	await page.goto("data:text/html,<main><p>no triggers here</p></main>");
 	await expect(openDialog(page, /new project/i)).rejects.toThrow(StateUnavailableError);
+});
+
+const API_BASE = "https://api.example.com/v1";
+
+for (const browserBase of ["https://other.example.com/v1", "https://api.example.com/v2"]) {
+	test(`API guard rejects browser requests to ${browserBase}`, async ({ page }) => {
+		await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
+		const bases = trackPlayspaceApiBases(page);
+		await page.goto("https://app.example.com");
+		await page.evaluate(url => fetch(url), `${browserBase}/playspace/manager/projects`);
+
+		expect(() => assertApiBasesMatchSeeding(bases, "/manager/projects", API_BASE)).toThrow(/different backend/);
+	});
+}
+
+test("API guard accepts the configured prefix with a canonical host and port", async ({ page }) => {
+	await page.route("**/*", route => route.fulfill({ body: "{}", contentType: "application/json" }));
+	const bases = trackPlayspaceApiBases(page);
+	await page.goto("https://app.example.com");
+	await page.evaluate(url => fetch(url), `${API_BASE}/playspace/manager/projects`);
+
+	expect(() =>
+		assertApiBasesMatchSeeding(bases, "/manager/projects", "https://API.example.com:443/v1/")
+	).not.toThrow();
+});
+
+test("API guard ignores document routes and Playspace paths in query strings", async ({ page }) => {
+	await page.route("**/*", route => route.fulfill({ body: "<main>Ready</main>", contentType: "text/html" }));
+	const bases = trackPlayspaceApiBases(page);
+	await page.goto("https://app.example.com/playspace/help");
+	await page.evaluate(() => fetch("https://app.example.com/search?next=/playspace/manager/projects"));
+
+	expect(() => assertApiBasesMatchSeeding(bases, "/manager/projects", API_BASE)).not.toThrow();
 });
