@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
@@ -20,12 +21,18 @@ function isRouteGroup(segment: string): boolean {
 	return segment.startsWith("(") && segment.endsWith(")");
 }
 
-function isDynamicSegment(segment: string): boolean {
-	return segment.startsWith("[") && segment.endsWith("]");
+/** `[[...slug]]` - a catch-all that also matches zero segments. */
+function isOptionalCatchAll(segment: string): boolean {
+	return segment.startsWith("[[...");
 }
 
 function isCatchAllSegment(segment: string): boolean {
-	return segment.startsWith("[...") || segment.startsWith("[[...");
+	return segment.startsWith("[...") || isOptionalCatchAll(segment);
+}
+
+/** `[id]` - consumes exactly one segment, unlike a catch-all. */
+function isDynamicSegment(segment: string): boolean {
+	return segment.startsWith("[") && segment.endsWith("]") && !isCatchAllSegment(segment);
 }
 
 function childDirectories(dir: string): string[] {
@@ -39,24 +46,39 @@ function hasPageFile(dir: string): boolean {
 
 /**
  * Resolves a URL pathname against the App Router tree: route groups `(name)`
- * are transparent, `[param]` consumes one segment, and `[...param]` consumes
- * the rest. Returns true when some directory on that path holds a `page` file.
+ * are transparent, `[param]` consumes one segment, `[...param]` consumes the
+ * rest, and `[[...param]]` also matches none. Returns true when some directory
+ * on that path holds a `page` file.
+ *
+ * The last segment being consumed does not end the search: the page may still
+ * sit inside a route group or an optional catch-all below this directory, as
+ * `/` does when it is served from `app/(marketing)/page.tsx`.
  */
 function routeHasPage(dir: string, segments: readonly string[]): boolean {
-	if (segments.length === 0) {
-		return hasPageFile(dir);
+	if (segments.length === 0 && hasPageFile(dir)) {
+		return true;
 	}
 
-	const [segment, ...rest] = segments;
 	for (const child of childDirectories(dir)) {
+		const childDir = path.join(dir, child);
+
 		// A route group sits between URL segments without consuming one.
-		if (isRouteGroup(child) && routeHasPage(path.join(dir, child), segments)) {
-			return true;
+		if (isRouteGroup(child)) {
+			if (routeHasPage(childDir, segments)) return true;
+			continue;
 		}
-		if (isCatchAllSegment(child) && hasPageFile(path.join(dir, child))) {
-			return true;
+
+		// A catch-all swallows every remaining segment; only the optional form
+		// matches when none are left.
+		if (isCatchAllSegment(child)) {
+			if ((segments.length > 0 || isOptionalCatchAll(child)) && hasPageFile(childDir)) return true;
+			continue;
 		}
-		if ((child === segment || isDynamicSegment(child)) && routeHasPage(path.join(dir, child), rest)) {
+
+		if (segments.length === 0) continue;
+
+		const [segment, ...rest] = segments;
+		if ((child === segment || isDynamicSegment(child)) && routeHasPage(childDir, rest)) {
 			return true;
 		}
 	}
@@ -67,6 +89,49 @@ function routeHasPage(dir: string, segments: readonly string[]): boolean {
 function toPathSegments(route: string): readonly string[] {
 	return new URL(route, "http://localhost").pathname.split("/").filter(Boolean);
 }
+
+/**
+ * `routeHasPage` is the load-bearing half of the check below, so pin its App
+ * Router semantics against a throwaway tree rather than only against the real
+ * one, where most of these shapes do not currently appear.
+ */
+test("routeHasPage resolves App Router directory shapes", () => {
+	const root = mkdtempSync(path.join(os.tmpdir(), "route-resolver-"));
+	try {
+		for (const dir of [
+			"plain",
+			"(group)/grouped",
+			"nested/(group)",
+			"dynamic/[id]",
+			"catchall/[...rest]",
+			"optional/[[...rest]]"
+		]) {
+			mkdirSync(path.join(root, dir), { recursive: true });
+			writeFileSync(path.join(root, dir, "page.tsx"), "");
+		}
+
+		const resolves = (route: string) => routeHasPage(root, toPathSegments(route));
+
+		assert.equal(resolves("/plain"), true);
+		// A route group is transparent, both mid-path and as the last hop.
+		assert.equal(resolves("/grouped"), true);
+		assert.equal(resolves("/nested"), true);
+		assert.equal(resolves("/dynamic/anything"), true);
+		// A catch-all takes the rest; the optional form also takes none.
+		assert.equal(resolves("/catchall/a/b/c"), true);
+		assert.equal(resolves("/optional"), true);
+		assert.equal(resolves("/optional/a/b"), true);
+
+		// A required catch-all does not match an empty remainder, and a
+		// one-segment [id] does not swallow a deeper path.
+		assert.equal(resolves("/catchall"), false);
+		assert.equal(resolves("/dynamic/one/two"), false);
+		assert.equal(resolves("/missing"), false);
+		assert.equal(resolves("/plain/deeper"), false);
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
+});
 
 /**
  * The catalog outlives the pages it points at: /admin/system was folded into
