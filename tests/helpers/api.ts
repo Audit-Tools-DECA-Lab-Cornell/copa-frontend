@@ -54,10 +54,53 @@ export function apiUnreachableMessage(baseUrl: string, detail: string): string {
 		"",
 		'  export E2E_API_BASE_URL="https://your-seeded-api.example.com"',
 		"",
+		"That one export configures both sides: the Playwright config forwards it to the",
+		"dev server it starts, so the browser app reads the same backend. Set",
+		"NEXT_PUBLIC_API_BASE_URL as well only to point the app somewhere else on purpose,",
+		"and restart an already-running dev server, which is reused with its original env.",
+		"",
 		"VISUAL_API_BASE_URL is the CI repository variable only and has no effect locally.",
 		"If the backend sleeps when idle, warm it first - a cold start can outlast the 60s",
 		'timeout on its own: curl -s -o /dev/null "$E2E_API_BASE_URL/health".'
 	].join("\n");
+}
+
+/**
+ * The visual run drives two API clients that must reach the same backend: this
+ * process seeds fixtures through `E2E_API_BASE_URL`, while the browser app reads
+ * `NEXT_PUBLIC_API_BASE_URL`. When they disagree the seeded ids resolve against
+ * one backend and the pages fetch from another, so data-backed pages fall into
+ * their "unable to load" state - and most readiness gates only check that `main`
+ * rendered, so the run still reports green while capturing broken screenshots.
+ *
+ * Only an outright conflict is an error. A missing app URL is normal: the
+ * Playwright config hands the seeding URL to the dev server it starts.
+ */
+export function assertApiBaseUrlsAgree(): void {
+	const stripSlash = (value: string) => value.replace(/\/+$/, "");
+	const seedingUrl = process.env.E2E_API_BASE_URL?.trim();
+	const appUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+
+	if (!seedingUrl || !appUrl || stripSlash(seedingUrl) === stripSlash(appUrl)) {
+		return;
+	}
+
+	throw new Error(
+		[
+			"E2E_API_BASE_URL and NEXT_PUBLIC_API_BASE_URL point at different backends:",
+			"",
+			`  seeding (this process): ${seedingUrl}`,
+			`  app (browser):          ${appUrl}`,
+			"",
+			"The fixtures would be seeded on one backend and read from the other, so pages",
+			"render their error state while the run still reports passing tests. Export the",
+			"same URL for both, or unset NEXT_PUBLIC_API_BASE_URL and let the Playwright",
+			"config pass E2E_API_BASE_URL to the dev server it starts.",
+			"",
+			"Note: an already-running dev server is reused as-is, so restart it after",
+			"changing either variable."
+		].join("\n")
+	);
 }
 
 export function apiRouteMissingMessage(baseUrl: string, route: string): string {

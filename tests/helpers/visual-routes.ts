@@ -3,7 +3,14 @@ import { expect } from "@playwright/test";
 
 import { e2eIds } from "../fixtures/ids";
 import type { BrowserSessionRole } from "./api";
-import { apiUnreachableMessage, bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "./api";
+import {
+	apiUnreachableMessage,
+	assertApiBaseUrlsAgree,
+	bearerHeaders,
+	expectOk,
+	getApiBaseUrl,
+	loginViaApi
+} from "./api";
 
 export type VisualRouteRole = BrowserSessionRole;
 
@@ -160,6 +167,8 @@ async function fetchManagerAuditorId(request: APIRequestContext): Promise<string
  * identical failures that name neither the URL that was called nor the variable to set.
  */
 async function assertPlayspaceApiReachable(request: APIRequestContext): Promise<void> {
+	assertApiBaseUrlsAgree();
+
 	const baseUrl = getApiBaseUrl();
 	let detail: string;
 	try {
