@@ -41,6 +41,9 @@ const VARIANT_CONFIGS: Record<CloudinaryVariant, CloudinaryVariantConfig> = {
 const CLOUDINARY_UPSCALE_MAX_INPUT_PIXELS = 4_200_000;
 const CLOUDINARY_UPSCALE_FACTOR = 4;
 
+/** Product folder for COPA originals in the shared Cloudinary account. */
+export const COPA_CLOUDINARY_FOLDER = "copa";
+
 export interface AssetEntry {
 	id: string;
 	source: "web" | "mobile";

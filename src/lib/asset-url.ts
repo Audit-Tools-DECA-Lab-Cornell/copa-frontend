@@ -1,15 +1,29 @@
-import { buildCloudinaryUrl, getAssetDisplayUrl } from "@/lib/cloudinary-images";
-import { type AssetIndex, type BuildCloudinaryUrlOptions, type CloudinaryVariant } from "@/lib/cloudinary-images";
+import marketingAssets from "@/data/marketing-assets.json";
+import {
+	type AssetIndex,
+	buildCloudinaryUrl,
+	type BuildCloudinaryUrlOptions,
+	type CloudinaryVariant,
+	COPA_CLOUDINARY_FOLDER,
+	getAssetDisplayUrl
+} from "@/lib/cloudinary-images";
 
+const marketingDelivery: Readonly<Record<string, string>> = marketingAssets;
+
+/**
+ * Maps a landing-page local path to the Cloudinary public ID under `copa/`.
+ * Framed dashboard shots: `/screenshots/Framed/...` → `copa/web/framed/...`
+ * Marketing shots: `/marketing/...` → `copa/web/marketing/...`
+ */
 function publicIdFromLocalAssetPath(localPath: string): string | null {
 	const framedMatch = localPath.match(/^\/screenshots\/Framed\/(.+)\.(?:png|jpg|jpeg|webp)$/i);
 	if (framedMatch) {
-		return `web/framed/${framedMatch[1]}`;
+		return `${COPA_CLOUDINARY_FOLDER}/web/framed/${framedMatch[1]}`;
 	}
 
 	const marketingMatch = localPath.match(/^\/marketing\/(.+)\.(?:png|jpg|jpeg|webp)$/i);
 	if (marketingMatch) {
-		return `web/marketing/${marketingMatch[1]}`;
+		return `${COPA_CLOUDINARY_FOLDER}/web/marketing/${marketingMatch[1]}`;
 	}
 
 	return null;
@@ -19,13 +33,14 @@ function findAssetByPublicId(assetIndex: AssetIndex | undefined, publicId: strin
 	return assetIndex?.assets.find(asset => asset.cloudinaryPublicId === publicId) ?? null;
 }
 
-// Converts a local public/ reference to a Cloudinary delivery URL.
-// Pass assetIndex when available so the URL builder can use width/height metadata for automatic upscaling.
 export function screenshotUrl(
 	localPath: string,
 	variant: CloudinaryVariant = "full",
 	options: BuildCloudinaryUrlOptions & { assetIndex?: AssetIndex } = {}
 ): string {
+	const refreshedAsset = marketingDelivery[localPath];
+	if (refreshedAsset) return refreshedAsset;
+
 	const publicId = publicIdFromLocalAssetPath(localPath);
 	if (!publicId) return localPath;
 
