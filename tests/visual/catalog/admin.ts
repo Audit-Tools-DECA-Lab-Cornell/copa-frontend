@@ -11,7 +11,7 @@ export const adminTargets: readonly CaptureTarget[] = [
 		role: "admin",
 		route: () => "/admin/dashboard",
 		segments: ["admin", "dashboard"],
-		states: [{ name: "overview", label: "Admin Dashboard" }, ...dashboardChromeStates]
+		states: [{ name: "overview", label: "Admin Dashboard" }, ...dashboardChromeStates("Admin Dashboard")]
 	},
 	{
 		role: "admin",

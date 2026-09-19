@@ -81,3 +81,24 @@ test("every capture target points at a route the app still serves", () => {
 
 	assert.deepEqual(dead, [], `capture targets with no matching page: ${dead.join(", ")}`);
 });
+
+/**
+ * Percy keys snapshots by name and silently discards later duplicates, so a
+ * repeated label costs visual coverage without failing the run.
+ */
+test("every capture state has a unique Percy snapshot label", () => {
+	const seen = new Set<string>();
+	const duplicates: string[] = [];
+
+	for (const target of captureCatalog) {
+		for (const state of target.states) {
+			if (seen.has(state.label)) {
+				duplicates.push(state.label);
+				continue;
+			}
+			seen.add(state.label);
+		}
+	}
+
+	assert.deepEqual(duplicates, [], `duplicate Percy labels: ${duplicates.join(", ")}`);
+});

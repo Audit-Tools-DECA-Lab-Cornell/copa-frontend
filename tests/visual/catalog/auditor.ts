@@ -13,7 +13,7 @@ export const auditorTargets: readonly CaptureTarget[] = [
 		role: "auditor",
 		route: () => "/auditor/dashboard",
 		segments: ["auditor", "dashboard"],
-		states: [{ name: "overview", label: "Auditor Dashboard" }, ...dashboardChromeStates]
+		states: [{ name: "overview", label: "Auditor Dashboard" }, ...dashboardChromeStates("Auditor Dashboard")]
 	},
 	{
 		role: "auditor",
