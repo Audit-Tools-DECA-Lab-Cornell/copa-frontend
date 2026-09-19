@@ -5,6 +5,13 @@ const parsedBaseUrl = new URL(baseURL);
 const isLocalBaseUrl = ["localhost", "127.0.0.1"].includes(parsedBaseUrl.hostname);
 const localPort = parsedBaseUrl.port || (parsedBaseUrl.protocol === "https:" ? "443" : "80");
 
+/**
+ * The API base URL the browser app should use: an explicit NEXT_PUBLIC_API_BASE_URL
+ * wins, otherwise the seeding URL, so a single `export E2E_API_BASE_URL=...`
+ * configures both sides of the run.
+ */
+const appApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || process.env.E2E_API_BASE_URL?.trim() || undefined;
+
 export default defineConfig({
 	testDir: "./tests/",
 	timeout: 60_000,
@@ -56,7 +63,14 @@ export default defineConfig({
 				command: `pnpm exec next dev --hostname 127.0.0.1 --port ${localPort}`,
 				url: baseURL,
 				reuseExistingServer: true,
-				timeout: 120_000
+				timeout: 120_000,
+				// The suites drive two API clients that must reach the same backend: the
+				// test process seeds through E2E_API_BASE_URL, while the browser app reads
+				// NEXT_PUBLIC_API_BASE_URL and otherwise falls back to a local FastAPI.
+				// CI sets both from one variable; locally only E2E_API_BASE_URL is
+				// documented, so hand it to the dev server rather than let the app point
+				// somewhere the seeded ids do not exist.
+				env: appApiBaseUrl === undefined ? {} : { NEXT_PUBLIC_API_BASE_URL: appApiBaseUrl }
 			}
 		: undefined
 });

@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 import { VISUAL_VIEWPORT } from "../../helpers/visual";
@@ -16,6 +16,33 @@ export class StateUnavailableError extends Error {
 	}
 }
 
+/**
+ * How long a trigger gets to appear before its state counts as unavailable.
+ *
+ * `count()`, `isVisible()` and `isEnabled()` read the page as it is right now -
+ * unlike assertions and actions, they never retry. The readiness gate these
+ * steps run behind only waits for `main`, which renders while a table is still
+ * loading, so probing straight away finds no trigger and records a state that
+ * exists as missing. That is the whole difference between a run against a warm
+ * backend and one against a cold or slow one.
+ */
+const TRIGGER_TIMEOUT = 10_000;
+
+/** Let a trigger render before the non-retrying probes below look for it. */
+async function waitForTrigger(locator: Locator): Promise<void> {
+	await locator
+		.first()
+		.waitFor({ state: "visible", timeout: TRIGGER_TIMEOUT })
+		.catch(() => undefined);
+}
+
+/** As above, when any one of several alternative triggers will do. */
+async function waitForAnyTrigger(locators: readonly Locator[]): Promise<void> {
+	await Promise.any(
+		locators.map(locator => locator.first().waitFor({ state: "visible", timeout: TRIGGER_TIMEOUT }))
+	).catch(() => undefined);
+}
+
 async function isVisible(page: Page, locator: ReturnType<Page["getByRole"]>): Promise<boolean> {
 	return locator.isVisible().catch(() => false);
 }
@@ -27,6 +54,7 @@ async function isVisible(page: Page, locator: ReturnType<Page["getByRole"]>): Pr
  */
 export async function openDialog(page: Page, buttonName: RegExp | string): Promise<void> {
 	const matches = page.getByRole("button", { name: buttonName });
+	await waitForTrigger(matches);
 	const count = await matches.count();
 	if (count === 0) {
 		throw new StateUnavailableError(`No "${buttonName}" trigger button found`);
@@ -62,6 +90,7 @@ export async function openDialog(page: Page, buttonName: RegExp | string): Promi
  */
 export async function openBuildDialogForPlace(page: Page, placeName: string): Promise<void> {
 	const row = page.getByRole("row").filter({ hasText: placeName }).first();
+	await waitForTrigger(row);
 	if (!(await row.isVisible().catch(() => false))) {
 		throw new StateUnavailableError(`No reports row found for "${placeName}"`);
 	}
@@ -87,6 +116,7 @@ export async function openThenCloseDialog(page: Page, buttonName: RegExp | strin
 /** Opens a toolbar filter popover by its trigger label (e.g. "Projects"). */
 export async function openFilterPopover(page: Page, triggerName: RegExp | string): Promise<void> {
 	const trigger = page.getByRole("button", { name: triggerName }).first();
+	await waitForTrigger(trigger);
 	if (!(await trigger.isVisible().catch(() => false))) {
 		throw new StateUnavailableError(`No "${triggerName}" filter button found`);
 	}
@@ -101,6 +131,7 @@ export async function openRowMenu(page: Page): Promise<void> {
 		page.getByRole("button", { name: /open menu/i }).last(),
 		page.locator('[data-slot="dropdown-menu-trigger"]').first()
 	];
+	await waitForAnyTrigger(candidates);
 	for (const candidate of candidates) {
 		if (await candidate.isVisible().catch(() => false)) {
 			await candidate.click();
@@ -121,6 +152,7 @@ export async function openUserMenu(page: Page): Promise<void> {
 export async function collapseSidebar(page: Page): Promise<void> {
 	await page.setViewportSize({ ...VISUAL_VIEWPORT });
 	const collapseButton = page.getByRole("button", { name: /collapse sidebar/i }).first();
+	await waitForTrigger(collapseButton);
 	if (!(await isVisible(page, collapseButton))) {
 		throw new StateUnavailableError("No collapse-sidebar control found");
 	}
@@ -132,6 +164,7 @@ export async function collapseSidebar(page: Page): Promise<void> {
 export async function openMobileNav(page: Page): Promise<void> {
 	await page.setViewportSize({ ...MOBILE_VIEWPORT });
 	const trigger = page.getByRole("button", { name: /open menu/i }).first();
+	await waitForTrigger(trigger);
 	if (!(await isVisible(page, trigger))) {
 		throw new StateUnavailableError("No open-menu control found on mobile viewport");
 	}
@@ -147,6 +180,7 @@ export async function expectText(page: Page, text: RegExp | string): Promise<voi
 /** Activates a tab by its accessible name. */
 export async function openTab(page: Page, name: RegExp | string): Promise<void> {
 	const tab = page.getByRole("tab", { name }).first();
+	await waitForTrigger(tab);
 	if (!(await tab.isVisible().catch(() => false))) {
 		throw new StateUnavailableError(`No "${name}" tab found`);
 	}
@@ -157,6 +191,7 @@ export async function openTab(page: Page, name: RegExp | string): Promise<void> 
 /** Clicks a button by accessible name and waits for any dialog it raises. */
 export async function clickButton(page: Page, name: RegExp | string, expectDialog = false): Promise<void> {
 	const button = page.getByRole("button", { name }).first();
+	await waitForTrigger(button);
 	if (!(await button.isVisible().catch(() => false))) {
 		throw new StateUnavailableError(`No "${name}" button found`);
 	}
