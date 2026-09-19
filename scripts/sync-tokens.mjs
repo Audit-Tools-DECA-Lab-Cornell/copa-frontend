@@ -67,6 +67,19 @@ function render(tokens) {
  * will fail the \`tokens:check\` job in CI.
  */
 
+/**
+ * Default appearance for this platform, resolved from brand/tokens.json. The palette
+ * a first-time visitor sees is part of the brand, so it lives with the colours rather
+ * than as a literal in design-system.ts.
+ */
+export const GENERATED_DEFAULTS: {
+\treadonly theme: "light" | "dark";
+\treadonly contrast: "standard" | "high";
+} = {
+\ttheme: ${JSON.stringify(tokens.web.defaultTheme)},
+\tcontrast: ${JSON.stringify(tokens.web.defaultContrast)}
+};
+
 export const GENERATED_PALETTES = {
 ${modes.join(",\n")}
 } as const;
@@ -99,6 +112,11 @@ ${group("mapPlaceholder")}
 /** Decorative wash and hero scrims on the public pages, emitted as CSS custom properties. */
 export const GENERATED_LANDING_COLORS = {
 ${group("landing")}
+} as const;
+
+/** Always-dark code pane for the raw-JSON inspector. Does not follow the app theme. */
+export const GENERATED_CODE_VIEWER_COLORS = {
+${group("codeViewer")}
 } as const;
 
 /** Cloudinary upload widget frame overlay - the widget takes a plain colour string. */
@@ -171,6 +189,21 @@ function validate(tokens) {
 		}
 	};
 
+	// The defaults are emitted into TypeScript as a narrow union, so a typo here would
+	// produce a file that does not compile rather than one that renders the wrong theme.
+	// Catch it at the source instead.
+	if (!["light", "dark"].includes(tokens.web?.defaultTheme)) {
+		errors.push(`web.defaultTheme: ${JSON.stringify(tokens.web?.defaultTheme)} - must be "light" or "dark"`);
+	}
+	if (!["standard", "high"].includes(tokens.web?.defaultContrast)) {
+		errors.push(
+			`web.defaultContrast: ${JSON.stringify(tokens.web?.defaultContrast)} - must be "standard" or "high"`
+		);
+	}
+	if (!["light", "dark"].includes(tokens.mobile?.defaultTheme)) {
+		errors.push(`mobile.defaultTheme: ${JSON.stringify(tokens.mobile?.defaultTheme)} - must be "light" or "dark"`);
+	}
+
 	const web = tokens.web?.palettes ?? {};
 	let webKeys = null;
 	for (const [theme, contrasts] of Object.entries(web)) {
@@ -219,12 +252,13 @@ function validate(tokens) {
 		check(`scales.constructs.${token}`, value, true);
 	}
 
-	// Groups added in phase 2. `_note` keys carry prose, not colour, so they are skipped.
+	// Flat groups. `_note` keys carry prose, not colour, so they are skipped.
 	for (const group of [
 		"feedback",
 		"reportSource",
 		"mapPlaceholder",
 		"exportDocument",
+		"codeViewer",
 		"nativeSplash",
 		"landing",
 		"mobileSurface",

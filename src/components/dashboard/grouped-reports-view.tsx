@@ -287,7 +287,7 @@ function AuditStatusBadge({ status }: Readonly<{ status: AuditActivityRow["statu
 		status === "SUBMITTED"
 			? "border-status-success/40 text-status-success"
 			: status === "PAUSED"
-				? "border-amber-500/40 text-amber-600"
+				? "border-status-warning-border text-status-warning"
 				: "border-edge/50 text-muted-foreground";
 	return (
 		<Badge variant="outline" className={cn("whitespace-nowrap text-xs font-medium", tone)}>

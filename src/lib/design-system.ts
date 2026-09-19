@@ -7,7 +7,12 @@
  */
 
 import { getPvScaleCssVariables } from "@/lib/audit/scale-colors";
-import { GENERATED_LANDING_COLORS, GENERATED_PALETTES } from "@/lib/design-system.generated";
+import {
+	GENERATED_CODE_VIEWER_COLORS,
+	GENERATED_DEFAULTS,
+	GENERATED_LANDING_COLORS,
+	GENERATED_PALETTES
+} from "@/lib/design-system.generated";
 
 export type DesignSystemThemeMode = "light" | "dark";
 export type DesignSystemContrastMode = "standard" | "high";
@@ -43,6 +48,8 @@ interface DesignSystemPalette {
 	readonly statusInProgressBorder: string;
 	readonly statusInfoSurface: string;
 	readonly statusInfoBorder: string;
+	readonly accentVioletSurface: string;
+	readonly accentVioletBorder: string;
 	readonly primaryForeground: string;
 	readonly inputBorder: string;
 	readonly actionOutlineBorder: string;
@@ -72,8 +79,8 @@ interface DesignSystemVariableInput {
 }
 
 export const DESIGN_SYSTEM = {
-	defaultTheme: "dark",
-	defaultContrast: "standard",
+	defaultTheme: GENERATED_DEFAULTS.theme,
+	defaultContrast: GENERATED_DEFAULTS.contrast,
 	fontScale: {
 		min: 0.85,
 		max: 1.3,
@@ -208,6 +215,8 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--status-in-progress-border": palette.statusInProgressBorder,
 		"--status-info-surface": palette.statusInfoSurface,
 		"--status-info-border": palette.statusInfoBorder,
+		"--accent-violet-surface": palette.accentVioletSurface,
+		"--accent-violet-border": palette.accentVioletBorder,
 		"--background": palette.canvas,
 		"--foreground": palette.textPrimary,
 		"--card": palette.surface,
@@ -280,7 +289,29 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--landing-hero-shadow-soft": GENERATED_LANDING_COLORS.heroShadowSoft,
 		"--landing-hero-shadow-medium": GENERATED_LANDING_COLORS.heroShadowMedium,
 		"--landing-hero-shadow-strong": GENERATED_LANDING_COLORS.heroShadowStrong,
-		"--landing-hero-shadow-deep": GENERATED_LANDING_COLORS.heroShadowDeep
+		"--landing-hero-shadow-deep": GENERATED_LANDING_COLORS.heroShadowDeep,
+		// The code pane is always dark, so these do not vary by theme - but they are
+		// emitted alongside the rest so the pane still resolves from the token file.
+		"--code-surface": GENERATED_CODE_VIEWER_COLORS.surface,
+		"--code-surface-raised": GENERATED_CODE_VIEWER_COLORS.surfaceRaised,
+		"--code-gutter": GENERATED_CODE_VIEWER_COLORS.gutter,
+		"--code-row-stripe": GENERATED_CODE_VIEWER_COLORS.rowStripe,
+		"--code-edge": GENERATED_CODE_VIEWER_COLORS.edge,
+		"--code-edge-subtle": GENERATED_CODE_VIEWER_COLORS.edgeSubtle,
+		"--code-hover": GENERATED_CODE_VIEWER_COLORS.hover,
+		"--code-text-primary": GENERATED_CODE_VIEWER_COLORS.textPrimary,
+		"--code-text-secondary": GENERATED_CODE_VIEWER_COLORS.textSecondary,
+		"--code-text-muted": GENERATED_CODE_VIEWER_COLORS.textMuted,
+		"--code-punctuation": GENERATED_CODE_VIEWER_COLORS.punctuation,
+		"--code-key": GENERATED_CODE_VIEWER_COLORS.key,
+		"--code-string": GENERATED_CODE_VIEWER_COLORS.string,
+		"--code-number": GENERATED_CODE_VIEWER_COLORS.number,
+		"--code-boolean": GENERATED_CODE_VIEWER_COLORS.boolean,
+		"--code-chrome-warning": GENERATED_CODE_VIEWER_COLORS.chromeWarning,
+		"--code-chrome-success": GENERATED_CODE_VIEWER_COLORS.chromeSuccess,
+		"--code-chrome-danger": GENERATED_CODE_VIEWER_COLORS.chromeDanger,
+		"--code-shadow-ring": GENERATED_CODE_VIEWER_COLORS.shadowRing,
+		"--code-shadow-drop": GENERATED_CODE_VIEWER_COLORS.shadowDrop
 	};
 }
 

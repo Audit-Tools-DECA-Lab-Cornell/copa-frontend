@@ -151,7 +151,7 @@ function AssetCard({ asset }: Readonly<{ asset: AssetEntry }>) {
 								{t("card.uploadedBadge")}
 							</span>
 						) : (
-							<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-amber-300/90 backdrop-blur-sm">
+							<span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-status-warning backdrop-blur-sm">
 								<Clock className="size-3" />
 								{t("card.pendingBadge")}
 							</span>
@@ -375,8 +375,8 @@ export function AssetGallery({ index }: Readonly<{ index: AssetIndex }>) {
 
 			{/* pending hint */}
 			{pendingCount > 0 && (
-				<div className="flex items-center gap-3 rounded-card border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-muted-foreground">
-					<Clock className="size-4 shrink-0 text-amber-500" />
+				<div className="flex items-center gap-3 rounded-card border border-status-warning-border bg-status-warning-surface px-4 py-3 text-sm text-muted-foreground">
+					<Clock className="size-4 shrink-0 text-status-warning" />
 					<span>
 						{t.rich("pendingHint", {
 							count: pendingCount,

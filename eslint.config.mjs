@@ -3,6 +3,19 @@ import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 
+/**
+ * Tailwind palette classes (`bg-amber-100`, `text-zinc-500`, ...) written in any of the
+ * three node types a className can be built from. Utility prefixes and shades are spelled
+ * out rather than matched loosely so a legitimate identifier like `border-b-2` or a
+ * token class like `text-status-warning` cannot trip it.
+ */
+const TAILWIND_PALETTE = String.raw`\b(bg|text|border|ring|from|via|to|decoration|outline|divide|fill|stroke|shadow|accent|caret|placeholder)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|[1-9]00|950)\b`;
+const COLOUR_CLASS_NODES = [
+	`Literal[value=/${TAILWIND_PALETTE}/]`,
+	`TemplateElement[value.raw=/${TAILWIND_PALETTE}/]`,
+	`JSXAttribute[name.name="className"] > JSXExpressionContainer Literal[value=/${TAILWIND_PALETTE}/]`
+];
+
 const eslintConfig = defineConfig([
 	...nextCoreWebVitals,
 	...nextTypescript,
@@ -75,6 +88,16 @@ const eslintConfig = defineConfig([
 						"TemplateElement[value.raw=/#(?!fff\\b|ffffff\\b|FFF\\b|FFFFFF\\b|000\\b|000000\\b)[0-9a-fA-F]{3,8}\\b|rgba?\\(\\s*(?!0\\s*,\\s*0\\s*,\\s*0|255\\s*,\\s*255\\s*,\\s*255)\\d/]",
 					message:
 						"Hard-coded colour in a template literal. Add it to brand/tokens.json and interpolate the token instead."
+				},
+				// Tailwind's own palette classes are the other way colour leaks in, and the
+				// worse one: `text-amber-600 dark:text-amber-400` looks theme-aware but
+				// ignores the contrast mode entirely, so high-contrast users kept getting
+				// the same pale amber. The token classes (text-status-warning and friends)
+				// resolve per theme *and* per contrast, and need no `dark:` variant.
+				{
+					selector: `${COLOUR_CLASS_NODES.join(", ")}`,
+					message:
+						"Raw Tailwind palette class. Use the token class instead - text-status-warning, bg-status-success-surface, border-accent-violet-border and the rest are defined in src/app/globals.css from brand/tokens.json."
 				}
 			]
 		}

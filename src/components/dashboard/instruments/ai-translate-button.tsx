@@ -38,7 +38,7 @@ export function AiTranslateFieldButton({ className }: Readonly<{ className?: str
 						size="icon"
 						aria-label={t("aiTranslateField")}
 						className={cn(
-							"h-6 w-6 shrink-0 text-violet-500/70 hover:bg-violet-500/10 hover:text-violet-600 dark:text-violet-300/70",
+							"h-6 w-6 shrink-0 text-accent-violet/70 hover:bg-accent-violet-surface hover:text-accent-violet",
 							className
 						)}>
 						<Sparkles className="h-3.5 w-3.5" />
@@ -72,12 +72,12 @@ export function AiTranslateButton({ targetLang, baseLang }: Readonly<{ targetLan
 					type="button"
 					variant="outline"
 					size="sm"
-					className="h-10 gap-1.5 border-violet-400/50 bg-violet-500/10 text-violet-700 hover:bg-violet-500/15 dark:text-violet-300">
+					className="h-10 gap-1.5 border-accent-violet-border bg-accent-violet-surface text-accent-violet hover:bg-accent-violet/15">
 					<Sparkles className="h-4 w-4" />
 					{t("aiTranslate")}
 					<Badge
 						variant="outline"
-						className="ml-0.5 border-violet-400/50 bg-background/40 px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-violet-300">
+						className="ml-0.5 border-accent-violet-border bg-background/40 px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide text-accent-violet">
 						{t("premiumBadge")}
 					</Badge>
 				</Button>
@@ -85,7 +85,7 @@ export function AiTranslateButton({ targetLang, baseLang }: Readonly<{ targetLan
 			<PopoverContent align="end" className="w-80">
 				<PopoverHeader>
 					<PopoverTitle className="flex items-center gap-2">
-						<Sparkles className="h-4 w-4 text-violet-500" />
+						<Sparkles className="h-4 w-4 text-accent-violet" />
 						{t("aiTranslateTitle")}
 					</PopoverTitle>
 					<PopoverDescription>
@@ -95,7 +95,7 @@ export function AiTranslateButton({ targetLang, baseLang }: Readonly<{ targetLan
 						})}
 					</PopoverDescription>
 				</PopoverHeader>
-				<div className="mt-3 rounded-md border border-violet-400/30 bg-violet-500/5 p-3 text-xs text-muted-foreground">
+				<div className="mt-3 rounded-md border border-accent-violet-border bg-accent-violet-surface p-3 text-xs text-muted-foreground">
 					{t("aiTranslateComingSoon")}
 				</div>
 				<Button disabled className="mt-3 w-full gap-1.5" size="sm">

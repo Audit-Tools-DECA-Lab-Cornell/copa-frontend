@@ -991,18 +991,18 @@ function SociabilityBestWorstSection({ rankings }: Readonly<{ rankings: readonly
 								</div>
 							) : (
 								<>
-									<div className="border-b border-edge/40 bg-emerald-50 px-3 py-2.5 dark:bg-emerald-950/20">
+									<div className="border-b border-edge/40 bg-status-success-surface px-3 py-2.5">
 										<div className="mb-1 flex items-center gap-1.5">
-											<div className="size-2 rounded-full bg-emerald-500" aria-hidden />
+											<div className="size-2 rounded-full bg-status-success" aria-hidden />
 											<span className="text-xs font-bold text-muted-foreground">
 												{t("highestScored")}
 											</span>
 										</div>
 										<RankedDomainList domains={ranking.bestDomains} />
 									</div>
-									<div className="flex-1 bg-rose-50 px-3 py-2.5 dark:bg-rose-950/20">
+									<div className="flex-1 bg-status-danger-surface px-3 py-2.5">
 										<div className="mb-1 flex items-center gap-1.5">
-											<div className="size-2 rounded-full bg-rose-500" aria-hidden />
+											<div className="size-2 rounded-full bg-status-danger" aria-hidden />
 											<span className="text-xs font-bold text-muted-foreground">
 												{t("lowestScored")}
 											</span>
@@ -1085,9 +1085,9 @@ function BestWorstSection({
 													{t(CONSTRUCT_LABEL_KEYS[key])}
 												</p>
 											</div>
-											<div className="border-b border-edge/40 bg-emerald-50 px-3 py-2.5 dark:bg-emerald-950/20">
+											<div className="border-b border-edge/40 bg-status-success-surface px-3 py-2.5">
 												<div className="mb-1 flex items-center gap-1.5">
-													<div className="size-2 rounded-full bg-emerald-500" />
+													<div className="size-2 rounded-full bg-status-success" />
 													<span className="text-xs font-bold text-muted-foreground">
 														{t("highestScored")}
 													</span>
@@ -1110,9 +1110,9 @@ function BestWorstSection({
 													<p className="text-sm text-muted-foreground">-</p>
 												)}
 											</div>
-											<div className="bg-rose-50 px-3 py-2.5 dark:bg-rose-950/20">
+											<div className="bg-status-danger-surface px-3 py-2.5">
 												<div className="mb-1 flex items-center gap-1.5">
-													<div className="size-2 rounded-full bg-rose-500" />
+													<div className="size-2 rounded-full bg-status-danger" />
 													<span className="text-xs font-bold text-muted-foreground">
 														{t("lowestScored")}
 													</span>
@@ -1432,7 +1432,7 @@ export function AuditReportView({
 							helper={
 								overall !== null ? t("maxScoreEq", { value: overall.play_value_total_max }) : undefined
 							}
-							accent="bg-amber-500"
+							accent="bg-status-warning"
 						/>
 					) : null}
 					{visibleConstructs.usability ? (
@@ -1451,7 +1451,7 @@ export function AuditReportView({
 						helper={
 							overall !== null ? t("maxScoreEq", { value: overall.sociability_total_max }) : undefined
 						}
-						accent="bg-emerald-500"
+						accent="bg-status-success"
 					/>
 				</div>
 			</div>

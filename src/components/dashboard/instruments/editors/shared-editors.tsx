@@ -186,7 +186,7 @@ export function ScaleOptionsEditor({
 							onClick={addUnsureOption}
 							disabled={hasUnsureOption}
 							title={hasUnsureOption ? t("unsureOptionExists") : t("isUnsure")}
-							className="text-sky-700 hover:text-sky-800 hover:bg-sky-100/60 dark:text-sky-300 dark:hover:bg-sky-900/30">
+							className="text-accent-slate hover:bg-status-info-surface">
 							<Plus className="mr-1 h-3 w-3" />
 							{t("addUnsureOption")}
 						</Button>
@@ -311,7 +311,7 @@ export function ScaleOptionsEditor({
 									}
 									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.is_not_applicable
-											? "border-amber-400/60 bg-amber-100 text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/30 dark:text-amber-300"
+											? "border-status-warning-border bg-status-warning-surface text-status-warning"
 											: "border-edge/40 bg-transparent text-muted-foreground hover:border-edge/40/80"
 									}`}
 									title={t("isNotApplicable")}>
@@ -328,7 +328,7 @@ export function ScaleOptionsEditor({
 									}
 									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.is_unsure
-											? "border-sky-400/60 bg-sky-100 text-sky-800 dark:border-sky-500/40 dark:bg-sky-900/30 dark:text-sky-300"
+											? "border-status-info-border bg-status-info-surface text-accent-slate"
 											: "border-edge/40 bg-transparent text-muted-foreground hover:border-edge/40/80"
 									}`}
 									title={t("isUnsure")}>
@@ -345,7 +345,7 @@ export function ScaleOptionsEditor({
 									}
 									className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed ${
 										opt.allows_follow_up_scales
-											? "border-violet-400/60 bg-violet-100 text-violet-800 dark:border-violet-500/40 dark:bg-violet-900/30 dark:text-violet-300"
+											? "border-accent-violet-border bg-accent-violet-surface text-accent-violet"
 											: "border-edge/40 bg-transparent text-muted-foreground hover:border-edge/40/80"
 									}`}
 									title={t("allowsFollowUp")}>
@@ -376,19 +376,19 @@ export function ScaleOptionsEditor({
 				<div className="flex items-center gap-3 pt-1 pl-1">
 					<span className="text-[10px] text-muted-foreground/60">{t("flags")}:</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-						<span className="rounded-full border border-amber-400/60 bg-amber-100 dark:bg-amber-900/30 px-1.5 text-amber-800 dark:text-amber-300">
+						<span className="rounded-full border border-status-warning-border bg-status-warning-surface px-1.5 text-status-warning">
 							{t("notApplicable")}
 						</span>
 						= {t("notApplicableDesc")}
 					</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-						<span className="rounded-full border border-sky-400/60 bg-sky-100 dark:bg-sky-900/30 px-1.5 text-sky-800 dark:text-sky-300">
+						<span className="rounded-full border border-status-info-border bg-status-info-surface px-1.5 text-accent-slate">
 							{t("unsure")}
 						</span>
 						= {t("unsureDesc")}
 					</span>
 					<span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-						<span className="rounded-full border border-violet-400/60 bg-violet-100 dark:bg-violet-900/30 px-1.5 text-violet-800 dark:text-violet-300">
+						<span className="rounded-full border border-accent-violet-border bg-accent-violet-surface px-1.5 text-accent-violet">
 							{t("followUpBadge")}
 						</span>
 						= {t("allowsFollowUpDesc")}
