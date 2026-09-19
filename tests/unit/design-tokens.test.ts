@@ -3,7 +3,13 @@ import test from "node:test";
 
 import { REPORT_SOURCE_STYLES } from "@/lib/audit/report-source-sessions";
 import { CONSTRUCT_ACCENT_COLORS, SCALE_ACCENT_COLORS, withAlpha } from "@/lib/audit/scale-colors";
-import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
+import {
+	DESIGN_SYSTEM,
+	getDesignSystemCssVariables,
+	getThemeBootstrapScript,
+	getThemePaletteStylesheet,
+	PREFERENCES_STORAGE_KEY
+} from "@/lib/design-system";
 import {
 	GENERATED_FEEDBACK_COLORS,
 	GENERATED_LANDING_COLORS,
@@ -295,3 +301,134 @@ test("landing custom properties are emitted for every mode", () => {
 		}
 	}
 });
+
+/**
+ * The script that runs before the first paint.
+ *
+ * Flipping the web default to light made this load-bearing: without it every visitor
+ * whose preference differs from the server-rendered default gets one frame of the
+ * wrong palette on every page load. The cases below are the ones that matter, and the
+ * last is the one that actually bit - a partially-written blob, where the script and
+ * `PreferencesProvider` disagreed about whether to trust it.
+ */
+describe_bootstrap();
+
+function describe_bootstrap(): void {
+	interface Applied {
+		readonly dark: boolean;
+		readonly contrast: string;
+		readonly dyslexicFont: string;
+		readonly fontScale: string | null;
+	}
+
+	/** Runs the real bootstrap source against a stub document and reports what it set. */
+	function run(stored: unknown, systemPrefersLight: boolean): Applied {
+		const classes = new Set<string>();
+		const dataset: Record<string, string> = {};
+		const properties: Record<string, string> = {};
+		const root = {
+			classList: {
+				toggle: (name: string, on: boolean) => {
+					if (on) classes.add(name);
+					else classes.delete(name);
+				}
+			},
+			dataset,
+			style: {
+				setProperty: (name: string, value: string) => {
+					properties[name] = value;
+				}
+			}
+		};
+		const scope = {
+			document: { documentElement: root },
+			localStorage: {
+				getItem: (key: string) =>
+					key === PREFERENCES_STORAGE_KEY && stored !== undefined ? JSON.stringify(stored) : null
+			},
+			window: { matchMedia: () => ({ matches: systemPrefersLight }) }
+		};
+
+		new Function("document", "localStorage", "window", getThemeBootstrapScript())(
+			scope.document,
+			scope.localStorage,
+			scope.window
+		);
+
+		return {
+			dark: classes.has("dark"),
+			contrast: dataset.contrast ?? "",
+			dyslexicFont: dataset.dyslexicFont ?? "",
+			fontScale: properties["--app-font-scale"] ?? null
+		};
+	}
+
+	const complete = (overrides: Record<string, unknown> = {}) => ({
+		themeMode: "system",
+		languagePreference: "system",
+		fontScale: 1,
+		highContrast: false,
+		dyslexicFont: false,
+		...overrides
+	});
+
+	test("bootstrap follows the system preference when nothing is stored", () => {
+		assert.equal(run(undefined, false).dark, true);
+		assert.equal(run(undefined, true).dark, false);
+	});
+
+	test("bootstrap follows an explicit stored theme over the system preference", () => {
+		assert.equal(run(complete({ themeMode: "dark" }), true).dark, true);
+		assert.equal(run(complete({ themeMode: "light" }), false).dark, false);
+	});
+
+	test("bootstrap carries high contrast, dyslexic font and font scale", () => {
+		const applied = run(
+			complete({ themeMode: "dark", highContrast: true, dyslexicFont: true, fontScale: 1.3 }),
+			false
+		);
+
+		assert.equal(applied.contrast, "high");
+		assert.equal(applied.dyslexicFont, "true");
+		assert.equal(applied.fontScale, "1.3");
+	});
+
+	/**
+	 * PreferencesProvider validates the blob with a schema that requires every field and
+	 * falls back to the defaults as a whole when any is missing. A bootstrap that trusted
+	 * the partial blob would set dark here and be overruled to light a frame later -
+	 * which is the flash, just moved rather than fixed.
+	 */
+	test("bootstrap rejects a partial blob exactly as the provider does", () => {
+		assert.equal(run({ themeMode: "light" }, false).dark, true);
+		assert.equal(run({ themeMode: "light", fontScale: 1 }, false).dark, true);
+		assert.equal(run(complete({ themeMode: "light" }), false).dark, false);
+	});
+
+	test("bootstrap survives unreadable storage", () => {
+		assert.doesNotThrow(() => run(null, false));
+		assert.equal(run("not json at all", false).contrast, "standard");
+	});
+
+	/** A palette resolved from a stylesheet rule, not an inline style, is what lets the class switch work. */
+	test("every mode ships as a stylesheet rule", () => {
+		const stylesheet = getThemePaletteStylesheet();
+
+		for (const selector of [
+			":root",
+			':root[data-contrast="high"]',
+			":root.dark",
+			':root.dark[data-contrast="high"]'
+		]) {
+			assert.ok(stylesheet.includes(`${selector}{`), `${selector} is missing from the palette stylesheet`);
+		}
+		for (const theme of THEMES) {
+			for (const contrast of CONTRASTS) {
+				assert.ok(
+					stylesheet.includes(DESIGN_SYSTEM.palettes[theme][contrast].canvas),
+					`${theme}/${contrast} canvas is not in the palette stylesheet`
+				);
+			}
+		}
+	});
+}

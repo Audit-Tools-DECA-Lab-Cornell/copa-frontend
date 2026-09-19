@@ -6,7 +6,12 @@ import localFont from "next/font/local";
 import type { CSSProperties } from "react";
 import { Suspense } from "react";
 
-import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
+import {
+	DESIGN_SYSTEM,
+	getShellCssVariables,
+	getThemeBootstrapScript,
+	getThemePaletteStylesheet
+} from "@/lib/design-system";
 
 import enMessages from "../../messages/en.json";
 import { RequestProviders } from "./request-providers";
@@ -49,12 +54,16 @@ const monoFont = localFont({
 	]
 });
 
-const initialDesignSystemStyle = getDesignSystemCssVariables({
+// Shell variables only - the palette ships as stylesheet rules below, so the
+// pre-paint script can switch it with a class instead of waiting for hydration.
+const initialDesignSystemStyle = getShellCssVariables({
 	theme: DESIGN_SYSTEM.defaultTheme,
 	contrast: DESIGN_SYSTEM.defaultContrast,
 	fontScale: DESIGN_SYSTEM.fontScale.default
 }) as CSSProperties;
 
+const themePaletteStylesheet = getThemePaletteStylesheet();
+const themeBootstrapScript = getThemeBootstrapScript();
 /**
  * Root metadata is static default-locale (English) content so the document shell
  * prerenders without reading request state. Localized, request-scoped metadata
@@ -89,6 +98,18 @@ export default function RootLayout({
 			data-contrast={DESIGN_SYSTEM.defaultContrast}
 			data-dyslexic-font="false"
 			style={initialDesignSystemStyle}>
+			<head>
+				<style
+					id="theme-palettes"
+					// Generated from brand/tokens.json; no user input reaches this string.
+					dangerouslySetInnerHTML={{ __html: themePaletteStylesheet }}
+				/>
+				<script
+					id="theme-bootstrap"
+					// Must run before the first paint, so it cannot be a React effect.
+					dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+				/>
+			</head>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
 				<Suspense fallback={<div className="min-h-dvh bg-background" aria-hidden />}>
 					<RequestProviders>{children}</RequestProviders>

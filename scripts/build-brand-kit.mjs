@@ -23,16 +23,35 @@ const CLOSE = "<!-- /generated:colour-tables -->";
 const light = tokens.web.palettes.light.standard;
 const dark = tokens.web.palettes.dark.standard;
 
-/** @returns The WCAG 2.x relative luminance of an opaque `#rrggbb`. */
-function luminance(hex) {
+const OPAQUE_HEX = /^#[0-9a-fA-F]{6}$/;
+
+/**
+ * @returns The WCAG 2.x relative luminance of an opaque `#rrggbb`.
+ *
+ * The token validator accepts any CSS colour form, so a value could legitimately
+ * become `rgba(...)`, `#abc` or `#rrggbbaa` and reach this. Parsing one of those as
+ * six-digit hex yields NaN, which would print a ratio of "NaN:1" into the brand kit
+ * and pass `docs:check` on the next run because the generated text would match. Fail
+ * loudly instead, naming the value and where it came from.
+ */
+function luminance(hex, label) {
+	if (!OPAQUE_HEX.test(hex)) {
+		console.error(
+			`brand-kit - ${label} is ${JSON.stringify(hex)}; the contrast figures in this document need ` +
+				"an opaque #rrggbb. Either give the token an opaque hex value, or drop it from the " +
+				"generated tables in scripts/build-brand-kit.mjs."
+		);
+		process.exit(1);
+	}
+
 	const [red, green, blue] = [1, 3, 5]
 		.map(offset => Number.parseInt(hex.slice(offset, offset + 2), 16) / 255)
 		.map(channel => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4));
 	return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 }
 
-function ratio(a, b) {
-	const values = [luminance(a), luminance(b)];
+function ratio(a, b, label) {
+	const values = [luminance(a, `${label} (${a})`), luminance(b, `${label} background (${b})`)];
 	return (Math.max(...values) + 0.05) / (Math.min(...values) + 0.05);
 }
 
@@ -94,8 +113,8 @@ const generated = [
 	...["textPrimary", "textSecondary", "textMuted"].map(key =>
 		row([
 			`\`--${key.replace(/([A-Z])/g, "-$1").toLowerCase()}\``,
-			`${ratio(light[key], light.surface).toFixed(2)}:1`,
-			`${ratio(dark[key], dark.surface).toFixed(2)}:1`
+			`${ratio(light[key], light.surface, `web.palettes.light.standard.${key}`).toFixed(2)}:1`,
+			`${ratio(dark[key], dark.surface, `web.palettes.dark.standard.${key}`).toFixed(2)}:1`
 		])
 	),
 	"",
@@ -113,7 +132,9 @@ const generated = [
 	"",
 	row(["Bar", "Value", "On white"]),
 	row(["---", "---", "---"]),
-	...BAR_ORDER.map(key => row([BAR_LABELS[key], `\`${BARS[key]}\``, `${ratio(BARS[key], "#FFFFFF").toFixed(2)}:1`])),
+	...BAR_ORDER.map(key =>
+		row([BAR_LABELS[key], `\`${BARS[key]}\``, `${ratio(BARS[key], "#FFFFFF", `audit bar ${key}`).toFixed(2)}:1`])
+	),
 	"",
 	CLOSE
 ].join("\n");

@@ -12,9 +12,13 @@ import {
 	resolveLanguagePreference,
 	resolveSupportedLanguage
 } from "@/i18n/config";
-import { applyDesignSystemVariables, clampDesignSystemFontScale, DESIGN_SYSTEM } from "@/lib/design-system";
+import {
+	applyDesignSystemVariables,
+	clampDesignSystemFontScale,
+	DESIGN_SYSTEM,
+	PREFERENCES_STORAGE_KEY
+} from "@/lib/design-system";
 
-const PREFERENCES_STORAGE_KEY = "playspace_web_preferences";
 const MIN_FONT_SCALE = DESIGN_SYSTEM.fontScale.min;
 const MAX_FONT_SCALE = DESIGN_SYSTEM.fontScale.max;
 const THEME_MODES = ["system", "light", "dark"] as const;

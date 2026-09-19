@@ -78,6 +78,15 @@ interface DesignSystemVariableInput {
 	readonly dyslexicFont?: boolean;
 }
 
+/**
+ * localStorage key holding the visitor's appearance preferences.
+ *
+ * Lives here rather than in the provider because two separate things read it: the
+ * provider, and the pre-paint bootstrap script in the root layout. A drift between
+ * those two is invisible in review and shows up only as a flash on first paint.
+ */
+export const PREFERENCES_STORAGE_KEY = "playspace_web_preferences";
+
 export const DESIGN_SYSTEM = {
 	defaultTheme: GENERATED_DEFAULTS.theme,
 	defaultContrast: GENERATED_DEFAULTS.contrast,
@@ -163,25 +172,17 @@ export function clampDesignSystemFontScale(scale: number): number {
 /**
  * Resolve a CSS custom-property map for the active theme and contrast mode.
  */
-export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariableInput>): Record<string, string> {
-	const palette = DESIGN_SYSTEM.palettes[input.theme][input.contrast];
-	const fontScale = clampDesignSystemFontScale(input.fontScale ?? DESIGN_SYSTEM.fontScale.default);
-
+/**
+ * The theme- and contrast-dependent half of the token set.
+ *
+ * Split out from the rest because these are the only variables whose value depends
+ * on which palette is active, so they are the only ones that have to be resolvable
+ * before the first paint. They ship as stylesheet rules (see
+ * `getThemePaletteStylesheet`) rather than as an inline style, so the browser can
+ * pick the right palette from a class instead of waiting for React to hydrate.
+ */
+function getPaletteCssVariables(palette: DesignSystemPalette): Record<string, string> {
 	return {
-		...getPvScaleCssVariables(),
-		"--radius": "6px",
-		"--app-font-scale": String(fontScale),
-		"--font-body-stack": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.body.stack,
-		"--font-heading-stack": input.dyslexicFont
-			? DESIGN_SYSTEM.fonts.dyslexicStack
-			: DESIGN_SYSTEM.fonts.heading.stack,
-		"--font-code-stack": DESIGN_SYSTEM.fonts.mono.stack,
-		"--font-body-active": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.body.stack,
-		"--font-heading-active": input.dyslexicFont
-			? DESIGN_SYSTEM.fonts.dyslexicStack
-			: DESIGN_SYSTEM.fonts.heading.stack,
-		"--font-code-active": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.mono.stack,
-		"--font-dyslexic": DESIGN_SYSTEM.fonts.dyslexicStack,
 		"--canvas": palette.canvas,
 		"--surface": palette.surface,
 		"--surface-raised": palette.surfaceRaised,
@@ -281,7 +282,84 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--solid-draft": palette.solidDraft,
 		"--solid-draft-text": palette.solidDraftText,
 		"--solid-orphan": palette.solidOrphan,
-		"--solid-orphan-text": palette.solidOrphanText,
+		"--solid-orphan-text": palette.solidOrphanText
+	};
+}
+
+/**
+ * Source of the script that applies the stored appearance preference before the
+ * first paint.
+ *
+ * The server cannot know the preference: `themeMode` defaults to "system", which only
+ * `prefers-color-scheme` can resolve, and it is read from localStorage. Without this
+ * the document paints `DESIGN_SYSTEM.defaultTheme` and `PreferencesProvider` corrects
+ * it in an effect - one frame later, as a visible flash on every page load.
+ *
+ * It only stamps the class and data attributes; the palettes are stylesheet rules, so
+ * no colour value is inlined here. Every access is guarded, and a blocked or empty
+ * localStorage just leaves the server-rendered default in place.
+ *
+ * It validates the stored blob the same all-or-nothing way `PreferencesProvider` does.
+ * That agreement is the whole point: a script that trusts a partial blob the provider
+ * then rejects produces exactly the flash it exists to prevent.
+ */
+export function getThemeBootstrapScript(): string {
+	return `(function(){try{
+var root=document.documentElement;
+var stored=null;
+try{stored=JSON.parse(localStorage.getItem(${JSON.stringify(PREFERENCES_STORAGE_KEY)})||"null")}catch(e){}
+// PreferencesProvider validates the stored blob with a schema that requires every
+// field and falls back to the defaults as a whole if any is missing. Mirror that
+// all-or-nothing rule here: trusting a partial blob that the provider will then
+// reject is exactly the disagreement that produces the flash this script prevents.
+if(!stored||typeof stored.themeMode!=="string"||typeof stored.languagePreference!=="string"||typeof stored.fontScale!=="number"||typeof stored.highContrast!=="boolean"||typeof stored.dyslexicFont!=="boolean"){stored=null}
+var mode=stored&&stored.themeMode;
+if(mode!=="light"&&mode!=="dark"){mode=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}
+root.classList.toggle("dark",mode==="dark");
+root.dataset.contrast=stored&&stored.highContrast?"high":"standard";
+root.dataset.dyslexicFont=stored&&stored.dyslexicFont?"true":"false";
+if(stored&&typeof stored.fontScale==="number"){root.style.setProperty("--app-font-scale",String(stored.fontScale))}
+}catch(e){}})();`;
+}
+
+/**
+ * The four palettes as stylesheet rules, keyed by the `dark` class and the
+ * `data-contrast` attribute the pre-paint script stamps on `<html>`.
+ */
+export function getThemePaletteStylesheet(): string {
+	const rule = (selector: string, theme: DesignSystemThemeMode, contrast: DesignSystemContrastMode) => {
+		const declarations = Object.entries(getPaletteCssVariables(DESIGN_SYSTEM.palettes[theme][contrast]))
+			.map(([name, value]) => `${name}:${value}`)
+			.join(";");
+		return `${selector}{${declarations}}`;
+	};
+
+	return [
+		rule(":root", "light", "standard"),
+		rule(':root[data-contrast="high"]', "light", "high"),
+		rule(":root.dark", "dark", "standard"),
+		rule(':root.dark[data-contrast="high"]', "dark", "high")
+	].join("");
+}
+
+export function getShellCssVariables(input: Readonly<DesignSystemVariableInput>): Record<string, string> {
+	const fontScale = clampDesignSystemFontScale(input.fontScale ?? DESIGN_SYSTEM.fontScale.default);
+
+	return {
+		...getPvScaleCssVariables(),
+		"--radius": "6px",
+		"--app-font-scale": String(fontScale),
+		"--font-body-stack": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.body.stack,
+		"--font-heading-stack": input.dyslexicFont
+			? DESIGN_SYSTEM.fonts.dyslexicStack
+			: DESIGN_SYSTEM.fonts.heading.stack,
+		"--font-code-stack": DESIGN_SYSTEM.fonts.mono.stack,
+		"--font-body-active": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.body.stack,
+		"--font-heading-active": input.dyslexicFont
+			? DESIGN_SYSTEM.fonts.dyslexicStack
+			: DESIGN_SYSTEM.fonts.heading.stack,
+		"--font-code-active": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.mono.stack,
+		"--font-dyslexic": DESIGN_SYSTEM.fonts.dyslexicStack,
 		// Public marketing/resources pages. Theme-independent: these composite over
 		// whatever surface is beneath them, so both themes get the same values.
 		"--landing-texture-warm": GENERATED_LANDING_COLORS.textureWarm,
@@ -316,12 +394,27 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 }
 
 /**
+ * The full token set for one mode: the shell variables plus that mode's palette.
+ *
+ * Nothing renders from this - the shell half ships as an inline style and the palette
+ * half as stylesheet rules, because only the latter has to resolve before hydration.
+ * It exists so a test can assert that a mode resolves completely, with no holes.
+ */
+export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariableInput>): Record<string, string> {
+	return {
+		...getShellCssVariables(input),
+		...getPaletteCssVariables(DESIGN_SYSTEM.palettes[input.theme][input.contrast])
+	};
+}
+
+/**
  * Apply the active design-token values to a specific DOM element.
  */
 export function applyDesignSystemVariables(element: HTMLElement, input: Readonly<DesignSystemVariableInput>): void {
-	const variables = getDesignSystemCssVariables(input);
-
-	for (const [propertyName, propertyValue] of Object.entries(variables)) {
+	// Shell variables only. The palette lives in the stylesheet so it resolves before
+	// hydration; setting it inline here would outrank those rules and undo the class
+	// the pre-paint script already applied.
+	for (const [propertyName, propertyValue] of Object.entries(getShellCssVariables(input))) {
 		element.style.setProperty(propertyName, propertyValue);
 	}
 }
