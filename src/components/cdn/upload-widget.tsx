@@ -6,6 +6,7 @@ import { type ComponentProps, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DESIGN_SYSTEM } from "@/lib/design-system";
+import { GENERATED_UPLOAD_WIDGET_COLORS } from "@/lib/design-system.generated";
 
 import { usePreferences } from "../app/preferences-provider";
 import type { UploadButtonProps } from "./upload";
@@ -30,7 +31,7 @@ function useCloudinaryUploadOptions(): CloudinaryUploadOptions {
 			showInsecurePreview: true,
 			showPoweredBy: false,
 			styles: {
-				frame: { background: `rgba(30,30,30, 0.4)` },
+				frame: { background: GENERATED_UPLOAD_WIDGET_COLORS.frameOverlay },
 				palette: {
 					window: palette.surfaceRaised,
 					windowBorder: palette.edge,

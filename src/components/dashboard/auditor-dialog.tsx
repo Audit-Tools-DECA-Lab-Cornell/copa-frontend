@@ -449,7 +449,7 @@ function AuditorCreatedConfirmation({
 		<div className="flex flex-col gap-6 py-2" role="status" aria-live="polite">
 			{/* Header */}
 			<div className="flex flex-col items-center gap-3 text-center">
-				<span className="flex size-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+				<span className="flex size-14 items-center justify-center rounded-full bg-status-success-surface text-status-success">
 					<CheckCircle2Icon className="size-7" aria-hidden="true" />
 				</span>
 				<div>
@@ -471,7 +471,7 @@ function AuditorCreatedConfirmation({
 						</p>
 						<p className="truncate text-sm font-medium">{summary.email}</p>
 					</div>
-					<span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+					<span className="shrink-0 rounded-full bg-status-warning-surface px-2.5 py-0.5 text-xs font-medium text-status-warning">
 						{t("awaitingSignup")}
 					</span>
 				</div>

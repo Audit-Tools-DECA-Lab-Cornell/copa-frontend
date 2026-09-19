@@ -46,7 +46,7 @@ export function ToolbarChip({
 		draft: "border-status-pending-border bg-status-pending-surface text-solid-draft dark:border-solid-draft/40 dark:bg-solid-draft/25 dark:text-solid-draft-text",
 		active: "border-status-success-border bg-status-success-surface/30 text-status-success",
 		warning: "border-status-warning-border bg-status-warning-surface/30 text-status-warning",
-		violet: "border-violet-400/40 bg-violet-500/10 text-violet-700 dark:text-violet-300"
+		violet: "border-accent-violet-border bg-accent-violet-surface text-accent-violet"
 	}[tone];
 
 	return (

@@ -634,7 +634,7 @@ function ViewerScaleRow({
 							opt.is_not_applicable
 								? "border-dashed border-muted-foreground/40 text-muted-foreground"
 								: opt.is_unsure
-									? "border-dashed border-sky-400/50 text-sky-700 dark:text-sky-300"
+									? "border-dashed border-status-info-border text-accent-slate"
 									: opt.allows_follow_up_scales
 										? "border-status-success-border bg-status-success-surface text-foreground font-medium"
 										: "border-edge/50 bg-muted/40"

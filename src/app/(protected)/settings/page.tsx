@@ -252,7 +252,7 @@ function isCurrentUserPrimaryManager(
 function InviteStatusBadge({ status, t }: Readonly<{ status: ManagerInviteStatus; t: (key: string) => string }>) {
 	if (status === "ACCEPTED") {
 		return (
-			<Badge variant="secondary" className="text-green-700 dark:text-green-400">
+			<Badge variant="secondary" className="text-status-success">
 				{t("pendingInvites.statusAccepted")}
 			</Badge>
 		);
@@ -260,7 +260,7 @@ function InviteStatusBadge({ status, t }: Readonly<{ status: ManagerInviteStatus
 
 	if (status === "EXPIRED") {
 		return (
-			<Badge variant="outline" className="text-amber-600 dark:text-amber-400">
+			<Badge variant="outline" className="text-status-warning">
 				{t("pendingInvites.statusExpired")}
 			</Badge>
 		);
@@ -1012,7 +1012,7 @@ function ManagerOrganizationCard({
 									</p>
 								) : null}
 								{saveSuccess ? (
-									<p aria-live="polite" className="text-sm text-green-600 dark:text-green-400">
+									<p aria-live="polite" className="text-sm text-status-success">
 										{saveSuccess}
 									</p>
 								) : null}
@@ -1233,7 +1233,7 @@ function ManagerContactsCard({
 								)}
 
 								{actionMessage ? (
-									<p aria-live="polite" className="text-sm text-green-600 dark:text-green-400">
+									<p aria-live="polite" className="text-sm text-status-success">
 										{actionMessage}
 									</p>
 								) : null}
@@ -1424,9 +1424,7 @@ function ManagerSelfServiceCard({ profile }: Readonly<{ profile: MyManagerProfil
 							<p
 								aria-live="polite"
 								className={
-									profileMessage.isError
-										? "text-sm text-destructive"
-										: "text-sm text-green-600 dark:text-green-400"
+									profileMessage.isError ? "text-sm text-destructive" : "text-sm text-status-success"
 								}>
 								{profileMessage.text}
 							</p>
@@ -1482,9 +1480,7 @@ function ManagerSelfServiceCard({ profile }: Readonly<{ profile: MyManagerProfil
 							<p
 								aria-live="polite"
 								className={
-									passwordMessage.isError
-										? "text-sm text-destructive"
-										: "text-sm text-green-600 dark:text-green-400"
+									passwordMessage.isError ? "text-sm text-destructive" : "text-sm text-status-success"
 								}>
 								{passwordMessage.text}
 							</p>

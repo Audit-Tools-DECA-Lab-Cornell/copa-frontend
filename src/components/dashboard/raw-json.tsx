@@ -33,22 +33,22 @@ function getSummary(data: unknown) {
 
 function renderPrimitive(value: unknown) {
 	if (typeof value === "string") {
-		return <span className="text-emerald-300">&ldquo;{value}&ldquo;</span>;
+		return <span className="text-code-string">&ldquo;{value}&ldquo;</span>;
 	}
 
 	if (typeof value === "number") {
-		return <span className="text-amber-300">{String(value)}</span>;
+		return <span className="text-code-number">{String(value)}</span>;
 	}
 
 	if (typeof value === "boolean") {
-		return <span className="text-violet-300">{String(value)}</span>;
+		return <span className="text-code-boolean">{String(value)}</span>;
 	}
 
 	if (value === null) {
-		return <span className="text-zinc-500">null</span>;
+		return <span className="text-code-punctuation">null</span>;
 	}
 
-	return <span className="text-zinc-300">{String(value)}</span>;
+	return <span className="text-code-text-secondary">{String(value)}</span>;
 }
 
 export function JsonViewer({ data, title = "payload.json", defaultOpen = true, className }: JsonViewerProps) {
@@ -74,13 +74,13 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 
 			output.push(
 				<React.Fragment key={`${key}-${lineNumber}`}>
-					<div className="select-none border-r border-white/5 bg-zinc-900/40 px-3 text-right text-zinc-500">
+					<div className="select-none border-r border-code-edge-subtle bg-code-gutter px-3 text-right text-code-punctuation">
 						{lineNumber}
 					</div>
 					<div
 						className={cn(
 							"whitespace-pre px-4 font-mono text-[13px] leading-6",
-							lineNumber % 2 === 0 ? "bg-zinc-950/95" : "bg-zinc-950"
+							lineNumber % 2 === 0 ? "bg-code-row-stripe" : "bg-code-surface"
 						)}>
 						{content}
 					</div>
@@ -101,8 +101,8 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 
 			return (
 				<>
-					<span className="text-sky-300">&ldquo;{label}&rdquo;</span>
-					<span className="text-zinc-500">: </span>
+					<span className="text-code-key">&ldquo;{label}&rdquo;</span>
+					<span className="text-code-punctuation">: </span>
 				</>
 			);
 		};
@@ -128,7 +128,7 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 						<span>
 							{renderKey(label)}
 							{renderPrimitive(value)}
-							{!isLast && <span className="text-zinc-500">,</span>}
+							{!isLast && <span className="text-code-punctuation">,</span>}
 						</span>
 					</div>
 				);
@@ -150,18 +150,18 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 						<button
 							type="button"
 							onClick={() => toggleNode(path, depth)}
-							className="mr-2 mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+							className="mr-2 mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-code-punctuation hover:bg-code-hover hover:text-code-text-secondary"
 							aria-label={`Expand ${label ?? "node"}`}>
 							<ChevronRight className="h-4 w-4" />
 						</button>
 
 						<span>
 							{renderKey(label)}
-							<span className="text-zinc-300">{openToken}</span>
-							<span className="text-zinc-500">…</span>
-							<span className="text-zinc-300">{closeToken}</span>
-							{!isLast && <span className="text-zinc-500">,</span>}
-							<span className="ml-2 text-zinc-500">{summary}</span>
+							<span className="text-code-text-secondary">{openToken}</span>
+							<span className="text-code-punctuation">…</span>
+							<span className="text-code-text-secondary">{closeToken}</span>
+							{!isLast && <span className="text-code-punctuation">,</span>}
+							<span className="ml-2 text-code-punctuation">{summary}</span>
 						</span>
 					</div>
 				);
@@ -174,14 +174,14 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 					<button
 						type="button"
 						onClick={() => toggleNode(path, depth)}
-						className="mr-2 mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
+						className="mr-2 mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-code-punctuation hover:bg-code-hover hover:text-code-text-secondary"
 						aria-label={`Collapse ${label ?? "node"}`}>
 						<ChevronDown className="h-4 w-4" />
 					</button>
 
 					<span>
 						{renderKey(label)}
-						<span className="text-zinc-300">{openToken}</span>
+						<span className="text-code-text-secondary">{openToken}</span>
 					</span>
 				</div>
 			);
@@ -201,8 +201,8 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 				<div className="flex items-start" style={{ paddingLeft: `${depth * 16}px` }}>
 					<span className="mr-2 inline-flex h-4 w-4 shrink-0" />
 					<span>
-						<span className="text-zinc-300">{closeToken}</span>
-						{!isLast && <span className="text-zinc-500">,</span>}
+						<span className="text-code-text-secondary">{closeToken}</span>
+						{!isLast && <span className="text-code-punctuation">,</span>}
 					</span>
 				</div>
 			);
@@ -213,7 +213,7 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 				"root-open",
 				<div className="flex items-start">
 					<span className="mr-2 inline-flex h-4 w-4 shrink-0" />
-					<span className="text-zinc-300">{Array.isArray(data) ? "[" : "{"}</span>
+					<span className="text-code-text-secondary">{Array.isArray(data) ? "[" : "{"}</span>
 				</div>
 			);
 
@@ -235,7 +235,7 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 				"root-close",
 				<div className="flex items-start">
 					<span className="mr-2 inline-flex h-4 w-4 shrink-0" />
-					<span className="text-zinc-300">{Array.isArray(data) ? "]" : "}"}</span>
+					<span className="text-code-text-secondary">{Array.isArray(data) ? "]" : "}"}</span>
 				</div>
 			);
 		} else {
@@ -256,23 +256,23 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 			open={open}
 			onOpenChange={setOpen}
 			className={cn(
-				"group overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 text-zinc-100 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_16px_48px_rgba(0,0,0,0.35)]",
+				"group overflow-hidden rounded-2xl border border-code-edge bg-code-surface text-code-text-primary shadow-[0_0_0_1px_var(--code-shadow-ring),0_16px_48px_var(--code-shadow-drop)]",
 				className
 			)}>
-			<div className="flex items-center justify-between border-b border-white/10 bg-zinc-900/80 px-3 py-2 backdrop-blur">
+			<div className="flex items-center justify-between border-b border-code-edge bg-code-surface-raised px-3 py-2 backdrop-blur">
 				<div className="flex min-w-0 items-center gap-3">
 					<div className="flex items-center gap-1.5">
-						<span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
-						<span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-						<span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+						<span className="h-2.5 w-2.5 rounded-full bg-code-chrome-danger" />
+						<span className="h-2.5 w-2.5 rounded-full bg-code-chrome-warning" />
+						<span className="h-2.5 w-2.5 rounded-full bg-code-chrome-success" />
 					</div>
 
-					<div className="flex min-w-0 items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1">
-						<FileJson2 className="h-4 w-4 text-sky-300" />
-						<span className="truncate font-mono text-[13px] text-zinc-200">{title}</span>
+					<div className="flex min-w-0 items-center gap-2 rounded-md border border-code-edge bg-code-hover px-2 py-1">
+						<FileJson2 className="h-4 w-4 text-code-key" />
+						<span className="truncate font-mono text-[13px] text-code-text-secondary">{title}</span>
 					</div>
 
-					<span className="hidden rounded-md bg-white/5 px-2 py-1 font-mono text-xs text-zinc-400 sm:inline-flex">
+					<span className="hidden rounded-md bg-code-hover px-2 py-1 font-mono text-xs text-code-text-muted sm:inline-flex">
 						{getSummary(data)}
 					</span>
 				</div>
@@ -283,7 +283,7 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 						variant="ghost"
 						size="icon"
 						onClick={onCopy}
-						className="h-8 w-8 text-zinc-400 hover:bg-white/5 hover:text-zinc-100">
+						className="h-8 w-8 text-code-text-muted hover:bg-code-hover hover:text-code-text-primary">
 						{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
 					</Button>
 
@@ -292,7 +292,7 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 							type="button"
 							variant="ghost"
 							size="icon"
-							className="h-8 w-8 text-zinc-400 hover:bg-white/5 hover:text-zinc-100">
+							className="h-8 w-8 text-code-text-muted hover:bg-code-hover hover:text-code-text-primary">
 							{open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
 						</Button>
 					</CollapsibleTrigger>

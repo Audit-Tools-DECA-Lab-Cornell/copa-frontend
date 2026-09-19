@@ -6,3 +6,9 @@ node_modules
 *.md
 .env
 .env.*
+
+# Generated from brand/tokens.json - the generator owns the formatting.
+# Reformatting these makes `pnpm tokens:check` fail; edit brand/tokens.json instead.
+*.generated.ts
+brand/tokens.json
+tests/fixtures/design-tokens-baseline.json

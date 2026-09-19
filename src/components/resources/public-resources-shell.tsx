@@ -8,7 +8,7 @@ export function PublicResourcesShell({ children }: Readonly<{ children: React.Re
 	const resources = getPublicResources();
 
 	return (
-		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(75,85,99,0.12),transparent_35%),linear-gradient(180deg,rgba(148,163,184,0.08),transparent_24%),hsl(var(--background))]">
+		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,var(--landing-texture-warm),transparent_35%),linear-gradient(180deg,var(--landing-texture-cool),transparent_24%),hsl(var(--background))]">
 			<header className="border-b border-edge/60 bg-background/90 backdrop-blur">
 				<div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
 					<div className="flex flex-wrap items-center justify-between gap-4">

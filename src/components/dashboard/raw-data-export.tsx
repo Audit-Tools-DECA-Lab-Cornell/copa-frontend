@@ -180,13 +180,7 @@ export function CollectionNamespaceBar({
 				<>
 					<Separator orientation="vertical" className="h-3.5 shrink-0" />
 					<div className="flex items-center gap-1.5">
-						<span
-							className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold tabular-nums"
-							style={{
-								background: "rgba(0, 168, 90, 0.10)",
-								color: "#00a85a",
-								border: "1px solid rgba(0, 168, 90, 0.28)"
-							}}>
+						<span className="inline-flex items-center gap-1 rounded-full border border-status-success-border bg-status-success-surface px-2 py-0.5 font-mono text-[11px] font-semibold tabular-nums text-status-success">
 							<CheckIcon className="size-2.5" aria-hidden="true" />
 							{selectedLabel ?? `${selectedCount.toLocaleString()} selected`}
 						</span>
@@ -237,20 +231,14 @@ export function SelectionBar({
 	const labels = { ...DEFAULT_SELECTION_LABELS, ...labelsProp };
 	if (selectedCount === 0) return null;
 	return (
-		<div
-			className="flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm"
-			style={{
-				background: "rgba(0, 168, 90, 0.07)",
-				borderColor: "rgba(0, 168, 90, 0.25)"
-			}}>
+		<div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-status-success-border bg-status-success-surface px-4 py-2.5 text-sm">
 			<div className="flex items-center gap-2">
 				<span
-					className="flex size-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums"
-					style={{ background: "#00a85a", color: "#fff" }}
+					className="flex size-5 items-center justify-center rounded-full bg-status-success text-[10px] font-bold tabular-nums text-primary-foreground"
 					aria-hidden="true">
 					{selectedCount > 99 ? "99+" : selectedCount}
 				</span>
-				<span className="font-medium" style={{ color: "#007a40" }}>
+				<span className="font-medium text-status-success">
 					{`${selectedCount.toLocaleString()} ${labels.selectedText}`}
 				</span>
 			</div>
@@ -259,11 +247,8 @@ export function SelectionBar({
 					type="button"
 					size="sm"
 					disabled={isExporting}
-					className="h-8 gap-1.5 text-white"
-					style={{ background: "#00a85a" }}
-					onClick={onExportSelected}
-					onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = "#008f4c")}
-					onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = "#00a85a")}>
+					className="h-8 gap-1.5 bg-status-success text-primary-foreground hover:bg-status-success/85"
+					onClick={onExportSelected}>
 					{isExporting ? (
 						<Loader2Icon className="size-3.5 animate-spin" aria-hidden="true" />
 					) : (

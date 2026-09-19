@@ -12,9 +12,13 @@ import {
 	resolveLanguagePreference,
 	resolveSupportedLanguage
 } from "@/i18n/config";
-import { applyDesignSystemVariables, clampDesignSystemFontScale, DESIGN_SYSTEM } from "@/lib/design-system";
+import {
+	applyDesignSystemVariables,
+	clampDesignSystemFontScale,
+	DESIGN_SYSTEM,
+	PREFERENCES_STORAGE_KEY
+} from "@/lib/design-system";
 
-const PREFERENCES_STORAGE_KEY = "playspace_web_preferences";
 const MIN_FONT_SCALE = DESIGN_SYSTEM.fontScale.min;
 const MAX_FONT_SCALE = DESIGN_SYSTEM.fontScale.max;
 const THEME_MODES = ["system", "light", "dark"] as const;
@@ -201,7 +205,10 @@ export function PreferencesProvider({
 		...DEFAULT_PREFERENCES,
 		languagePreference: initialLanguagePreference
 	}));
-	const [systemTheme, setSystemTheme] = React.useState<ResolvedTheme>("dark");
+	// Seeded from the token file, so the first render agrees with the shell the server
+	// rendered. Hard-coding "dark" here was harmless while defaultTheme was dark and became
+	// wrong by construction when it flipped to light.
+	const [systemTheme, setSystemTheme] = React.useState<ResolvedTheme>(DESIGN_SYSTEM.defaultTheme);
 	const [systemLanguage, setSystemLanguage] = React.useState<ResolvedLanguage>(initialResolvedLanguage);
 	const [isHydrated, setIsHydrated] = React.useState(false);
 	const lastResolvedLanguageRef = React.useRef<ResolvedLanguage>(initialResolvedLanguage);
@@ -242,6 +249,11 @@ export function PreferencesProvider({
 	const resolvedLanguage = resolveLanguagePreference(preferences.languagePreference, systemLanguage);
 
 	React.useEffect(() => {
+		// Before hydration completes, `preferences` is still the default blob and
+		// `systemTheme` the seed - writing those to the document would overwrite what the
+		// pre-paint script already resolved correctly, then correct itself a render later.
+		if (!isHydrated) return;
+
 		applyPreferencesToDocument({
 			resolvedTheme,
 			resolvedLanguage,
@@ -249,7 +261,14 @@ export function PreferencesProvider({
 			highContrast: preferences.highContrast,
 			dyslexicFont: preferences.dyslexicFont
 		});
-	}, [preferences.dyslexicFont, preferences.fontScale, preferences.highContrast, resolvedLanguage, resolvedTheme]);
+	}, [
+		isHydrated,
+		preferences.dyslexicFont,
+		preferences.fontScale,
+		preferences.highContrast,
+		resolvedLanguage,
+		resolvedTheme
+	]);
 
 	React.useEffect(() => {
 		if (!isHydrated) {

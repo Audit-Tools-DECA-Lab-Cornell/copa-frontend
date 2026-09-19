@@ -272,7 +272,7 @@ function StageOne() {
 							alt="COPA auditor management on a laptop with the invite-auditor dialog open over a roster showing assignments and progress"
 							glow="violet"
 							sizes="(min-width: 1024px) 28rem, 70vw"
-							className="absolute -bottom-6 -right-4 w-[62%] max-w-88 filter-[drop-shadow(0_28px_48px_rgba(15,23,42,0.32))] sm:-right-8"
+							className="absolute -bottom-6 -right-4 w-[62%] max-w-88 filter-[drop-shadow(0_28px_48px_var(--landing-hero-shadow-deep))] sm:-right-8"
 						/>
 					</DeviceScene>
 				</div>
@@ -684,7 +684,7 @@ function ClosingBand() {
 
 export function FieldToBoardroomLoopPage() {
 	return (
-		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(75,85,99,0.12),transparent_35%),linear-gradient(180deg,rgba(148,163,184,0.08),transparent_24%),hsl(var(--background))] text-foreground">
+		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,var(--landing-texture-warm),transparent_35%),linear-gradient(180deg,var(--landing-texture-cool),transparent_24%),hsl(var(--background))] text-foreground">
 			<LandingHeader links={NAV} />
 			<main>
 				<Hero />

@@ -516,8 +516,8 @@ export function InstrumentEditor({
 				) : null}
 
 				{isTranslation && (
-					<div className="flex items-start gap-2 rounded-md border border-violet-400/25 bg-violet-500/5 px-3 py-2">
-						<Lock className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
+					<div className="flex items-start gap-2 rounded-md border border-accent-violet-border bg-accent-violet-surface px-3 py-2">
+						<Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent-violet" aria-hidden="true" />
 						<div className="min-w-0">
 							<p className="text-sm font-medium text-foreground">
 								{t("translationBannerTitle", {

@@ -109,9 +109,9 @@ function BlockerNotice({
 	const isTransferBlocker = copyKey === "primaryManagerTransferRequired";
 
 	return (
-		<div className="rounded-card border border-amber-500/40 bg-amber-500/10 p-4">
+		<div className="rounded-card border border-status-warning-border bg-status-warning-surface p-4">
 			<p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-				<AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+				<AlertTriangle className="h-4 w-4 shrink-0 text-status-warning" aria-hidden="true" />
 				{t("title")}
 			</p>
 			<p className="mt-2 text-sm leading-6 text-foreground">{body}</p>
@@ -219,7 +219,7 @@ export function AccountDeletionCard({
 				)}
 
 				{transferSuccessMessage ? (
-					<p aria-live="polite" className="text-sm text-green-600 dark:text-green-400">
+					<p aria-live="polite" className="text-sm text-status-success">
 						{transferSuccessMessage}
 					</p>
 				) : null}

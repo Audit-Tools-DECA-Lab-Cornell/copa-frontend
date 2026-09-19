@@ -9,6 +9,7 @@ import { playspaceApi } from "@/lib/api/playspace";
 import type { AuditExportDataFormat } from "@/lib/export/audit";
 import { estimateRawDataExport } from "@/lib/export/export-estimator";
 import type { ExportProgress, ExportZipResult } from "@/lib/export/raw-data-zip";
+import { cn } from "@/lib/utils";
 
 /** What a page's export closure resolves to. */
 export interface ExportRunResult {
@@ -200,33 +201,35 @@ function ExportJobsIndicator() {
 			{jobs.slice(0, 4).map(job => {
 				// A status-coloured left accent bar plus a chunky raised shadow make the
 				// card read clearly against the warm page background.
-				const accent = job.status === "running" ? "#00a85a" : job.status === "done" ? "#00a85a" : "#b45309";
+				// Status tokens resolve per theme and per contrast mode. The toast paints on
+				// `bg-popover`, which is theme-dependent, so a fixed value here reads as
+				// near-black green on the dark surface.
+				const isProblem = job.status === "error" || job.status === "interrupted";
 				return (
 					<div
 						key={job.id}
-						style={{ borderLeftColor: accent }}
-						className="animate-in slide-in-from-bottom-4 fade-in overflow-hidden rounded-xl border-2 border-foreground/25 border-l-[7px] bg-popover p-3.5 text-popover-foreground shadow-[0_6px_0_rgba(0,0,0,0.22),0_18px_38px_rgba(0,0,0,0.24)] ring-2 ring-background duration-300">
+						className={cn(
+							isProblem ? "border-l-status-warning" : "border-l-status-success",
+							"animate-in slide-in-from-bottom-4 fade-in overflow-hidden rounded-xl border-2 border-foreground/25 border-l-[7px] bg-popover p-3.5 text-popover-foreground shadow-[0_6px_0_rgba(0,0,0,0.22),0_18px_38px_rgba(0,0,0,0.24)] ring-2 ring-background duration-300"
+						)}>
 						<div className="flex items-start justify-between gap-2">
 							<div className="flex items-center gap-2.5">
 								<span
-									className="flex size-7 shrink-0 items-center justify-center rounded-full"
-									style={{
-										background:
-											job.status === "error" || job.status === "interrupted"
-												? "rgba(180, 83, 9, 0.12)"
-												: "rgba(0, 168, 90, 0.12)"
-									}}>
+									className={cn(
+										"flex size-7 shrink-0 items-center justify-center rounded-full",
+										isProblem ? "bg-status-warning-surface" : "bg-status-success-surface"
+									)}>
 									{job.status === "running" && (
 										<Loader2Icon
-											className="size-4 animate-spin text-[#00a85a]"
+											className="size-4 animate-spin text-status-success"
 											aria-hidden="true"
 										/>
 									)}
 									{job.status === "done" && (
-										<CheckCircle2Icon className="size-4 text-[#00a85a]" aria-hidden="true" />
+										<CheckCircle2Icon className="size-4 text-status-success" aria-hidden="true" />
 									)}
 									{(job.status === "error" || job.status === "interrupted") && (
-										<TriangleAlertIcon className="size-4 text-amber-700" aria-hidden="true" />
+										<TriangleAlertIcon className="size-4 text-status-warning" aria-hidden="true" />
 									)}
 								</span>
 								<div className="min-w-0">
@@ -250,7 +253,7 @@ function ExportJobsIndicator() {
 						<p className="mt-2 text-xs text-muted-foreground">
 							{job.status === "running" && <ExportJobProgressText progress={job.progress} t={t} />}
 							{job.status === "done" && (
-								<span className="inline-flex items-center gap-1 font-medium text-[#007a40]">
+								<span className="inline-flex items-center gap-1 font-medium text-status-success">
 									<DownloadIcon className="size-3" aria-hidden="true" />
 									{t("downloaded")}
 								</span>
@@ -262,8 +265,8 @@ function ExportJobsIndicator() {
 						{job.status === "running" && (
 							<div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-muted">
 								<div
-									className="h-full rounded-full transition-all"
-									style={{ width: `${runningPercent(job.progress)}%`, background: "#00a85a" }}
+									className="h-full rounded-full bg-status-success transition-all"
+									style={{ width: `${runningPercent(job.progress)}%` }}
 								/>
 							</div>
 						)}

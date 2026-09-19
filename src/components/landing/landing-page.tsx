@@ -157,7 +157,7 @@ function DeviceShot({
 				height={height}
 				priority={priority}
 				sizes={sizes}
-				className="h-auto w-full select-none filter-[drop-shadow(0_28px_50px_rgba(15,23,42,0.22))]"
+				className="h-auto w-full select-none filter-[drop-shadow(0_28px_50px_var(--landing-hero-shadow-soft))]"
 			/>
 		</div>
 	);
@@ -1464,7 +1464,7 @@ function SiteFooter() {
 /** Public marketing homepage for the Comprehensive Outdoor Playspace Audit Tool. */
 export function LandingPage() {
 	return (
-		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,rgba(75,85,99,0.12),transparent_35%),linear-gradient(180deg,rgba(148,163,184,0.08),transparent_24%),hsl(var(--background))] text-foreground">
+		<div className="min-h-dvh bg-[radial-gradient(circle_at_top,var(--landing-texture-warm),transparent_35%),linear-gradient(180deg,var(--landing-texture-cool),transparent_24%),hsl(var(--background))] text-foreground">
 			<SiteHeader />
 			<main>
 				<Hero />

@@ -1,0 +1,55 @@
+name: Design Tokens
+
+on:
+    pull_request:
+    push:
+        branches:
+            - master
+
+concurrency:
+    group: design-tokens-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    tokens:
+        name: Token Drift Gate
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.4.0
+              with:
+                  version: 10
+
+            - name: Setup Node.js
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+              with:
+                  node-version: 20
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            # Fails if design-system.generated.ts was hand-edited, or if someone
+            # changed brand/tokens.json without regenerating. This is the check
+            # that keeps colour definable in exactly one place.
+            - name: Verify generated tokens are current
+              run: pnpm tokens:check
+
+            # The brand kit's colour tables were transcribed by hand and were two
+            # generations stale by the time phase 3 found them. They are generated
+            # from the same token file now, and this is what keeps them honest.
+            - name: Verify the brand kit matches the tokens
+              run: pnpm docs:check
+
+            - name: Typecheck
+              run: pnpm exec tsc --noEmit
+
+            - name: Design token tests
+              run: pnpm exec tsx --test tests/unit/design-tokens.test.ts
