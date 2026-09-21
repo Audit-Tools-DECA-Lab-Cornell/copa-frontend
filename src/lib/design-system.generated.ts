@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE - DO NOT EDIT.
  *
- * Source:      brand/tokens.json (checksum 766198809a6ad314)
+ * Source:      brand/tokens.json (checksum aa86cc4e473a476d)
  * Regenerate:  pnpm tokens:build
  * Verify:      pnpm tokens:check
  *
