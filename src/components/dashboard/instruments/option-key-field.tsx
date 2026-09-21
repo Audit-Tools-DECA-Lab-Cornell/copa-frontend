@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+import { useInstrumentEdit } from "./instrument-edit-context";
 import { issueElementId, type IssueTarget } from "./instrument-issues";
 import { useOptionKeySessionOrNoop } from "./option-key-session";
 import {
@@ -40,7 +41,11 @@ export function OptionKeyChip({
 }>) {
 	const t = useTranslations("admin.instruments.content");
 	const session = useOptionKeySessionOrNoop();
-	const editable = session.canOverride(scope, optionKey);
+	const { translationMode, baseLang } = useInstrumentEdit();
+	const editable = !translationMode && session.canOverride(scope, optionKey);
+	const lockedHint = translationMode
+		? t("keyLockedHint", { lang: baseLang.toUpperCase() })
+		: t("optionKeyFixedHint");
 	const open = session.isOverrideOpenFor(scope, optionKey);
 
 	const target: IssueTarget = {
@@ -80,10 +85,10 @@ export function OptionKeyChip({
 						<TooltipTrigger asChild>
 							<Lock
 								className="h-3 w-3 shrink-0 text-muted-foreground/50"
-								aria-label={t("optionKeyFixedHint")}
+								aria-label={lockedHint}
 							/>
 						</TooltipTrigger>
-						<TooltipContent className="max-w-[260px]">{t("optionKeyFixedHint")}</TooltipContent>
+						<TooltipContent className="max-w-[260px]">{lockedHint}</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
 			)}
@@ -126,8 +131,9 @@ export function OptionKeyOverridePanel<T extends { key: string }>({
 	const hintId = useId();
 	const errorId = useId();
 
+	const { translationMode } = useInstrumentEdit();
 	const pending = session.pending;
-	if (pending === null) return null;
+	if (pending === null || translationMode) return null;
 
 	const currentKey = pending.optionKey;
 	const errorCode = pending.code;

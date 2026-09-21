@@ -10,7 +10,7 @@
 
 import type { PlayspaceInstrument } from "@/types/audit";
 
-import { collectOwningLists } from "./instrument-issues";
+import { collectOwningLists, scopeOwnerLabel } from "./instrument-issues";
 import {
 	checkStoredOptionKey,
 	defaultKeyGenerator,
@@ -23,7 +23,6 @@ import {
 } from "./option-keys";
 import { findLocaleMismatches, type LocaleMismatch } from "./translation-sync";
 import type { InstrumentContent, Lang } from "./types";
-import { formatQuestionKeyForDisplay } from "./utils";
 
 export type OptionKeyRepair = Readonly<{
 	id: string;
@@ -60,19 +59,7 @@ export type RepairPlan = Readonly<{
 }>;
 
 function repairLocation(scope: OptionOwnerScope, index: number): string {
-	const row = `row ${index + 1}`;
-	switch (scope.kind) {
-		case "questionScale":
-			return `${formatQuestionKeyForDisplay(scope.questionKey)} · ${scope.scaleKey} · ${row}`;
-		case "checklist":
-			return `${formatQuestionKeyForDisplay(scope.questionKey)} · checklist · ${row}`;
-		case "scaleGuidance":
-			return `Scale guidance · ${scope.scaleKey} · ${row}`;
-		case "preAudit":
-			return `Pre-audit · ${scope.questionKey} · ${row}`;
-		case "executionModes":
-			return `Execution modes · ${row}`;
-	}
+	return `${scopeOwnerLabel(scope)} · row ${index + 1}`;
 }
 
 /**

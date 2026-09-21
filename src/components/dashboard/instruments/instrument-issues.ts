@@ -94,7 +94,12 @@ function scopeTab(scope: OptionOwnerScope): EditorTab {
 	}
 }
 
-function scopeTarget(scope: OptionOwnerScope, locale: string, optionIndex: number, field: IssueField): IssueTarget {
+function scopeTarget(
+	scope: OptionOwnerScope,
+	locale: string,
+	optionIndex: number | undefined,
+	field: IssueField
+): IssueTarget {
 	const base = { locale, tab: scopeTab(scope), optionIndex, field };
 	switch (scope.kind) {
 		case "questionScale":
@@ -110,20 +115,24 @@ function scopeTarget(scope: OptionOwnerScope, locale: string, optionIndex: numbe
 	}
 }
 
-function scopeLocation(scope: OptionOwnerScope, optionIndex: number): string {
-	const row = `row ${optionIndex + 1}`;
+/** Name one answer list the way the editor shows it, e.g. `Q 12.13 · provision`. */
+export function scopeOwnerLabel(scope: OptionOwnerScope): string {
 	switch (scope.kind) {
 		case "questionScale":
-			return `${formatQuestionKeyForDisplay(scope.questionKey)} · ${scope.scaleKey} · ${row}`;
+			return `${formatQuestionKeyForDisplay(scope.questionKey)} · ${scope.scaleKey}`;
 		case "checklist":
-			return `${formatQuestionKeyForDisplay(scope.questionKey)} · checklist · ${row}`;
+			return `${formatQuestionKeyForDisplay(scope.questionKey)} · checklist`;
 		case "scaleGuidance":
-			return `Scale guidance · ${scope.scaleKey} · ${row}`;
+			return `Scale guidance · ${scope.scaleKey}`;
 		case "preAudit":
-			return `Pre-audit · ${scope.questionKey} · ${row}`;
+			return `Pre-audit · ${scope.questionKey}`;
 		case "executionModes":
-			return `Execution modes · ${row}`;
+			return "Execution modes";
 	}
+}
+
+function scopeLocation(scope: OptionOwnerScope, optionIndex: number): string {
+	return `${scopeOwnerLabel(scope)} · row ${optionIndex + 1}`;
 }
 
 type OwningList = Readonly<{ scope: OptionOwnerScope; options: readonly { key: string; label: string }[] }>;
@@ -338,13 +347,16 @@ export function scanInstrumentIssues(content: InstrumentContent, baseLang: strin
 	}
 
 	for (const mismatch of findLocaleMismatches(content, baseLang)) {
+		const owner = scopeOwnerLabel(mismatch.scope);
 		issues.push({
-			id: `${mismatch.locale}:locale:${mismatch.owner}:${mismatch.reason}`,
+			id: `${mismatch.locale}:locale:${scopeId(mismatch.scope)}:${mismatch.reason}`,
 			severity: "publish",
 			code: "localeMismatch",
-			values: { locale: mismatch.locale.toUpperCase(), owner: mismatch.owner, base: baseLang.toUpperCase() },
-			location: `${mismatch.locale.toUpperCase()} · ${mismatch.owner}`,
-			target: { locale: mismatch.locale, tab: "sections", field: "structure" }
+			values: { locale: mismatch.locale.toUpperCase(), owner, base: baseLang.toUpperCase() },
+			location: `${mismatch.locale.toUpperCase()} · ${owner}`,
+			// Opens the translation at the list that differs. A list the translation
+			// is missing entirely has nothing there to open, so it lands on the owner.
+			target: scopeTarget(mismatch.scope, mismatch.locale, undefined, "structure")
 		});
 	}
 

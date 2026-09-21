@@ -556,3 +556,24 @@ test("a repair that cannot mint keys is reported as such, not as nothing to do",
 	assert.equal(plan.repairable, false);
 	assert.deepEqual(plan.repairs, []);
 });
+
+test("a translation that disagrees is named in the admin's terms and can be opened", () => {
+	const bundle = content();
+	bundle.de = structuredClone(bundle.en);
+	bundle.de.sections[0].questions[0].scales[0].options.reverse();
+
+	const [issue] = scanInstrumentIssues(bundle, "en").filter(candidate => candidate.code === "localeMismatch");
+
+	// The message and the list row read like the rest of the editor, not like a
+	// storage path such as "section_1_test/q_1_1/provision".
+	assert.equal(issue.values.owner, "Q 1.1 · provision");
+	assert.equal(issue.location, "DE · Q 1.1 · provision");
+	assert.ok(!String(issue.values.owner).includes("/"));
+
+	// Review has somewhere to go: the translation, its Sections tab, and the question.
+	assert.equal(issue.target.locale, "de");
+	assert.equal(issue.target.tab, "sections");
+	assert.equal(issue.target.sectionKey, "section_1_test");
+	assert.equal(issue.target.questionKey, "q_1_1");
+	assert.equal(issue.target.scaleKey, "provision");
+});

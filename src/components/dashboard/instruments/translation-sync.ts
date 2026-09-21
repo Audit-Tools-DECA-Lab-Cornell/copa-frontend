@@ -10,45 +10,59 @@
 
 import type { ChoiceOption, PlayspaceInstrument, ScaleOption } from "@/types/audit";
 
+import { type OptionOwnerScope, scopeId } from "./option-keys";
 import type { InstrumentContent, Lang } from "./types";
 
-/** One owning list, addressed the same way in every language. */
-function optionKeyFingerprint(instrument: PlayspaceInstrument): Map<string, string[]> {
-	const fingerprint = new Map<string, string[]>();
+/** Every answer list in one language, keyed the same way in every language. */
+function optionKeyFingerprint(
+	instrument: PlayspaceInstrument
+): Map<string, { scope: OptionOwnerScope; keys: string[] }> {
+	const fingerprint = new Map<string, { scope: OptionOwnerScope; keys: string[] }>();
+	const add = (scope: OptionOwnerScope, options: readonly { key: string }[]) => {
+		fingerprint.set(scopeId(scope), { scope, keys: options.map(option => option.key) });
+	};
 	for (const guidance of instrument.scale_guidance) {
-		fingerprint.set(
-			`scale_guidance/${guidance.key}`,
-			guidance.options.map(option => option.key)
-		);
+		add({ kind: "scaleGuidance", scaleKey: guidance.key }, guidance.options);
 	}
 	for (const section of instrument.sections) {
 		for (const question of section.questions) {
 			for (const scale of question.scales) {
-				fingerprint.set(
-					`${section.section_key}/${question.question_key}/${scale.key}`,
-					scale.options.map(option => option.key)
+				add(
+					{
+						kind: "questionScale",
+						sectionKey: section.section_key,
+						questionKey: question.question_key,
+						scaleKey: scale.key
+					},
+					scale.options
 				);
 			}
 			if (question.options.length > 0) {
-				fingerprint.set(
-					`${section.section_key}/${question.question_key}/checklist`,
-					question.options.map(option => option.key)
+				add(
+					{ kind: "checklist", sectionKey: section.section_key, questionKey: question.question_key },
+					question.options
 				);
 			}
 		}
 	}
 	for (const question of instrument.pre_audit_questions) {
 		if (question.options.length > 0) {
-			fingerprint.set(
-				`pre_audit/${question.key}`,
-				question.options.map(option => option.key)
-			);
+			add({ kind: "preAudit", questionKey: question.key }, question.options);
 		}
 	}
 	return fingerprint;
 }
 
-export type LocaleMismatch = Readonly<{ locale: string; owner: string; reason: "missing" | "extra" | "different" }>;
+/**
+ * One answer list where a translation disagrees with the base language. It
+ * carries the list's structured address so the editor can open it and describe
+ * it in the admin's terms, not as an internal path.
+ */
+export type LocaleMismatch = Readonly<{
+	locale: string;
+	scope: OptionOwnerScope;
+	reason: "missing" | "extra" | "different";
+}>;
 
 /**
  * List the answer lists where a translation disagrees with the base language.
@@ -66,19 +80,19 @@ export function findLocaleMismatches(content: InstrumentContent, baseLang: strin
 	for (const [locale, instrument] of Object.entries(content)) {
 		if (locale === baseLang || !instrument) continue;
 		const fingerprint = optionKeyFingerprint(instrument);
-		for (const [owner, baseKeys] of baseFingerprint) {
-			const keys = fingerprint.get(owner);
+		for (const [owner, { scope, keys: baseKeys }] of baseFingerprint) {
+			const keys = fingerprint.get(owner)?.keys;
 			if (keys === undefined) {
-				mismatches.push({ locale, owner, reason: "missing" });
+				mismatches.push({ locale, scope, reason: "missing" });
 				continue;
 			}
 			if (keys.length !== baseKeys.length || keys.some((key, index) => key !== baseKeys[index])) {
-				mismatches.push({ locale, owner, reason: "different" });
+				mismatches.push({ locale, scope, reason: "different" });
 			}
 		}
-		for (const owner of fingerprint.keys()) {
+		for (const [owner, { scope }] of fingerprint) {
 			if (!baseFingerprint.has(owner)) {
-				mismatches.push({ locale, owner, reason: "extra" });
+				mismatches.push({ locale, scope, reason: "extra" });
 			}
 		}
 	}

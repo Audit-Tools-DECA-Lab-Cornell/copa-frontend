@@ -17,7 +17,9 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+import { scopeOwnerLabel } from "./instrument-issues";
 import type { ConditionResolutions, RepairPlan } from "./option-key-repair";
+import { scopeId } from "./option-keys";
 
 /**
  * Give every answer in a copy its own key, with the exact changes shown first.
@@ -78,9 +80,9 @@ export function RepairDialog({
 						<p className="text-xs leading-relaxed text-muted-foreground">{t("repair.blockedBody")}</p>
 						<ul className="list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
 							{plan.blockedMismatches.slice(0, 8).map(mismatch => (
-								<li key={`${mismatch.locale}-${mismatch.owner}-${mismatch.reason}`}>
+								<li key={`${mismatch.locale}-${scopeId(mismatch.scope)}-${mismatch.reason}`}>
 									<span className="font-mono">{mismatch.locale.toUpperCase()}</span> ·{" "}
-									<span className="font-mono">{mismatch.owner}</span> ·{" "}
+									<span className="font-mono">{scopeOwnerLabel(mismatch.scope)}</span> ·{" "}
 									{t(`repair.mismatch.${mismatch.reason}`)}
 								</li>
 							))}

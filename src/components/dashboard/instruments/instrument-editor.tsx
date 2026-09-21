@@ -193,7 +193,10 @@ function InstrumentEditorBody({
 	// telling them to apply or cancel something that is no longer on screen.
 	const pendingOverride = keySession?.pending ?? null;
 	const hasPendingOverride = useMemo(() => {
-		if (pendingOverride === null) return false;
+		// The panel only exists in the base language, so a translation can never
+		// be held up by an edit it has no way to apply or cancel. Nothing was
+		// written to the draft yet, so saving from a translation loses nothing.
+		if (pendingOverride === null || activeLang !== baseLang) return false;
 		const editing = draftContent[activeLang];
 		if (!editing) return false;
 		return collectOwningLists(editing).some(
@@ -201,7 +204,7 @@ function InstrumentEditorBody({
 				scopeId(list.scope) === pendingOverride.scopeId &&
 				list.options.some(option => option.key === pendingOverride.optionKey)
 		);
-	}, [pendingOverride, draftContent, activeLang]);
+	}, [pendingOverride, draftContent, activeLang, baseLang]);
 	const hasUnsavedWork = useMemo(
 		() => getInstrumentChanges(content, draftContent).length > 0 || draftVersion !== version,
 		[content, draftContent, draftVersion, version]
