@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -17,14 +18,31 @@ import { QuestionEditor } from "./shared-editors";
 export function SectionEditorList({
 	sections,
 	scaleGuidanceMap,
+	openRequest,
 	onChange
 }: Readonly<{
 	sections: InstrumentSection[];
 	scaleGuidanceMap: Map<string, ScaleDefinition>;
+	/** Set when a reported issue should be opened; bumped so repeat reviews re-open it. */
+	openRequest?: { sectionKey?: string; questionKey?: string; nonce: number };
 	onChange: (sections: InstrumentSection[]) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
 	const { translationMode } = useInstrumentEdit();
+	const [openSection, setOpenSection] = useState<string>("");
+	const [handledRequest, setHandledRequest] = useState(0);
+
+	// Reviewing an issue has to reveal the control it points at, so the owning
+	// section opens itself rather than leaving the admin to hunt for it. Adjusted
+	// during render (not in an effect) so the section is already open on the same
+	// frame the issue is opened.
+	if (openRequest && openRequest.nonce !== handledRequest) {
+		setHandledRequest(openRequest.nonce);
+		const index = sections.findIndex(section => section.section_key === openRequest.sectionKey);
+		if (index >= 0) {
+			setOpenSection(`section-${index}`);
+		}
+	}
 
 	function updateSection(index: number, updater: (s: InstrumentSection) => void) {
 		const next = structuredClone(sections);
@@ -59,7 +77,7 @@ export function SectionEditorList({
 				}
 			/>
 
-			<Accordion type="single" collapsible className="w-full">
+			<Accordion type="single" collapsible className="w-full" value={openSection} onValueChange={setOpenSection}>
 				{sections.map((section, sIdx) => (
 					<AccordionItem key={`section-${sIdx}`} value={`section-${sIdx}`}>
 						<AccordionTrigger className="text-sm hover:no-underline border border-edge/50 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
@@ -239,7 +257,13 @@ export function SectionEditorList({
 											<div className="min-w-0 flex-1">
 												<QuestionEditor
 													question={question}
+													sectionQuestions={section.questions}
 													scaleGuidanceMap={scaleGuidanceMap}
+													expandRequest={
+														openRequest?.questionKey === question.question_key
+															? openRequest.nonce
+															: undefined
+													}
 													onUpdate={updater =>
 														updateSection(sIdx, s => {
 															updater(s.questions[qIdx]);

@@ -236,6 +236,7 @@ function QuestionCard({
 				<div className="border-t-2 border-edge/50 px-4 py-3 bg-muted/10 rounded-b-xl">
 					<ChoiceOptionsEditor
 						options={question.options}
+						scope={{ kind: "preAudit", questionKey: question.key }}
 						onChange={opts =>
 							onUpdate(q => {
 								q.options = opts;

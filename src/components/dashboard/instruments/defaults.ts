@@ -10,10 +10,16 @@ import type {
 	ScaleOption
 } from "@/types/audit";
 
-export function makeDefaultScaleOption(): ScaleOption {
+/**
+ * A new answer without its identity.
+ *
+ * The key is minted by the editor when the answer is added and then stays
+ * fixed, so a shared starting key can never reach two answers at once. See
+ * `option-keys.ts`.
+ */
+export function makeScaleOptionTemplate(label: string): Omit<ScaleOption, "key"> {
 	return {
-		key: "new_option",
-		label: "New Option",
+		label,
 		addition_value: 0,
 		boost_value: 0,
 		allows_follow_up_scales: false,
@@ -22,12 +28,11 @@ export function makeDefaultScaleOption(): ScaleOption {
 	};
 }
 
-export function makeDefaultUnsureOption(): ScaleOption {
+export function makeUnsureOptionTemplate(): Omit<ScaleOption, "key"> {
 	// A ready-to-use "I don't know" answer. Selecting it scores zero and, with
 	// follow-up scales locked off, hides Variety / Challenge / Sociability so the
 	// auditor only confirms they could not assess provision.
 	return {
-		key: "unsure",
 		label: "Unsure / I don't know",
 		addition_value: 0,
 		boost_value: 1,
@@ -37,11 +42,11 @@ export function makeDefaultUnsureOption(): ScaleOption {
 	};
 }
 
-export function makeDefaultChoiceOption(): ChoiceOption {
-	return { key: "new_option", label: "New Option", description: null };
+export function makeChoiceOptionTemplate(label: string): Omit<ChoiceOption, "key"> {
+	return { label, description: null };
 }
 
-export function makeDefaultQuestionScale(): QuestionScale {
+export function makeDefaultQuestionScale(firstOptionKey: string, firstOptionLabel: string): QuestionScale {
 	return {
 		key: "provision",
 		title: "Provision",
@@ -49,7 +54,7 @@ export function makeDefaultQuestionScale(): QuestionScale {
 		// `single` is the backward-compatible default: instruments written before multi-select
 		// omit the field entirely and are read as single-select.
 		selection_mode: "single",
-		options: [makeDefaultScaleOption()]
+		options: [{ ...makeScaleOptionTemplate(firstOptionLabel), key: firstOptionKey }]
 	};
 }
 
@@ -81,14 +86,14 @@ export function makeDefaultSection(index: number): InstrumentSection {
 	};
 }
 
-export function makeDefaultScaleDefinition(): ScaleDefinition {
+export function makeDefaultScaleDefinition(firstOptionKey: string, firstOptionLabel: string): ScaleDefinition {
 	return {
 		key: "provision",
 		title: "New Scale",
 		prompt: "Scale prompt",
 		description: "Scale description",
 		selection_mode: "single",
-		options: [makeDefaultScaleOption()]
+		options: [{ ...makeScaleOptionTemplate(firstOptionLabel), key: firstOptionKey }]
 	};
 }
 

@@ -488,6 +488,7 @@ function ViewerSectionAccordion({
 										<ViewerQuestionCard
 											key={question.question_key}
 											question={question}
+											sectionQuestions={section.questions}
 											scaleGuidanceMap={scaleGuidanceMap}
 										/>
 									))}
@@ -503,9 +504,12 @@ function ViewerSectionAccordion({
 
 function ViewerQuestionCard({
 	question,
+	sectionQuestions,
 	scaleGuidanceMap
 }: Readonly<{
 	question: InstrumentQuestion;
+	/** The questions a follow-up rule on this question may read, so answers resolve to labels. */
+	sectionQuestions: readonly InstrumentQuestion[];
 	scaleGuidanceMap: Map<string, ScaleDefinition>;
 }>) {
 	const t = useTranslations("admin.instruments.content");
@@ -551,7 +555,12 @@ function ViewerQuestionCard({
 							</Badge>
 						)}
 
-						{question.display_if && <DisplayConditionBadge condition={question.display_if} />}
+						{question.display_if && (
+							<DisplayConditionBadge
+								condition={question.display_if}
+								sectionQuestions={sectionQuestions}
+							/>
+						)}
 					</div>
 
 					{question.scales.length > 0 && (

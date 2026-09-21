@@ -8,6 +8,8 @@ import type { ScaleDefinition, ScaleKey } from "@/types/audit";
 
 import { makeDefaultScaleDefinition } from "../defaults";
 import { useInstrumentEdit } from "../instrument-edit-context";
+import { useOptionKeySessionOrNoop } from "../option-key-session";
+import { mintOptionKey } from "../option-keys";
 import { EditableField } from "../shared-components";
 import { ScaleOptionsEditor, SelectionModeField } from "./shared-editors";
 
@@ -20,6 +22,7 @@ export function ScaleGuidanceEditor({
 }>) {
 	const t = useTranslations("admin.instruments.content");
 	const { translationMode } = useInstrumentEdit();
+	const session = useOptionKeySessionOrNoop();
 
 	function updateScale(index: number, updater: (s: ScaleDefinition) => void) {
 		const next = structuredClone(scales);
@@ -28,10 +31,21 @@ export function ScaleGuidanceEditor({
 	}
 
 	function addScale() {
-		onChange([...scales, makeDefaultScaleDefinition()]);
+		const firstOptionKey = mintOptionKey(new Set());
+		if (firstOptionKey === null) return;
+		const scale = makeDefaultScaleDefinition(firstOptionKey, t("newOptionLabel"));
+		session.noteCreated({ kind: "scaleGuidance", scaleKey: scale.key }, firstOptionKey);
+		onChange([...scales, scale]);
 	}
 
 	function removeScale(index: number) {
+		const removed = scales[index];
+		if (removed) {
+			session.noteRetired(
+				{ kind: "scaleGuidance", scaleKey: removed.key },
+				removed.options.map(option => option.key)
+			);
+		}
 		onChange(scales.filter((_, i) => i !== index));
 	}
 
@@ -129,6 +143,7 @@ export function ScaleGuidanceEditor({
 						<CardContent className="px-4 pb-4">
 							<ScaleOptionsEditor
 								options={scale.options}
+								scope={{ kind: "scaleGuidance", scaleKey: scale.key }}
 								onChange={opts =>
 									updateScale(sIdx, s => {
 										s.options = opts;

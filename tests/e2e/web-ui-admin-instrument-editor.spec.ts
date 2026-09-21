@@ -115,4 +115,80 @@ test.describe("@web-ui Admin Instrument Editor", () => {
 		await page.getByRole("button", { name: "Delete permanently" }).click();
 		await expect(draftBranch).toBeHidden({ timeout: 15_000 });
 	});
+
+	test("added answers each get their own identifier, and a typed one is checked before it applies", async ({
+		page
+	}) => {
+		// The 5.40 instrument was published with 69 answers all keyed `new_option`,
+		// so three differently scored answers collapsed into one. This walks the
+		// authoring path that produced them.
+		await loginAsAdmin(page);
+
+		await page.getByRole("link", { name: /instruments/i }).click();
+		await expect(page).toHaveURL(/\/admin\/instruments/);
+		await expect(page.getByText("Version History").first()).toBeVisible({ timeout: 15_000 });
+
+		await page.getByTestId("edit-duplicate-button").first().click();
+		await expect(page.getByText("Instrument Editor").first()).toBeVisible({ timeout: 15_000 });
+
+		// Scale Guidance holds a scale whose answers are editable without expanding
+		// a section accordion first.
+		await page.getByRole("tab", { name: /Scale Guidance/i }).click();
+
+		const addOption = page.getByRole("button", { name: "Add option", exact: true }).first();
+		await expect(addOption).toBeVisible();
+
+		const optionKeys = page.getByTestId("option-key");
+		const startingCount = await optionKeys.count();
+
+		for (let index = 0; index < 3; index += 1) {
+			await addOption.click();
+		}
+		await expect(optionKeys).toHaveCount(startingCount + 3);
+
+		// Every answer must be addressable on its own: no placeholder, no repeats.
+		const keys = (await optionKeys.allTextContents()).map(value => value.trim());
+		expect(keys).toHaveLength(startingCount + 3);
+		expect(keys.some(key => key === "new_option")).toBe(false);
+		expect(new Set(keys).size).toBe(keys.length);
+		expect(keys.every(key => key.length > 0 && key !== "-")).toBe(true);
+
+		// The three answers are scored differently, which is what the shared key destroyed.
+		const labels = ["No", "Some", "A lot"];
+		for (let index = 0; index < 3; index += 1) {
+			const row = page.getByTestId(`scale-option-row-${(startingCount + index).toString()}`);
+			await row.getByRole("textbox", { name: "Label" }).fill(labels[index]);
+			await row.getByRole("spinbutton", { name: "Add" }).fill(String(index));
+		}
+
+		// An identifier can still be chosen by hand, but only before the version is
+		// saved, and only after it is checked.
+		const lastRow = page.getByTestId(`scale-option-row-${(startingCount + 2).toString()}`);
+		await lastRow.getByRole("button", { name: /Set identifier/i }).click();
+
+		const keyInput = page.getByLabel("Answer identifier");
+		await expect(keyInput).toBeVisible();
+
+		// While an identifier is being typed, saving is held back and says why.
+		await expect(page.getByText(/Apply or cancel it before saving/i).first()).toBeVisible();
+		await expect(page.getByRole("button", { name: /save draft/i })).toBeDisabled();
+
+		await keyInput.fill("A Lot");
+		await page.getByRole("button", { name: "Apply", exact: true }).click();
+		await expect(page.getByText(/only lowercase letters, numbers and underscores/i)).toBeVisible();
+
+		await keyInput.fill("a_lot_of_things");
+		await page.getByRole("button", { name: "Apply", exact: true }).click();
+		await expect(keyInput).toBeHidden();
+		await expect(lastRow.getByTestId("option-key")).toHaveText("a_lot_of_things");
+
+		// With nothing pending and every answer distinct, saving is offered again.
+		await expect(page.getByRole("button", { name: /save draft/i })).toBeEnabled();
+		await expect(page.getByText("Fix before saving")).toBeHidden();
+
+		// Leave the database alone: discard the draft rather than saving it.
+		await page.getByRole("button", { name: "Cancel" }).last().click();
+		await page.getByRole("button", { name: /Discard changes/i }).click();
+		await expect(page.getByText("Version History").first()).toBeVisible({ timeout: 15_000 });
+	});
 });

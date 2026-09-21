@@ -5,7 +5,7 @@
 
 import { parsePromptSegments, type PromptSegment } from "@/lib/audit/prompt-segments";
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
-import type { PlayspaceInstrument } from "@/types/audit";
+import type { InstrumentQuestion, PlayspaceInstrument } from "@/types/audit";
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -198,6 +198,32 @@ export function formatLabel(raw: string): string {
 		.join(" ");
 }
 
+/**
+ * Describe a follow-up rule in the wording a reader recognises.
+ *
+ * Answers are stored by identifier, which says nothing to someone reading a
+ * printed instrument, so each one is resolved to its label from the question it
+ * belongs to. An identifier that no longer resolves is printed as-is rather
+ * than dropped, so a broken rule is visible in the export.
+ */
+function describeDisplayCondition(
+	condition: NonNullable<InstrumentQuestion["display_if"]>,
+	sectionQuestions: readonly InstrumentQuestion[]
+): string {
+	const source = sectionQuestions.find(question => question.question_key === condition.question_key);
+	const sourceOptions =
+		(source?.question_type ?? "scaled") === "checklist"
+			? (source?.options ?? [])
+			: (source?.scales.find(scale => scale.key === condition.response_key)?.options ?? []);
+	const answers = condition.any_of_option_keys
+		.map(key => {
+			const label = sourceOptions.find(option => option.key === key)?.label;
+			return label && label.trim().length > 0 ? label : key;
+		})
+		.join(", ");
+	return `${formatQuestionKeyForDisplay(condition.question_key)} (${formatLabel(condition.response_key)}) = ${answers}`;
+}
+
 // ─── Instrument flattening ────────────────────────────────────────────────────
 
 /**
@@ -248,9 +274,7 @@ export function flattenInstrument(instrument: PlayspaceInstrument): FlatRow[] {
 					.join(", ") || "";
 			const modeStr = formatLabel(q.mode || "");
 			const typeStr = formatLabel(q.question_type || "scaled");
-			const conditionStr = q.display_if
-				? `${formatQuestionKeyForDisplay(q.display_if.question_key)} (${formatLabel(q.display_if.response_key)}) = ${q.display_if.any_of_option_keys.map(formatLabel).join(", ")}`
-				: "";
+			const conditionStr = q.display_if ? describeDisplayCondition(q.display_if, section.questions) : "";
 
 			const questionPromptSegments = parseInstrumentPromptSegments(q.prompt || "");
 

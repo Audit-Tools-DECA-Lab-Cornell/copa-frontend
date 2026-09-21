@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { type PvScaleKey, SCALE_BADGE_CLASS_NAMES } from "@/lib/audit/scale-colors";
-import type { QuestionDisplayCondition } from "@/types/audit";
+import type { InstrumentQuestion, QuestionDisplayCondition } from "@/types/audit";
 
 import { AiTranslateFieldButton } from "./ai-translate-button";
 import { useInstrumentEdit } from "./instrument-edit-context";
@@ -126,9 +126,29 @@ export function ScaleKeyBadge({ scaleKey }: Readonly<{ scaleKey: string }>) {
 	);
 }
 
-export function DisplayConditionBadge({ condition }: Readonly<{ condition: QuestionDisplayCondition }>) {
+/**
+ * Summarise a follow-up rule in the wording the auditor sees.
+ *
+ * Answers are stored by key, but a key is not what an admin recognises, so the
+ * badge resolves each one to its label from the question it belongs to. A key
+ * that no longer resolves is shown as-is, marked unresolved rather than hidden.
+ */
+export function DisplayConditionBadge({
+	condition,
+	sectionQuestions = []
+}: Readonly<{ condition: QuestionDisplayCondition; sectionQuestions?: readonly InstrumentQuestion[] }>) {
 	const t = useTranslations("admin.instruments.content");
-	const optionKeysStr = condition.any_of_option_keys.join(", ");
+	const source = sectionQuestions.find(question => question.question_key === condition.question_key);
+	const sourceOptions =
+		(source?.question_type ?? "scaled") === "checklist"
+			? (source?.options ?? [])
+			: (source?.scales.find(scale => scale.key === condition.response_key)?.options ?? []);
+	const optionKeysStr = condition.any_of_option_keys
+		.map(key => {
+			const label = sourceOptions.find(option => option.key === key)?.label;
+			return label && label.trim().length > 0 ? label : t("conditionUnresolvedAnswer", { key });
+		})
+		.join(", ");
 
 	return (
 		<Badge

@@ -44,6 +44,7 @@ export function InstrumentsAdminClient() {
 	const [versionToActivate, setVersionToActivate] = useState<InstrumentVersionRow | null>(null);
 	const [versionToDelete, setVersionToDelete] = useState<InstrumentVersionRow | null>(null);
 	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+	const [uploadError, setUploadError] = useState<string | null>(null);
 
 	// Single source of truth: the full list and the active version both derive from
 	// this one query, avoiding a two-query race (empty-state flash, stale UI). The
@@ -178,13 +179,29 @@ export function InstrumentsAdminClient() {
 		setEditingContent(structuredClone(baseContent));
 	}
 
-	function handleUpload(version: string, content: InstrumentContent, activate: boolean) {
-		setInstrumentMutation.mutate({
-			version,
-			content: content as InstrumentContentPayload,
-			activate,
-			parentInstrumentId: null
-		});
+	async function handleUpload(version: string, content: InstrumentContent, activate: boolean) {
+		setUploadError(null);
+		try {
+			await setInstrumentMutation.mutateAsync({
+				version,
+				content: content as InstrumentContentPayload,
+				activate,
+				parentInstrumentId: null
+			});
+			// The dialog closes only once the server has confirmed. A rejection keeps
+			// the file, the version and the language so the attempt can be corrected.
+			setIsUploadDialogOpen(false);
+		} catch (error) {
+			setUploadError(error instanceof Error ? error.message : String(error));
+		}
+	}
+
+	/** Open an uploaded file in the editor instead of sending it, so it can be fixed first. */
+	function handleEditUploadedCopy(version: string, content: InstrumentContent) {
+		setUploadError(null);
+		setEditingVersion(version);
+		setEditingParentInstrumentId(null);
+		setEditingContent(structuredClone(content));
 		setIsUploadDialogOpen(false);
 	}
 
@@ -344,8 +361,13 @@ export function InstrumentsAdminClient() {
 			<UploadDialog
 				open={isUploadDialogOpen}
 				isPending={isMutating}
+				serverError={uploadError}
 				onUpload={handleUpload}
-				onClose={() => setIsUploadDialogOpen(false)}
+				onEditCopy={handleEditUploadedCopy}
+				onClose={() => {
+					setUploadError(null);
+					setIsUploadDialogOpen(false);
+				}}
 			/>
 		</div>
 	);

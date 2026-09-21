@@ -13,8 +13,9 @@ import {
 	X
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -46,6 +47,24 @@ import { PreambleEditor } from "./editors/preamble-editor";
 import { ScaleGuidanceEditor } from "./editors/scale-guidance-editor";
 import { SectionEditorList } from "./editors/section-editor-list";
 import { InstrumentEditProvider, languageLabel, resolveBaseLang } from "./instrument-edit-context";
+import {
+	collectOwningLists,
+	type InstrumentIssue,
+	issueElementId,
+	publishBlockers,
+	saveBlockers,
+	scanInstrumentIssues
+} from "./instrument-issues";
+import { IssuePanel } from "./issue-panel";
+import {
+	applyOptionKeyRepairs,
+	type ConditionResolutions,
+	planOptionKeyRepairs,
+	type RepairPlan
+} from "./option-key-repair";
+import { OptionKeySessionProvider, useOptionKeySession } from "./option-key-session";
+import { scopeId } from "./option-keys";
+import { RepairDialog } from "./repair-dialog";
 import { InstrumentChange, ReviewChangesDialog } from "./review-changes-dialog";
 import { SociabilityBulkDialog } from "./sociability-bulk-dialog";
 import {
@@ -55,12 +74,36 @@ import {
 	validateSociabilityMultiSelect
 } from "./sociability-multi-select";
 import { SpreadsheetView } from "./spreadsheet-view";
+import { findLocaleMismatches, syncTranslationsToBase } from "./translation-sync";
 import { type InstrumentContent, Lang } from "./types";
 import { buildScaleGuidanceMap, getInstrumentChanges, getTranslationCoverage } from "./utils";
 
 type EditorTab = "overview" | "sections" | "spreadsheet" | "preAudit" | "scales" | "legalDocuments";
 
-export function InstrumentEditor({
+/**
+ * Wraps the editor in the key session so every option list shares one record of
+ * which answers were added now and which keys are spent.
+ */
+export function InstrumentEditor(props: Readonly<InstrumentEditorProps>) {
+	return (
+		<OptionKeySessionProvider>
+			<InstrumentEditorBody {...props} />
+		</OptionKeySessionProvider>
+	);
+}
+
+type InstrumentEditorProps = Readonly<{
+	content: InstrumentContent;
+	version: string;
+	lockVersion?: boolean;
+	isPending: boolean;
+	/** Backend rejection (for example a 422 semantic validation failure) for the last save attempt. */
+	saveError?: string | null;
+	onSave: (version: string, content: InstrumentContent, activate?: boolean) => void;
+	onCancel: () => void;
+}>;
+
+function InstrumentEditorBody({
 	content,
 	version,
 	lockVersion = false,
@@ -91,6 +134,12 @@ export function InstrumentEditor({
 	const [reviewModalOpen, setReviewModalOpen] = useState(false);
 	const [pendingChanges, setPendingChanges] = useState<InstrumentChange[]>([]);
 	const [sociabilityBulkOpen, setSociabilityBulkOpen] = useState(false);
+	const [openRequest, setOpenRequest] = useState<{ sectionKey?: string; questionKey?: string; nonce: number }>();
+	const [focusRequest, setFocusRequest] = useState<{ elementId: string; nonce: number } | null>(null);
+	const [repairPlan, setRepairPlan] = useState<RepairPlan | null>(null);
+	const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
+	const keySession = useOptionKeySession();
+	const navigationNonce = useRef(0);
 
 	const instrument = draftContent[activeLang] as PlayspaceInstrument | undefined;
 
@@ -130,11 +179,97 @@ export function InstrumentEditor({
 		[draftContent, baseLang]
 	);
 
+	// Whether the bundle lined up when it was opened. Recomputing it from the
+	// draft would flip to false the moment an answer is added to the base
+	// language and before the translations are brought along in the same step.
+	const [bundleAligned] = useState(() => findLocaleMismatches(content, resolveBaseLang(content)).length === 0);
+
+	const issues = useMemo(() => scanInstrumentIssues(draftContent, baseLang), [draftContent, baseLang]);
+	const blockingSave = useMemo(() => saveBlockers(issues), [issues]);
+	const blockingPublish = useMemo(() => publishBlockers(issues), [issues]);
+	// A key being typed holds up saving only while the answer it belongs to is
+	// still in the draft. Deleting that answer - or the scale, question or section
+	// around it - releases the hold, so the admin is never left with a message
+	// telling them to apply or cancel something that is no longer on screen.
+	const pendingOverride = keySession?.pending ?? null;
+	const hasPendingOverride = useMemo(() => {
+		if (pendingOverride === null) return false;
+		const editing = draftContent[activeLang];
+		if (!editing) return false;
+		return collectOwningLists(editing).some(
+			list =>
+				scopeId(list.scope) === pendingOverride.scopeId &&
+				list.options.some(option => option.key === pendingOverride.optionKey)
+		);
+	}, [pendingOverride, draftContent, activeLang]);
+	const hasUnsavedWork = useMemo(
+		() => getInstrumentChanges(content, draftContent).length > 0 || draftVersion !== version,
+		[content, draftContent, draftVersion, version]
+	);
+	const canRepairKeys = useMemo(() => blockingSave.some(issue => issue.target.field === "optionKey"), [blockingSave]);
+
+	// Opening an issue changes language, tab, section and question first; the
+	// control it points at only exists once those have rendered, so the focus is
+	// retried a few times rather than assumed to land on the first frame.
+	useEffect(() => {
+		if (focusRequest === null) return;
+		let attempts = 0;
+		let timer: ReturnType<typeof setTimeout>;
+		const tryFocus = () => {
+			const element = document.getElementById(focusRequest.elementId);
+			if (element) {
+				element.scrollIntoView({ block: "center", behavior: "smooth" });
+				element.focus({ preventScroll: true });
+				return;
+			}
+			attempts += 1;
+			if (attempts < 5) {
+				timer = setTimeout(tryFocus, 120);
+			}
+		};
+		timer = setTimeout(tryFocus, 0);
+		return () => clearTimeout(timer);
+	}, [focusRequest]);
+
+	function handleReviewIssue(issue: InstrumentIssue) {
+		navigationNonce.current += 1;
+		const nonce = navigationNonce.current;
+		if (draftContent[issue.target.locale as Lang]) {
+			setActiveLang(issue.target.locale as Lang);
+		}
+		setActiveTab(issue.target.tab);
+		setOpenRequest({
+			sectionKey: issue.target.sectionKey,
+			questionKey: issue.target.questionKey,
+			nonce
+		});
+		setFocusRequest({ elementId: issueElementId(issue.target), nonce });
+	}
+
+	function handleOpenRepair() {
+		setRepairPlan(planOptionKeyRepairs(draftContent, baseLang));
+	}
+
+	function handleConfirmRepair(resolutions: ConditionResolutions) {
+		if (repairPlan === null) return;
+		// The repair rewrites a working copy; the version it came from is untouched
+		// until the admin saves this draft.
+		setDraftContent(applyOptionKeyRepairs(draftContent, repairPlan, resolutions));
+		setRepairPlan(null);
+	}
+
 	function updateInstrument(updater: (i: PlayspaceInstrument) => void) {
 		setDraftContent(prev => {
 			const next = structuredClone(prev);
 			if (next[activeLang]) {
 				updater(next[activeLang]);
+			}
+			// A structural edit in the base language has to reach every translation
+			// in the same step, or the languages would answer with different keys.
+			// A bundle that did not line up to begin with is left alone and sent to
+			// the repair flow instead of being matched by guesswork.
+			if (activeLang === baseLang && bundleAligned) {
+				return syncTranslationsToBase(next, baseLang);
 			}
 			return next;
 		});
@@ -185,13 +320,23 @@ export function InstrumentEditor({
 	}
 
 	function handleSaveDraft() {
+		if (blockingSave.length > 0 || hasPendingOverride) return;
 		onSave(draftVersion, draftContent, false);
 	}
 
 	function handleOpenReview() {
+		if (blockingPublish.length > 0 || hasPendingOverride) return;
 		const changes = getInstrumentChanges(content, draftContent);
 		setPendingChanges(changes);
 		setReviewModalOpen(true);
+	}
+
+	function handleCancel() {
+		if (hasUnsavedWork) {
+			setConfirmDiscardOpen(true);
+			return;
+		}
+		onCancel();
 	}
 
 	function handlePublishConfirm() {
@@ -363,6 +508,18 @@ export function InstrumentEditor({
 		);
 	}
 
+	// A disabled action always says why, next to the action itself.
+	const saveBlockedReason = hasPendingOverride
+		? t("pendingOverrideBlocks")
+		: blockingSave.length > 0
+			? t("saveBlockedByIssues", { count: blockingSave.length })
+			: null;
+	const publishBlockedReason = hasPendingOverride
+		? t("pendingOverrideBlocks")
+		: blockingPublish.length > 0
+			? t("publishBlockedByIssues", { count: blockingPublish.length })
+			: null;
+
 	if (!instrument) return null;
 
 	return (
@@ -430,7 +587,7 @@ export function InstrumentEditor({
 								variant="ghost"
 								size="sm"
 								className="h-10"
-								onClick={onCancel}
+								onClick={handleCancel}
 								disabled={isPending}>
 								{t("cancel")}
 							</Button>
@@ -440,7 +597,8 @@ export function InstrumentEditor({
 								size="sm"
 								className="h-10 gap-2"
 								onClick={handleSaveDraft}
-								disabled={isPending || !draftVersion.trim()}>
+								title={saveBlockedReason ?? undefined}
+								disabled={isPending || !draftVersion.trim() || saveBlockedReason !== null}>
 								<Save className="h-4 w-4" aria-hidden="true" />
 								{t("saveDraft")}
 							</Button>
@@ -449,7 +607,8 @@ export function InstrumentEditor({
 								size="sm"
 								className="h-10 gap-2 bg-status-success text-primary-foreground hover:bg-status-success/90"
 								onClick={handleOpenReview}
-								disabled={isPending || !draftVersion.trim()}>
+								title={publishBlockedReason ?? undefined}
+								disabled={isPending || !draftVersion.trim() || publishBlockedReason !== null}>
 								<Check className="h-4 w-4" aria-hidden="true" />
 								{t("publish")}
 							</Button>
@@ -465,6 +624,27 @@ export function InstrumentEditor({
 					onCancel={() => setReviewModalOpen(false)}
 				/>
 
+				<RepairDialog
+					open={repairPlan !== null}
+					plan={repairPlan}
+					onConfirm={handleConfirmRepair}
+					onCancel={() => setRepairPlan(null)}
+				/>
+
+				<ConfirmDialog
+					open={confirmDiscardOpen}
+					onOpenChange={open => {
+						if (!open) setConfirmDiscardOpen(false);
+					}}
+					title={t("discardTitle")}
+					description={t("discardBody")}
+					confirmLabel={t("discardConfirm")}
+					onConfirm={() => {
+						setConfirmDiscardOpen(false);
+						onCancel();
+					}}
+				/>
+
 				<SociabilityBulkDialog
 					open={sociabilityBulkOpen}
 					targets={sociabilityTargets}
@@ -472,6 +652,20 @@ export function InstrumentEditor({
 					onConfirm={handleApplySociabilityMultiSelect}
 					onCancel={() => setSociabilityBulkOpen(false)}
 				/>
+
+				<IssuePanel
+					issues={issues}
+					onReview={handleReviewIssue}
+					onRepair={canRepairKeys ? handleOpenRepair : undefined}
+				/>
+
+				{hasPendingOverride ? (
+					<p
+						role="status"
+						className="rounded-md border border-accent-violet-border bg-accent-violet-surface/40 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+						{t("pendingOverrideBlocks")}
+					</p>
+				) : null}
 
 				{saveError ? (
 					<div
@@ -532,7 +726,17 @@ export function InstrumentEditor({
 					</div>
 				)}
 
-				<Tabs value={activeTab} onValueChange={v => setActiveTab(v as EditorTab)}>
+				{/*
+				 * While a save is in flight the content is frozen. Editing on top of a
+				 * request that is about to succeed would leave those edits behind when
+				 * the editor closes on the server's answer.
+				 */}
+				<Tabs
+					value={activeTab}
+					onValueChange={v => setActiveTab(v as EditorTab)}
+					aria-busy={isPending || undefined}
+					inert={isPending || undefined}
+					className={isPending ? "opacity-70 transition-opacity" : "transition-opacity"}>
 					<TabsList className="h-auto flex-wrap justify-start gap-1">
 						<TabsTrigger value="overview">{t("overview")}</TabsTrigger>
 						<TabsTrigger value="sections">
@@ -573,6 +777,7 @@ export function InstrumentEditor({
 						<SectionEditorList
 							sections={instrument.sections}
 							scaleGuidanceMap={scaleGuidanceMap}
+							openRequest={openRequest}
 							onChange={s =>
 								updateInstrument(i => {
 									i.sections = s;

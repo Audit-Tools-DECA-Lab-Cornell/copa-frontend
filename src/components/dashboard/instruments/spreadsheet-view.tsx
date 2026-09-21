@@ -16,6 +16,30 @@ import { useInstrumentEdit } from "./instrument-edit-context";
 import { ScaleKeyBadge } from "./shared-components";
 import { isScaleCustomized, renderInlineMarkdown } from "./utils";
 
+/**
+ * Name the answers a follow-up rule reads.
+ *
+ * The stored identifiers mean nothing to a reader, so each is resolved to its
+ * label from the question it belongs to. One that no longer resolves is shown
+ * as-is, so a broken rule stays visible.
+ */
+function describeConditionAnswers(
+	condition: NonNullable<InstrumentQuestion["display_if"]>,
+	sectionQuestions: readonly InstrumentQuestion[]
+): string {
+	const source = sectionQuestions.find(question => question.question_key === condition.question_key);
+	const sourceOptions =
+		(source?.question_type ?? "scaled") === "checklist"
+			? (source?.options ?? [])
+			: (source?.scales.find(scale => scale.key === condition.response_key)?.options ?? []);
+	return condition.any_of_option_keys
+		.map(key => {
+			const label = sourceOptions.find(option => option.key === key)?.label;
+			return label && label.trim().length > 0 ? label : key;
+		})
+		.join(", ");
+}
+
 interface SpreadsheetRow {
 	sectionIndex: number;
 	questionIndex: number;
@@ -668,8 +692,11 @@ export function SpreadsheetView({
 															{" "}
 															({q.display_if.response_key}) ={" "}
 														</span>
-														<span className="font-mono">
-															{q.display_if.any_of_option_keys.join(", ")}
+														<span>
+															{describeConditionAnswers(
+																q.display_if,
+																sections[row.sectionIndex]?.questions ?? []
+															)}
 														</span>
 													</div>
 												) : (
