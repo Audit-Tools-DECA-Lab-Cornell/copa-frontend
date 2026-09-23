@@ -936,6 +936,15 @@ const CONSTRUCT_GRID: readonly (readonly [ConstructKey, ConstructKey, ConstructK
 	["sociability", "play_value", "usability"]
 ];
 
+const CONSTRUCT_HEADER_CLASS_NAMES: Record<ConstructKey, string> = {
+	provision: "bg-scale-provision text-solid-primary-text",
+	variety: "bg-scale-variety text-solid-primary-text",
+	challenge: "bg-scale-challenge text-solid-primary-text",
+	sociability: "bg-scale-sociability text-solid-primary-text",
+	play_value: "bg-status-warning text-primary-foreground",
+	usability: "bg-primary text-primary-foreground"
+};
+
 /** Translation key suffix (under `shared.reportView`) per Sociability opportunity. */
 const SOCIABILITY_DIMENSION_LABEL_KEYS: Record<SociabilityDimensionKey, string> = {
 	play_alone: "metricSociabilityPlayAlone",
@@ -967,8 +976,8 @@ function SociabilityBestWorstSection({ rankings }: Readonly<{ rankings: readonly
 						<div
 							key={ranking.dimensionKey}
 							className="flex flex-col overflow-hidden rounded-lg border border-edge/40">
-							<div className="bg-primary px-3 py-2">
-								<p className="text-center text-xs font-bold text-primary-foreground">
+							<div className="bg-scale-sociability px-3 py-2 text-solid-primary-text">
+								<p className="text-center text-xs font-bold">
 									{t(SOCIABILITY_DIMENSION_LABEL_KEYS[ranking.dimensionKey])}
 								</p>
 							</div>
@@ -1080,10 +1089,8 @@ function BestWorstSection({
 									const ranking = rankingByKey.get(key);
 									return (
 										<div key={key} className="overflow-hidden rounded-lg border border-edge/40">
-											<div className="bg-primary px-3 py-2">
-												<p className="text-center text-xs font-bold text-primary-foreground">
-													{t(CONSTRUCT_LABEL_KEYS[key])}
-												</p>
+											<div className={cn("px-3 py-2", CONSTRUCT_HEADER_CLASS_NAMES[key])}>
+												<p className="text-center text-xs font-bold">{t(CONSTRUCT_LABEL_KEYS[key])}</p>
 											</div>
 											<div className="border-b border-edge/40 bg-status-success-surface px-3 py-2.5">
 												<div className="mb-1 flex items-center gap-1.5">
