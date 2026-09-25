@@ -43,9 +43,7 @@ export function OptionKeyChip({
 	const session = useOptionKeySessionOrNoop();
 	const { translationMode, baseLang } = useInstrumentEdit();
 	const editable = !translationMode && session.canOverride(scope, optionKey);
-	const lockedHint = translationMode
-		? t("keyLockedHint", { lang: baseLang.toUpperCase() })
-		: t("optionKeyFixedHint");
+	const lockedHint = translationMode ? t("keyLockedHint", { lang: baseLang.toUpperCase() }) : t("optionKeyFixedHint");
 	const open = session.isOverrideOpenFor(scope, optionKey);
 
 	const target: IssueTarget = {
@@ -83,10 +81,7 @@ export function OptionKeyChip({
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<Lock
-								className="h-3 w-3 shrink-0 text-muted-foreground/50"
-								aria-label={lockedHint}
-							/>
+							<Lock className="h-3 w-3 shrink-0 text-muted-foreground/50" aria-label={lockedHint} />
 						</TooltipTrigger>
 						<TooltipContent className="max-w-[260px]">{lockedHint}</TooltipContent>
 					</Tooltip>
