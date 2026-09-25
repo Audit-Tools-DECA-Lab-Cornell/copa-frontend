@@ -83,7 +83,7 @@ export function OptionKeyChip({
 						<TooltipTrigger asChild>
 							<Lock className="h-3 w-3 shrink-0 text-muted-foreground/50" aria-label={lockedHint} />
 						</TooltipTrigger>
-						<TooltipContent className="max-w-[260px]">{lockedHint}</TooltipContent>
+						<TooltipContent className="max-w-65">{lockedHint}</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
 			)}
@@ -153,7 +153,7 @@ export function OptionKeyOverridePanel<T extends { key: string }>({
 	return (
 		<div className="rounded-md border border-accent-violet-border bg-accent-violet-surface/40 p-2.5">
 			<div className="flex flex-wrap items-end gap-2">
-				<div className="min-w-[200px] flex-1 space-y-1">
+				<div className="min-w-50 flex-1 space-y-1">
 					<Label htmlFor={inputId} className="text-[11px] font-medium text-foreground">
 						{t("optionKeyHeading")}
 					</Label>
