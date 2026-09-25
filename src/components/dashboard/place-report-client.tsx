@@ -36,6 +36,7 @@ import { playspaceApi } from "@/lib/api/playspace";
 import { buildReportIdentity } from "@/lib/audit/report-filter-cache";
 import { getReportKnownDomainKeys } from "@/lib/audit/report-helpers";
 import { useReportFilter } from "@/lib/audit/use-report-filter";
+import { useReportInstrument } from "@/lib/audit/use-report-instrument";
 
 /**
  * Format source-submission timestamps consistently for the place report.
@@ -169,21 +170,13 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 		return primarySession;
 	}, [isCombined, primarySession, surveySession]);
 
-	// Fetch instrument
-	const instrumentQuery = useQuery({
-		queryKey: ["playspace", "instrument", reportSession?.instrument_key],
-		queryFn: () => {
-			if (reportSession?.instrument !== undefined && reportSession.instrument !== null) {
-				return Promise.resolve(reportSession.instrument);
-			}
-			if (typeof reportSession?.instrument_key !== "string") throw new Error("No instrument key");
-			return playspaceApi.auditor.fetchInstrument(reportSession.instrument_key);
-		},
-		enabled: reportSession !== undefined
-	});
+	// The report layout follows the primary submission's instrument version; in a combined
+	// report each source's answers are still read with that source's own version.
+	const reportInstrument = useReportInstrument(reportSession);
+	const instrument = reportInstrument.instrument;
 	const knownDomainKeys =
-		reportSession !== undefined && instrumentQuery.data !== undefined
-			? getReportKnownDomainKeys(reportSession, instrumentQuery.data)
+		reportSession !== undefined && instrument !== undefined
+			? getReportKnownDomainKeys(reportSession, instrument)
 			: undefined;
 	const placeReportFilter = useReportFilter(
 		buildReportIdentity(reportSession?.audit_id ?? "", isCombined ? (surveySession?.audit_id ?? null) : null),
@@ -218,7 +211,7 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 		}
 	});
 
-	const isLoading = auditQuery.isLoading || (isCombined && surveyQuery.isLoading) || instrumentQuery.isLoading;
+	const isLoading = auditQuery.isLoading || (isCombined && surveyQuery.isLoading) || reportInstrument.isLoading;
 
 	const reportsBasePath = `/${rolePrefix}/reports`;
 
@@ -307,10 +300,10 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 				]}
 				actions={
 					<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-						{reportSession !== undefined && instrumentQuery.data !== undefined && (
+						{reportSession !== undefined && instrument !== undefined && (
 							<AuditExportActions
 								audit={reportSession}
-								instrument={instrumentQuery.data}
+								instrument={instrument}
 								resultFilter={placeReportFilter.filter}
 							/>
 						)}
@@ -414,7 +407,7 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 			{/* Report content */}
 			<AuditReportView
 				audit={reportSession}
-				instrument={instrumentQuery.data ?? null}
+				instrument={instrument ?? null}
 				basePath={isCombined ? undefined : `/${rolePrefix}`}
 				reportIdentity={buildReportIdentity(
 					reportSession.audit_id,

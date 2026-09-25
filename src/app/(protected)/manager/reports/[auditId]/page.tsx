@@ -2,6 +2,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getServerAudit, getServerInstrument } from "@/lib/api/playspace-server";
 import { type AuditSession } from "@/lib/api/playspace-types";
+import { activeReportInstrumentQueryKey } from "@/lib/audit/report-instrument-key";
 import { getQueryClient } from "@/lib/query/server-query-client";
 
 import { ManagerReportDetailClient } from "./report-detail-client";
@@ -26,7 +27,7 @@ export default async function ManagerReportDetailPage({ params }: Readonly<Manag
 	if (audit && (audit.instrument === null || audit.instrument === undefined)) {
 		await queryClient
 			.prefetchQuery({
-				queryKey: ["playspace", "instrument", audit.instrument_key],
+				queryKey: activeReportInstrumentQueryKey(audit.instrument_key),
 				queryFn: () => getServerInstrument(audit.instrument_key)
 			})
 			.catch(() => undefined);

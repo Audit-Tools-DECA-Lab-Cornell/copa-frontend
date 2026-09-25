@@ -21,6 +21,7 @@ import {
 	resolveDomainConstructSelection
 } from "@/lib/audit/report-filter";
 import {
+	type CombinedReportSources,
 	getCombinedReportSources,
 	getReportSourceLabel,
 	type ReportSourceComponent
@@ -769,6 +770,56 @@ function buildVisibleQuestionEntriesForSession(
 }
 
 /**
+ * Parsed questions of each source submission's own instrument version, grouped by section key.
+ * Keyed by the embedded instrument object so every section of one report reuses a single parse.
+ */
+const sourceQuestionLookups = new WeakMap<object, ReadonlyMap<string, ReadonlyMap<string, InstrumentQuestion>>>();
+
+function getSourceQuestionLookup(
+	instrumentInput: PlayspaceInstrumentInput
+): ReadonlyMap<string, ReadonlyMap<string, InstrumentQuestion>> {
+	const cached = sourceQuestionLookups.get(instrumentInput);
+	if (cached !== undefined) {
+		return cached;
+	}
+	const instrument = playspaceInstrumentSchema.parse(instrumentInput);
+	const lookup = new Map(
+		instrument.sections.map(
+			section =>
+				[
+					section.section_key,
+					new Map(section.questions.map(question => [question.question_key, question] as const))
+				] as const
+		)
+	);
+	sourceQuestionLookups.set(instrumentInput, lookup);
+	return lookup;
+}
+
+/**
+ * The question definition a source submission was answered against.
+ *
+ * The audit and the survey in a combined report can come from different instrument
+ * versions, and the same question can change shape between versions (Sociability is
+ * single-choice up to 5.31 and multi-choice from 5.32). Each source's answers are read
+ * with its own version of the question; the report instrument's question is used only
+ * when the source arrives without an embedded instrument or its version lacks the question.
+ */
+function resolveSourceQuestion(
+	sourceSession: CombinedReportSources[ReportSourceComponent],
+	sectionKey: string,
+	reportQuestion: InstrumentQuestion
+): InstrumentQuestion {
+	const sourceInstrument = sourceSession.instrument;
+	if (sourceInstrument === undefined) {
+		return reportQuestion;
+	}
+	return (
+		getSourceQuestionLookup(sourceInstrument).get(sectionKey)?.get(reportQuestion.question_key) ?? reportQuestion
+	);
+}
+
+/**
  * Resolve the visible question rows for one section, preserving instrument order while
  * duplicating shared questions when a combined report has separate audit and survey sources.
  */
@@ -783,9 +834,10 @@ export function buildVisibleQuestionEntries(
 	}
 
 	const visibleEntries: VisibleQuestionEntry[] = [];
-	section.questions.forEach(question => {
+	section.questions.forEach(reportQuestion => {
 		(["audit", "survey"] as const).forEach(sourceComponent => {
 			const sourceSession = combinedSources[sourceComponent];
+			const question = resolveSourceQuestion(sourceSession, section.section_key, reportQuestion);
 			const sectionState = sourceSession.aggregate.sections[section.section_key];
 			const sectionResponses = sectionState?.responses ?? {};
 			const executionMode = resolveExecutionMode(sourceSession);

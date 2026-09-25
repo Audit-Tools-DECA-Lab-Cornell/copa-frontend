@@ -14,6 +14,7 @@ import { playspaceApi } from "@/lib/api/playspace";
 import { buildReportIdentity } from "@/lib/audit/report-filter-cache";
 import { getReportKnownDomainKeys } from "@/lib/audit/report-helpers";
 import { useReportFilter } from "@/lib/audit/use-report-filter";
+import { useReportInstrument } from "@/lib/audit/use-report-instrument";
 
 /**
  * Manager-facing individual audit report detail page.
@@ -33,23 +34,9 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 
 	const audit = auditQuery.data;
 
-	const instrumentQuery = useQuery({
-		queryKey: ["playspace", "instrument", audit?.instrument_key],
-		queryFn: () => {
-			if (audit?.instrument !== undefined && audit.instrument !== null) {
-				return Promise.resolve(audit.instrument);
-			}
-			if (typeof audit?.instrument_key !== "string") {
-				throw new Error("No instrument key available");
-			}
-			return playspaceApi.auditor.fetchInstrument(audit.instrument_key);
-		},
-		enabled: audit !== undefined
-	});
+	const { instrument } = useReportInstrument(audit);
 	const knownDomainKeys =
-		audit !== undefined && instrumentQuery.data !== undefined
-			? getReportKnownDomainKeys(audit, instrumentQuery.data)
-			: undefined;
+		audit !== undefined && instrument !== undefined ? getReportKnownDomainKeys(audit, instrument) : undefined;
 	const reportFilter = useReportFilter(buildReportIdentity(auditId), session?.userEmail ?? null, knownDomainKeys);
 
 	return (
@@ -65,10 +52,10 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 				]}
 				actions={
 					<div className="flex flex-col items-end gap-2">
-						{audit !== undefined && instrumentQuery.data !== undefined && (
+						{audit !== undefined && instrument !== undefined && (
 							<AuditExportActions
 								audit={audit}
-								instrument={instrumentQuery.data}
+								instrument={instrument}
 								resultFilter={reportFilter.filter}
 							/>
 						)}
@@ -106,7 +93,7 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 			{audit !== undefined ? (
 				<AuditReportView
 					audit={audit}
-					instrument={instrumentQuery.data ?? null}
+					instrument={instrument ?? null}
 					basePath="/manager"
 					reportIdentity={buildReportIdentity(audit.audit_id)}
 					userEmail={session?.userEmail ?? null}
